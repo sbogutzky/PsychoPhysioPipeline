@@ -1,7 +1,7 @@
 ---
 title: 'Studie: Flow beim Laufen'
 author: "Simon Bogutzky"
-date: "2. April 2015"
+date: "April 2015"
 output: pdf_document
 ---
 
