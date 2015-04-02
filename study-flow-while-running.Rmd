@@ -4,10 +4,28 @@ author: "Simon Bogutzky"
 date: "April 2015"
 output: pdf_document
 ---
+# Ziel
+Die Studie diente dazu statistische Beziehungen zwischen:
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+* Flow und der Aktivität des autonomen Nervensystems
+* Flow und dem Bewegungsfluss
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+beim Laufen herzustellen. Des Weiteren suchte ich in den Daten nach markanten Mustern, die den Eintritt in den Flow, Flow selbst und den Austritt aus dem Flow markieren.
+
+# Methode 
+## Untersuchungsdesign 
+
+Ein männlicher Freizeitläufer (29) nahm am Experiment teil. Er lief in sechs aufeinanderfolgenden Wochen an einem Tag 60 Minuten jeweils die gleiche Strecke und zur gleichen Tageszeit.
+
+Vor jedem Lauf rüstete ich ihn mit einem geladenen Smartphone, einem passenden Smartphone-Armband, zwei geladenen Bewegungssensoren, einem geladenen Elektrokardiogramm (EKG)-Sensoren und vier Elektroden aus. Die Anordnung des Equipments ist Abbildung 1 zu entnehmen.
+
+![Equipment Anordnung](./figures/equipment-arrangement.png)
+
+Abbildung 1: Equipment Anordnung
+
+Während jedes Laufes nutzte ich die dafür eigens entwickelte mobile Datenaufnahme App, um EKG und Bewegungsdaten mit Hilfe der tragbaren Sensoren des Unternehmens Shimmer Research (Shimmer 2r) aufzuzeichnen. Die Datenaufnahme App läuft auf dem Android OS ab Version 4.4 und kommuniziert mit den Sensoren über Bluetooth. Die Bewegungssensoren besitzen einen Beschleunigungsmesser und ein Kreiselinstrument, die beide auf jeweils drei Achsen messen. Für das Experiment nutzte ich das Smartphone Samsung Galaxy Nexus, welches auch über einen Beschleunigungsmesser und ein Kreiselinstrument verfügt. Alle Bewegungssensoren arbeiten mit einer Datenrate von 100 Hz. Der EKG-Sensor von Shimmer Research arbeitet mit vier Ableitungen. Im Experiment nutzte ich Knopfelektroden und eine Datenrate von 512 Hz. Alle 15 Minuten während jedes Laufes forderte die Datenaufnahme App mit einem Signal den Läufer auf, eine FSK auszufüllen. Vor jedem Lauf führte der Läufer eine 15-minütige Baseline Messung durch. 
+
+Nach jedem Lauf übertrug ich die gesammelten Daten für die software-technische Analyse auf meinen Arbeitsrechner. Die Daten bestehen für jeden Lauf aus kontinuierlichen EKG-Daten, Global Positioning System (GPS)-Positionen, Beschleunigungen und Winkelgeschwindigkeiten von den Körperpositionen Bein, Arm und Handgelenk.
 
 ```{r}
 summary(cars)
