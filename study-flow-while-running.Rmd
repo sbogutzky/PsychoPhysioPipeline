@@ -35,8 +35,11 @@ Nach jedem Lauf übertrug ich die gesammelten Daten für die software-technische
 Zur subjektiven Erfassung des Flow-Erlebens kam die Flow-Kurzskala (FKS) von Rheinberg, Vollmeyer und Engeser (2003) zum Einsatz. Die FKS besteht aus insgesamt 16 Items. Die ersten 10 Items bilden anhand einer 7-Punkte-Likert-Skala ("trifft nicht zu" = 1 bis "trifft zu" = 7) Komponenten des Flow-Erlebens ab und man fasst sie als Generalfaktor zusammen. Zur weiteren Differenzierung des Flow-Konstrukts ist der Generalfaktor der FKS in zwei Faktoren (Subdimensionen) unterteilt worden. Faktor I umfasst dabei sechs Items, die durchweg Aussagen zum "Glatten automatisierten Verlauf" einer Handlung beschreiben. Faktor II beinhaltet vier Items, die mit "Absorbiertheit" in Zusammenhang stehen. Der Reliabilitätskoeffizient der 10 Items im Generalfaktor (Cronbachs Alpha) liegt nach Angaben Rheinbergs (2003) im Bereich um $\alpha = 0.90$. Da nicht damit zu rechnen ist, dass in Anforderungssituationen ausschließlich Flow entsteht, sondern auch Angst und Besorgnis ausgelöst werden kann, wurde die FKS durch eine "Besorgniskomponente" erweitert. Diese besteht aus drei Items (Nr. 11 bis 13, Cronbachs $\alpha = 0.80$ bis $\alpha = 0.90$). Am Ende der FKS nehmen die Probanden noch drei Einschätzungen zur Anforderungs-Fähigkeits-Passung (auf einer 9-Punkte-Skala) vor. Dabei fokussiert das Item 14 auf einen Vergleich der Schwierigkeit der jetzigen Tätigkeit mit allen anderen Tätigkeiten (leicht vs. schwer) und das Item 15 auf die eigene Leistungsfähigkeit (niedrig vs. hoch). Das Item 16 fragt direkt, auf die aktuelle Tätigkeit (hier also dem Laufabchnitt) bezogen, nach der subjektiv wahrgenommenen Anforderungs-Fähigkeits-Passung (zu gering vs. zu hoch).
 
 ```{r fss-results}
+# Set start date
+start.date <- as.POSIXct(strptime("2013-10-31 18:11:26", "%Y-%m-%d %H:%M:%S"), tz = "CET")
+
 # Load fss data 
-fss.data <- read.csv("/Users/simonbogutzky/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/2013-10-31--18-11-26/fss-data.csv", header=T)
+fss.data <- read.csv(paste("/Users/simonbogutzky/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/", format(start.date, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/fss-data.csv", sep=""), header=T)
 
 summary(cars)
 ```
