@@ -21,7 +21,7 @@ WriteDataSubsetInCSVFile <- function(data, times, starts, ends, file.name, file.
           file <- paste(file.path, file.name, "-", i, ".csv", sep="")
           write.csv(x, file=file, row.names=F)
           
-          print(paste("Wrote data in ", file, " from ", start, " to ", end, " (", format(round(end-start, 2), nsmall=2), ")", sep=""))
+          message(paste("Wrote data in ", file, " from ", start, " to ", end, " (", format(round(end-start, 2), nsmall=2), ")", sep=""))
         }
       } else {
         warning("File name OR file path is missing")
