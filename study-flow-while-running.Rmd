@@ -23,7 +23,7 @@ Vor jedem Lauf rüstete ich ihn mit einem geladenen Smartphone, einem passenden 
 
 Abbildung 1: Anordnung des Equipments
 
-Während jedes Laufes nutzte ich die dafür eigens entwickelte mobile Datenaufnahme App, um EKG und Bewegungsdaten mit Hilfe der tragbaren Sensoren des Unternehmens Shimmer Research (Shimmer 2r) aufzuzeichnen. Die Datenaufnahme App läuft auf dem Android OS ab Version 4.4 und kommuniziert mit den Sensoren über Bluetooth. Die Bewegungssensoren besitzen einen Beschleunigungsmesser und ein Kreiselinstrument, die beide auf jeweils drei Achsen messen. Für das Experiment nutzte ich das Smartphone Samsung Galaxy Nexus, welches auch über einen Beschleunigungsmesser und ein Kreiselinstrument verfügt. Alle Bewegungssensoren arbeiten mit einer Datenrate von 100 Hz. Der EKG-Sensor von Shimmer Research arbeitet mit vier Ableitungen. Im Experiment nutzte ich Knopfelektroden und eine Datenrate von 512 Hz. Alle 15 Minuten während jedes Laufes forderte die Datenaufnahme App mit einem Signal den Läufer auf, eine FSK auszufüllen. Vor jedem Lauf führte der Läufer eine 15-minütige Baseline Messung durch. 
+Während jedes Laufes nutzte ich die dafür eigens entwickelte mobile Datenaufnahme App, um EKG und Bewegungsdaten mit Hilfe der tragbaren Sensoren des Unternehmens Shimmer Research (Shimmer 2r) aufzuzeichnen. Die Datenaufnahme App läuft auf dem Android OS ab Version 4.4 und kommuniziert mit den Sensoren über Bluetooth. Die Bewegungssensoren besitzen einen Beschleunigungsmesser und ein Kreiselinstrument, die beide auf jeweils drei Achsen messen. Für das Experiment nutzte ich das Smartphone Samsung Galaxy Nexus, welches auch über einen Beschleunigungsmesser und ein Kreiselinstrument verfügt. Alle Bewegungssensoren arbeiten mit einer Datenrate von 100 Hz. Der EKG-Sensor von Shimmer Research arbeitet mit vier Ableitungen. Im Experiment nutzte ich Knopfelektroden und eine Datenrate von 204.8 Hz. Alle 15 Minuten während jedes Laufes forderte die Datenaufnahme App mit einem Signal den Läufer auf, eine FSK auszufüllen. Vor jedem Lauf führte der Läufer eine 15-minütige Baseline Messung durch. 
 
 Nach jedem Lauf übertrug ich die gesammelten Daten für die software-technische Analyse auf meinen Arbeitsrechner. Die Daten bestehen für jeden Lauf aus kontinuierlichen EKG-Daten, Global Positioning System (GPS)-Positionen, Beschleunigungen und Winkelgeschwindigkeiten von den Körperpositionen Bein, Arm und Handgelenk. 
 
@@ -78,7 +78,7 @@ Als Maßzahl nutze ich die zweite Subdimension der Flow-Kurzskala wie **Peifer (
 Abbildung 2: Bewertete Absorbiertheit nach jeweils 15 Minuten Laufen
 
 #### HRV-Analyse
-Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte. 
+Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte. Diese 15-Minuten Abschnitte las ich in Kubios HRV (Version 2.1) ein. Kubios HRV automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. 
 
 ```{r ecg-subsets, echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -94,13 +94,66 @@ WriteDataSubsetInCSVFile(ecg.data, times, starts, ends, file.name=file.name, fil
 rm(file.name)
 ```
 
-```{r figure-03, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('postscript', 'tiff'), dpi=800, warning=FALSE}
-par(mfcol=c(1, 1), mar=c(2.5, 2.5, 1.5, 3.5) + 0.1, mgp=c(1.5, .5, 0), las=1, cex.axis=0.8, tck=.03, cex.lab=.8, xaxs="i", yaxs="i")
+```{r}
+library(RHRV)
+for (j in 1:i) {
+  hrv.file.name <- paste(file.path, "/ecg-data-", i, "_hrv.txt", sep="")
+  if(file.exists(hrv.file.name)) {
+      hrv.kubios.data   <- read.csv(hrv.file.name, header = F, na.strings = "", fill = T, skip = 97, col.names = c("NA1", "Time", "RRInterval", "FFTFrequency", "FFTPSD", "ARFrequency", "ARPSD", "NA2", "NA3", "NA4", "NA5"))
+      time              <- hrv.kubios.data$Time
+      time              <- time[complete.cases(time)]
+      
+      rr.interval       <- hrv.kubios.data$RRInterval
+      rr.interval       <- rr.interval[complete.cases(rr.interval)]
+      
+      hrv.data          <- CreateHRVData()
+      hrv.data          <- SetVerbose(hrv.data, TRUE)
+      hrv.data$Beat     <- data.frame("Time"=time[time >= time[length(time)] - 60 * 10])
+      
+      hrv.data          <- BuildNIHR(hrv.data)
+      PlotNIHR(hrv.data)
+      
+      hrv.data          <- EditNIHR(hrv.data)
+      PlotNIHR(hrv.data)
+      
+      hrv.data          <- InterpolateNIHR(hrv.data, method="spline")
+      PlotHR(hrv.data)
+      
+      hrv.data          <- CreateTimeAnalysis(hrv.data, size=60)
+      
+      PlotSpectrogram(hrv.data, size=30, shift=1, freqRange=c(0.04, 0.15))
+      PlotSpectrogram(hrv.data, size=10, shift=1, freqRange=c(0.15, 1))
+      
+      hrv.data          <- CreateFreqAnalysis(hrv.data)
+      hrv.data          <- CalculatePowerBand(hrv.data, indexFreqAnalysis=1, type="wavelet", wavelet="la8", bandtolerance=0.005, ULFmin=0, ULFmax=0.0033, VLFmin=0.0033, VLFmax=0.04, LFmin=0.04, LFmax=0.15, HFmin=0.15, HFmax= 1)
+      PlotPowerBand(hrv.data, indexFreqAnalysis=1)
+      
+    ulf.power.a         <- mean(hrv.data$FreqAnalysis[[1]]$ULF)
+    vlf.power.a         <- mean(hrv.data$FreqAnalysis[[1]]$VLF)
+    lf.power.a          <- mean(hrv.data$FreqAnalysis[[1]]$LF)
+    hf.power.a          <- mean(hrv.data$FreqAnalysis[[1]]$HF)
+    total.power         <- ulf.power.a + vlf.power.a + lf.power.a + hf.power.a
+    ulf.power.r         <- ulf.power.a/total.power * 100
+    vlf.power.r         <- vlf.power.a/total.power * 100
+    lf.power.r          <- lf.power.a/total.power * 100
+    hf.power.r          <- hf.power.a/total.power * 100
+    lf.power.nu         <- lf.power.a/(lf.power.a + hf.power.a) * 100
+    hf.power.nu         <- hf.power.a/(lf.power.a + hf.power.a) * 100
+    lfhf                <- lf.power.a/hf.power.a
 
-x <- ecg.data[, 2]
+    }
+}
+```
+
+
+```{r figure-03, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('postscript', 'tiff'), dpi=800, warning=FALSE}
+par(mfcol=c(2, 1), mar=c(2.5, 2.5, 1.5, 3.5) + 0.1, mgp=c(1.5, .5, 0), las=1, cex.axis=0.8, tck=.03, cex.lab=.8, xaxs="i", yaxs="i")
+
+t <- times
+y <- ecg.data[, 3]
 
 # Plot ecg data
-plot(times, x, type="l", xlab="Zeit", ylab=expression("EKG RA LL ["~mV~"]"), xaxt="n",  yaxt="n", col="grey")
+plot(t, y, type="l", xlab="Zeit", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n",  yaxt="n", col="grey")
 
 # Plot ticks and vertical lines
 axis(1, at=c(starts, ends), label=format(c(starts, ends), "%H:%M:%S"))
@@ -110,5 +163,30 @@ axis(4, at=seq(-6, 6, 2), labels=rep("", length(seq(-6, 6, 2))))
 abline(v=starts, lty = "dashed")
 abline(v=ends, lty = "dashed")
 
-rm(x)
+end   <- ends[5]
+start <- starts[5]
+isIn  <- start - 30 <= t & end + 30 >= t
+t     <- t[isIn]
+y     <- y[isIn]
+
+lines(t, y, col = "darkgrey")
+
+# Plot ecg data
+plot(t, y, type="l", xlab="Zeit", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n",  yaxt="n", col="grey")
+
+# Plot ticks and vertical lines
+axis(1, at=c(starts, ends), label=format(c(starts, ends), "%H:%M:%S"))
+axis(2, at=seq(-6, 6, 2), labels=seq(-6, 6, 2))
+axis(3, at=c(starts, ends), label=rep("", length(c(starts, ends))))
+axis(4, at=seq(-6, 6, 2), labels=rep("", length(seq(-6, 6, 2))))
+abline(v=starts, lty = "dashed")
+abline(v=ends, lty = "dashed")
+
+isIn  <- start <= t & end >= t
+t     <- t[isIn]
+y     <- y[isIn]
+
+lines(t, y, col = "darkgrey")
+
+rm(y)
 ```
