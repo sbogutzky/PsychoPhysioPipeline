@@ -94,11 +94,12 @@ WriteDataSubsetInCSVFile(ecg.data, times, starts, ends, file.name=file.name, fil
 rm(file.name)
 ```
 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 library(RHRV)
 for (j in 1:i) {
-  hrv.file.name <- paste(file.path, "/ecg-data-", i, "_hrv.txt", sep="")
+  hrv.file.name <- paste(file.path, "ecg-data-", j, "_hrv.txt", sep="")
   if(file.exists(hrv.file.name)) {
+      print(hrv.file.name)
       hrv.kubios.data   <- read.csv(hrv.file.name, header = F, na.strings = "", fill = T, skip = 97, col.names = c("NA1", "Time", "RRInterval", "FFTFrequency", "FFTPSD", "ARFrequency", "ARPSD", "NA2", "NA3", "NA4", "NA5"))
       time              <- hrv.kubios.data$Time
       time              <- time[complete.cases(time)]
@@ -121,25 +122,25 @@ for (j in 1:i) {
       
       hrv.data          <- CreateTimeAnalysis(hrv.data, size=60)
       
-      PlotSpectrogram(hrv.data, size=30, shift=1, freqRange=c(0.04, 0.15))
-      PlotSpectrogram(hrv.data, size=10, shift=1, freqRange=c(0.15, 1))
+      #PlotSpectrogram(hrv.data, size=30, shift=1, freqRange=c(0.04, 0.15))
+      #PlotSpectrogram(hrv.data, size=10, shift=1, freqRange=c(0.15, 1))
       
       hrv.data          <- CreateFreqAnalysis(hrv.data)
       hrv.data          <- CalculatePowerBand(hrv.data, indexFreqAnalysis=1, type="wavelet", wavelet="la8", bandtolerance=0.005, ULFmin=0, ULFmax=0.0033, VLFmin=0.0033, VLFmax=0.04, LFmin=0.04, LFmax=0.15, HFmin=0.15, HFmax= 1)
-      PlotPowerBand(hrv.data, indexFreqAnalysis=1)
+      #PlotPowerBand(hrv.data, indexFreqAnalysis=1)
       
-    ulf.power.a         <- mean(hrv.data$FreqAnalysis[[1]]$ULF)
-    vlf.power.a         <- mean(hrv.data$FreqAnalysis[[1]]$VLF)
-    lf.power.a          <- mean(hrv.data$FreqAnalysis[[1]]$LF)
-    hf.power.a          <- mean(hrv.data$FreqAnalysis[[1]]$HF)
-    total.power         <- ulf.power.a + vlf.power.a + lf.power.a + hf.power.a
-    ulf.power.r         <- ulf.power.a/total.power * 100
-    vlf.power.r         <- vlf.power.a/total.power * 100
-    lf.power.r          <- lf.power.a/total.power * 100
-    hf.power.r          <- hf.power.a/total.power * 100
-    lf.power.nu         <- lf.power.a/(lf.power.a + hf.power.a) * 100
-    hf.power.nu         <- hf.power.a/(lf.power.a + hf.power.a) * 100
-    lfhf                <- lf.power.a/hf.power.a
+      ulf.power.a         <- mean(hrv.data$FreqAnalysis[[1]]$ULF)
+      vlf.power.a         <- mean(hrv.data$FreqAnalysis[[1]]$VLF)
+      lf.power.a          <- mean(hrv.data$FreqAnalysis[[1]]$LF)
+      hf.power.a          <- mean(hrv.data$FreqAnalysis[[1]]$HF)
+      total.power         <- ulf.power.a + vlf.power.a + lf.power.a + hf.power.a
+      ulf.power.r         <- ulf.power.a/total.power * 100
+      vlf.power.r         <- vlf.power.a/total.power * 100
+      lf.power.r          <- lf.power.a/total.power * 100
+      hf.power.r          <- hf.power.a/total.power * 100
+      lf.power.nu         <- lf.power.a/(lf.power.a + hf.power.a) * 100
+      hf.power.nu         <- hf.power.a/(lf.power.a + hf.power.a) * 100
+      lfhf                <- lf.power.a/hf.power.a
 
     }
 }
@@ -147,46 +148,91 @@ for (j in 1:i) {
 
 
 ```{r figure-03, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('postscript', 'tiff'), dpi=800, warning=FALSE}
-par(mfcol=c(2, 1), mar=c(2.5, 2.5, 1.5, 3.5) + 0.1, mgp=c(1.5, .5, 0), las=1, cex.axis=0.8, tck=.03, cex.lab=.8, xaxs="i", yaxs="i")
+par(mfcol=c(4, 1), mar=c(2.5, 2.5, 1.5, 3.5) + 0.1, mgp=c(1.5, .5, 0), las=1, cex.axis=0.8, tck=.03, cex.lab=.8, xaxs="i", yaxs="i")
 
 t <- times
 y <- ecg.data[, 3]
 
-# Plot ecg data
-plot(t, y, type="l", xlab="Zeit", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n",  yaxt="n", col="grey")
+# Plot all ecg data
+plot(t, y, type="l", xlab="Zeit", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n", yaxt="n", col="grey")
+
+# Plot the last 15 minutes of ecg data
+end   <- ends[5]
+start <- starts[5]
+isIn  <- start <= t & end >= t
+t     <- t[isIn]
+y     <- y[isIn]
+lines(t, y, col = "darkgrey")
 
 # Plot ticks and vertical lines
 axis(1, at=c(starts, ends), label=format(c(starts, ends), "%H:%M:%S"))
 axis(2, at=seq(-6, 6, 2), labels=seq(-6, 6, 2))
 axis(3, at=c(starts, ends), label=rep("", length(c(starts, ends))))
 axis(4, at=seq(-6, 6, 2), labels=rep("", length(seq(-6, 6, 2))))
-abline(v=starts, lty = "dashed")
-abline(v=ends, lty = "dashed")
+abline(v=starts, lty="dashed")
+abline(v=ends, lty="dashed")
 
-end   <- ends[5]
-start <- starts[5]
+# Plot the last 15 minutes of ecg data again
+t     <- times
+y     <- ecg.data[, 3]
 isIn  <- start - 30 <= t & end + 30 >= t
 t     <- t[isIn]
 y     <- y[isIn]
-
-lines(t, y, col = "darkgrey")
-
-# Plot ecg data
-plot(t, y, type="l", xlab="Zeit", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n",  yaxt="n", col="grey")
-
-# Plot ticks and vertical lines
-axis(1, at=c(starts, ends), label=format(c(starts, ends), "%H:%M:%S"))
-axis(2, at=seq(-6, 6, 2), labels=seq(-6, 6, 2))
-axis(3, at=c(starts, ends), label=rep("", length(c(starts, ends))))
-axis(4, at=seq(-6, 6, 2), labels=rep("", length(seq(-6, 6, 2))))
-abline(v=starts, lty = "dashed")
-abline(v=ends, lty = "dashed")
+plot(t, y, type="l", xlab="Zeit", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n", yaxt="n", col="grey")
 
 isIn  <- start <= t & end >= t
 t     <- t[isIn]
 y     <- y[isIn]
-
 lines(t, y, col = "darkgrey")
+
+# Plot ticks and vertical lines
+axis(1, at=c(starts, ends), label=format(c(starts, ends), "%H:%M:%S"))
+axis(2, at=seq(-6, 6, 2), labels=seq(-6, 6, 2))
+axis(3, at=c(starts, ends), label=rep("", length(c(starts, ends))))
+axis(4, at=seq(-6, 6, 2), labels=rep("", length(seq(-6, 6, 2))))
+abline(v=starts, lty="dashed")
+abline(v=ends, lty="dashed")
+
+# Plot rrIntervals
+t <- hrv.kubios.data$Time
+y <- hrv.kubios.data$RRInterval
+xlim <- c(min(t)-30, max(t)+30)
+plot(t, y, type="l", xlab="Zeit", ylab=expression("RR-Intervalle ["~s~"]"), xaxt="n", yaxt="n", xlim=xlim, col="grey")
+
+isIn  <- max(t) - 10 * 60 <= t & max(t) >= t
+t     <- t[isIn]
+y     <- y[isIn]
+lines(t, y, col = "darkgrey")
+
+# Plot ticks and vertical lines
+t      <- hrv.kubios.data$Time
+marker <- c(min(t), max(t) - 10 * 60, max(t))
+axis(1, at=marker, label=format(c(start, end - 10 * 60, end), "%H:%M:%S"))
+axis(2, at=seq(.25, .50, .05), labels=seq(.25, .50, .05))
+axis(3, at=marker, label=rep("", length(marker)))
+axis(4, at=seq(.25, .50, .05), labels=rep("", length(seq(.25, .50, .05))))
+abline(v=c(min(t), max(t) - 10 * 60, max(t)), lty = "dashed")
+
+# Plot rrIntervals
+t <- hrv.data$Beat$Time
+y <- hrv.data$Beat$RR
+xlim <- c(min(t)-30, max(t)+30)
+plot(t, y, type="l", xlab="Zeit", ylab=expression("RR-Intervalle ["~s~"]"), xaxt="n", yaxt="n", xlim=xlim, col="grey")
+
+rect(par("usr")[1], par("usr")[2], par("usr")[3], par("usr")[4], col = "gray")
+
+# Plot ticks and vertical lines
+marker <- c(min(t), max(t))
+axis(1, at=marker, label=format(c(end - 10 * 60, end), "%H:%M:%S"))
+axis(2, at=seq(.25, .50, .05), labels=seq(.25, .50, .05))
+axis(3, at=marker, label=rep("", length(marker)))
+axis(4, at=seq(.25, .50, .05), labels=rep("", length(seq(.25, .50, .05))))
+abline(v=c(min(t), max(t)), lty = "dashed")
+
+polygon(c(min(t), min(t), max(t), max(t)), c(min(y), max(y) min(y), max(y)),
+        col = c("yellow"),
+        border = c("black"),
+        lty = c("solid"))
 
 rm(y)
 ```
