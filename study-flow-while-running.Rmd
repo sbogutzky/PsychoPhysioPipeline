@@ -35,36 +35,44 @@ Nach jedem Lauf übertrug ich die gesammelten Daten für die software-technische
 Zur subjektiven Erfassung des Flow-Erlebens kam die Flow-Kurzskala (FKS) von **Rheinberg, Vollmeyer und Engeser (2003)** zum Einsatz. Die FKS besteht aus insgesamt 16 Items. Die ersten 10 Items bilden anhand einer 7-Punkte-Likert-Skala ("trifft nicht zu" = 1 bis "trifft zu" = 7) Komponenten des Flow-Erlebens ab und man fasst sie als Generalfaktor zusammen. Zur weiteren Differenzierung des Flow-Konstrukts ist der Generalfaktor der FKS in zwei Faktoren (Subdimensionen) unterteilt worden. Faktor I umfasst dabei sechs Items, die durchweg Aussagen zum "Glatten automatisierten Verlauf" einer Handlung beschreiben. Faktor II beinhaltet vier Items, die mit "Absorbiertheit" in Zusammenhang stehen. Der Reliabilitätskoeffizient der 10 Items im Generalfaktor (Cronbachs Alpha) liegt nach Angaben **Rheinbergs (2003)** im Bereich um $\alpha = 0.90$. Da nicht damit zu rechnen ist, dass in Anforderungssituationen ausschließlich Flow entsteht, sondern auch Angst und Besorgnis ausgelöst werden kann, wurde die FKS durch eine "Besorgniskomponente" erweitert. Diese besteht aus drei Items (Nr. 11 bis 13, Cronbachs $\alpha = 0.80$ bis $\alpha = 0.90$). Am Ende der FKS nehmen die Probanden noch drei Einschätzungen zur Anforderungs-Fähigkeits-Passung (AFP) (auf einer 9-Punkte-Skala) vor. Dabei fokussiert das Item 14 auf einen Vergleich der Schwierigkeit der jetzigen Tätigkeit mit allen anderen Tätigkeiten (leicht vs. schwer) und das Item 15 auf die eigene Leistungsfähigkeit (niedrig vs. hoch). Das Item 16 fragt direkt, auf die aktuelle Tätigkeit (hier also dem Laufabchnitt) bezogen, nach der subjektiv wahrgenommenen AFP (zu gering vs. zu hoch). In Tabelle 1 sind die Ergebnisse der Flow-Skalen des Laufes vom Donnerstag, den 31. Oktober 2013 dargestellt. In diesem Lauf steigt die AFP kontinuirlich und am Ende erzielt der Läufer seinen höchsten Flow-Gesamtwert. 
 
 ```{r calculate-fss-features, echo=FALSE, message=FALSE, warning=FALSE}
-library("flow")
+  library("flow")
+  
+  # Set start time
+  start.time <- as.POSIXct(strptime("2013-10-31 18:11:26", "%Y-%m-%d %H:%M:%S"), tz="CET")
+  
+  # Set file path
+  file.path <- paste("/Users/simonbogutzky/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/", format(start.time, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", sep="")
+  
+  # Load fss data
+  fss.data  <- read.csv(paste(file.path, "fss-data.csv", sep=""), header=T)
+  
+  # Calculate fss features
+  fss.features.list <- c()
+  for(i in 1:nrow(fss.data)) {
+      fss.features.list <- c(fss.features.list, CalculateFlowShortScaleResults(c(t(fss.data[i, 1:16])), start=as.POSIXct(fss.data[i, 17]/1000, origin="1970-01-01", tz="CET"), end=as.POSIXct(fss.data[i, 18]/1000, origin="1970-01-01", tz="CET")))
+  }
 
-# Set start time
-start.time <- as.POSIXct(strptime("2013-10-31 18:11:26", "%Y-%m-%d %H:%M:%S"), tz="CET")
-
-# Set file path
-file.path <- paste("/Users/simonbogutzky/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/", format(start.time, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", sep="")
-
-# Load fss data
-fss.data  <- read.csv(paste(file.path, "fss-data.csv", sep=""), header=T)
-
-# Calculate fss features
-fss.features <- c()
-for(i in 1:nrow(fss.data)) {
-    fss.features <- c(fss.features, CalculateFlowShortScaleResults(c(t(fss.data[i, 1:16])), start=as.POSIXct(fss.data[i, 17]/1000, origin="1970-01-01", tz="CET"), end=as.POSIXct(fss.data[i, 18]/1000, origin="1970-01-01", tz="CET")))
-}
+    # Extract flow features
+  flow        <- c(fss.features.list[1][[1]][[1]][[1]], fss.features.list[2][[1]][[1]][[1]], fss.features.list[3][[1]][[1]][[1]], fss.features.list[4][[1]][[1]][[1]], fss.features.list[5][[1]][[1]][[1]])
+  fluency     <- c(fss.features.list[1][[1]][[1]][[2]], fss.features.list[2][[1]][[1]][[2]], fss.features.list[3][[1]][[1]][[2]], fss.features.list[4][[1]][[1]][[2]], fss.features.list[5][[1]][[1]][[2]])
+  absorption  <- c(fss.features.list[1][[1]][[1]][[3]], fss.features.list[2][[1]][[1]][[3]], fss.features.list[3][[1]][[1]][[3]], fss.features.list[4][[1]][[1]][[3]], fss.features.list[5][[1]][[1]][[3]])
+  anxiety     <- c(fss.features.list[1][[1]][[1]][[4]], fss.features.list[2][[1]][[1]][[4]], fss.features.list[3][[1]][[1]][[4]], fss.features.list[4][[1]][[1]][[4]], fss.features.list[5][[1]][[1]][[4]])
+  fit         <- c(fss.features.list[1][[1]][[1]][[5]], fss.features.list[2][[1]][[1]][[5]], fss.features.list[3][[1]][[1]][[5]], fss.features.list[4][[1]][[1]][[5]], fss.features.list[5][[1]][[1]][[5]])
+  fss.features  <- data.frame(flow, fluency, absorption, anxiety, fit)
 
 # Clean up
-rm(fss.data)
+rm(fss.data, flow, fluency, absorption, anxiety, fit)
 ```
 
 | Faktoren        | Nach Baseline |  Nach 15 Min. |  Nach 30 Min. |  Nach 45 Min. |  Nach 60 Min. |
 |-----------------|--------------:|--------------:|--------------:|--------------:|--------------:|
 |                 | M (SD)        | M (SD)        | M (SD)        | M (SD)        | M (SD)        |
 |-----------------|---------------|---------------|---------------|---------------|---------------|
-| Generalfaktor   | `r format(round(fss.features[1][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features[1][[1]][[2]][[1]], 2), nsmall=2)`) | `r format(round(fss.features[2][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features[1][[1]][[2]][[1]], 2), nsmall=2)`) | `r format(round(fss.features[3][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features[3][[1]][[2]][[1]], 2), nsmall=2)`) | `r format(round(fss.features[4][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features[4][[1]][[2]][[1]], 2), nsmall=2)`) | `r format(round(fss.features[5][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features[5][[1]][[2]][[1]], 2), nsmall=2)`) |
-| Glatter Verlauf | `r format(round(fss.features[1][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features[1][[1]][[2]][[2]], 2), nsmall=2)`) | `r format(round(fss.features[2][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features[2][[1]][[2]][[2]], 2), nsmall=2)`) | `r format(round(fss.features[3][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features[3][[1]][[2]][[2]], 2), nsmall=2)`) | `r format(round(fss.features[4][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features[4][[1]][[2]][[2]], 2), nsmall=2)`) | `r format(round(fss.features[5][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features[5][[1]][[2]][[2]], 2), nsmall=2)`) |
-| Absorbiertheit  | `r format(round(fss.features[1][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features[1][[1]][[2]][[3]], 2), nsmall=2)`) | `r format(round(fss.features[2][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features[2][[1]][[2]][[3]], 2), nsmall=2)`) | `r format(round(fss.features[3][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features[3][[1]][[2]][[3]], 2), nsmall=2)`) | `r format(round(fss.features[4][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features[4][[1]][[2]][[3]], 2), nsmall=2)`) | `r format(round(fss.features[5][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features[5][[1]][[2]][[3]], 2), nsmall=2)`) |
-| Besorgnis       | `r format(round(fss.features[1][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features[1][[1]][[2]][[4]], 2), nsmall=2)`) | `r format(round(fss.features[2][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features[2][[1]][[2]][[4]], 2), nsmall=2)`) | `r format(round(fss.features[3][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features[3][[1]][[2]][[4]], 2), nsmall=2)`) | `r format(round(fss.features[4][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features[4][[1]][[2]][[4]], 2), nsmall=2)`) | `r format(round(fss.features[5][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features[5][[1]][[2]][[4]], 2), nsmall=2)`) |
-| AFP             | `r format(round(fss.features[1][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features[1][[1]][[2]][[5]], 2), nsmall=2)`) | `r format(round(fss.features[2][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features[2][[1]][[2]][[5]], 2), nsmall=2)`) | `r format(round(fss.features[3][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features[3][[1]][[2]][[5]], 2), nsmall=2)`) | `r format(round(fss.features[4][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features[4][[1]][[2]][[5]], 2), nsmall=2)`) | `r format(round(fss.features[5][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features[5][[1]][[2]][[5]], 2), nsmall=2)`) |
+| Generalfaktor   | `r format(round(fss.features.list[1][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features.list[1][[1]][[2]][[1]], 2), nsmall=2)`) | `r format(round(fss.features.list[2][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features.list[1][[1]][[2]][[1]], 2), nsmall=2)`) | `r format(round(fss.features.list[3][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features.list[3][[1]][[2]][[1]], 2), nsmall=2)`) | `r format(round(fss.features.list[4][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features.list[4][[1]][[2]][[1]], 2), nsmall=2)`) | `r format(round(fss.features.list[5][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features.list[5][[1]][[2]][[1]], 2), nsmall=2)`) |
+| Glatter Verlauf | `r format(round(fss.features.list[1][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features.list[1][[1]][[2]][[2]], 2), nsmall=2)`) | `r format(round(fss.features.list[2][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features.list[2][[1]][[2]][[2]], 2), nsmall=2)`) | `r format(round(fss.features.list[3][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features.list[3][[1]][[2]][[2]], 2), nsmall=2)`) | `r format(round(fss.features.list[4][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features.list[4][[1]][[2]][[2]], 2), nsmall=2)`) | `r format(round(fss.features.list[5][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features.list[5][[1]][[2]][[2]], 2), nsmall=2)`) |
+| Absorbiertheit  | `r format(round(fss.features.list[1][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features.list[1][[1]][[2]][[3]], 2), nsmall=2)`) | `r format(round(fss.features.list[2][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features.list[2][[1]][[2]][[3]], 2), nsmall=2)`) | `r format(round(fss.features.list[3][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features.list[3][[1]][[2]][[3]], 2), nsmall=2)`) | `r format(round(fss.features.list[4][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features.list[4][[1]][[2]][[3]], 2), nsmall=2)`) | `r format(round(fss.features.list[5][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features.list[5][[1]][[2]][[3]], 2), nsmall=2)`) |
+| Besorgnis       | `r format(round(fss.features.list[1][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features.list[1][[1]][[2]][[4]], 2), nsmall=2)`) | `r format(round(fss.features.list[2][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features.list[2][[1]][[2]][[4]], 2), nsmall=2)`) | `r format(round(fss.features.list[3][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features.list[3][[1]][[2]][[4]], 2), nsmall=2)`) | `r format(round(fss.features.list[4][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features.list[4][[1]][[2]][[4]], 2), nsmall=2)`) | `r format(round(fss.features.list[5][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features.list[5][[1]][[2]][[4]], 2), nsmall=2)`) |
+| AFP             | `r format(round(fss.features.list[1][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features.list[1][[1]][[2]][[5]], 2), nsmall=2)`) | `r format(round(fss.features.list[2][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features.list[2][[1]][[2]][[5]], 2), nsmall=2)`) | `r format(round(fss.features.list[3][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features.list[3][[1]][[2]][[5]], 2), nsmall=2)`) | `r format(round(fss.features.list[4][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features.list[4][[1]][[2]][[5]], 2), nsmall=2)`) | `r format(round(fss.features.list[5][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features.list[5][[1]][[2]][[5]], 2), nsmall=2)`) |
 
 Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
 
@@ -74,8 +82,8 @@ Als Maßzahl nutze ich die zweite Subdimension der Flow-Kurzskala wie **Peifer (
   par(mfcol=c(1, 1), mar=c(2.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2.5, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8)
   
   # Set data
-  x <- c(fss.features[2][[1]][[3]][[1]], fss.features[3][[1]][[3]][[1]], fss.features[4][[1]][[3]][[1]], fss.features[5][[1]][[3]][[1]])
-  y <- c(fss.features[2][[1]][[1]][[3]], fss.features[3][[1]][[1]][[3]], fss.features[4][[1]][[1]][[3]], fss.features[5][[1]][[1]][[3]])
+  x <- c(fss.features.list[2][[1]][[3]][[1]], fss.features.list[3][[1]][[3]][[1]], fss.features.list[4][[1]][[3]][[1]], fss.features.list[5][[1]][[3]][[1]])
+  y <- c(fss.features.list[2][[1]][[1]][[3]], fss.features.list[3][[1]][[1]][[3]], fss.features.list[4][[1]][[1]][[3]], fss.features.list[5][[1]][[1]][[3]])
 
   # Plot data
   plot(x, y, type="b", xlab ="Zeit", ylab="Absorbiertheit", pch=21, ylim=c(3, 6), xaxt="n", yaxt="n")
@@ -103,8 +111,8 @@ Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweil
   ecg.data  <- read.csv(paste(file.path, "/ecg-data.csv", sep=""), header=T)
   
   # Set function attributes
-  starts    <- c(start.time, fss.features[1][[1]][[3]][[2]], fss.features[2][[1]][[3]][[2]], fss.features[3][[1]][[3]][[2]], fss.features[4][[1]][[3]][[2]])
-  ends      <- c(fss.features[1][[1]][[3]][[1]], fss.features[2][[1]][[3]][[1]], fss.features[3][[1]][[3]][[1]], fss.features[4][[1]][[3]][[1]], fss.features[5][[1]][[3]][[1]])
+  starts    <- c(start.time, fss.features.list[1][[1]][[3]][[2]], fss.features.list[2][[1]][[3]][[2]], fss.features.list[3][[1]][[3]][[2]], fss.features.list[4][[1]][[3]][[2]])
+  ends      <- c(fss.features.list[1][[1]][[3]][[1]], fss.features.list[2][[1]][[3]][[1]], fss.features.list[3][[1]][[3]][[1]], fss.features.list[4][[1]][[3]][[1]], fss.features.list[5][[1]][[3]][[1]])
   times     <- as.POSIXct(ecg.data[, 4]/1000, origin="1970-01-01", tz="CET")
   file.name <- "ecg-data"
   
@@ -138,7 +146,7 @@ Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweil
         
         # Create hrv data of 10 minutes of the end of the whole data
         hrv.data          <- CreateHRVData()
-        hrv.data          <- SetVerbose(hrv.data, TRUE)
+        hrv.data          <- SetVerbose(hrv.data, FALSE)
         hrv.data$Beat     <- data.frame("Time"=time[time >= time[length(time)] - 60 * 10])
         
         # Build not interpolated heart rates
@@ -208,7 +216,7 @@ Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweil
   rm(j, s, m, minbpm, maxbpm, hrv.kubios.data, dimnames)
 ```
 
-```{r figure-03, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('postscript', 'tiff'), dpi=800, warning=FALSE}
+```{r figure-03, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('tiff'), dpi=800, warning=FALSE}
   par(mfcol=c(4, 1), mar=c(3, 3, 1.5, 3) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="i", yaxs="i")
   
   # Set data
@@ -218,7 +226,7 @@ Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweil
   start <- starts[length(starts)]
   
   # Plot all ecg data
-  plot(t, y, type="l", xlab="Zeit", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n", yaxt="n", col="darkgrey")
+  plot(t, y, type="l", xlab="", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n", yaxt="n", col="darkgrey")
   par(new = T)
   plot(times, y, type="n", xlab="", ylab="", xaxt="n", yaxt="n")
 
@@ -245,7 +253,7 @@ Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweil
   y            <- y[isIn]
   times.subset <- times[isIn]
   
-  plot(t, y, type="l", xlab="Zeit", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n", yaxt="n", col="darkgrey")
+  plot(t, y, type="l", xlab="", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n", yaxt="n", col="darkgrey")
   par(new = T)
   plot(times.subset, y, type="n", xlab="", ylab="", xaxt="n", yaxt="n")
 
@@ -271,7 +279,7 @@ Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweil
   xlim      <- c(start.rr - 30, end.rr + 30)
   
   # Plot rrIntervals
-  plot(t, y, type="l", xlab="Zeit", ylab=expression("RR-Intervalle ["~s~"]"), xaxt="n", yaxt="n", xlim=xlim, col="darkgrey")
+  plot(t, y, type="l", xlab="", ylab=expression("RR-Intervalle ["~s~"]"), xaxt="n", yaxt="n", xlim=xlim, col="darkgrey")
 
   # Mark interesting part
   polygon(c(end.rr - 10 * 60, end.rr - 10 * 60, end.rr, end.rr), c(0, 1, 1, -0), col = rgb(1, 1, 0, .1), border = rgb(0, 0, 0, 0))
@@ -318,3 +326,29 @@ Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweil
   rm(ecg.data, end, end.rr, hrv.data, isIn, marker, rr.interval, start, start.rr, t, time, times, times.subset, xlim, y)
 
 ```
+
+| Parameter       | Nach Baseline |  Nach 15 Min. |  Nach 30 Min. |  Nach 45 Min. |  Nach 60 Min. |
+|-----------------|--------------:|--------------:|--------------:|--------------:|--------------:|
+| Mittlere Herzrate (BPM)  | `r format(round(hrv.features$mean.hr[1], 2), nsmall=2)` | `r format(round(hrv.features$mean.hr[2], 2), nsmall=2)` | `r format(round(hrv.features$mean.hr[3], 2), nsmall=2)` | `r format(round(hrv.features$mean.hr[4], 2), nsmall=2)` | `r format(round(hrv.features$mean.hr[5], 2), nsmall=2)` |
+| LF (ms^2^)  | `r format(round(hrv.features$lf.power.a[1], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.a[2], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.a[3], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.a[4], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.a[5], 2), nsmall=2)` |
+| HF-VHF (ms^2^)  | `r format(round(hrv.features$hf.power.a[1], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.a[2], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.a[3], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.a[4], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.a[5], 2), nsmall=2)` |
+| Total (ms^2^)  | `r format(round(hrv.features$total.power[1], 2), nsmall=2)` | `r format(round(hrv.features$total.power[2], 2), nsmall=2)` | `r format(round(hrv.features$total.power[3], 2), nsmall=2)` | `r format(round(hrv.features$total.power[4], 2), nsmall=2)` | `r format(round(hrv.features$total.power[5], 2), nsmall=2)` |
+| LF (%)  | `r format(round(hrv.features$lf.power.r[1], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.r[2], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.r[3], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.r[4], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.r[5], 2), nsmall=2)` |
+| HF-VHF (%)  | `r format(round(hrv.features$hf.power.r[1], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.r[2], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.r[3], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.r[4], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.r[5], 2), nsmall=2)` |
+| LF (n. u.)  | `r format(round(hrv.features$lf.power.nu[1], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.nu[2], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.nu[3], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.nu[4], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.nu[5], 2), nsmall=2)` |
+| HF-VHF (n. u.)  | `r format(round(hrv.features$hf.power.nu[1], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.nu[2], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.nu[3], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.nu[4], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.nu[5], 2), nsmall=2)` |
+| LF/HF-VHF  | `r format(round(hrv.features$lfhf[1], 2), nsmall=2)` | `r format(round(hrv.features$lfhf[2], 2), nsmall=2)` | `r format(round(hrv.features$lfhf[3], 2), nsmall=2)` | `r format(round(hrv.features$lfhf[4], 2), nsmall=2)` | `r format(round(hrv.features$lfhf[5], 2), nsmall=2)` |
+
+Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
+
+```{r save-features, echo=FALSE, message=FALSE, warning=FALSE}
+  
+  # Append data
+  if(file.exists("/Users/simonbogutzky/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/features.csv")) {
+    features <- read.csv("/Users/simonbogutzky/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/features.csv")
+    write.csv(rbind(features, cbind(fss.features, hrv.features)), "/Users/simonbogutzky/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/features.csv", row.names=FALSE)
+  } else {
+    write.csv(cbind(fss.features, hrv.features), "/Users/simonbogutzky/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/features.csv", row.names=FALSE)
+  }
+```
+
