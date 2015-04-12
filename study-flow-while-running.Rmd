@@ -205,93 +205,116 @@ Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweil
   hrv.features  <- as.data.frame(t(matrix(hrv.features, ncol=i, nrow=9, dimnames=dimnames)))
 
   # Clean up
-  rm(j, s, m, minbpm, maxbpm)
+  rm(j, s, m, minbpm, maxbpm, hrv.kubios.data, dimnames)
 ```
 
 ```{r figure-03, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('postscript', 'tiff'), dpi=800, warning=FALSE}
-par(mfcol=c(4, 1), mar=c(2.5, 2.5, 1.5, 3.5) + 0.1, mgp=c(1.5, .5, 0), las=1, cex.axis=0.8, tck=.03, cex.lab=.8, xaxs="i", yaxs="i")
+  par(mfcol=c(4, 1), mar=c(3, 3, 1.5, 3) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="i", yaxs="i")
+  
+  # Set data
+  t     <- ecg.data[, 1]
+  y     <- ecg.data[, 3]
+  end   <- ends[length(ends)]
+  start <- starts[length(starts)]
+  
+  # Plot all ecg data
+  plot(t, y, type="l", xlab="Zeit", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n", yaxt="n", col="darkgrey")
+  par(new = T)
+  plot(times, y, type="n", xlab="", ylab="", xaxt="n", yaxt="n")
 
-t <- times
-y <- ecg.data[, 3]
+  # Mark interesting part
+  polygon(c(start, start, end, end), c(-6, 6, 6, -6), col = rgb(1, 1, 0, .1), border = rgb(0, 0, 0, 0))
+  
+  # Plot ticks and vertical lines
+  axis(1, at=c(starts, ends), label=format(c(starts, ends), "%H:%M:%S"))
+  axis(2, at=seq(-6, 6, 2), labels=seq(-6, 6, 2))
+  axis(3, at=c(starts, ends), label=rep("", length(c(starts, ends))))
+  axis(4, at=seq(-6, 6, 2), labels=rep("", length(seq(-6, 6, 2))))
+  abline(v=starts, lty="dashed")
+  abline(v=ends, lty="dashed")
+  
+  # Plot box again
+  box()
+  
+  # Add reference letter  
+  mtext("A", 4, line=2)
 
-# Plot all ecg data
-plot(t, y, type="l", xlab="Zeit", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n", yaxt="n", col="grey")
+  # Plot the last 15 minutes of ecg data
+  isIn         <- start - 30 <= times & end + 30 >= times
+  t            <- t[isIn]
+  y            <- y[isIn]
+  times.subset <- times[isIn]
+  
+  plot(t, y, type="l", xlab="Zeit", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n", yaxt="n", col="darkgrey")
+  par(new = T)
+  plot(times.subset, y, type="n", xlab="", ylab="", xaxt="n", yaxt="n")
 
-# Plot the last 15 minutes of ecg data
-end   <- ends[5]
-start <- starts[5]
-isIn  <- start <= t & end >= t
-t     <- t[isIn]
-y     <- y[isIn]
-lines(t, y, col = "darkgrey")
+  # Plot ticks and vertical lines
+  axis(1, at=c(starts, ends), label=format(c(starts, ends), "%H:%M:%S"))
+  axis(2, at=seq(-6, 6, 2), labels=seq(-6, 6, 2))
+  axis(3, at=c(starts, ends), label=rep("", length(c(starts, ends))))
+  axis(4, at=seq(-6, 6, 2), labels=rep("", length(seq(-6, 6, 2))))
+  abline(v=starts, lty="dashed")
+  abline(v=ends, lty="dashed")
 
-# Plot ticks and vertical lines
-axis(1, at=c(starts, ends), label=format(c(starts, ends), "%H:%M:%S"))
-axis(2, at=seq(-6, 6, 2), labels=seq(-6, 6, 2))
-axis(3, at=c(starts, ends), label=rep("", length(c(starts, ends))))
-axis(4, at=seq(-6, 6, 2), labels=rep("", length(seq(-6, 6, 2))))
-abline(v=starts, lty="dashed")
-abline(v=ends, lty="dashed")
+  # Plot box again
+  box()
 
-# Plot the last 15 minutes of ecg data again
-t     <- times
-y     <- ecg.data[, 3]
-isIn  <- start - 30 <= t & end + 30 >= t
-t     <- t[isIn]
-y     <- y[isIn]
-plot(t, y, type="l", xlab="Zeit", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n", yaxt="n", col="grey")
+  # Add reference letter  
+  mtext("B", 4, line=2)
 
-isIn  <- start <= t & end >= t
-t     <- t[isIn]
-y     <- y[isIn]
-lines(t, y, col = "darkgrey")
+  # Set data
+  t         <- time
+  y         <- rr.interval
+  end.rr    <- max(t)
+  start.rr  <- min(t)
+  xlim      <- c(start.rr - 30, end.rr + 30)
+  
+  # Plot rrIntervals
+  plot(t, y, type="l", xlab="Zeit", ylab=expression("RR-Intervalle ["~s~"]"), xaxt="n", yaxt="n", xlim=xlim, col="darkgrey")
 
-# Plot ticks and vertical lines
-axis(1, at=c(starts, ends), label=format(c(starts, ends), "%H:%M:%S"))
-axis(2, at=seq(-6, 6, 2), labels=seq(-6, 6, 2))
-axis(3, at=c(starts, ends), label=rep("", length(c(starts, ends))))
-axis(4, at=seq(-6, 6, 2), labels=rep("", length(seq(-6, 6, 2))))
-abline(v=starts, lty="dashed")
-abline(v=ends, lty="dashed")
+  # Mark interesting part
+  polygon(c(end.rr - 10 * 60, end.rr - 10 * 60, end.rr, end.rr), c(0, 1, 1, -0), col = rgb(1, 1, 0, .1), border = rgb(0, 0, 0, 0))
 
-# Plot rrIntervals
-t <- time
-y <- rr.interval
-xlim <- c(min(t)-30, max(t)+30)
-plot(t, y, type="l", xlab="Zeit", ylab=expression("RR-Intervalle ["~s~"]"), xaxt="n", yaxt="n", xlim=xlim, col="grey")
+  # Plot ticks and vertical lines
+  marker <- c(start.rr, end.rr - 10 * 60, end.rr)
+  axis(1, at=marker, label=format(c(start, end - 10 * 60, end), "%H:%M:%S"))
+  axis(2, at=seq(.25, .50, .05), labels=seq(.25, .50, .05))
+  axis(3, at=marker, label=rep("", length(marker)))
+  axis(4, at=seq(.25, .50, .05), labels=rep("", length(seq(.25, .50, .05))))
+  abline(v=marker, lty = "dashed")
 
-isIn  <- max(t) - 10 * 60 <= t & max(t) >= t
-t     <- t[isIn]
-y     <- y[isIn]
-lines(t, y, col = "darkgrey")
+  # Plot box again
+  box()
 
-# Plot ticks and vertical lines
-t      <- hrv.kubios.data$Time
-marker <- c(min(t), max(t) - 10 * 60, max(t))
-axis(1, at=marker, label=format(c(start, end - 10 * 60, end), "%H:%M:%S"))
-axis(2, at=seq(.25, .50, .05), labels=seq(.25, .50, .05))
-axis(3, at=marker, label=rep("", length(marker)))
-axis(4, at=seq(.25, .50, .05), labels=rep("", length(seq(.25, .50, .05))))
-abline(v=c(min(t), max(t) - 10 * 60, max(t)), lty = "dashed")
+  # Add reference letter  
+  mtext("C", 4, line=2)
 
-# Plot rrIntervals
-t <- hrv.data$Beat$Time
-y <- hrv.data$Beat$RR
-xlim <- c(min(t)-30, max(t)+30)
-plot(t, y, type="l", xlab="Zeit", ylab=expression("RR-Intervalle ["~s~"]"), xaxt="n", yaxt="n", xlim=xlim, col="grey")
+  # Set data
+  t         <- hrv.data$Beat$Time
+  y         <- hrv.data$Beat$RR / 1000
+  end.rr    <- max(t)
+  start.rr  <- min(t)
+  xlim      <- c(start.rr - 30, end.rr + 30)
+  
+  # Plot rrIntervals
+  plot(t, y, type="l", xlab="Zeit", ylab=expression("RR-Intervalle ["~s~"]"), xaxt="n", yaxt="n", xlim=xlim, col="darkgrey")
 
-# Plot ticks and vertical lines
-marker <- c(min(t), max(t))
-axis(1, at=marker, label=format(c(end - 10 * 60, end), "%H:%M:%S"))
-axis(2, at=seq(.25, .50, .05), labels=seq(.25, .50, .05))
-axis(3, at=marker, label=rep("", length(marker)))
-axis(4, at=seq(.25, .50, .05), labels=rep("", length(seq(.25, .50, .05))))
-abline(v=c(min(t), max(t)), lty = "dashed")
+  # Plot ticks and vertical lines
+  marker <- c(start.rr, end.rr)
+  axis(1, at=marker, label=format(c(end - 10 * 60, end), "%H:%M:%S"))
+  axis(2, at=seq(.25, .50, .025), labels=seq(.25, .50, .025))
+  axis(3, at=marker, label=rep("", length(marker)))
+  axis(4, at=seq(.25, .50, .025), labels=rep("", length(seq(.25, .50, .025))))
+  abline(v=c(min(t), max(t)), lty = "dashed")
 
-polygon(c(min(t), min(t), max(t), max(t)), c(min(y), max(y) min(y), max(y)),
-        col = c("yellow"),
-        border = c("black"),
-        lty = c("solid"))
+  # Plot box again
+  box()
 
-rm(y)
+  # Add reference letter  
+  mtext("D", 4, line=2)
+
+  # Clean up
+  rm(ecg.data, end, end.rr, hrv.data, isIn, marker, rr.interval, start, start.rr, t, time, times, times.subset, xlim, y)
+
 ```
