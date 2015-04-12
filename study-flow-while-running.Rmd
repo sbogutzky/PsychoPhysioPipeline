@@ -40,8 +40,8 @@ Zur subjektiven Erfassung des Flow-Erlebens kam die Flow-Kurzskala (FKS) von **R
   # Set start time
   start.time <- as.POSIXct(strptime("2013-10-31 18:11:26", "%Y-%m-%d %H:%M:%S"), tz="CET")
   
-  # Set file path
-  file.path <- paste("/Users/simonbogutzky/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/", format(start.time, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", sep="")
+  # Set file path 
+  file.path <- paste("C:/Users/Simon Bogutzky/Documents/Entwicklung/non-disruptive-flow-measures/data/", format(start.time, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", sep="")
   
   # Load fss data
   fss.data  <- read.csv(paste(file.path, "fss-data.csv", sep=""), header=T)
@@ -78,7 +78,7 @@ Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
 
 Als Maßzahl nutze ich die zweite Subdimension der Flow-Kurzskala wie **Peifer (2014)**, da Absorbiertheit laut **Rheinberg & Vollmeyer (2003)** nur eintritt, wenn Anforderungen und Fähigkeiten sich in Balance befinden — somit ist sie ausschließlich im *Flow-Kanal* anzutreffen und deshalb ein repräsentativer Indikator für Flow als der Generalfaktor, der sich aus den zwei Subdimension zusammensetzt. Denn einen glatten Verlauf kann man auch auf Unterforderung zurückführen. Exemplarisch wird der Verlauf der Absorbiertheit in Abbildung 2 dargestellt.
 
-```{r figure-02, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('postscript', 'tiff'), dpi=800, warning=FALSE}
+```{r figure-02, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('pdf'), warning=FALSE}
   par(mfcol=c(1, 1), mar=c(2.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2.5, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8)
   
   # Set data
@@ -216,7 +216,7 @@ Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweil
   rm(j, s, m, minbpm, maxbpm, hrv.kubios.data, dimnames)
 ```
 
-```{r figure-03, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('tiff'), dpi=800, warning=FALSE}
+```{r figure-03, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('pdf'), warning=FALSE}
   par(mfcol=c(4, 1), mar=c(3, 3, 1.5, 3) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="i", yaxs="i")
   
   # Set data
@@ -344,11 +344,11 @@ Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
 ```{r save-features, echo=FALSE, message=FALSE, warning=FALSE}
   
   # Append data
-  if(file.exists("/Users/simonbogutzky/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/features.csv")) {
-    features <- read.csv("/Users/simonbogutzky/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/features.csv")
-    write.csv(rbind(features, cbind(fss.features, hrv.features)), "/Users/simonbogutzky/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/features.csv", row.names=FALSE)
+  if(file.exists("C:/Users/Simon Bogutzky/Documents/Entwicklung/non-disruptive-flow-measures/data/features.csv")) {
+    features <- read.csv("C:/Users/Simon Bogutzky/Documents/Entwicklung/non-disruptive-flow-measures/data/features.csv")
+    write.csv(rbind(features, cbind(fss.features, hrv.features)), "C:/Users/Simon Bogutzky/Documents/Entwicklung/non-disruptive-flow-measures/data/features.csv", row.names=FALSE)
   } else {
-    write.csv(cbind(fss.features, hrv.features), "/Users/simonbogutzky/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/features.csv", row.names=FALSE)
+    write.csv(cbind(fss.features, hrv.features), "C:/Users/Simon Bogutzky/Documents/Entwicklung/non-disruptive-flow-measures/data/features.csv", row.names=FALSE)
   }
 ```
 
