@@ -40,8 +40,8 @@ Zur subjektiven Erfassung des Flow-Erlebens kam die Flow-Kurzskala (FKS) von **R
   # Set start time
   start.time <- as.POSIXct(strptime("2013-10-31 18:11:26", "%Y-%m-%d %H:%M:%S"), tz="CET")
   
-  # Set file path
-  file.path <- paste("/Users/simonbogutzky/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/", format(start.time, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", sep="")
+  # Set file path 
+  file.path <- paste("./data/", format(start.time, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", sep="")
   
   # Load fss data
   fss.data  <- read.csv(paste(file.path, "fss-data.csv", sep=""), header=T)
@@ -78,7 +78,7 @@ Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
 
 Als Maßzahl nutze ich die zweite Subdimension der Flow-Kurzskala wie **Peifer (2014)**, da Absorbiertheit laut **Rheinberg & Vollmeyer (2003)** nur eintritt, wenn Anforderungen und Fähigkeiten sich in Balance befinden — somit ist sie ausschließlich im *Flow-Kanal* anzutreffen und deshalb ein repräsentativer Indikator für Flow als der Generalfaktor, der sich aus den zwei Subdimension zusammensetzt. Denn einen glatten Verlauf kann man auch auf Unterforderung zurückführen. Exemplarisch wird der Verlauf der Absorbiertheit in Abbildung 2 dargestellt.
 
-```{r figure-02, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('postscript', 'tiff'), dpi=800, warning=FALSE}
+```{r figure-02, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('pdf'), warning=FALSE}
   par(mfcol=c(1, 1), mar=c(2.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2.5, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8)
   
   # Set data
@@ -103,7 +103,7 @@ Als Maßzahl nutze ich die zweite Subdimension der Flow-Kurzskala wie **Peifer (
 Abbildung 2: Bewertete Absorbiertheit nach jeweils 15 Minuten Laufen
 
 #### HRV-Analyse
-Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte. Diese 15-Minuten Abschnitte las ich in Kubios HRV (Version 2.1) ein. Kubios HRV automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. 
+Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte. Diese 15-Minuten Abschnitte las ich in Kubios HRV (Version 2.1) ein. Kubios HRV automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. EKG-Daten mit mehr als 2%% an Artefakten habe ich aus der Datensammlung entfernt.
 
 ```{r subset-ecg-data, echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -127,14 +127,18 @@ Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweil
   library(RHRV)
   
   # Create feature vector
-  hrv.features <- c() 
+  hrv.features <- c()
 
-  for (j in 1:i) {
+  # HRV file indexes
+  hrv.file.index <- c(1, 2, 3, 4, 5)
+
+  for (j in hrv.file.index) {
     
-    # Set hrv file name
-    hrv.file.name <- paste(file.path, "ecg-data-", j, "_hrv.txt", sep="")
-    if(file.exists(hrv.file.name)) {
-      
+    if(!is.na(j)) {
+    
+        # Set hrv file name
+        hrv.file.name <- paste(file.path, "ecg-data-", j, "_hrv.txt", sep="")
+        
         # Load Kubios HRV txt data
         hrv.kubios.data   <- read.csv(hrv.file.name, header = F, na.strings = "", fill = T, skip = 97, col.names = c("NA1", "Time", "RRInterval", "FFTFrequency", "FFTPSD", "ARFrequency", "ARPSD", "NA2", "NA3", "NA4", "NA5"))
         
@@ -205,6 +209,24 @@ Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweil
         
         # Clean up
         rm(ulf.power.a, vlf.power.a, lf.power.a, hf.power.a, total.power, ulf.power.r, vlf.power.r, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf, mean.hr)
+      } else {
+        # Calculate HRV features
+        ulf.power.a       <- NA
+        vlf.power.a       <- NA
+        lf.power.a        <- NA
+        hf.power.a        <- NA
+        total.power       <- NA
+        ulf.power.r       <- NA
+        vlf.power.r       <- NA
+        lf.power.r        <- NA
+        hf.power.r        <- NA
+        lf.power.nu       <- NA
+        hf.power.nu       <- NA
+        lfhf              <- NA
+        mean.hr           <- NA
+        
+        # Add features to feature vector
+        hrv.features      <- c(hrv.features, lf.power.a, hf.power.a, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf, total.power, mean.hr)
       }
   }
   
@@ -255,7 +277,7 @@ Warum LF und HF?
 
 One particular approach to analyze HRV is to use spectral methods that provide information about how variance in HR ("power") distributes as a function of frequency (Task Force Guidelines, 1996). One of the relevant parameters in spectral analyses is the high-frequency component of the heart rate variability (HF-HRV), which reflects variance in the high frequency range (0.15-0.4 Hz). HF-HRV has been shown to be a reliable indicator for parasympathetic efferent activity (Porges, 1995) and increased task demands are related to a low level of HF-HRV (Backs et al., 1991; Mulder et al., 2002). Furthermore, increased HF-HRV is associated with efficient use of strategies for self-regulation and attention, which results in better performance in cognitive tasks (better accuracy and shorter reaction time) (Hansen et al, 2003; Thayer et al., 2009). In contrast, decreased HF-HRV is related to limited use of self-regulatory strategies (Thayer & Brosschot, 2005), for example, failure to recognize task relevant information or to habituate to novel, non-relevant stimuli (hypervigilance; Friedman, 2007; Thayer, Friedman, Borkovec, Johnsen, & Molina, 2000; Thayer et al., 2009). Focusing on task relevant stimuli and fading out task-irrelevant information are key components of flow. Therefore, one can assume a positive relation between flow and HF-HRV. However, prior studies suggest that moderate and increased task demands are related to lower levels of HF-HRV (Backs et al., 1991; Jorna, 1992; Mulder et al., 2002 Vicente et al., 1987). Based on these findings, we hypothesize a relation between flow and HF-HRV without making any assumptions regarding the direction of the relationship. Another parameter of HRV is the low-frequency component of the HRV (LF-HRV), which reflects the variance in the low frequency range (0.04-0.15 Hz) of heart rates. The meaning of this parameter is controversial in recent research. LF-HRV has been used as an indicator for sympathetic activity (Pagani et al., 1986; Malliani, Pagani, Lombardi, & Cerutti, 1991). However, a growing body of research disproved this assumption and showed that LF-HRV rather reflects baroreflex modulation (Heathers, 2014; Rahman, Pechnik, Gross, Sewall, Goldstein, 2011; Schroeder et al., 2003). The baroreflex is one of the elementary mechanisms through which acute changes in the heart rate and blood pressure is controlled (Guyton, 1980) Baroreflex activity has been associated with several cognitive functions such as mental stress (del Paso, Langewitz, Robles, & Pérez, 1996; Robbe et al., 1987, Steptoe & Sawada, 1989), cognitive-attentional demands (del Paso, González, & Hernández, 2004), and cognitive performance (Yasumasu, del Paso, Takahara, & Nakashima, 2006). According to Lacey's intake/rejection hypothesis (Lacey & Lacey, 1970), tasks containing cognitive elaboration are related to a baroreceptor-elicited cardiac acceleration (del Paso et al., 2004). In contrast, activities involving the detection of external stimuli are related to a baroreceptor-modulated cardiac deceleration (Bernardi, Porta, Spicuzza, & Sleight, 2005). Yasumasu et al. (2006) showed that activities that involve cognitive elaboration and rejection of external stimuli cause a decrease of baroreflex activity, which in turn causes an increase in cardiovascular activity (i.e., increase in heart rate). Cognitive involvement in an activity and rejection of external stimuli are crucial for experiencing flow. Furthermore, previous research suggests an inverted u-shaped function between flow and LF-HRV (Peifer et al., 2014b). Based on these results, we assume a relation between LF-HRV (as an indicator for baroreflex function) and flow experience and test this assumption in an experimental setting that addresses the aforementioned limitations of previous studies. (Tozman2015)
 
-```{r figure-03, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('tiff'), dpi=800, warning=FALSE}
+```{r figure-03, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('pdf'), warning=FALSE}
   par(mfcol=c(4, 1), mar=c(3, 3, 1.5, 3) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="i", yaxs="i")
   
   # Set data
@@ -270,7 +292,7 @@ One particular approach to analyze HRV is to use spectral methods that provide i
   plot(times, y, type="n", xlab="", ylab="", xaxt="n", yaxt="n")
 
   # Mark interesting part
-  polygon(c(start, start, end, end), c(-6, 6, 6, -6), col = rgb(1, 1, 0, .1), border = rgb(0, 0, 0, 0))
+  polygon(c(start, start, end, end), c(-10, 10, 10, -10), col = rgb(1, 1, 0, .1), border = rgb(0, 0, 0, 0))
   
   # Plot ticks and vertical lines
   axis(1, at=c(starts, ends), label=format(c(starts, ends), "%H:%M:%S"))
@@ -383,11 +405,11 @@ Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
 ```{r save-features, echo=FALSE, message=FALSE, warning=FALSE}
   
   # Append data
-  if(file.exists("/Users/simonbogutzky/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/features.csv")) {
-    features <- read.csv("/Users/simonbogutzky/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/features.csv")
-    write.csv(rbind(features, cbind(fss.features, hrv.features)), "/Users/simonbogutzky/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/features.csv", row.names=FALSE)
+  if(file.exists("./data/features.csv")) {
+    features <- read.csv("./data/features.csv")
+    write.csv(rbind(features, cbind(fss.features, hrv.features)), "./data/features.csv", row.names=FALSE)
   } else {
-    write.csv(cbind(fss.features, hrv.features), "/Users/simonbogutzky/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/features.csv", row.names=FALSE)
+    write.csv(cbind(fss.features, hrv.features), "./data/features.csv", row.names=FALSE)
   }
 ```
 
