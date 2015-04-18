@@ -41,7 +41,7 @@ Zur subjektiven Erfassung des Flow-Erlebens kam die Flow-Kurzskala (FKS) von **R
   start.time <- as.POSIXct(strptime("2013-10-31 18:11:26", "%Y-%m-%d %H:%M:%S"), tz="CET")
   
   # Set file path 
-  file.path <- paste("C:/Users/Simon Bogutzky/Documents/Entwicklung/non-disruptive-flow-measures/data/", format(start.time, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", sep="")
+  file.path <- paste("./data/", format(start.time, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", sep="")
   
   # Load fss data
   fss.data  <- read.csv(paste(file.path, "fss-data.csv", sep=""), header=T)
@@ -103,7 +103,7 @@ Als Maßzahl nutze ich die zweite Subdimension der Flow-Kurzskala wie **Peifer (
 Abbildung 2: Bewertete Absorbiertheit nach jeweils 15 Minuten Laufen
 
 #### HRV-Analyse
-Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte. Diese 15-Minuten Abschnitte las ich in Kubios HRV (Version 2.1) ein. Kubios HRV automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. 
+Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte. Diese 15-Minuten Abschnitte las ich in Kubios HRV (Version 2.1) ein. Kubios HRV automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. EKG-Daten mit mehr als 2%% an Artefakten habe ich aus der Datensammlung entfernt.
 
 ```{r subset-ecg-data, echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -127,14 +127,18 @@ Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweil
   library(RHRV)
   
   # Create feature vector
-  hrv.features <- c() 
+  hrv.features <- c()
 
-  for (j in 1:i) {
+  # HRV file indexes
+  hrv.file.index <- c(1, 2, 3, 4, 5)
+
+  for (j in hrv.file.index) {
     
-    # Set hrv file name
-    hrv.file.name <- paste(file.path, "ecg-data-", j, "_hrv.txt", sep="")
-    if(file.exists(hrv.file.name)) {
-      
+    if(!is.na(j)) {
+    
+        # Set hrv file name
+        hrv.file.name <- paste(file.path, "ecg-data-", j, "_hrv.txt", sep="")
+        
         # Load Kubios HRV txt data
         hrv.kubios.data   <- read.csv(hrv.file.name, header = F, na.strings = "", fill = T, skip = 97, col.names = c("NA1", "Time", "RRInterval", "FFTFrequency", "FFTPSD", "ARFrequency", "ARPSD", "NA2", "NA3", "NA4", "NA5"))
         
@@ -205,6 +209,24 @@ Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweil
         
         # Clean up
         rm(ulf.power.a, vlf.power.a, lf.power.a, hf.power.a, total.power, ulf.power.r, vlf.power.r, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf, mean.hr)
+      } else {
+        # Calculate HRV features
+        ulf.power.a       <- NA
+        vlf.power.a       <- NA
+        lf.power.a        <- NA
+        hf.power.a        <- NA
+        total.power       <- NA
+        ulf.power.r       <- NA
+        vlf.power.r       <- NA
+        lf.power.r        <- NA
+        hf.power.r        <- NA
+        lf.power.nu       <- NA
+        hf.power.nu       <- NA
+        lfhf              <- NA
+        mean.hr           <- NA
+        
+        # Add features to feature vector
+        hrv.features      <- c(hrv.features, lf.power.a, hf.power.a, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf, total.power, mean.hr)
       }
   }
   
@@ -231,7 +253,7 @@ Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweil
   plot(times, y, type="n", xlab="", ylab="", xaxt="n", yaxt="n")
 
   # Mark interesting part
-  polygon(c(start, start, end, end), c(-6, 6, 6, -6), col = rgb(1, 1, 0, .1), border = rgb(0, 0, 0, 0))
+  polygon(c(start, start, end, end), c(-10, 10, 10, -10), col = rgb(1, 1, 0, .1), border = rgb(0, 0, 0, 0))
   
   # Plot ticks and vertical lines
   axis(1, at=c(starts, ends), label=format(c(starts, ends), "%H:%M:%S"))
@@ -344,11 +366,11 @@ Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
 ```{r save-features, echo=FALSE, message=FALSE, warning=FALSE}
   
   # Append data
-  if(file.exists("C:/Users/Simon Bogutzky/Documents/Entwicklung/non-disruptive-flow-measures/data/features.csv")) {
-    features <- read.csv("C:/Users/Simon Bogutzky/Documents/Entwicklung/non-disruptive-flow-measures/data/features.csv")
-    write.csv(rbind(features, cbind(fss.features, hrv.features)), "C:/Users/Simon Bogutzky/Documents/Entwicklung/non-disruptive-flow-measures/data/features.csv", row.names=FALSE)
+  if(file.exists("./data/features.csv")) {
+    features <- read.csv("./data/features.csv")
+    write.csv(rbind(features, cbind(fss.features, hrv.features)), "./data/features.csv", row.names=FALSE)
   } else {
-    write.csv(cbind(fss.features, hrv.features), "C:/Users/Simon Bogutzky/Documents/Entwicklung/non-disruptive-flow-measures/data/features.csv", row.names=FALSE)
+    write.csv(cbind(fss.features, hrv.features), "./data/features.csv", row.names=FALSE)
   }
 ```
 
