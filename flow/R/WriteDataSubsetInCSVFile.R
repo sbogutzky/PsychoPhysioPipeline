@@ -14,9 +14,10 @@ WriteDataSubsetInCSVFile <- function(data, times, starts, ends, file.name, file.
     if(length(starts) == length(ends)) {
       if(!missing(file.name) & !missing(file.path)) {
         for(i in 1:length(starts)) {
-          x <- data[starts[i] <= times & ends[i] > times, ]
-          start <- as.POSIXct(x[1, 4]/1000, origin="1970-01-01", tz="CET")
-          end   <- as.POSIXct(x[nrow(x), 4]/1000, origin="1970-01-01", tz="CET")
+          x     <- data[starts[i] <= times & ends[i] > times, ]
+          t     <- times[starts[i] <= times & ends[i] > times]
+          start <- t[1]
+          end   <- t[length(t)]
           
           file <- paste(file.path, file.name, "-", i, ".csv", sep="")
           write.csv(x, file=file, row.names=F)
