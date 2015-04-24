@@ -103,7 +103,7 @@ Als Maßzahl nutze ich die zweite Subdimension der Flow-Kurzskala wie **Peifer (
 Abbildung 2: Bewertete Absorbiertheit nach jeweils 15 Minuten Laufen
 
 #### HRV-Analyse
-Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte. Diese 15-Minuten Abschnitte las ich in Kubios HRV (Version 2.1) ein. Kubios HRV automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. EKG-Daten mit mehr als 2%% an Artefakten habe ich aus der Datensammlung entfernt.
+Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte. Diese 15-Minuten Abschnitte las ich in Kubios HRV (Version 2.1) ein. Kubios HRV automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. EKG-Daten mit mehr als 2% an Artefakten habe ich aus der Datensammlung entfernt.
 
 ```{r subset-ecg-data, echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -402,7 +402,7 @@ One particular approach to analyze HRV is to use spectral methods that provide i
 
 Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
 
-```{r save-features, echo=FALSE, message=FALSE, warning=FALSE}
+```{r save-features, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
   
   # Append data
   if(file.exists("./data/features.csv")) {
@@ -413,3 +413,98 @@ Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
   }
 ```
 
+```{r anova, echo=FALSE, message=FALSE, warning=FALSE}
+  
+  # Load feature data
+  load("./data/features.RData")
+
+  # Backup data
+  features -> features.backup
+  
+  # Modify m 
+  features[features[, 1] != 1, ][,1] = 2
+  
+  # Define help function
+  mean.na.rm <- function(x) {
+      mean(x, na.rm = T)
+    }
+
+  sd.na.rm <- function(x) {
+      sd(x, na.rm = T)
+    }
+
+  getSigString <- function(p) {
+      sig.string <- ""
+      if (p < .1)
+        sig.string <- "."
+      if (p < .05)
+        sig.string <- "\\*"
+      if (p < .01)
+        sig.string <- "\\*\\*"
+      if (p < .001)
+        sig.string <- "\\*\\*\\*"
+      return(sig.string)
+    }
+  
+  # Result table
+  table.data <- data.frame()
+
+  for (i in 2:ncol(features)) {
+#     boxplot(features[,i]  ~ m, data = features, title = colnames(features)[i])
+    
+    # Calculate feature values
+    features  <- features[,c(1, i)]
+    means     <- aggregate(features[, 2], list(features[, 1]), mean.na.rm)
+    sds       <- aggregate(features[, 2], list(features[, 1]), sd.na.rm)
+    
+    # Create anova structure
+    features.stack    <- stack(features)
+    m                 <- rep(features.stack[1:nrow(features), 1], ncol(features) - 1)
+    features.stack    <- features.stack[(nrow(features) + 1):nrow(features.stack),]
+    features.stack[3] <- as.factor(m)                   
+    rm(m)                               
+    colnames(features.stack) = c("value", "feature", "m")
+  
+    # Get p value
+    fit <- aov(value ~ m, data=features.stack)
+    p   <- summary(fit)[[1]][["Pr(>F)"]][1]
+    
+    # Store values
+    row <- cbind(means[1, 2], sds[1, 2], means[2, 2], sds[2, 2], p)
+    table.data <- rbind(table.data, row)
+
+#     tukey <- TukeyHSD(fit)
+#     print(tukey)
+    
+    features          <- features.backup
+    features[features[, 1] != 1, ][,1] = 2
+  }
+  
+  # Clean up
+  rm (features, features.stack, means, row, sds, fit, i, p)
+```
+
+| Merkmal                 | Baseline | Laufen |         |
+|-------------------------|---------:|-------:|:--------|
+|                         | M (SD)   | M (SD) | P       |
+|-------------------------|----------|--------|---------|
+| Generalfaktor           | `r format(round(table.data[1, 1], 2), nsmall=2)` (`r format(round(table.data[1, 2], 2), nsmall=2)`) | `r format(round(table.data[1, 3], 2), nsmall=2)` (`r format(round(table.data[1, 4], 2), nsmall=2)`) | `r format(round(table.data[1, 5], 2), nsmall=2)` `r getSigString(table.data[1, 5])`|
+| Glatter Verlauf         | `r format(round(table.data[2, 1], 2), nsmall=2)` (`r format(round(table.data[2, 2], 2), nsmall=2)`) | `r format(round(table.data[2, 3], 2), nsmall=2)` (`r format(round(table.data[2, 4], 2), nsmall=2)`) | `r format(round(table.data[2, 5], 2), nsmall=2)` `r getSigString(table.data[2, 5])`|  
+| Absorbiertheit          | `r format(round(table.data[3, 1], 2), nsmall=2)` (`r format(round(table.data[3, 2], 2), nsmall=2)`) | `r format(round(table.data[3, 3], 2), nsmall=2)` (`r format(round(table.data[3, 4], 2), nsmall=2)`) | `r format(round(table.data[3, 5], 2), nsmall=2)` `r getSigString(table.data[3, 5])`|
+| Besorgnis               | `r format(round(table.data[4, 1], 2), nsmall=2)` (`r format(round(table.data[4, 2], 2), nsmall=2)`) | `r format(round(table.data[4, 3], 2), nsmall=2)` (`r format(round(table.data[4, 4], 2), nsmall=2)`) | `r format(round(table.data[4, 5], 2), nsmall=2)` `r getSigString(table.data[4, 5])`|  
+| AFP                     | `r format(round(table.data[5, 1], 2), nsmall=2)` (`r format(round(table.data[5, 2], 2), nsmall=2)`) | `r format(round(table.data[5, 3], 2), nsmall=2)` (`r format(round(table.data[5, 4], 2), nsmall=2)`) | `r format(round(table.data[5, 5], 2), nsmall=2)` `r getSigString(table.data[5, 5])`|
+| Mittlere Herzrate (BPM)               | `r format(round(table.data[14, 1], 2), nsmall=2)` (`r format(round(table.data[14, 2], 2), nsmall=2)`) | `r format(round(table.data[14, 3], 2), nsmall=2)` (`r format(round(table.data[14, 4], 2), nsmall=2)`) | `r format(round(table.data[14, 5], 2), nsmall=2)` `r getSigString(table.data[14, 5])`| 
+| LF (ms^2^)  | `r format(round(table.data[6, 1], 2), nsmall=2)` (`r format(round(table.data[6, 2], 2), nsmall=2)`) | `r format(round(table.data[6, 3], 2), nsmall=2)` (`r format(round(table.data[6, 4], 2), nsmall=2)`) | `r format(round(table.data[6, 5], 2), nsmall=2)` `r getSigString(table.data[6, 5])`| 
+| HF-VHF (ms^2^)              | `r format(round(table.data[7, 1], 2), nsmall=2)` (`r format(round(table.data[7, 2], 2), nsmall=2)`) | `r format(round(table.data[7, 3], 2), nsmall=2)` (`r format(round(table.data[7, 4], 2), nsmall=2)`) | `r format(round(table.data[7, 5], 2), nsmall=2)` `r getSigString(table.data[7, 5])`|
+|  Total (ms^2^)        | `r format(round(table.data[13, 1], 2), nsmall=2)` (`r format(round(table.data[13, 2], 2), nsmall=2)`) | `r format(round(table.data[13, 3], 2), nsmall=2)` (`r format(round(table.data[13, 4], 2), nsmall=2)`) | `r format(round(table.data[13, 5], 2), nsmall=2)` `r getSigString(table.data[13, 5])` | 
+| LF (%)        | `r format(round(table.data[8, 1], 2), nsmall=2)` (`r format(round(table.data[8, 2], 2), nsmall=2)`) | `r format(round(table.data[8, 3], 2), nsmall=2)` (`r format(round(table.data[8, 4], 2), nsmall=2)`) | `r format(round(table.data[8, 5], 2), nsmall=2)` `r getSigString(table.data[8, 5])`|
+| HF-VHF (%)          | `r format(round(table.data[9, 1], 2), nsmall=2)` (`r format(round(table.data[9, 2], 2), nsmall=2)`) | `r format(round(table.data[9, 3], 2), nsmall=2)` (`r format(round(table.data[9, 4], 2), nsmall=2)`) | `r format(round(table.data[9, 5], 2), nsmall=2)` `r getSigString(table.data[9, 5])`| 
+| LF (n. u.)                   | `r format(round(table.data[10, 1], 2), nsmall=2)` (`r format(round(table.data[10, 2], 2), nsmall=2)`) | `r format(round(table.data[10, 3], 2), nsmall=2)` (`r format(round(table.data[10, 4], 2), nsmall=2)`) | `r format(round(table.data[10, 5], 2), nsmall=2)` `r getSigString(table.data[10, 5])`| 
+| HF-VHF (n. u.)             | `r format(round(table.data[11, 1], 2), nsmall=2)` (`r format(round(table.data[11, 2], 2), nsmall=2)`) | `r format(round(table.data[11, 3], 2), nsmall=2)` (`r format(round(table.data[11, 4], 2), nsmall=2)`) | `r format(round(table.data[11, 5], 2), nsmall=2)` `r getSigString(table.data[11, 5])`| 
+| LF/HF-VHF             | `r format(round(table.data[12, 1], 2), nsmall=2)` (`r format(round(table.data[12, 2], 2), nsmall=2)`) | `r format(round(table.data[12, 3], 2), nsmall=2)` (`r format(round(table.data[12, 4], 2), nsmall=2)`) | `r format(round(table.data[12, 5], 2), nsmall=2)` `r getSigString(table.data[12, 5])` | 
+
+Table: Unterschied zwischen Baseline-Messungen und Laufmessungen
+
+## Unterschied zwischen Baseline-Messungen und Laufmessungen
+
+Um zu testen, ob ein Unterschied zwischen Merkmalen aus den Baseline-Messungen und den Laufmessungen besteht führte ich eine einfaktorielle Varianzanalyse (ANOVA) für jedes Merkmal als abhängige Variable durch. 
