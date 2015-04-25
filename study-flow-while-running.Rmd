@@ -468,4 +468,4 @@ Table: Unterschied zwischen Baseline-Messungen und Laufmessungen
 
 ## Unterschied zwischen Baseline-Messungen und Laufmessungen
 
-Um zu testen, ob ein Unterschied zwischen Merkmalen aus den Baseline-Messungen und den Laufmessungen besteht führte ich eine einfaktorielle Varianzanalyse (ANOVA) für jedes Merkmal als abhängige Variable durch. 
+Um zu testen, ob ein Unterschied zwischen den erhobenen Merkmalen aus den Baseline-Messungen und den Laufmessungen besteht, führte ich eine einfaktorielle Varianzanalyse (ANOVA) für jedes Merkmal. Das Ergebnis zeigt, dass alle Merkmale, außer dem Generalfaktor und dem Besorgnisfaktor, sich mindestens signifikant zwischen Baseline-Messungen und Laufmessungen unterscheiden. Das Ergebnis unterstützt meine Entscheidung Absorbiertheit als Maßzahl zur benutzen.  
