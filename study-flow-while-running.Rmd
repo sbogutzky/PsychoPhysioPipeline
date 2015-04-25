@@ -2,8 +2,26 @@
 title: 'Studie: Flow beim Laufen'
 author: "Simon Bogutzky"
 date: "April 2015"
-output: pdf_document
+output:
+  pdf_document:
+    keep_tex: yes
+header-includes: \usepackage{graphicx} \usepackage[printonlyused,withpage]{acronym}
+  \usepackage{natbib} 
 ---
+
+
+# Abkürzungsverzeichnis
+
+\begin{acronym}[TDMA]
+  \acro{AFP}{Anforderungs-Fähigkeits-Passung}
+  \acro{ANS}{autonome Nervensystem}
+	\acro{EKG}{Elektrokardiogramm}
+	\acro{ESM}{Experience Sampling Method}
+	\acro{FKS}{Flow-Kurzskala}
+	\acro{GPS}{Global Positioning System}
+	\acro{HRV}{Herzratenvariabilität}
+\end{acronym}
+
 # Ziel
 Die Studie diente dazu statistische Beziehungen zwischen:
 
@@ -12,33 +30,37 @@ Die Studie diente dazu statistische Beziehungen zwischen:
 
 beim Laufen herzustellen. Des Weiteren suchte ich in den Daten nach markanten Mustern, die den Eintritt in den Flow, Flow selbst und den Austritt aus dem Flow markieren.
 
-# Methode 
-## Untersuchungsdesign 
+# Methode
+## Flow-Diagnostik
+### Flow-Kurzskala
 
+Zur subjektiven Erfassung des Flow-Erlebens kam die \ac{FKS} von \citet{Rheinberg2003} zum Einsatz. Die \ac{FKS} besteht aus insgesamt 16 Items. Die ersten zehn Items bilden anhand einer 7-Punkte-Likert-Skala ("trifft nicht zu" = 1 bis "trifft zu" = 7) Komponenten des Flow-Erlebens ab und man fasst sie als Generalfaktor zusammen. Zur weiteren Differenzierung des Flow-Konstrukts ist der Generalfaktor der \ac{FKS} in zwei Faktoren (Subdimensionen) unterteilt worden. Faktor I umfasst dabei sechs Items, die durchweg Aussagen zum "Glatten automatisierten Verlauf" einer Handlung beschreiben. Faktor II beinhaltet vier Items, die mit "Absorbiertheit" in Zusammenhang stehen. Der Reliabilitätskoeffizient der zehn Items im Generalfaktor (Cronbachs Alpha) liegt nach Angaben von \citet[S. 9]{Rheinberg2003} im Bereich um $\alpha = 0.90$. Da nicht damit zu rechnen ist, dass in Anforderungssituationen ausschließlich Flow entsteht, sondern auch Angst und Besorgnis ausgelöst werden kann, wurde die \ac{FKS} durch eine "Besorgniskomponente" erweitert. Diese besteht aus drei Items (Nr. 11 bis 13, Cronbachs $\alpha = 0.80$ bis $\alpha = 0.90$). Am Ende der \ac{FKS} nehmen die Probanden noch drei Einschätzungen zur \ac{AFP} (auf einer 9-Punkte-Skala) vor. Dabei fokussiert das Item 14 auf einen Vergleich der Schwierigkeit der jetzigen Tätigkeit mit allen anderen Tätigkeiten (leicht vs. schwer) und das Item 15 auf die eigene Leistungsfähigkeit (niedrig vs. hoch). Das Item 16 fragt direkt, auf die aktuelle Tätigkeit (hier also Laufens) bezogen, nach der subjektiv wahrgenommenen \ac{AFP} (zu gering vs. zu hoch). 
+
+## Untersuchungsdesign 
 Ein männlicher Freizeitläufer (29) nahm am Experiment teil. Er lief in sechs aufeinanderfolgenden Wochen an einem Tag 60 Minuten jeweils die gleiche Strecke und zur gleichen Tageszeit.
 
-Vor jedem Lauf rüstete ich ihn mit einem geladenen Smartphone, einem passenden Smartphone-Armband, zwei geladenen Bewegungssensoren, einem geladenen Elektrokardiogramm (EKG)-Sensoren und vier Elektroden aus. Die Anordnung des Equipments ist Abbildung 1 zu entnehmen.
+Vor jedem Lauf rüstete ich ihn mit einem geladenen Smartphone, einem passenden Smartphone-Armband, zwei geladenen Bewegungssensoren, einem geladenen \ac{EKG}-Sensoren und vier Elektroden aus. Die Anordnung des Equipments ist Abbildung \ref{fig:anordnung-des-equipments} zu entnehmen.
 
-![Anordnung des Equipments](./figures/equipment-arrangement.png)
+\begin{figure}[htbp]
+\centering
+\includegraphics[keepaspectratio,width=0.5\textwidth]{./figures/equipment-arrangement.png}
+\caption{Anordnung des Equipments}
+\label{fig:anordnung-des-equipments}
+\end{figure}
 
-Abbildung 1: Anordnung des Equipments
+Während jedes Laufes nutzte ich die dafür eigens entwickelte mobile Datenaufnahme App, um \ac{EKG} und Bewegungsdaten mit Hilfe der tragbaren Sensoren des Unternehmens Shimmer Research (Shimmer 2r) aufzuzeichnen. Die Datenaufnahme App läuft auf dem Android OS ab Version 4.4 und kommuniziert mit den Sensoren über Bluetooth. Die Bewegungssensoren besitzen einen Beschleunigungsmesser und ein Kreiselinstrument, die beide auf jeweils drei Achsen messen. Für das Experiment nutzte ich das Smartphone Samsung Galaxy Nexus, welches auch über einen Beschleunigungsmesser und ein Kreiselinstrument verfügt. Alle Bewegungssensoren arbeiten mit einer Datenrate von 100 Hz. Der \ac{EKG}-Sensor von Shimmer Research arbeitet mit vier Ableitungen. Im Experiment nutzte ich Knopfelektroden und eine Datenrate von 204.8 Hz. Alle 15 Minuten während jedes Laufes forderte die Datenaufnahme App mit einem Signal den Läufer auf, eine \ac{FKS} auszufüllen. Vor jedem Lauf führte der Läufer eine 15-minütige Baseline Messung durch. 
 
-Während jedes Laufes nutzte ich die dafür eigens entwickelte mobile Datenaufnahme App, um EKG und Bewegungsdaten mit Hilfe der tragbaren Sensoren des Unternehmens Shimmer Research (Shimmer 2r) aufzuzeichnen. Die Datenaufnahme App läuft auf dem Android OS ab Version 4.4 und kommuniziert mit den Sensoren über Bluetooth. Die Bewegungssensoren besitzen einen Beschleunigungsmesser und ein Kreiselinstrument, die beide auf jeweils drei Achsen messen. Für das Experiment nutzte ich das Smartphone Samsung Galaxy Nexus, welches auch über einen Beschleunigungsmesser und ein Kreiselinstrument verfügt. Alle Bewegungssensoren arbeiten mit einer Datenrate von 100 Hz. Der EKG-Sensor von Shimmer Research arbeitet mit vier Ableitungen. Im Experiment nutzte ich Knopfelektroden und eine Datenrate von 204.8 Hz. Alle 15 Minuten während jedes Laufes forderte die Datenaufnahme App mit einem Signal den Läufer auf, eine FSK auszufüllen. Vor jedem Lauf führte der Läufer eine 15-minütige Baseline Messung durch. 
+Nach jedem Lauf übertrug ich die gesammelten Daten für die software-technische Analyse auf meinen Arbeitsrechner. Die Daten bestehen für jeden Lauf aus kontinuierlichen \ac{EKG}-Daten, \ac{GPS}-Positionen, Beschleunigungen und Winkelgeschwindigkeiten von den Körperpositionen Bein, Arm und Handgelenk. 
 
-Nach jedem Lauf übertrug ich die gesammelten Daten für die software-technische Analyse auf meinen Arbeitsrechner. Die Daten bestehen für jeden Lauf aus kontinuierlichen EKG-Daten, Global Positioning System (GPS)-Positionen, Beschleunigungen und Winkelgeschwindigkeiten von den Körperpositionen Bein, Arm und Handgelenk. 
-
-## Flow-Diagnostik
 ### Datenverarbeitung
-
 #### Flow-Kurzskala
-
-Zur subjektiven Erfassung des Flow-Erlebens kam die Flow-Kurzskala (FKS) von **Rheinberg, Vollmeyer und Engeser (2003)** zum Einsatz. Die FKS besteht aus insgesamt 16 Items. Die ersten 10 Items bilden anhand einer 7-Punkte-Likert-Skala ("trifft nicht zu" = 1 bis "trifft zu" = 7) Komponenten des Flow-Erlebens ab und man fasst sie als Generalfaktor zusammen. Zur weiteren Differenzierung des Flow-Konstrukts ist der Generalfaktor der FKS in zwei Faktoren (Subdimensionen) unterteilt worden. Faktor I umfasst dabei sechs Items, die durchweg Aussagen zum "Glatten automatisierten Verlauf" einer Handlung beschreiben. Faktor II beinhaltet vier Items, die mit "Absorbiertheit" in Zusammenhang stehen. Der Reliabilitätskoeffizient der 10 Items im Generalfaktor (Cronbachs Alpha) liegt nach Angaben **Rheinbergs (2003)** im Bereich um $\alpha = 0.90$. Da nicht damit zu rechnen ist, dass in Anforderungssituationen ausschließlich Flow entsteht, sondern auch Angst und Besorgnis ausgelöst werden kann, wurde die FKS durch eine "Besorgniskomponente" erweitert. Diese besteht aus drei Items (Nr. 11 bis 13, Cronbachs $\alpha = 0.80$ bis $\alpha = 0.90$). Am Ende der FKS nehmen die Probanden noch drei Einschätzungen zur Anforderungs-Fähigkeits-Passung (AFP) (auf einer 9-Punkte-Skala) vor. Dabei fokussiert das Item 14 auf einen Vergleich der Schwierigkeit der jetzigen Tätigkeit mit allen anderen Tätigkeiten (leicht vs. schwer) und das Item 15 auf die eigene Leistungsfähigkeit (niedrig vs. hoch). Das Item 16 fragt direkt, auf die aktuelle Tätigkeit (hier also dem Laufabchnitt) bezogen, nach der subjektiv wahrgenommenen AFP (zu gering vs. zu hoch). In Tabelle 1 sind die Ergebnisse der Flow-Skalen des Laufes vom Donnerstag, den 31. Oktober 2013 dargestellt. In diesem Lauf steigt die AFP kontinuirlich und am Ende erzielt der Läufer seinen höchsten Flow-Gesamtwert. 
+Aus den Fragebogen Daten berechnete die Faktoren der \ac{FKS}. In Tabelle \ref{tab:ergebisse-fks} sind die Ergebnisse der \ac{FKS} des Laufes vom Donnerstag, den 31. Oktober 2013 dargestellt. In diesem Lauf z. B. steigt die \ac{AFP} kontinuirlich und am Ende des Laufes bewertet der Läufer sein Flow-Erleben am höchsten. 
 
 ```{r calculate-fss-features, echo=FALSE, message=FALSE, warning=FALSE}
   library("flow")
   
   # Set start time
-  start.time <- as.POSIXct(strptime("2013-10-31 18:11:26", "%Y-%m-%d %H:%M:%S"), tz="CET")
+  start.time <- as.POSIXct(strptime("2013-10-31--18-11-26", "%Y-%m-%d--%H-%M-%S"), tz="CET")
   
   # Set file path 
   file.path <- paste("./data/", format(start.time, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", sep="")
@@ -47,72 +69,75 @@ Zur subjektiven Erfassung des Flow-Erlebens kam die Flow-Kurzskala (FKS) von **R
   fss.data  <- read.csv(paste(file.path, "fss-data.csv", sep=""), header=T)
   
   # Calculate fss features
-  fss.features.list <- c()
+  fss.features <- data.frame(stringsAsFactors = FALSE)
   for(i in 1:nrow(fss.data)) {
-      fss.features.list <- c(fss.features.list, CalculateFlowShortScaleResults(c(t(fss.data[i, 1:16])), start=as.POSIXct(fss.data[i, 17]/1000, origin="1970-01-01", tz="CET"), end=as.POSIXct(fss.data[i, 18]/1000, origin="1970-01-01", tz="CET")))
-  }
-
+    start       <- as.POSIXct(fss.data[i, 17]/1000, origin="1970-01-01", tz="CET")
+    end         <- as.POSIXct(fss.data[i, 18]/1000, origin="1970-01-01", tz="CET")
+    fss.results <- CalculateFlowShortScaleResults(c(t(fss.data[i, 1:16])), start=start, end=end)
+    
     # Extract flow features
-  flow        <- c(fss.features.list[1][[1]][[1]][[1]], fss.features.list[2][[1]][[1]][[1]], fss.features.list[3][[1]][[1]][[1]], fss.features.list[4][[1]][[1]][[1]], fss.features.list[5][[1]][[1]][[1]])
-  fluency     <- c(fss.features.list[1][[1]][[1]][[2]], fss.features.list[2][[1]][[1]][[2]], fss.features.list[3][[1]][[1]][[2]], fss.features.list[4][[1]][[1]][[2]], fss.features.list[5][[1]][[1]][[2]])
-  absorption  <- c(fss.features.list[1][[1]][[1]][[3]], fss.features.list[2][[1]][[1]][[3]], fss.features.list[3][[1]][[1]][[3]], fss.features.list[4][[1]][[1]][[3]], fss.features.list[5][[1]][[1]][[3]])
-  anxiety     <- c(fss.features.list[1][[1]][[1]][[4]], fss.features.list[2][[1]][[1]][[4]], fss.features.list[3][[1]][[1]][[4]], fss.features.list[4][[1]][[1]][[4]], fss.features.list[5][[1]][[1]][[4]])
-  fit         <- c(fss.features.list[1][[1]][[1]][[5]], fss.features.list[2][[1]][[1]][[5]], fss.features.list[3][[1]][[1]][[5]], fss.features.list[4][[1]][[1]][[5]], fss.features.list[5][[1]][[1]][[5]])
-  fss.features  <- data.frame(flow, fluency, absorption, anxiety, fit)
-
-# Clean up
-rm(fss.data, flow, fluency, absorption, anxiety, fit)
+    for(j in 1:length(fss.results[[1]][[1]])) {
+      fss.features <- rbind(fss.features, data.frame(fss.results[[1]][[1]][[j]], fss.results[[1]][[2]][[j]], format(start, format="%Y-%m-%d %H:%M:%S", tz="CET"), format(end, format="%Y-%m-%d %H:%M:%S", tz="CET"), j))
+    } 
+  }
+  colnames(fss.features)  <- c("m", "sd", "start", "end", "feature")
+  fss.features[,5] <- as.factor(fss.features[,5])
+  
+  # Clean up
+  rm(fss.results)
 ```
 
-| Faktoren        | Nach Baseline |  Nach 15 Min. |  Nach 30 Min. |  Nach 45 Min. |  Nach 60 Min. |
-|-----------------|--------------:|--------------:|--------------:|--------------:|--------------:|
-|                 | M (SD)        | M (SD)        | M (SD)        | M (SD)        | M (SD)        |
-|-----------------|---------------|---------------|---------------|---------------|---------------|
-| Generalfaktor   | `r format(round(fss.features.list[1][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features.list[1][[1]][[2]][[1]], 2), nsmall=2)`) | `r format(round(fss.features.list[2][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features.list[1][[1]][[2]][[1]], 2), nsmall=2)`) | `r format(round(fss.features.list[3][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features.list[3][[1]][[2]][[1]], 2), nsmall=2)`) | `r format(round(fss.features.list[4][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features.list[4][[1]][[2]][[1]], 2), nsmall=2)`) | `r format(round(fss.features.list[5][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features.list[5][[1]][[2]][[1]], 2), nsmall=2)`) |
-| Glatter Verlauf | `r format(round(fss.features.list[1][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features.list[1][[1]][[2]][[2]], 2), nsmall=2)`) | `r format(round(fss.features.list[2][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features.list[2][[1]][[2]][[2]], 2), nsmall=2)`) | `r format(round(fss.features.list[3][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features.list[3][[1]][[2]][[2]], 2), nsmall=2)`) | `r format(round(fss.features.list[4][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features.list[4][[1]][[2]][[2]], 2), nsmall=2)`) | `r format(round(fss.features.list[5][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features.list[5][[1]][[2]][[2]], 2), nsmall=2)`) |
-| Absorbiertheit  | `r format(round(fss.features.list[1][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features.list[1][[1]][[2]][[3]], 2), nsmall=2)`) | `r format(round(fss.features.list[2][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features.list[2][[1]][[2]][[3]], 2), nsmall=2)`) | `r format(round(fss.features.list[3][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features.list[3][[1]][[2]][[3]], 2), nsmall=2)`) | `r format(round(fss.features.list[4][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features.list[4][[1]][[2]][[3]], 2), nsmall=2)`) | `r format(round(fss.features.list[5][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features.list[5][[1]][[2]][[3]], 2), nsmall=2)`) |
-| Besorgnis       | `r format(round(fss.features.list[1][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features.list[1][[1]][[2]][[4]], 2), nsmall=2)`) | `r format(round(fss.features.list[2][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features.list[2][[1]][[2]][[4]], 2), nsmall=2)`) | `r format(round(fss.features.list[3][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features.list[3][[1]][[2]][[4]], 2), nsmall=2)`) | `r format(round(fss.features.list[4][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features.list[4][[1]][[2]][[4]], 2), nsmall=2)`) | `r format(round(fss.features.list[5][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features.list[5][[1]][[2]][[4]], 2), nsmall=2)`) |
-| AFP             | `r format(round(fss.features.list[1][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features.list[1][[1]][[2]][[5]], 2), nsmall=2)`) | `r format(round(fss.features.list[2][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features.list[2][[1]][[2]][[5]], 2), nsmall=2)`) | `r format(round(fss.features.list[3][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features.list[3][[1]][[2]][[5]], 2), nsmall=2)`) | `r format(round(fss.features.list[4][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features.list[4][[1]][[2]][[5]], 2), nsmall=2)`) | `r format(round(fss.features.list[5][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features.list[5][[1]][[2]][[5]], 2), nsmall=2)`) |
+\begin{table}
+\caption{Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`}
+\label{tab:ergebisse-fks}
+\centering
+```{r echo=FALSE, message=FALSE, results="asis"}
+  library(tables)
+  table.data            <- fss.features[,c(1:3, 5)]
+  table.data[,3]        <- factor(table.data[,3], levels(table.data[,3]), labels = c("Baseline", "Nach 15 Min.", "Nach 30 Min.", "Nach 45 Min.", "Nach 60 Min."))
+  table.data[,4]        <- factor(table.data[,4], levels(table.data[,4]), labels = c("Generalfaktor", "glatter Verlauf", "Absorbiertheit", "Besorgnis", "AFP"))
+  colnames(table.data)  <- c("M", "SD", "Beginn", "Merkmal")
+  tabular.data          <- tabular(Heading()*Merkmal ~ Heading()*Beginn*(`M` +`SD`)*Heading()*(identity)*Format(digits=2), data=table.data)
+  latex(tabular.data)
+  rm(tabular.data)
+```
+\end{table}
 
-Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
+Als Maßzahl nutze ich die zweite Subdimension \ac{FKS}, da Absorbiertheit laut \citet{Peifer2014} nur eintritt, wenn Anforderungen und Fähigkeiten sich in Balance befinden — somit ist sie ausschließlich im *Flow-Kanal* anzutreffen und deshalb ein repräsentativer Indikator für Flow als der Generalfaktor, der sich aus den zwei Subdimension zusammensetzt. Den Beleg hierfür geben \citet[S. 69]{Rheinberg2003a} in ihrer Studie. Sie stellten fest, dass Unterforderung keinen Einfluss auf den glatten Verlauf hat, jedoch die Absorbiertheit negativ beeinflusst. 
 
-Als Maßzahl nutze ich die zweite Subdimension der Flow-Kurzskala wie **Peifer (2014)**, da Absorbiertheit laut **Rheinberg & Vollmeyer (2003)** nur eintritt, wenn Anforderungen und Fähigkeiten sich in Balance befinden — somit ist sie ausschließlich im *Flow-Kanal* anzutreffen und deshalb ein repräsentativer Indikator für Flow als der Generalfaktor, der sich aus den zwei Subdimension zusammensetzt. Denn einen glatten Verlauf kann man auch auf Unterforderung zurückführen. Exemplarisch wird der Verlauf der Absorbiertheit in Abbildung 2 dargestellt.
-
-```{r figure-02, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('pdf'), warning=FALSE}
-  par(mfcol=c(1, 1), mar=c(2.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2.5, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8)
+```{r figure-02, eval=TRUE, echo=FALSE, fig.height=2.5, fig.width=6.5, dev=c('pdf'), fig.show='hide', warning=FALSE}
+  par(mfcol=c(1, 1), mar=c(3.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8)
   
-  # Set data
-  x <- c(fss.features.list[2][[1]][[3]][[1]], fss.features.list[3][[1]][[3]][[1]], fss.features.list[4][[1]][[3]][[1]], fss.features.list[5][[1]][[3]][[1]])
-  y <- c(fss.features.list[2][[1]][[1]][[3]], fss.features.list[3][[1]][[1]][[3]], fss.features.list[4][[1]][[1]][[3]], fss.features.list[5][[1]][[1]][[3]])
-
   # Plot data
-  plot(x, y, type="b", xlab ="Zeit", ylab="Absorbiertheit", pch=21, ylim=c(3, 6), xaxt="n", yaxt="n")
+  plot(table.data[fss.features[,5] == 3, 1], type="b", xlab ="Zeitpunkt", ylab="Absorbiertheit", pch=21, ylim=c(3, 6), xaxt="n", yaxt="n")
 
   # Plot ticks
-  axis(1, at=x, label=format(x, "%H:%M:%S"))
-  axis(2, at=seq(3, 6, .25), labels=seq(3, 6, .25))
-  axis(3, at=x, label=rep("", length(x)))
-  axis(4, at=seq(3, 6, .25), labels=rep("", length(seq(3, 6, .25))))
+  axis(1, at=1:5, label=table.data[fss.features[,5] == 3, 3])
+  axis(2, at=seq(3, 6, .5), labels=seq(3, 6, .5))
+  axis(3, at=1:5, label=rep("", length(1:5)))
+  axis(4, at=seq(3, 6, .5), labels=rep("", length(seq(3, 6, .5))))
 
   # Plot box again
   box()
-
-  # Clean up
-  rm(x, y)
 ```
-Abbildung 2: Bewertete Absorbiertheit nach jeweils 15 Minuten Laufen
+\begin{figure}[htbp]
+\centering 
+\includegraphics[keepaspectratio,width=6.5in, height=2.5in]{./study-flow-while-running_files/figure-latex/figure-02-1.pdf}
+\caption{Bewertete Absorbiertheit}
+\label{fig:bewertete-absorbiertheit}
+\end{figure}
 
 #### HRV-Analyse
-Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte. Diese 15-Minuten Abschnitte las ich in Kubios HRV (Version 2.1) ein. Kubios HRV automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. EKG-Daten mit mehr als 2% an Artefakten habe ich aus der Datensammlung entfernt.
+Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte. Diese 15-Minuten Abschnitte las ich in Kubios \ac{HRV} (Version 2.1) ein. Kubios \ac{HRV} automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. \ac{ECG}-Daten mit mehr als 2% an Artefakten habe ich aus der Datensammlung entfernt.
 
-```{r subset-ecg-data, echo=FALSE, message=FALSE, warning=FALSE}
+```{r subset-ecg-data, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
 
   # Load ecg data 
   ecg.data  <- read.csv(paste(file.path, "/ecg-data.csv", sep=""), header=T)
   
   # Set function attributes
-  starts    <- c(start.time, fss.features.list[1][[1]][[3]][[2]], fss.features.list[2][[1]][[3]][[2]], fss.features.list[3][[1]][[3]][[2]], fss.features.list[4][[1]][[3]][[2]])
-  ends      <- c(fss.features.list[1][[1]][[3]][[1]], fss.features.list[2][[1]][[3]][[1]], fss.features.list[3][[1]][[3]][[1]], fss.features.list[4][[1]][[3]][[1]], fss.features.list[5][[1]][[3]][[1]])
+  starts    <- c(start.time, as.POSIXct(strptime(fss.features[fss.features[,5] == 3, 4][1:4], "%Y-%m-%d %H:%M:%S"), tz="CET"))
+  ends      <- c(as.POSIXct(strptime(fss.features[fss.features[,5] == 3, 3], "%Y-%m-%d %H:%M:%S"), tz="CET"))
   times     <- as.POSIXct(ecg.data[, 4]/1000, origin="1970-01-01", tz="CET")
   file.name <- "ecg-data"
   
@@ -240,6 +265,13 @@ Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweil
 
 ```{r figure-03, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('pdf'), warning=FALSE}
   par(mfcol=c(4, 1), mar=c(3, 3, 1.5, 3) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="i", yaxs="i")
+
+  # Load ecg data 
+  #ecg.data  <- read.csv(paste(file.path, "/ecg-data.csv", sep=""), header=T)
+  
+  # Set function attributes
+  starts    <- c(start.time, as.POSIXct(strptime(fss.features[fss.features[,5] == 3, 4][1:4], "%Y-%m-%d %H:%M:%S"), tz="CET"))
+  ends      <- c(as.POSIXct(strptime(fss.features[fss.features[,5] == 3, 3], "%Y-%m-%d %H:%M:%S"), tz="CET"))
   
   # Set data
   t     <- ecg.data[, 1]
@@ -469,3 +501,5 @@ Table: Unterschied zwischen Baseline-Messungen und Laufmessungen
 ## Unterschied zwischen Baseline-Messungen und Laufmessungen
 
 Um zu testen, ob ein Unterschied zwischen den erhobenen Merkmalen aus den Baseline-Messungen und den Laufmessungen besteht, führte ich eine einfaktorielle Varianzanalyse (ANOVA) für jedes Merkmal. Das Ergebnis zeigt, dass alle Merkmale, außer dem Generalfaktor und dem Besorgnisfaktor, sich mindestens signifikant zwischen Baseline-Messungen und Laufmessungen unterscheiden. Das Ergebnis unterstützt meine Entscheidung Absorbiertheit als Maßzahl zur benutzen.  
+\bibliographystyle{agsm}
+\bibliography{./bibtex/library}
