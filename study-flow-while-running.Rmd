@@ -91,7 +91,7 @@ Aus den Fragebogen Daten berechnete die Faktoren der \ac{FKS}. In Tabelle \ref{t
 \caption{Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`}
 \label{tab:fks-merkmale}
 \centering
-```{r fks-merkmale, echo=FALSE, message=FALSE, results="asis"}
+```{r fks-merkmale, echo=FALSE, message=FALSE, warning=FALSE, results="asis"}
   library(tables)
   table.data            <- fss.features[,c(1:3, 5)]
   table.data[,3]        <- factor(table.data[,3], levels(table.data[,3]), labels = c("Baseline", "Nach 15 Min.", "Nach 30 Min.", "Nach 45 Min.", "Nach 60 Min."))
