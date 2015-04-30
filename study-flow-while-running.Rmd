@@ -2,8 +2,26 @@
 title: 'Studie: Flow beim Laufen'
 author: "Simon Bogutzky"
 date: "April 2015"
-output: pdf_document
+output:
+  pdf_document:
+    fig_caption: yes
+    keep_tex: yes
+header-includes: \usepackage{graphicx} \usepackage[printonlyused,withpage]{acronym}
+  \usepackage{natbib}
 ---
+
+# Abkürzungsverzeichnis
+
+\begin{acronym}[TDMA]
+  \acro{AFP}{Anforderungs-Fähigkeits-Passung}
+  \acro{ANS}{autonome Nervensystem}
+	\acro{EKG}{Elektrokardiogramm}
+	\acro{ESM}{Experience Sampling Method}
+	\acro{FKS}{Flow-Kurzskala}
+	\acro{GPS}{Global Positioning System}
+	\acro{HRV}{Herzratenvariabilität}
+\end{acronym}
+
 # Ziel
 Die Studie diente dazu statistische Beziehungen zwischen:
 
@@ -12,33 +30,37 @@ Die Studie diente dazu statistische Beziehungen zwischen:
 
 beim Laufen herzustellen. Des Weiteren suchte ich in den Daten nach markanten Mustern, die den Eintritt in den Flow, Flow selbst und den Austritt aus dem Flow markieren.
 
-# Methode 
-## Untersuchungsdesign 
+# Methode
+## Flow-Diagnostik
+### Flow-Kurzskala
 
+Zur subjektiven Erfassung des Flow-Erlebens kam die \ac{FKS} von \citet{Rheinberg2003} zum Einsatz. Die \ac{FKS} besteht aus insgesamt 16 Items. Die ersten zehn Items bilden anhand einer 7-Punkte-Likert-Skala ("trifft nicht zu" = 1 bis "trifft zu" = 7) Komponenten des Flow-Erlebens ab und man fasst sie als Generalfaktor zusammen. Zur weiteren Differenzierung des Flow-Konstrukts ist der Generalfaktor der \ac{FKS} in zwei Faktoren (Subdimensionen) unterteilt worden. Faktor I umfasst dabei sechs Items, die durchweg Aussagen zum "Glatten automatisierten Verlauf" einer Handlung beschreiben. Faktor II beinhaltet vier Items, die mit "Absorbiertheit" in Zusammenhang stehen. Der Reliabilitätskoeffizient der zehn Items im Generalfaktor (Cronbachs Alpha) liegt nach Angaben von \citet[S. 9]{Rheinberg2003} im Bereich um $\alpha = 0.90$. Da nicht damit zu rechnen ist, dass in Anforderungssituationen ausschließlich Flow entsteht, sondern auch Angst und Besorgnis ausgelöst werden kann, wurde die \ac{FKS} durch eine "Besorgniskomponente" erweitert. Diese besteht aus drei Items (Nr. 11 bis 13, Cronbachs $\alpha = 0.80$ bis $\alpha = 0.90$). Am Ende der \ac{FKS} nehmen die Probanden noch drei Einschätzungen zur \ac{AFP} (auf einer 9-Punkte-Skala) vor. Dabei fokussiert das Item 14 auf einen Vergleich der Schwierigkeit der jetzigen Tätigkeit mit allen anderen Tätigkeiten (leicht vs. schwer) und das Item 15 auf die eigene Leistungsfähigkeit (niedrig vs. hoch). Das Item 16 fragt direkt, auf die aktuelle Tätigkeit (hier also Laufens) bezogen, nach der subjektiv wahrgenommenen \ac{AFP} (zu gering vs. zu hoch). 
+
+## Untersuchungsdesign 
 Ein männlicher Freizeitläufer (29) nahm am Experiment teil. Er lief in sechs aufeinanderfolgenden Wochen an einem Tag 60 Minuten jeweils die gleiche Strecke und zur gleichen Tageszeit.
 
-Vor jedem Lauf rüstete ich ihn mit einem geladenen Smartphone, einem passenden Smartphone-Armband, zwei geladenen Bewegungssensoren, einem geladenen Elektrokardiogramm (EKG)-Sensoren und vier Elektroden aus. Die Anordnung des Equipments ist Abbildung 1 zu entnehmen.
+Vor jedem Lauf rüstete ich ihn mit einem geladenen Smartphone, einem passenden Smartphone-Armband, zwei geladenen Bewegungssensoren, einem geladenen \ac{EKG}-Sensoren und vier Elektroden aus. Die Anordnung des Equipments ist Abbildung \ref{fig:anordnung-des-equipments} zu entnehmen.
 
-![Anordnung des Equipments](./figures/equipment-arrangement.png)
+\begin{figure}[htbp]
+\centering
+\includegraphics[keepaspectratio,width=0.75\textwidth]{./figures/equipment-arrangement.pdf}
+\caption{Anordnung des Equipments}
+\label{fig:anordnung-des-equipments}
+\end{figure}
 
-Abbildung 1: Anordnung des Equipments
+Während jedes Laufes nutzte ich die dafür eigens entwickelte mobile Datenaufnahme App, um \ac{EKG} und Bewegungsdaten mit Hilfe der tragbaren Sensoren des Unternehmens Shimmer Research (Shimmer 2r) aufzuzeichnen. Die Datenaufnahme App läuft auf dem Android OS ab Version 4.4 und kommuniziert mit den Sensoren über Bluetooth. Die Bewegungssensoren besitzen einen Beschleunigungsmesser und ein Kreiselinstrument, die beide auf jeweils drei Achsen messen. Für das Experiment nutzte ich das Smartphone Samsung Galaxy Nexus, welches auch über einen Beschleunigungsmesser und ein Kreiselinstrument verfügt. Alle Bewegungssensoren arbeiten mit einer Datenrate von 100 Hz. Der \ac{EKG}-Sensor von Shimmer Research arbeitet mit vier Ableitungen. Im Experiment nutzte ich Knopfelektroden und eine Datenrate von 204.8 Hz. Alle 15 Minuten während jedes Laufes forderte die Datenaufnahme App mit einem Signal den Läufer auf, eine \ac{FKS} auszufüllen. Vor jedem Lauf führte der Läufer eine 15-minütige Baseline Messung durch. 
 
-Während jedes Laufes nutzte ich die dafür eigens entwickelte mobile Datenaufnahme App, um EKG und Bewegungsdaten mit Hilfe der tragbaren Sensoren des Unternehmens Shimmer Research (Shimmer 2r) aufzuzeichnen. Die Datenaufnahme App läuft auf dem Android OS ab Version 4.4 und kommuniziert mit den Sensoren über Bluetooth. Die Bewegungssensoren besitzen einen Beschleunigungsmesser und ein Kreiselinstrument, die beide auf jeweils drei Achsen messen. Für das Experiment nutzte ich das Smartphone Samsung Galaxy Nexus, welches auch über einen Beschleunigungsmesser und ein Kreiselinstrument verfügt. Alle Bewegungssensoren arbeiten mit einer Datenrate von 100 Hz. Der EKG-Sensor von Shimmer Research arbeitet mit vier Ableitungen. Im Experiment nutzte ich Knopfelektroden und eine Datenrate von 204.8 Hz. Alle 15 Minuten während jedes Laufes forderte die Datenaufnahme App mit einem Signal den Läufer auf, eine FSK auszufüllen. Vor jedem Lauf führte der Läufer eine 15-minütige Baseline Messung durch. 
+Nach jedem Lauf übertrug ich die gesammelten Daten für die software-technische Analyse auf meinen Arbeitsrechner. Die Daten bestehen für jeden Lauf aus kontinuierlichen \ac{EKG}-Daten, \ac{GPS}-Positionen, Beschleunigungen und Winkelgeschwindigkeiten von den Körperpositionen Bein, Arm und Handgelenk. 
 
-Nach jedem Lauf übertrug ich die gesammelten Daten für die software-technische Analyse auf meinen Arbeitsrechner. Die Daten bestehen für jeden Lauf aus kontinuierlichen EKG-Daten, Global Positioning System (GPS)-Positionen, Beschleunigungen und Winkelgeschwindigkeiten von den Körperpositionen Bein, Arm und Handgelenk. 
-
-## Flow-Diagnostik
 ### Datenverarbeitung
-
 #### Flow-Kurzskala
-
-Zur subjektiven Erfassung des Flow-Erlebens kam die Flow-Kurzskala (FKS) von **Rheinberg, Vollmeyer und Engeser (2003)** zum Einsatz. Die FKS besteht aus insgesamt 16 Items. Die ersten 10 Items bilden anhand einer 7-Punkte-Likert-Skala ("trifft nicht zu" = 1 bis "trifft zu" = 7) Komponenten des Flow-Erlebens ab und man fasst sie als Generalfaktor zusammen. Zur weiteren Differenzierung des Flow-Konstrukts ist der Generalfaktor der FKS in zwei Faktoren (Subdimensionen) unterteilt worden. Faktor I umfasst dabei sechs Items, die durchweg Aussagen zum "Glatten automatisierten Verlauf" einer Handlung beschreiben. Faktor II beinhaltet vier Items, die mit "Absorbiertheit" in Zusammenhang stehen. Der Reliabilitätskoeffizient der 10 Items im Generalfaktor (Cronbachs Alpha) liegt nach Angaben **Rheinbergs (2003)** im Bereich um $\alpha = 0.90$. Da nicht damit zu rechnen ist, dass in Anforderungssituationen ausschließlich Flow entsteht, sondern auch Angst und Besorgnis ausgelöst werden kann, wurde die FKS durch eine "Besorgniskomponente" erweitert. Diese besteht aus drei Items (Nr. 11 bis 13, Cronbachs $\alpha = 0.80$ bis $\alpha = 0.90$). Am Ende der FKS nehmen die Probanden noch drei Einschätzungen zur Anforderungs-Fähigkeits-Passung (AFP) (auf einer 9-Punkte-Skala) vor. Dabei fokussiert das Item 14 auf einen Vergleich der Schwierigkeit der jetzigen Tätigkeit mit allen anderen Tätigkeiten (leicht vs. schwer) und das Item 15 auf die eigene Leistungsfähigkeit (niedrig vs. hoch). Das Item 16 fragt direkt, auf die aktuelle Tätigkeit (hier also dem Laufabchnitt) bezogen, nach der subjektiv wahrgenommenen AFP (zu gering vs. zu hoch). In Tabelle 1 sind die Ergebnisse der Flow-Skalen des Laufes vom Donnerstag, den 31. Oktober 2013 dargestellt. In diesem Lauf steigt die AFP kontinuirlich und am Ende erzielt der Läufer seinen höchsten Flow-Gesamtwert. 
+Aus den Fragebogen Daten berechnete die Faktoren der \ac{FKS}. In Tabelle \ref{tab:fks-merkmale} sind die Ergebnisse der \ac{FKS} des Laufes vom Donnerstag, den 31. Oktober 2013 dargestellt. In diesem Lauf z. B. steigt die \ac{AFP} kontinuirlich und am Ende des Laufes bewertet der Läufer sein Flow-Erleben am höchsten. 
 
 ```{r calculate-fss-features, echo=FALSE, message=FALSE, warning=FALSE}
   library("flow")
   
   # Set start time
-  start.time <- as.POSIXct(strptime("2013-10-31 18:11:26", "%Y-%m-%d %H:%M:%S"), tz="CET")
+  start.time <- as.POSIXct(strptime("2013-10-31--18-11-26", "%Y-%m-%d--%H-%M-%S"), tz="CET")
   
   # Set file path 
   file.path <- paste("./data/", format(start.time, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", sep="")
@@ -47,72 +69,69 @@ Zur subjektiven Erfassung des Flow-Erlebens kam die Flow-Kurzskala (FKS) von **R
   fss.data  <- read.csv(paste(file.path, "fss-data.csv", sep=""), header=T)
   
   # Calculate fss features
-  fss.features.list <- c()
+  fss.features  <- data.frame()
   for(i in 1:nrow(fss.data)) {
-      fss.features.list <- c(fss.features.list, CalculateFlowShortScaleResults(c(t(fss.data[i, 1:16])), start=as.POSIXct(fss.data[i, 17]/1000, origin="1970-01-01", tz="CET"), end=as.POSIXct(fss.data[i, 18]/1000, origin="1970-01-01", tz="CET")))
-  }
-
+    start       <- as.POSIXct(fss.data[i, 17]/1000, origin="1970-01-01", tz="CET")
+    end         <- as.POSIXct(fss.data[i, 18]/1000, origin="1970-01-01", tz="CET")
+    fss.results <- CalculateFlowShortScaleResults(c(t(fss.data[i, 1:16])), start=start, end=end)
+    
     # Extract flow features
-  flow        <- c(fss.features.list[1][[1]][[1]][[1]], fss.features.list[2][[1]][[1]][[1]], fss.features.list[3][[1]][[1]][[1]], fss.features.list[4][[1]][[1]][[1]], fss.features.list[5][[1]][[1]][[1]])
-  fluency     <- c(fss.features.list[1][[1]][[1]][[2]], fss.features.list[2][[1]][[1]][[2]], fss.features.list[3][[1]][[1]][[2]], fss.features.list[4][[1]][[1]][[2]], fss.features.list[5][[1]][[1]][[2]])
-  absorption  <- c(fss.features.list[1][[1]][[1]][[3]], fss.features.list[2][[1]][[1]][[3]], fss.features.list[3][[1]][[1]][[3]], fss.features.list[4][[1]][[1]][[3]], fss.features.list[5][[1]][[1]][[3]])
-  anxiety     <- c(fss.features.list[1][[1]][[1]][[4]], fss.features.list[2][[1]][[1]][[4]], fss.features.list[3][[1]][[1]][[4]], fss.features.list[4][[1]][[1]][[4]], fss.features.list[5][[1]][[1]][[4]])
-  fit         <- c(fss.features.list[1][[1]][[1]][[5]], fss.features.list[2][[1]][[1]][[5]], fss.features.list[3][[1]][[1]][[5]], fss.features.list[4][[1]][[1]][[5]], fss.features.list[5][[1]][[1]][[5]])
-  fss.features  <- data.frame(flow, fluency, absorption, anxiety, fit)
-
-# Clean up
-rm(fss.data, flow, fluency, absorption, anxiety, fit)
+    for(j in 1:length(fss.results[[1]][[1]])) {
+      fss.features <- rbind(fss.features, data.frame(fss.results[[1]][[1]][[j]], fss.results[[1]][[2]][[j]], format(start, format="%Y-%m-%d %H:%M:%S", tz="CET"), format(end, format="%Y-%m-%d %H:%M:%S", tz="CET"), j))
+    } 
+  }
+  colnames(fss.features)  <- c("m", "sd", "start", "end", "feature")
+  fss.features[,5]        <- as.factor(fss.features[,5])
+  
+  # Clean up
+  rm(fss.results)
 ```
 
-| Faktoren        | Nach Baseline |  Nach 15 Min. |  Nach 30 Min. |  Nach 45 Min. |  Nach 60 Min. |
-|-----------------|--------------:|--------------:|--------------:|--------------:|--------------:|
-|                 | M (SD)        | M (SD)        | M (SD)        | M (SD)        | M (SD)        |
-|-----------------|---------------|---------------|---------------|---------------|---------------|
-| Generalfaktor   | `r format(round(fss.features.list[1][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features.list[1][[1]][[2]][[1]], 2), nsmall=2)`) | `r format(round(fss.features.list[2][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features.list[1][[1]][[2]][[1]], 2), nsmall=2)`) | `r format(round(fss.features.list[3][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features.list[3][[1]][[2]][[1]], 2), nsmall=2)`) | `r format(round(fss.features.list[4][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features.list[4][[1]][[2]][[1]], 2), nsmall=2)`) | `r format(round(fss.features.list[5][[1]][[1]][[1]], 2), nsmall=2)` (`r format(round(fss.features.list[5][[1]][[2]][[1]], 2), nsmall=2)`) |
-| Glatter Verlauf | `r format(round(fss.features.list[1][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features.list[1][[1]][[2]][[2]], 2), nsmall=2)`) | `r format(round(fss.features.list[2][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features.list[2][[1]][[2]][[2]], 2), nsmall=2)`) | `r format(round(fss.features.list[3][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features.list[3][[1]][[2]][[2]], 2), nsmall=2)`) | `r format(round(fss.features.list[4][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features.list[4][[1]][[2]][[2]], 2), nsmall=2)`) | `r format(round(fss.features.list[5][[1]][[1]][[2]], 2), nsmall=2)` (`r format(round(fss.features.list[5][[1]][[2]][[2]], 2), nsmall=2)`) |
-| Absorbiertheit  | `r format(round(fss.features.list[1][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features.list[1][[1]][[2]][[3]], 2), nsmall=2)`) | `r format(round(fss.features.list[2][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features.list[2][[1]][[2]][[3]], 2), nsmall=2)`) | `r format(round(fss.features.list[3][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features.list[3][[1]][[2]][[3]], 2), nsmall=2)`) | `r format(round(fss.features.list[4][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features.list[4][[1]][[2]][[3]], 2), nsmall=2)`) | `r format(round(fss.features.list[5][[1]][[1]][[3]], 2), nsmall=2)` (`r format(round(fss.features.list[5][[1]][[2]][[3]], 2), nsmall=2)`) |
-| Besorgnis       | `r format(round(fss.features.list[1][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features.list[1][[1]][[2]][[4]], 2), nsmall=2)`) | `r format(round(fss.features.list[2][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features.list[2][[1]][[2]][[4]], 2), nsmall=2)`) | `r format(round(fss.features.list[3][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features.list[3][[1]][[2]][[4]], 2), nsmall=2)`) | `r format(round(fss.features.list[4][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features.list[4][[1]][[2]][[4]], 2), nsmall=2)`) | `r format(round(fss.features.list[5][[1]][[1]][[4]], 2), nsmall=2)` (`r format(round(fss.features.list[5][[1]][[2]][[4]], 2), nsmall=2)`) |
-| AFP             | `r format(round(fss.features.list[1][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features.list[1][[1]][[2]][[5]], 2), nsmall=2)`) | `r format(round(fss.features.list[2][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features.list[2][[1]][[2]][[5]], 2), nsmall=2)`) | `r format(round(fss.features.list[3][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features.list[3][[1]][[2]][[5]], 2), nsmall=2)`) | `r format(round(fss.features.list[4][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features.list[4][[1]][[2]][[5]], 2), nsmall=2)`) | `r format(round(fss.features.list[5][[1]][[1]][[5]], 2), nsmall=2)` (`r format(round(fss.features.list[5][[1]][[2]][[5]], 2), nsmall=2)`) |
+\begin{table}
+\caption{Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`}
+\label{tab:fks-merkmale}
+\centering
+```{r fks-merkmale, echo=FALSE, message=FALSE, results="asis"}
+  library(tables)
+  table.data            <- fss.features[,c(1:3, 5)]
+  table.data[,3]        <- factor(table.data[,3], levels(table.data[,3]), labels = c("Baseline", "Nach 15 Min.", "Nach 30 Min.", "Nach 45 Min.", "Nach 60 Min."))
+  table.data[,4]        <- factor(table.data[,4], levels(table.data[,4]), labels = c("Generalfaktor", "glatter Verlauf", "Absorbiertheit", "Besorgnis", "AFP"))
+  colnames(table.data)  <- c("M", "SD", "Beginn", "Merkmal")
+  tabular.data          <- tabular(Heading()*Merkmal ~ Heading()*Beginn*(`M` +`SD`)*Heading()*(identity)*Format(digits=2), data=table.data)
+  latex(tabular.data)
+  rm(tabular.data)
+```
+\end{table}
 
-Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
+Als Maßzahl nutze ich die zweite Subdimension \ac{FKS}, da Absorbiertheit laut \citet{Peifer2014} nur eintritt, wenn Anforderungen und Fähigkeiten sich in Balance befinden — somit ist sie ausschließlich im *Flow-Kanal* anzutreffen und deshalb ein repräsentativer Indikator für Flow als der Generalfaktor, der sich aus den zwei Subdimension zusammensetzt. Den Beleg hierfür geben \citet[S. 69]{Rheinberg2003a} in ihrer Studie. Sie stellten fest, dass Unterforderung keinen Einfluss auf den glatten Verlauf hat, jedoch die Absorbiertheit negativ beeinflusst. 
 
-Als Maßzahl nutze ich die zweite Subdimension der Flow-Kurzskala wie **Peifer (2014)**, da Absorbiertheit laut **Rheinberg & Vollmeyer (2003)** nur eintritt, wenn Anforderungen und Fähigkeiten sich in Balance befinden — somit ist sie ausschließlich im *Flow-Kanal* anzutreffen und deshalb ein repräsentativer Indikator für Flow als der Generalfaktor, der sich aus den zwei Subdimension zusammensetzt. Denn einen glatten Verlauf kann man auch auf Unterforderung zurückführen. Exemplarisch wird der Verlauf der Absorbiertheit in Abbildung 2 dargestellt.
-
-```{r figure-02, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('pdf'), warning=FALSE}
-  par(mfcol=c(1, 1), mar=c(2.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2.5, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8)
+```{r bewertete-absorbiertheit, echo=FALSE, warning=FALSE, dev='pdf', fig.height=2.5, fig.width=6.5, fig.pos='htbp', fig.cap='Bewertete Absorbiertheit'}
+  par(mfcol=c(1, 1), mar=c(3.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8)
   
-  # Set data
-  x <- c(fss.features.list[2][[1]][[3]][[1]], fss.features.list[3][[1]][[3]][[1]], fss.features.list[4][[1]][[3]][[1]], fss.features.list[5][[1]][[3]][[1]])
-  y <- c(fss.features.list[2][[1]][[1]][[3]], fss.features.list[3][[1]][[1]][[3]], fss.features.list[4][[1]][[1]][[3]], fss.features.list[5][[1]][[1]][[3]])
-
   # Plot data
-  plot(x, y, type="b", xlab ="Zeit", ylab="Absorbiertheit", pch=21, ylim=c(3, 6), xaxt="n", yaxt="n")
+  plot(table.data[fss.features[,5] == 3, 1], type="b", xlab ="Zeitpunkt", ylab="Absorbiertheit", pch=21, ylim=c(3, 6), xaxt="n", yaxt="n")
 
   # Plot ticks
-  axis(1, at=x, label=format(x, "%H:%M:%S"))
-  axis(2, at=seq(3, 6, .25), labels=seq(3, 6, .25))
-  axis(3, at=x, label=rep("", length(x)))
-  axis(4, at=seq(3, 6, .25), labels=rep("", length(seq(3, 6, .25))))
+  axis(1, at=1:5, label=table.data[fss.features[,5] == 3, 3])
+  axis(2, at=seq(3, 6, .5), labels=seq(3, 6, .5))
+  axis(3, at=1:5, label=rep("", length(1:5)))
+  axis(4, at=seq(3, 6, .5), labels=rep("", length(seq(3, 6, .5))))
 
   # Plot box again
   box()
-
-  # Clean up
-  rm(x, y)
 ```
-Abbildung 2: Bewertete Absorbiertheit nach jeweils 15 Minuten Laufen
 
 #### HRV-Analyse
-Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte. Diese 15-Minuten Abschnitte las ich in Kubios HRV (Version 2.1) ein. Kubios HRV automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. EKG-Daten mit mehr als 2% an Artefakten habe ich aus der Datensammlung entfernt.
+Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte. Diese 15-Minuten Abschnitte las ich in Kubios \ac{HRV} (Version 2.1) ein. Kubios \ac{HRV} automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. \ac{EKG}-Daten mit mehr als 2% an Artefakten habe ich aus der Datensammlung entfernt.
 
-```{r subset-ecg-data, echo=FALSE, message=FALSE, warning=FALSE}
+```{r subset-ecg-data, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
 
   # Load ecg data 
   ecg.data  <- read.csv(paste(file.path, "/ecg-data.csv", sep=""), header=T)
   
   # Set function attributes
-  starts    <- c(start.time, fss.features.list[1][[1]][[3]][[2]], fss.features.list[2][[1]][[3]][[2]], fss.features.list[3][[1]][[3]][[2]], fss.features.list[4][[1]][[3]][[2]])
-  ends      <- c(fss.features.list[1][[1]][[3]][[1]], fss.features.list[2][[1]][[3]][[1]], fss.features.list[3][[1]][[3]][[1]], fss.features.list[4][[1]][[3]][[1]], fss.features.list[5][[1]][[3]][[1]])
+  starts    <- c(start.time, as.POSIXct(strptime(fss.features[fss.features[,5] == 3, 4][1:4], "%Y-%m-%d %H:%M:%S"), tz="CET"))
+  ends      <- c(as.POSIXct(strptime(fss.features[fss.features[,5] == 3, 3], "%Y-%m-%d %H:%M:%S"), tz="CET"))
   times     <- as.POSIXct(ecg.data[, 4]/1000, origin="1970-01-01", tz="CET")
   file.name <- "ecg-data"
   
@@ -205,7 +224,7 @@ Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweil
         mean.hr           <- mean(hrv.data$HR)
         
         # Add features to feature vector
-        hrv.features      <- c(hrv.features, lf.power.a, hf.power.a, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf, total.power, mean.hr)
+        hrv.features      <- c(hrv.features, mean.hr, lf.power.a, hf.power.a, total.power, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf)
         
         # Clean up
         rm(ulf.power.a, vlf.power.a, lf.power.a, hf.power.a, total.power, ulf.power.r, vlf.power.r, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf, mean.hr)
@@ -226,12 +245,12 @@ Von den EKG-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweil
         mean.hr           <- NA
         
         # Add features to feature vector
-        hrv.features      <- c(hrv.features, lf.power.a, hf.power.a, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf, total.power, mean.hr)
+        hrv.features      <- c(hrv.features, mean.hr, lf.power.a, hf.power.a, total.power, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf)
       }
   }
   
   # Make data frame
-  dimnames      <- list(row=c("lf.power.a", "hf.power.a", "lf.power.r", "hf.power.r", "lf.power.nu", "hf.power.nu", "lfhf", "total.power", "mean.hr"), col=1:i)
+  dimnames      <- list(row=c("mean.hr", "lf.power.a", "hf.power.a", "total.power", "lf.power.r", "hf.power.r", "lf.power.nu", "hf.power.nu", "lfhf"), col=1:i)
   hrv.features  <- as.data.frame(t(matrix(hrv.features, ncol=i, nrow=9, dimnames=dimnames)))
 
   # Clean up
@@ -277,8 +296,16 @@ Warum LF und HF?
 
 One particular approach to analyze HRV is to use spectral methods that provide information about how variance in HR ("power") distributes as a function of frequency (Task Force Guidelines, 1996). One of the relevant parameters in spectral analyses is the high-frequency component of the heart rate variability (HF-HRV), which reflects variance in the high frequency range (0.15-0.4 Hz). HF-HRV has been shown to be a reliable indicator for parasympathetic efferent activity (Porges, 1995) and increased task demands are related to a low level of HF-HRV (Backs et al., 1991; Mulder et al., 2002). Furthermore, increased HF-HRV is associated with efficient use of strategies for self-regulation and attention, which results in better performance in cognitive tasks (better accuracy and shorter reaction time) (Hansen et al, 2003; Thayer et al., 2009). In contrast, decreased HF-HRV is related to limited use of self-regulatory strategies (Thayer & Brosschot, 2005), for example, failure to recognize task relevant information or to habituate to novel, non-relevant stimuli (hypervigilance; Friedman, 2007; Thayer, Friedman, Borkovec, Johnsen, & Molina, 2000; Thayer et al., 2009). Focusing on task relevant stimuli and fading out task-irrelevant information are key components of flow. Therefore, one can assume a positive relation between flow and HF-HRV. However, prior studies suggest that moderate and increased task demands are related to lower levels of HF-HRV (Backs et al., 1991; Jorna, 1992; Mulder et al., 2002 Vicente et al., 1987). Based on these findings, we hypothesize a relation between flow and HF-HRV without making any assumptions regarding the direction of the relationship. Another parameter of HRV is the low-frequency component of the HRV (LF-HRV), which reflects the variance in the low frequency range (0.04-0.15 Hz) of heart rates. The meaning of this parameter is controversial in recent research. LF-HRV has been used as an indicator for sympathetic activity (Pagani et al., 1986; Malliani, Pagani, Lombardi, & Cerutti, 1991). However, a growing body of research disproved this assumption and showed that LF-HRV rather reflects baroreflex modulation (Heathers, 2014; Rahman, Pechnik, Gross, Sewall, Goldstein, 2011; Schroeder et al., 2003). The baroreflex is one of the elementary mechanisms through which acute changes in the heart rate and blood pressure is controlled (Guyton, 1980) Baroreflex activity has been associated with several cognitive functions such as mental stress (del Paso, Langewitz, Robles, & Pérez, 1996; Robbe et al., 1987, Steptoe & Sawada, 1989), cognitive-attentional demands (del Paso, González, & Hernández, 2004), and cognitive performance (Yasumasu, del Paso, Takahara, & Nakashima, 2006). According to Lacey's intake/rejection hypothesis (Lacey & Lacey, 1970), tasks containing cognitive elaboration are related to a baroreceptor-elicited cardiac acceleration (del Paso et al., 2004). In contrast, activities involving the detection of external stimuli are related to a baroreceptor-modulated cardiac deceleration (Bernardi, Porta, Spicuzza, & Sleight, 2005). Yasumasu et al. (2006) showed that activities that involve cognitive elaboration and rejection of external stimuli cause a decrease of baroreflex activity, which in turn causes an increase in cardiovascular activity (i.e., increase in heart rate). Cognitive involvement in an activity and rejection of external stimuli are crucial for experiencing flow. Furthermore, previous research suggests an inverted u-shaped function between flow and LF-HRV (Peifer et al., 2014b). Based on these results, we assume a relation between LF-HRV (as an indicator for baroreflex function) and flow experience and test this assumption in an experimental setting that addresses the aforementioned limitations of previous studies. (Tozman2015)
 
-```{r figure-03, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('pdf'), warning=FALSE}
+```{r ekg-signalverarbeitung, echo=FALSE, warning=FALSE, dev='CairoPNG', dpi=800, fig.height=4.5, fig.width=6.5, fig.pos='htbp', fig.cap='EKG-Signalverarbeitung'}
   par(mfcol=c(4, 1), mar=c(3, 3, 1.5, 3) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="i", yaxs="i")
+
+  # Load ecg data 
+  ecg.data  <- read.csv(paste(file.path, "/ecg-data.csv", sep=""), header=T)
+  
+  # Set time properties
+  starts    <- c(start.time, as.POSIXct(strptime(fss.features[fss.features[,5] == 3, 4][1:4], "%Y-%m-%d %H:%M:%S"), tz="CET"))
+  ends      <- c(as.POSIXct(strptime(fss.features[fss.features[,5] == 3, 3], "%Y-%m-%d %H:%M:%S"), tz="CET"))
+  times     <- as.POSIXct(ecg.data[, 4]/1000, origin="1970-01-01", tz="CET")
   
   # Set data
   t     <- ecg.data[, 1]
@@ -287,20 +314,20 @@ One particular approach to analyze HRV is to use spectral methods that provide i
   start <- starts[length(starts)]
   
   # Plot all ecg data
-  plot(t, y, type="l", xlab="", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n", yaxt="n", col="darkgrey")
+  plot(t, y, type="l", xlab="", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n", yaxt="n", col=1)
   par(new = T)
   plot(times, y, type="n", xlab="", ylab="", xaxt="n", yaxt="n")
 
   # Mark interesting part
-  polygon(c(start, start, end, end), c(-10, 10, 10, -10), col = rgb(1, 1, 0, .1), border = rgb(0, 0, 0, 0))
+  polygon(c(start, start, end, end), c(-10, 10, 10, -10), col = rgb(1, 1, 1, .2), border = rgb(0, 0, 0, 0))
   
   # Plot ticks and vertical lines
   axis(1, at=c(starts, ends), label=format(c(starts, ends), "%H:%M:%S"))
   axis(2, at=seq(-6, 6, 2), labels=seq(-6, 6, 2))
   axis(3, at=c(starts, ends), label=rep("", length(c(starts, ends))))
   axis(4, at=seq(-6, 6, 2), labels=rep("", length(seq(-6, 6, 2))))
-  abline(v=starts, lty="dashed")
-  abline(v=ends, lty="dashed")
+  abline(v=starts, lty="dashed", col="grey")
+  abline(v=ends, lty="dashed", col="grey")
   
   # Plot box again
   box()
@@ -314,7 +341,7 @@ One particular approach to analyze HRV is to use spectral methods that provide i
   y            <- y[isIn]
   times.subset <- times[isIn]
   
-  plot(t, y, type="l", xlab="", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n", yaxt="n", col="darkgrey")
+  plot(t, y, type="l", xlab="", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n", yaxt="n", col=1)
   par(new = T)
   plot(times.subset, y, type="n", xlab="", ylab="", xaxt="n", yaxt="n")
 
@@ -323,8 +350,8 @@ One particular approach to analyze HRV is to use spectral methods that provide i
   axis(2, at=seq(-6, 6, 2), labels=seq(-6, 6, 2))
   axis(3, at=c(starts, ends), label=rep("", length(c(starts, ends))))
   axis(4, at=seq(-6, 6, 2), labels=rep("", length(seq(-6, 6, 2))))
-  abline(v=starts, lty="dashed")
-  abline(v=ends, lty="dashed")
+  abline(v=starts, lty="dashed", col="grey")
+  abline(v=ends, lty="dashed", col="grey")
 
   # Plot box again
   box()
@@ -340,10 +367,10 @@ One particular approach to analyze HRV is to use spectral methods that provide i
   xlim      <- c(start.rr - 30, end.rr + 30)
   
   # Plot rrIntervals
-  plot(t, y, type="l", xlab="", ylab=expression("RR-Intervalle ["~s~"]"), xaxt="n", yaxt="n", xlim=xlim, col="darkgrey")
+  plot(t, y, type="l", xlab="", ylab=expression("RR-Intervalle ["~s~"]"), xaxt="n", yaxt="n", xlim=xlim, col=1)
 
   # Mark interesting part
-  polygon(c(end.rr - 10 * 60, end.rr - 10 * 60, end.rr, end.rr), c(0, 1, 1, -0), col = rgb(1, 1, 0, .1), border = rgb(0, 0, 0, 0))
+  polygon(c(end.rr - 10 * 60, end.rr - 10 * 60, end.rr, end.rr), c(0, 1, 1, -0), col = rgb(1, 1, 1, .2), border = rgb(0, 0, 0, 0))
 
   # Plot ticks and vertical lines
   marker <- c(start.rr, end.rr - 10 * 60, end.rr)
@@ -351,7 +378,7 @@ One particular approach to analyze HRV is to use spectral methods that provide i
   axis(2, at=seq(.25, .50, .05), labels=seq(.25, .50, .05))
   axis(3, at=marker, label=rep("", length(marker)))
   axis(4, at=seq(.25, .50, .05), labels=rep("", length(seq(.25, .50, .05))))
-  abline(v=marker, lty = "dashed")
+  abline(v=marker, lty = "dashed", col="grey")
 
   # Plot box again
   box()
@@ -367,7 +394,7 @@ One particular approach to analyze HRV is to use spectral methods that provide i
   xlim      <- c(start.rr - 30, end.rr + 30)
   
   # Plot rrIntervals
-  plot(t, y, type="l", xlab="Zeit", ylab=expression("RR-Intervalle ["~s~"]"), xaxt="n", yaxt="n", xlim=xlim, col="darkgrey")
+  plot(t, y, type="l", xlab="Zeit", ylab=expression("RR-Intervalle ["~s~"]"), xaxt="n", yaxt="n", xlim=xlim, col=1)
 
   # Plot ticks and vertical lines
   marker <- c(start.rr, end.rr)
@@ -375,7 +402,7 @@ One particular approach to analyze HRV is to use spectral methods that provide i
   axis(2, at=seq(.25, .50, .025), labels=seq(.25, .50, .025))
   axis(3, at=marker, label=rep("", length(marker)))
   axis(4, at=seq(.25, .50, .025), labels=rep("", length(seq(.25, .50, .025))))
-  abline(v=c(min(t), max(t)), lty = "dashed")
+  abline(v=c(min(t), max(t)), lty = "dashed", col="grey")
 
   # Plot box again
   box()
@@ -385,35 +412,19 @@ One particular approach to analyze HRV is to use spectral methods that provide i
 
   # Clean up
   rm(ecg.data, end, end.rr, hrv.data, isIn, marker, rr.interval, start, start.rr, t, time, times, times.subset, xlim, y)
-
 ```
 
-| Parameter       | Nach Baseline |  Nach 15 Min. |  Nach 30 Min. |  Nach 45 Min. |  Nach 60 Min. |
-|-----------------|--------------:|--------------:|--------------:|--------------:|--------------:|
-| Mittlere Herzrate (BPM)  | `r format(round(hrv.features$mean.hr[1], 2), nsmall=2)` | `r format(round(hrv.features$mean.hr[2], 2), nsmall=2)` | `r format(round(hrv.features$mean.hr[3], 2), nsmall=2)` | `r format(round(hrv.features$mean.hr[4], 2), nsmall=2)` | `r format(round(hrv.features$mean.hr[5], 2), nsmall=2)` |
-| LF (ms^2^)  | `r format(round(hrv.features$lf.power.a[1], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.a[2], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.a[3], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.a[4], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.a[5], 2), nsmall=2)` |
-| HF-VHF (ms^2^)  | `r format(round(hrv.features$hf.power.a[1], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.a[2], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.a[3], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.a[4], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.a[5], 2), nsmall=2)` |
-| Total (ms^2^)  | `r format(round(hrv.features$total.power[1], 2), nsmall=2)` | `r format(round(hrv.features$total.power[2], 2), nsmall=2)` | `r format(round(hrv.features$total.power[3], 2), nsmall=2)` | `r format(round(hrv.features$total.power[4], 2), nsmall=2)` | `r format(round(hrv.features$total.power[5], 2), nsmall=2)` |
-| LF (%)  | `r format(round(hrv.features$lf.power.r[1], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.r[2], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.r[3], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.r[4], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.r[5], 2), nsmall=2)` |
-| HF-VHF (%)  | `r format(round(hrv.features$hf.power.r[1], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.r[2], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.r[3], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.r[4], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.r[5], 2), nsmall=2)` |
-| LF (n. u.)  | `r format(round(hrv.features$lf.power.nu[1], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.nu[2], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.nu[3], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.nu[4], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.nu[5], 2), nsmall=2)` |
-| HF-VHF (n. u.)  | `r format(round(hrv.features$hf.power.nu[1], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.nu[2], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.nu[3], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.nu[4], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.nu[5], 2), nsmall=2)` |
-| LF/HF-VHF  | `r format(round(hrv.features$lfhf[1], 2), nsmall=2)` | `r format(round(hrv.features$lfhf[2], 2), nsmall=2)` | `r format(round(hrv.features$lfhf[3], 2), nsmall=2)` | `r format(round(hrv.features$lfhf[4], 2), nsmall=2)` | `r format(round(hrv.features$lfhf[5], 2), nsmall=2)` |
+```{r hrv-merkmale, echo=FALSE, message=FALSE, results="asis"}
+  library(xtable)  
+  table.data            <- t(hrv.features)
+  colnames(table.data)  <- c("Baseline", "Nach 15 Min.", "Nach 30 Min.", "Nach 45 Min.", "Nach 60 Min.")
+  rownames(table.data)  <- c("Mittlere Herzrate (BPM)", "LF ($ms^2$)", "HF-VHF ($ms^2$)", "Total ($ms^2$)", "LF (\\%)", "HF (\\%)", "LF (n. u.)", "HF-VHF (n. u.)", "LF/HF-VHF")
+  table.data            <- xtable(table.data, caption = paste("Ergebnisse vom", strftime(start.time, format = "%A, den %d. %B %Y")), align = "lrrrrr", label = "tab:hrv-ergebisse")
 
-Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
-
-```{r save-features, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
-  
-  # Append data
-  if(file.exists("./data/features.csv")) {
-    features <- read.csv("./data/features.csv")
-    write.csv(rbind(features, cbind(fss.features, hrv.features)), "./data/features.csv", row.names=FALSE)
-  } else {
-    write.csv(cbind(fss.features, hrv.features), "./data/features.csv", row.names=FALSE)
-  }
+  print(table.data, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment=FALSE)
 ```
 
-```{r anova, echo=FALSE, message=FALSE, warning=FALSE}
+```{r baseline-laufen-vergleich, echo=FALSE, message=FALSE, warning=FALSE, results="asis"}
   
   # Load feature data
   load("./data/features.RData")
@@ -423,39 +434,30 @@ Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
   
   # Modify m 
   features[features[, 1] != 1, ][,1] = 2
-  
-  # Define help function
-  mean.na.rm <- function(x) {
-      mean(x, na.rm = T)
-    }
-
-  sd.na.rm <- function(x) {
-      sd(x, na.rm = T)
-    }
 
   getSigString <- function(p) {
-      sig.string <- ""
+      sig.string <- "   "
       if (p < .1)
-        sig.string <- "."
+        sig.string <- ".  "
       if (p < .05)
-        sig.string <- "\\*"
+        sig.string <- "*  "
       if (p < .01)
-        sig.string <- "\\*\\*"
+        sig.string <- "** "
       if (p < .001)
-        sig.string <- "\\*\\*\\*"
+        sig.string <- "***"
       return(sig.string)
     }
   
   # Result table
-  table.data <- data.frame()
+  table.data <- data.frame(stringsAsFactors = FALSE)
 
   for (i in 2:ncol(features)) {
 #     boxplot(features[,i]  ~ m, data = features, title = colnames(features)[i])
     
     # Calculate feature values
     features  <- features[,c(1, i)]
-    means     <- aggregate(features[, 2], list(features[, 1]), mean.na.rm)
-    sds       <- aggregate(features[, 2], list(features[, 1]), sd.na.rm)
+    means     <- aggregate(features[, 2], list(features[, 1]), function(x) {mean(x, na.rm = T)})
+    sds       <- aggregate(features[, 2], list(features[, 1]), function(x) {sd(x, na.rm = T)})
     
     # Create anova structure
     features.stack    <- stack(features)
@@ -468,9 +470,10 @@ Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
     # Get p value
     fit <- aov(value ~ m, data=features.stack)
     p   <- summary(fit)[[1]][["Pr(>F)"]][1]
+    p   <- paste(sprintf("%.2f", round(p, 2)), getSigString(p))
     
     # Store values
-    row <- cbind(means[1, 2], sds[1, 2], means[2, 2], sds[2, 2], p)
+    row <- data.frame(means[1, 2], sds[1, 2], means[2, 2], sds[2, 2], p)
     table.data <- rbind(table.data, row)
 
 #     tukey <- TukeyHSD(fit)
@@ -479,32 +482,35 @@ Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
     features          <- features.backup
     features[features[, 1] != 1, ][,1] = 2
   }
+
+  rownames(table.data)  <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Besorgnis", "AFP", "Mittlere Herzrate (BPM)", "LF ($ms^2$)", "HF-VHF ($ms^2$)", "Total ($ms^2$)", "LF (\\%)", "HF (\\%)", "LF (n. u.)", "HF-VHF (n. u.)", "LF/HF-VHF")
+  addtorow          <- list()
+  addtorow$pos      <- list()
+  addtorow$pos[[1]] <- 0
+  addtorow$pos[[2]] <- 0
+  addtorow$command <- c("& \\multicolumn{2}{c}{Baseline} & \\multicolumn{2}{c}{Laufen} & \\\\\n", "& \\multicolumn{1}{c}{M} & \\multicolumn{1}{c}{SD} & \\multicolumn{1}{c}{M} & \\multicolumn{1}{c}{SD} & \\multicolumn{1}{c}{P} \\\\\n")
+  table.data            <- xtable(table.data, caption = "Unterschied zwischen Baseline-Messungen und Laufmessungen", label = "tab:baseline-laufen", align = "lrrrrl")
+
+  print(table.data, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment=FALSE, add.to.row = addtorow, include.colnames = FALSE)
   
   # Clean up
-  rm (features, features.stack, means, row, sds, fit, i, p)
+  rm(features, features.stack, means, row, sds, fit, i, p)
 ```
-
-| Merkmal                 | Baseline | Laufen |         |
-|-------------------------|---------:|-------:|:--------|
-|                         | M (SD)   | M (SD) | P       |
-|-------------------------|----------|--------|---------|
-| Generalfaktor           | `r format(round(table.data[1, 1], 2), nsmall=2)` (`r format(round(table.data[1, 2], 2), nsmall=2)`) | `r format(round(table.data[1, 3], 2), nsmall=2)` (`r format(round(table.data[1, 4], 2), nsmall=2)`) | `r format(round(table.data[1, 5], 2), nsmall=2)` `r getSigString(table.data[1, 5])`|
-| Glatter Verlauf         | `r format(round(table.data[2, 1], 2), nsmall=2)` (`r format(round(table.data[2, 2], 2), nsmall=2)`) | `r format(round(table.data[2, 3], 2), nsmall=2)` (`r format(round(table.data[2, 4], 2), nsmall=2)`) | `r format(round(table.data[2, 5], 2), nsmall=2)` `r getSigString(table.data[2, 5])`|  
-| Absorbiertheit          | `r format(round(table.data[3, 1], 2), nsmall=2)` (`r format(round(table.data[3, 2], 2), nsmall=2)`) | `r format(round(table.data[3, 3], 2), nsmall=2)` (`r format(round(table.data[3, 4], 2), nsmall=2)`) | `r format(round(table.data[3, 5], 2), nsmall=2)` `r getSigString(table.data[3, 5])`|
-| Besorgnis               | `r format(round(table.data[4, 1], 2), nsmall=2)` (`r format(round(table.data[4, 2], 2), nsmall=2)`) | `r format(round(table.data[4, 3], 2), nsmall=2)` (`r format(round(table.data[4, 4], 2), nsmall=2)`) | `r format(round(table.data[4, 5], 2), nsmall=2)` `r getSigString(table.data[4, 5])`|  
-| AFP                     | `r format(round(table.data[5, 1], 2), nsmall=2)` (`r format(round(table.data[5, 2], 2), nsmall=2)`) | `r format(round(table.data[5, 3], 2), nsmall=2)` (`r format(round(table.data[5, 4], 2), nsmall=2)`) | `r format(round(table.data[5, 5], 2), nsmall=2)` `r getSigString(table.data[5, 5])`|
-| Mittlere Herzrate (BPM)               | `r format(round(table.data[14, 1], 2), nsmall=2)` (`r format(round(table.data[14, 2], 2), nsmall=2)`) | `r format(round(table.data[14, 3], 2), nsmall=2)` (`r format(round(table.data[14, 4], 2), nsmall=2)`) | `r format(round(table.data[14, 5], 2), nsmall=2)` `r getSigString(table.data[14, 5])`| 
-| LF (ms^2^)  | `r format(round(table.data[6, 1], 2), nsmall=2)` (`r format(round(table.data[6, 2], 2), nsmall=2)`) | `r format(round(table.data[6, 3], 2), nsmall=2)` (`r format(round(table.data[6, 4], 2), nsmall=2)`) | `r format(round(table.data[6, 5], 2), nsmall=2)` `r getSigString(table.data[6, 5])`| 
-| HF-VHF (ms^2^)              | `r format(round(table.data[7, 1], 2), nsmall=2)` (`r format(round(table.data[7, 2], 2), nsmall=2)`) | `r format(round(table.data[7, 3], 2), nsmall=2)` (`r format(round(table.data[7, 4], 2), nsmall=2)`) | `r format(round(table.data[7, 5], 2), nsmall=2)` `r getSigString(table.data[7, 5])`|
-|  Total (ms^2^)        | `r format(round(table.data[13, 1], 2), nsmall=2)` (`r format(round(table.data[13, 2], 2), nsmall=2)`) | `r format(round(table.data[13, 3], 2), nsmall=2)` (`r format(round(table.data[13, 4], 2), nsmall=2)`) | `r format(round(table.data[13, 5], 2), nsmall=2)` `r getSigString(table.data[13, 5])` | 
-| LF (%)        | `r format(round(table.data[8, 1], 2), nsmall=2)` (`r format(round(table.data[8, 2], 2), nsmall=2)`) | `r format(round(table.data[8, 3], 2), nsmall=2)` (`r format(round(table.data[8, 4], 2), nsmall=2)`) | `r format(round(table.data[8, 5], 2), nsmall=2)` `r getSigString(table.data[8, 5])`|
-| HF-VHF (%)          | `r format(round(table.data[9, 1], 2), nsmall=2)` (`r format(round(table.data[9, 2], 2), nsmall=2)`) | `r format(round(table.data[9, 3], 2), nsmall=2)` (`r format(round(table.data[9, 4], 2), nsmall=2)`) | `r format(round(table.data[9, 5], 2), nsmall=2)` `r getSigString(table.data[9, 5])`| 
-| LF (n. u.)                   | `r format(round(table.data[10, 1], 2), nsmall=2)` (`r format(round(table.data[10, 2], 2), nsmall=2)`) | `r format(round(table.data[10, 3], 2), nsmall=2)` (`r format(round(table.data[10, 4], 2), nsmall=2)`) | `r format(round(table.data[10, 5], 2), nsmall=2)` `r getSigString(table.data[10, 5])`| 
-| HF-VHF (n. u.)             | `r format(round(table.data[11, 1], 2), nsmall=2)` (`r format(round(table.data[11, 2], 2), nsmall=2)`) | `r format(round(table.data[11, 3], 2), nsmall=2)` (`r format(round(table.data[11, 4], 2), nsmall=2)`) | `r format(round(table.data[11, 5], 2), nsmall=2)` `r getSigString(table.data[11, 5])`| 
-| LF/HF-VHF             | `r format(round(table.data[12, 1], 2), nsmall=2)` (`r format(round(table.data[12, 2], 2), nsmall=2)`) | `r format(round(table.data[12, 3], 2), nsmall=2)` (`r format(round(table.data[12, 4], 2), nsmall=2)`) | `r format(round(table.data[12, 5], 2), nsmall=2)` `r getSigString(table.data[12, 5])` | 
-
-Table: Unterschied zwischen Baseline-Messungen und Laufmessungen
 
 ## Unterschied zwischen Baseline-Messungen und Laufmessungen
 
-Um zu testen, ob ein Unterschied zwischen Merkmalen aus den Baseline-Messungen und den Laufmessungen besteht führte ich eine einfaktorielle Varianzanalyse (ANOVA) für jedes Merkmal als abhängige Variable durch. 
+Um zu testen, ob ein Unterschied zwischen den erhobenen Merkmalen aus den Baseline-Messungen und den Laufmessungen besteht, führte ich eine einfaktorielle Varianzanalyse (ANOVA) für jedes Merkmal durch. Das Ergebnis zeigt, dass alle Merkmale, außer dem Generalfaktor und dem Besorgnisfaktor, sich mindestens signifikant zwischen Baseline-Messungen und Laufmessungen unterscheiden (siehe Tabelle \ref{tab:baseline-laufen}). Das Ergebnis unterstützt meine Entscheidung Absorbiertheit als Maßzahl zu benutzen.  
+
+\bibliographystyle{agsm}
+\bibliography{./bibtex/library}
+
+```{r save-features, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+  
+  # Append data
+  if(file.exists("./data/features.csv")) {
+    features <- read.csv("./data/features.csv")
+    write.csv(rbind(features, cbind(fss.features, hrv.features)), "./data/features.csv", row.names=FALSE)
+  } else {
+    write.csv(cbind(fss.features, hrv.features), "./data/features.csv", row.names=FALSE)
+  }
+```
