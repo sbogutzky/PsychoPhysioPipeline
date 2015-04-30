@@ -4,11 +4,11 @@ author: "Simon Bogutzky"
 date: "April 2015"
 output:
   pdf_document:
+    fig_caption: yes
     keep_tex: yes
 header-includes: \usepackage{graphicx} \usepackage[printonlyused,withpage]{acronym}
-  \usepackage{natbib} 
+  \usepackage{natbib}
 ---
-
 
 # Abkürzungsverzeichnis
 
@@ -43,7 +43,7 @@ Vor jedem Lauf rüstete ich ihn mit einem geladenen Smartphone, einem passenden 
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[keepaspectratio,width=0.5\textwidth]{./figures/equipment-arrangement.png}
+\includegraphics[keepaspectratio,width=0.75\textwidth]{./figures/equipment-arrangement.pdf}
 \caption{Anordnung des Equipments}
 \label{fig:anordnung-des-equipments}
 \end{figure}
@@ -54,7 +54,7 @@ Nach jedem Lauf übertrug ich die gesammelten Daten für die software-technische
 
 ### Datenverarbeitung
 #### Flow-Kurzskala
-Aus den Fragebogen Daten berechnete die Faktoren der \ac{FKS}. In Tabelle \ref{tab:ergebisse-fks} sind die Ergebnisse der \ac{FKS} des Laufes vom Donnerstag, den 31. Oktober 2013 dargestellt. In diesem Lauf z. B. steigt die \ac{AFP} kontinuirlich und am Ende des Laufes bewertet der Läufer sein Flow-Erleben am höchsten. 
+Aus den Fragebogen Daten berechnete die Faktoren der \ac{FKS}. In Tabelle \ref{tab:fks-merkmale} sind die Ergebnisse der \ac{FKS} des Laufes vom Donnerstag, den 31. Oktober 2013 dargestellt. In diesem Lauf z. B. steigt die \ac{AFP} kontinuirlich und am Ende des Laufes bewertet der Läufer sein Flow-Erleben am höchsten. 
 
 ```{r calculate-fss-features, echo=FALSE, message=FALSE, warning=FALSE}
   library("flow")
@@ -69,7 +69,7 @@ Aus den Fragebogen Daten berechnete die Faktoren der \ac{FKS}. In Tabelle \ref{t
   fss.data  <- read.csv(paste(file.path, "fss-data.csv", sep=""), header=T)
   
   # Calculate fss features
-  fss.features <- data.frame(stringsAsFactors = FALSE)
+  fss.features  <- data.frame()
   for(i in 1:nrow(fss.data)) {
     start       <- as.POSIXct(fss.data[i, 17]/1000, origin="1970-01-01", tz="CET")
     end         <- as.POSIXct(fss.data[i, 18]/1000, origin="1970-01-01", tz="CET")
@@ -81,7 +81,7 @@ Aus den Fragebogen Daten berechnete die Faktoren der \ac{FKS}. In Tabelle \ref{t
     } 
   }
   colnames(fss.features)  <- c("m", "sd", "start", "end", "feature")
-  fss.features[,5] <- as.factor(fss.features[,5])
+  fss.features[,5]        <- as.factor(fss.features[,5])
   
   # Clean up
   rm(fss.results)
@@ -89,9 +89,9 @@ Aus den Fragebogen Daten berechnete die Faktoren der \ac{FKS}. In Tabelle \ref{t
 
 \begin{table}
 \caption{Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`}
-\label{tab:ergebisse-fks}
+\label{tab:fks-merkmale}
 \centering
-```{r echo=FALSE, message=FALSE, results="asis"}
+```{r fks-merkmale, echo=FALSE, message=FALSE, results="asis"}
   library(tables)
   table.data            <- fss.features[,c(1:3, 5)]
   table.data[,3]        <- factor(table.data[,3], levels(table.data[,3]), labels = c("Baseline", "Nach 15 Min.", "Nach 30 Min.", "Nach 45 Min.", "Nach 60 Min."))
@@ -105,7 +105,7 @@ Aus den Fragebogen Daten berechnete die Faktoren der \ac{FKS}. In Tabelle \ref{t
 
 Als Maßzahl nutze ich die zweite Subdimension \ac{FKS}, da Absorbiertheit laut \citet{Peifer2014} nur eintritt, wenn Anforderungen und Fähigkeiten sich in Balance befinden — somit ist sie ausschließlich im *Flow-Kanal* anzutreffen und deshalb ein repräsentativer Indikator für Flow als der Generalfaktor, der sich aus den zwei Subdimension zusammensetzt. Den Beleg hierfür geben \citet[S. 69]{Rheinberg2003a} in ihrer Studie. Sie stellten fest, dass Unterforderung keinen Einfluss auf den glatten Verlauf hat, jedoch die Absorbiertheit negativ beeinflusst. 
 
-```{r figure-02, eval=TRUE, echo=FALSE, fig.height=2.5, fig.width=6.5, dev=c('pdf'), fig.show='hide', warning=FALSE}
+```{r bewertete-absorbiertheit, echo=FALSE, warning=FALSE, dev='pdf', fig.height=2.5, fig.width=6.5, fig.pos='htbp', fig.cap='Bewertete Absorbiertheit'}
   par(mfcol=c(1, 1), mar=c(3.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8)
   
   # Plot data
@@ -120,15 +120,9 @@ Als Maßzahl nutze ich die zweite Subdimension \ac{FKS}, da Absorbiertheit laut 
   # Plot box again
   box()
 ```
-\begin{figure}[htbp]
-\centering 
-\includegraphics[keepaspectratio,width=6.5in, height=2.5in]{./study-flow-while-running_files/figure-latex/figure-02-1.pdf}
-\caption{Bewertete Absorbiertheit}
-\label{fig:bewertete-absorbiertheit}
-\end{figure}
 
 #### HRV-Analyse
-Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte. Diese 15-Minuten Abschnitte las ich in Kubios \ac{HRV} (Version 2.1) ein. Kubios \ac{HRV} automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. \ac{ECG}-Daten mit mehr als 2% an Artefakten habe ich aus der Datensammlung entfernt.
+Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte. Diese 15-Minuten Abschnitte las ich in Kubios \ac{HRV} (Version 2.1) ein. Kubios \ac{HRV} automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. \ac{EKG}-Daten mit mehr als 2% an Artefakten habe ich aus der Datensammlung entfernt.
 
 ```{r subset-ecg-data, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
 
@@ -230,7 +224,7 @@ Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt j
         mean.hr           <- mean(hrv.data$HR)
         
         # Add features to feature vector
-        hrv.features      <- c(hrv.features, lf.power.a, hf.power.a, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf, total.power, mean.hr)
+        hrv.features      <- c(hrv.features, mean.hr, lf.power.a, hf.power.a, total.power, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf)
         
         # Clean up
         rm(ulf.power.a, vlf.power.a, lf.power.a, hf.power.a, total.power, ulf.power.r, vlf.power.r, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf, mean.hr)
@@ -251,27 +245,28 @@ Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt j
         mean.hr           <- NA
         
         # Add features to feature vector
-        hrv.features      <- c(hrv.features, lf.power.a, hf.power.a, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf, total.power, mean.hr)
+        hrv.features      <- c(hrv.features, mean.hr, lf.power.a, hf.power.a, total.power, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf)
       }
   }
   
   # Make data frame
-  dimnames      <- list(row=c("lf.power.a", "hf.power.a", "lf.power.r", "hf.power.r", "lf.power.nu", "hf.power.nu", "lfhf", "total.power", "mean.hr"), col=1:i)
+  dimnames      <- list(row=c("mean.hr", "lf.power.a", "hf.power.a", "total.power", "lf.power.r", "hf.power.r", "lf.power.nu", "hf.power.nu", "lfhf"), col=1:i)
   hrv.features  <- as.data.frame(t(matrix(hrv.features, ncol=i, nrow=9, dimnames=dimnames)))
 
   # Clean up
   rm(j, s, m, minbpm, maxbpm, hrv.kubios.data, dimnames)
 ```
 
-```{r figure-03, eval=TRUE, echo=FALSE, fig.width=6.5, dev=c('pdf'), warning=FALSE}
+```{r ekg-signalverarbeitung, echo=FALSE, warning=FALSE, dev='CairoPNG', dpi=800, fig.height=4.5, fig.width=6.5, fig.pos='htbp', fig.cap='EKG-Signalverarbeitung'}
   par(mfcol=c(4, 1), mar=c(3, 3, 1.5, 3) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="i", yaxs="i")
 
   # Load ecg data 
-  #ecg.data  <- read.csv(paste(file.path, "/ecg-data.csv", sep=""), header=T)
+  ecg.data  <- read.csv(paste(file.path, "/ecg-data.csv", sep=""), header=T)
   
-  # Set function attributes
+  # Set time properties
   starts    <- c(start.time, as.POSIXct(strptime(fss.features[fss.features[,5] == 3, 4][1:4], "%Y-%m-%d %H:%M:%S"), tz="CET"))
   ends      <- c(as.POSIXct(strptime(fss.features[fss.features[,5] == 3, 3], "%Y-%m-%d %H:%M:%S"), tz="CET"))
+  times     <- as.POSIXct(ecg.data[, 4]/1000, origin="1970-01-01", tz="CET")
   
   # Set data
   t     <- ecg.data[, 1]
@@ -280,20 +275,20 @@ Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt j
   start <- starts[length(starts)]
   
   # Plot all ecg data
-  plot(t, y, type="l", xlab="", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n", yaxt="n", col="darkgrey")
+  plot(t, y, type="l", xlab="", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n", yaxt="n", col=1)
   par(new = T)
   plot(times, y, type="n", xlab="", ylab="", xaxt="n", yaxt="n")
 
   # Mark interesting part
-  polygon(c(start, start, end, end), c(-10, 10, 10, -10), col = rgb(1, 1, 0, .1), border = rgb(0, 0, 0, 0))
+  polygon(c(start, start, end, end), c(-10, 10, 10, -10), col = rgb(1, 1, 1, .2), border = rgb(0, 0, 0, 0))
   
   # Plot ticks and vertical lines
   axis(1, at=c(starts, ends), label=format(c(starts, ends), "%H:%M:%S"))
   axis(2, at=seq(-6, 6, 2), labels=seq(-6, 6, 2))
   axis(3, at=c(starts, ends), label=rep("", length(c(starts, ends))))
   axis(4, at=seq(-6, 6, 2), labels=rep("", length(seq(-6, 6, 2))))
-  abline(v=starts, lty="dashed")
-  abline(v=ends, lty="dashed")
+  abline(v=starts, lty="dashed", col="grey")
+  abline(v=ends, lty="dashed", col="grey")
   
   # Plot box again
   box()
@@ -307,7 +302,7 @@ Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt j
   y            <- y[isIn]
   times.subset <- times[isIn]
   
-  plot(t, y, type="l", xlab="", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n", yaxt="n", col="darkgrey")
+  plot(t, y, type="l", xlab="", ylab=expression("EKG LA LL ["~mV~"]"), xaxt="n", yaxt="n", col=1)
   par(new = T)
   plot(times.subset, y, type="n", xlab="", ylab="", xaxt="n", yaxt="n")
 
@@ -316,8 +311,8 @@ Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt j
   axis(2, at=seq(-6, 6, 2), labels=seq(-6, 6, 2))
   axis(3, at=c(starts, ends), label=rep("", length(c(starts, ends))))
   axis(4, at=seq(-6, 6, 2), labels=rep("", length(seq(-6, 6, 2))))
-  abline(v=starts, lty="dashed")
-  abline(v=ends, lty="dashed")
+  abline(v=starts, lty="dashed", col="grey")
+  abline(v=ends, lty="dashed", col="grey")
 
   # Plot box again
   box()
@@ -333,10 +328,10 @@ Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt j
   xlim      <- c(start.rr - 30, end.rr + 30)
   
   # Plot rrIntervals
-  plot(t, y, type="l", xlab="", ylab=expression("RR-Intervalle ["~s~"]"), xaxt="n", yaxt="n", xlim=xlim, col="darkgrey")
+  plot(t, y, type="l", xlab="", ylab=expression("RR-Intervalle ["~s~"]"), xaxt="n", yaxt="n", xlim=xlim, col=1)
 
   # Mark interesting part
-  polygon(c(end.rr - 10 * 60, end.rr - 10 * 60, end.rr, end.rr), c(0, 1, 1, -0), col = rgb(1, 1, 0, .1), border = rgb(0, 0, 0, 0))
+  polygon(c(end.rr - 10 * 60, end.rr - 10 * 60, end.rr, end.rr), c(0, 1, 1, -0), col = rgb(1, 1, 1, .2), border = rgb(0, 0, 0, 0))
 
   # Plot ticks and vertical lines
   marker <- c(start.rr, end.rr - 10 * 60, end.rr)
@@ -344,7 +339,7 @@ Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt j
   axis(2, at=seq(.25, .50, .05), labels=seq(.25, .50, .05))
   axis(3, at=marker, label=rep("", length(marker)))
   axis(4, at=seq(.25, .50, .05), labels=rep("", length(seq(.25, .50, .05))))
-  abline(v=marker, lty = "dashed")
+  abline(v=marker, lty = "dashed", col="grey")
 
   # Plot box again
   box()
@@ -360,7 +355,7 @@ Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt j
   xlim      <- c(start.rr - 30, end.rr + 30)
   
   # Plot rrIntervals
-  plot(t, y, type="l", xlab="Zeit", ylab=expression("RR-Intervalle ["~s~"]"), xaxt="n", yaxt="n", xlim=xlim, col="darkgrey")
+  plot(t, y, type="l", xlab="Zeit", ylab=expression("RR-Intervalle ["~s~"]"), xaxt="n", yaxt="n", xlim=xlim, col=1)
 
   # Plot ticks and vertical lines
   marker <- c(start.rr, end.rr)
@@ -368,7 +363,7 @@ Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt j
   axis(2, at=seq(.25, .50, .025), labels=seq(.25, .50, .025))
   axis(3, at=marker, label=rep("", length(marker)))
   axis(4, at=seq(.25, .50, .025), labels=rep("", length(seq(.25, .50, .025))))
-  abline(v=c(min(t), max(t)), lty = "dashed")
+  abline(v=c(min(t), max(t)), lty = "dashed", col="grey")
 
   # Plot box again
   box()
@@ -378,35 +373,19 @@ Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt j
 
   # Clean up
   rm(ecg.data, end, end.rr, hrv.data, isIn, marker, rr.interval, start, start.rr, t, time, times, times.subset, xlim, y)
-
 ```
 
-| Parameter       | Nach Baseline |  Nach 15 Min. |  Nach 30 Min. |  Nach 45 Min. |  Nach 60 Min. |
-|-----------------|--------------:|--------------:|--------------:|--------------:|--------------:|
-| Mittlere Herzrate (BPM)  | `r format(round(hrv.features$mean.hr[1], 2), nsmall=2)` | `r format(round(hrv.features$mean.hr[2], 2), nsmall=2)` | `r format(round(hrv.features$mean.hr[3], 2), nsmall=2)` | `r format(round(hrv.features$mean.hr[4], 2), nsmall=2)` | `r format(round(hrv.features$mean.hr[5], 2), nsmall=2)` |
-| LF (ms^2^)  | `r format(round(hrv.features$lf.power.a[1], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.a[2], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.a[3], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.a[4], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.a[5], 2), nsmall=2)` |
-| HF-VHF (ms^2^)  | `r format(round(hrv.features$hf.power.a[1], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.a[2], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.a[3], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.a[4], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.a[5], 2), nsmall=2)` |
-| Total (ms^2^)  | `r format(round(hrv.features$total.power[1], 2), nsmall=2)` | `r format(round(hrv.features$total.power[2], 2), nsmall=2)` | `r format(round(hrv.features$total.power[3], 2), nsmall=2)` | `r format(round(hrv.features$total.power[4], 2), nsmall=2)` | `r format(round(hrv.features$total.power[5], 2), nsmall=2)` |
-| LF (%)  | `r format(round(hrv.features$lf.power.r[1], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.r[2], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.r[3], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.r[4], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.r[5], 2), nsmall=2)` |
-| HF-VHF (%)  | `r format(round(hrv.features$hf.power.r[1], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.r[2], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.r[3], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.r[4], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.r[5], 2), nsmall=2)` |
-| LF (n. u.)  | `r format(round(hrv.features$lf.power.nu[1], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.nu[2], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.nu[3], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.nu[4], 2), nsmall=2)` | `r format(round(hrv.features$lf.power.nu[5], 2), nsmall=2)` |
-| HF-VHF (n. u.)  | `r format(round(hrv.features$hf.power.nu[1], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.nu[2], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.nu[3], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.nu[4], 2), nsmall=2)` | `r format(round(hrv.features$hf.power.nu[5], 2), nsmall=2)` |
-| LF/HF-VHF  | `r format(round(hrv.features$lfhf[1], 2), nsmall=2)` | `r format(round(hrv.features$lfhf[2], 2), nsmall=2)` | `r format(round(hrv.features$lfhf[3], 2), nsmall=2)` | `r format(round(hrv.features$lfhf[4], 2), nsmall=2)` | `r format(round(hrv.features$lfhf[5], 2), nsmall=2)` |
+```{r hrv-merkmale, echo=FALSE, message=FALSE, results="asis"}
+  library(xtable)  
+  table.data            <- t(hrv.features)
+  colnames(table.data)  <- c("Baseline", "Nach 15 Min.", "Nach 30 Min.", "Nach 45 Min.", "Nach 60 Min.")
+  rownames(table.data)  <- c("Mittlere Herzrate (BPM)", "LF ($ms^2$)", "HF-VHF ($ms^2$)", "Total ($ms^2$)", "LF (\\%)", "HF (\\%)", "LF (n. u.)", "HF-VHF (n. u.)", "LF/HF-VHF")
+  table.data            <- xtable(table.data, caption = paste("Ergebnisse vom", strftime(start.time, format = "%A, den %d. %B %Y")), align = "lrrrrr", label = "tab:hrv-ergebisse")
 
-Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
-
-```{r save-features, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
-  
-  # Append data
-  if(file.exists("./data/features.csv")) {
-    features <- read.csv("./data/features.csv")
-    write.csv(rbind(features, cbind(fss.features, hrv.features)), "./data/features.csv", row.names=FALSE)
-  } else {
-    write.csv(cbind(fss.features, hrv.features), "./data/features.csv", row.names=FALSE)
-  }
+  print(table.data, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment=FALSE)
 ```
 
-```{r anova, echo=FALSE, message=FALSE, warning=FALSE}
+```{r baseline-laufen-vergleich, echo=FALSE, message=FALSE, warning=FALSE, results="asis"}
   
   # Load feature data
   load("./data/features.RData")
@@ -416,39 +395,30 @@ Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
   
   # Modify m 
   features[features[, 1] != 1, ][,1] = 2
-  
-  # Define help function
-  mean.na.rm <- function(x) {
-      mean(x, na.rm = T)
-    }
-
-  sd.na.rm <- function(x) {
-      sd(x, na.rm = T)
-    }
 
   getSigString <- function(p) {
-      sig.string <- ""
+      sig.string <- "   "
       if (p < .1)
-        sig.string <- "."
+        sig.string <- ".  "
       if (p < .05)
-        sig.string <- "\\*"
+        sig.string <- "*  "
       if (p < .01)
-        sig.string <- "\\*\\*"
+        sig.string <- "** "
       if (p < .001)
-        sig.string <- "\\*\\*\\*"
+        sig.string <- "***"
       return(sig.string)
     }
   
   # Result table
-  table.data <- data.frame()
+  table.data <- data.frame(stringsAsFactors = FALSE)
 
   for (i in 2:ncol(features)) {
 #     boxplot(features[,i]  ~ m, data = features, title = colnames(features)[i])
     
     # Calculate feature values
     features  <- features[,c(1, i)]
-    means     <- aggregate(features[, 2], list(features[, 1]), mean.na.rm)
-    sds       <- aggregate(features[, 2], list(features[, 1]), sd.na.rm)
+    means     <- aggregate(features[, 2], list(features[, 1]), function(x) {mean(x, na.rm = T)})
+    sds       <- aggregate(features[, 2], list(features[, 1]), function(x) {sd(x, na.rm = T)})
     
     # Create anova structure
     features.stack    <- stack(features)
@@ -461,9 +431,10 @@ Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
     # Get p value
     fit <- aov(value ~ m, data=features.stack)
     p   <- summary(fit)[[1]][["Pr(>F)"]][1]
+    p   <- paste(sprintf("%.2f", round(p, 2)), getSigString(p))
     
     # Store values
-    row <- cbind(means[1, 2], sds[1, 2], means[2, 2], sds[2, 2], p)
+    row <- data.frame(means[1, 2], sds[1, 2], means[2, 2], sds[2, 2], p)
     table.data <- rbind(table.data, row)
 
 #     tukey <- TukeyHSD(fit)
@@ -472,34 +443,35 @@ Table: Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`
     features          <- features.backup
     features[features[, 1] != 1, ][,1] = 2
   }
+
+  rownames(table.data)  <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Besorgnis", "AFP", "Mittlere Herzrate (BPM)", "LF ($ms^2$)", "HF-VHF ($ms^2$)", "Total ($ms^2$)", "LF (\\%)", "HF (\\%)", "LF (n. u.)", "HF-VHF (n. u.)", "LF/HF-VHF")
+  addtorow          <- list()
+  addtorow$pos      <- list()
+  addtorow$pos[[1]] <- 0
+  addtorow$pos[[2]] <- 0
+  addtorow$command <- c("& \\multicolumn{2}{c}{Baseline} & \\multicolumn{2}{c}{Laufen} & \\\\\n", "& \\multicolumn{1}{c}{M} & \\multicolumn{1}{c}{SD} & \\multicolumn{1}{c}{M} & \\multicolumn{1}{c}{SD} & \\multicolumn{1}{c}{P} \\\\\n")
+  table.data            <- xtable(table.data, caption = "Unterschied zwischen Baseline-Messungen und Laufmessungen", label = "tab:baseline-laufen", align = "lrrrrl")
+
+  print(table.data, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment=FALSE, add.to.row = addtorow, include.colnames = FALSE)
   
   # Clean up
-  rm (features, features.stack, means, row, sds, fit, i, p)
+  rm(features, features.stack, means, row, sds, fit, i, p)
 ```
-
-| Merkmal                 | Baseline | Laufen |         |
-|-------------------------|---------:|-------:|:--------|
-|                         | M (SD)   | M (SD) | P       |
-|-------------------------|----------|--------|---------|
-| Generalfaktor           | `r format(round(table.data[1, 1], 2), nsmall=2)` (`r format(round(table.data[1, 2], 2), nsmall=2)`) | `r format(round(table.data[1, 3], 2), nsmall=2)` (`r format(round(table.data[1, 4], 2), nsmall=2)`) | `r format(round(table.data[1, 5], 2), nsmall=2)` `r getSigString(table.data[1, 5])`|
-| Glatter Verlauf         | `r format(round(table.data[2, 1], 2), nsmall=2)` (`r format(round(table.data[2, 2], 2), nsmall=2)`) | `r format(round(table.data[2, 3], 2), nsmall=2)` (`r format(round(table.data[2, 4], 2), nsmall=2)`) | `r format(round(table.data[2, 5], 2), nsmall=2)` `r getSigString(table.data[2, 5])`|  
-| Absorbiertheit          | `r format(round(table.data[3, 1], 2), nsmall=2)` (`r format(round(table.data[3, 2], 2), nsmall=2)`) | `r format(round(table.data[3, 3], 2), nsmall=2)` (`r format(round(table.data[3, 4], 2), nsmall=2)`) | `r format(round(table.data[3, 5], 2), nsmall=2)` `r getSigString(table.data[3, 5])`|
-| Besorgnis               | `r format(round(table.data[4, 1], 2), nsmall=2)` (`r format(round(table.data[4, 2], 2), nsmall=2)`) | `r format(round(table.data[4, 3], 2), nsmall=2)` (`r format(round(table.data[4, 4], 2), nsmall=2)`) | `r format(round(table.data[4, 5], 2), nsmall=2)` `r getSigString(table.data[4, 5])`|  
-| AFP                     | `r format(round(table.data[5, 1], 2), nsmall=2)` (`r format(round(table.data[5, 2], 2), nsmall=2)`) | `r format(round(table.data[5, 3], 2), nsmall=2)` (`r format(round(table.data[5, 4], 2), nsmall=2)`) | `r format(round(table.data[5, 5], 2), nsmall=2)` `r getSigString(table.data[5, 5])`|
-| Mittlere Herzrate (BPM)               | `r format(round(table.data[14, 1], 2), nsmall=2)` (`r format(round(table.data[14, 2], 2), nsmall=2)`) | `r format(round(table.data[14, 3], 2), nsmall=2)` (`r format(round(table.data[14, 4], 2), nsmall=2)`) | `r format(round(table.data[14, 5], 2), nsmall=2)` `r getSigString(table.data[14, 5])`| 
-| LF (ms^2^)  | `r format(round(table.data[6, 1], 2), nsmall=2)` (`r format(round(table.data[6, 2], 2), nsmall=2)`) | `r format(round(table.data[6, 3], 2), nsmall=2)` (`r format(round(table.data[6, 4], 2), nsmall=2)`) | `r format(round(table.data[6, 5], 2), nsmall=2)` `r getSigString(table.data[6, 5])`| 
-| HF-VHF (ms^2^)              | `r format(round(table.data[7, 1], 2), nsmall=2)` (`r format(round(table.data[7, 2], 2), nsmall=2)`) | `r format(round(table.data[7, 3], 2), nsmall=2)` (`r format(round(table.data[7, 4], 2), nsmall=2)`) | `r format(round(table.data[7, 5], 2), nsmall=2)` `r getSigString(table.data[7, 5])`|
-|  Total (ms^2^)        | `r format(round(table.data[13, 1], 2), nsmall=2)` (`r format(round(table.data[13, 2], 2), nsmall=2)`) | `r format(round(table.data[13, 3], 2), nsmall=2)` (`r format(round(table.data[13, 4], 2), nsmall=2)`) | `r format(round(table.data[13, 5], 2), nsmall=2)` `r getSigString(table.data[13, 5])` | 
-| LF (%)        | `r format(round(table.data[8, 1], 2), nsmall=2)` (`r format(round(table.data[8, 2], 2), nsmall=2)`) | `r format(round(table.data[8, 3], 2), nsmall=2)` (`r format(round(table.data[8, 4], 2), nsmall=2)`) | `r format(round(table.data[8, 5], 2), nsmall=2)` `r getSigString(table.data[8, 5])`|
-| HF-VHF (%)          | `r format(round(table.data[9, 1], 2), nsmall=2)` (`r format(round(table.data[9, 2], 2), nsmall=2)`) | `r format(round(table.data[9, 3], 2), nsmall=2)` (`r format(round(table.data[9, 4], 2), nsmall=2)`) | `r format(round(table.data[9, 5], 2), nsmall=2)` `r getSigString(table.data[9, 5])`| 
-| LF (n. u.)                   | `r format(round(table.data[10, 1], 2), nsmall=2)` (`r format(round(table.data[10, 2], 2), nsmall=2)`) | `r format(round(table.data[10, 3], 2), nsmall=2)` (`r format(round(table.data[10, 4], 2), nsmall=2)`) | `r format(round(table.data[10, 5], 2), nsmall=2)` `r getSigString(table.data[10, 5])`| 
-| HF-VHF (n. u.)             | `r format(round(table.data[11, 1], 2), nsmall=2)` (`r format(round(table.data[11, 2], 2), nsmall=2)`) | `r format(round(table.data[11, 3], 2), nsmall=2)` (`r format(round(table.data[11, 4], 2), nsmall=2)`) | `r format(round(table.data[11, 5], 2), nsmall=2)` `r getSigString(table.data[11, 5])`| 
-| LF/HF-VHF             | `r format(round(table.data[12, 1], 2), nsmall=2)` (`r format(round(table.data[12, 2], 2), nsmall=2)`) | `r format(round(table.data[12, 3], 2), nsmall=2)` (`r format(round(table.data[12, 4], 2), nsmall=2)`) | `r format(round(table.data[12, 5], 2), nsmall=2)` `r getSigString(table.data[12, 5])` | 
-
-Table: Unterschied zwischen Baseline-Messungen und Laufmessungen
 
 ## Unterschied zwischen Baseline-Messungen und Laufmessungen
 
-Um zu testen, ob ein Unterschied zwischen den erhobenen Merkmalen aus den Baseline-Messungen und den Laufmessungen besteht, führte ich eine einfaktorielle Varianzanalyse (ANOVA) für jedes Merkmal. Das Ergebnis zeigt, dass alle Merkmale, außer dem Generalfaktor und dem Besorgnisfaktor, sich mindestens signifikant zwischen Baseline-Messungen und Laufmessungen unterscheiden. Das Ergebnis unterstützt meine Entscheidung Absorbiertheit als Maßzahl zur benutzen.  
+Um zu testen, ob ein Unterschied zwischen den erhobenen Merkmalen aus den Baseline-Messungen und den Laufmessungen besteht, führte ich eine einfaktorielle Varianzanalyse (ANOVA) für jedes Merkmal durch. Das Ergebnis zeigt, dass alle Merkmale, außer dem Generalfaktor und dem Besorgnisfaktor, sich mindestens signifikant zwischen Baseline-Messungen und Laufmessungen unterscheiden (siehe Tabelle \ref{tab:baseline-laufen}). Das Ergebnis unterstützt meine Entscheidung Absorbiertheit als Maßzahl zu benutzen.  
+
 \bibliographystyle{agsm}
 \bibliography{./bibtex/library}
+
+```{r save-features, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+  
+  # Append data
+  if(file.exists("./data/features.csv")) {
+    features <- read.csv("./data/features.csv")
+    write.csv(rbind(features, cbind(fss.features, hrv.features)), "./data/features.csv", row.names=FALSE)
+  } else {
+    write.csv(cbind(fss.features, hrv.features), "./data/features.csv", row.names=FALSE)
+  }
+```
