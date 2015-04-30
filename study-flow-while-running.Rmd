@@ -412,8 +412,9 @@ Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt j
   # Result table
   table.data <- data.frame(stringsAsFactors = FALSE)
 
+  i <- 2
+
   for (i in 2:ncol(features)) {
-#     boxplot(features[,i]  ~ m, data = features, title = colnames(features)[i])
     
     # Calculate feature values
     features  <- features[,c(1, i)]
@@ -429,7 +430,8 @@ Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt j
     colnames(features.stack) = c("value", "feature", "m")
   
     # Get p value
-    fit <- aov(value ~ m, data=features.stack)
+    #fit <- Anova(lm(value ~ m, data=features.stack, contrasts=list(topic=contr.sum, sys=contr.sum)), type=3)
+    fit <- anova(aov(value ~ m, data=features.stack))
     p   <- summary(fit)[[1]][["Pr(>F)"]][1]
     p   <- paste(sprintf("%.2f", round(p, 2)), getSigString(p))
     
@@ -460,7 +462,54 @@ Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt j
 
 ## Unterschied zwischen Baseline-Messungen und Laufmessungen
 
-Um zu testen, ob ein Unterschied zwischen den erhobenen Merkmalen aus den Baseline-Messungen und den Laufmessungen besteht, führte ich eine einfaktorielle Varianzanalyse (ANOVA) für jedes Merkmal durch. Das Ergebnis zeigt, dass alle Merkmale, außer dem Generalfaktor und dem Besorgnisfaktor, sich mindestens signifikant zwischen Baseline-Messungen und Laufmessungen unterscheiden (siehe Tabelle \ref{tab:baseline-laufen}). Das Ergebnis unterstützt meine Entscheidung Absorbiertheit als Maßzahl zu benutzen.  
+Um zu testen, ob ein Unterschied zwischen den erhobenen Merkmalen aus den Baseline-Messungen und den Laufmessungen besteht, führte ich eine einfaktorielle Varianzanalyse (ANOVA) für jedes Merkmal durch. Das Ergebnis zeigt, dass alle Merkmale, außer dem Generalfaktor und dem Besorgnisfaktor, sich mindestens signifikant zwischen Baseline-Messungen und Laufmessungen unterscheiden (siehe Tabelle \ref{tab:baseline-laufen}). Das Ergebnis unterstützt meine Entscheidung Absorbiertheit als Maßzahl zu benutzen. 
+
+```{r lauf-messzeitpunkt-vergleich, echo=FALSE, message=FALSE, warning=FALSE, results="asis"}
+  
+  # Load feature data
+  load("./data/features.RData")
+
+  # Backup data
+  features -> features.backup
+  features <- features[features[,1] != 1,]
+
+  for (i in 2:ncol(features)) {
+    col.name <- colnames(features)[i]
+    boxplot(features[,i]  ~ m, data = features, main = col.name)
+    print(col.name)
+    
+    # Calculate feature values
+    features  <- features[,c(1, i)]
+    means     <- aggregate(features[, 2], list(features[, 1]), function(x) {mean(x, na.rm = T)})
+    sds       <- aggregate(features[, 2], list(features[, 1]), function(x) {sd(x, na.rm = T)})
+    
+    # Create anova structure
+    features.stack    <- stack(features)
+    m                 <- rep(features.stack[1:nrow(features), 1], ncol(features) - 1)
+    features.stack    <- features.stack[(nrow(features) + 1):nrow(features.stack),]
+    features.stack[3] <- as.factor(m)                   
+    rm(m)                               
+    colnames(features.stack) = c("value", "feature", "m")
+  
+    # Get p value
+    #fit <- aov(value ~ m, data=features.stack)
+    fit <- Anova(lm(value ~ m, data=features.stack, contrasts=list(topic=contr.sum, sys=contr.sum)), type=3)
+    print(summary(fit))
+
+    tukey <- TukeyHSD(fit)
+    print(tukey)
+    
+    features <- features.backup
+    features <- features[features[,1] != 1,]
+  }
+
+  # Clean up
+  rm(features, features.stack, means, row, sds, col.name fit, i, tukey)
+```
+
+## Unterschied zwischen den Laufmessungen
+
+Ich testete auch, ob zwischen den erhobenen Merkmalen der einzelnen Laufmessungen ein Unterschied besteht. Bei den Flow-Merkmalen hat der Zeitpunkt nur Einfluss auf das Merkmal der \ac{AFP}. Die \ac{AFP} steigt von Messung zu Messung (siehe Abbildung). Für die HRV-Merkmalen ist ein signifikanter Unterschied zwischen den Laufmessungen bei den Merkmalen der mittlere Herzrate, LF ($ms^2$), Total ($ms^2$), LF (\%), LF (n. u.) und LF (n. u.) und LF/HF zu erkennen. Um festzustellen wo, die Unterschiede liegen führte ich eine
 
 \bibliographystyle{agsm}
 \bibliography{./bibtex/library}
