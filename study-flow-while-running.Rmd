@@ -451,6 +451,13 @@ One particular approach to analyze HRV is to use spectral methods that provide i
   # Result table
   table.data <- data.frame(stringsAsFactors = FALSE)
 
+  #######
+  measure.5 <- features[features$m == 5,]
+
+  # Testen auf Normalverteilung
+  shapiro.test(measure.5$anxiety)
+  #######
+
   for (i in 2:ncol(features)) {
 #     boxplot(features[,i]  ~ m, data = features, title = colnames(features)[i])
     
