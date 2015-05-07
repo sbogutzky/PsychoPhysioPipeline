@@ -99,8 +99,13 @@ for (kubios.hrv.file.name in kubios.hrv.file.names) {
   # Extract properties
   activity.start    <- as.POSIXct(strptime(regmatches(kubios.hrv.file.name, regexpr("[0-9]{4}-[0-9]{2}-[0-9]{2}--[0-9]{2}-[0-9]{2}-[0-9]{2}", kubios.hrv.file.name)), "%Y-%m-%d--%H-%M-%S"))
   measurement.start <- activity.start + 10 * 60
-  activity.end      <- measurement.end <- measurement.start + time[length(time)]
+  measurement.end   <- measurement.start + time[length(time)]
   measurement       <- substr(regmatches(kubios.hrv.file.name, regexpr("[1-9]{1}_", kubios.hrv.file.name)), 1, 1)
+  
+  activity.start    <- strftime(activity.start, format = "%Y-%m-%d %H:%M:%S")
+  measurement.start <- strftime(measurement.start, format = "%Y-%m-%d %H:%M:%S")
+  activity.end      <- measurement.end <- strftime(measurement.end, format = "%Y-%m-%d %H:%M:%S")
+  activity.start    <- strftime(activity.start, format = "%Y-%m-%d %H:%M:%S")
   
   # Add parameter to feature vector
   hrv.features    <- rbind(hrv.features, data.frame(hrv.parameters, activity, activity.start, activity.end, measurement.start, measurement.end, measurement, last.name, first.name, date.of.birth))

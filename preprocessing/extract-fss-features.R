@@ -32,13 +32,13 @@ for (fss.data.file.name in fss.data.file.names) {
     
     # Extract times
     if(i == 1) {
-      activity.start  <- as.POSIXct(strptime(substr(fss.data.file.name, 1, 20), "%Y-%m-%d--%H-%M-%S"), tz="CET")
-      activity.end    <- as.POSIXct(fss.data[i, 1]/1000, origin="1970-01-01", tz="CET")
-      inquiry.end     <- as.POSIXct(fss.data[i, 2]/1000, origin="1970-01-01", tz="CET")
+      activity.start  <- strftime(as.POSIXct(strptime(substr(fss.data.file.name, 1, 20), "%Y-%m-%d--%H-%M-%S"), tz="CET"), format = "%Y-%m-%d %H:%M:%S")
+      activity.end    <- strftime(as.POSIXct(fss.data[i, 1]/1000, origin="1970-01-01", tz="CET"), format = "%Y-%m-%d %H:%M:%S")
+      inquiry.end     <- strftime(as.POSIXct(fss.data[i, 2]/1000, origin="1970-01-01", tz="CET"), format = "%Y-%m-%d %H:%M:%S")
     } else {
-      activity.start  <- inquiry.end
-      activity.end    <- as.POSIXct(fss.data[i, 1]/1000, origin="1970-01-01", tz="CET")
-      inquiry.end     <- as.POSIXct(fss.data[i, 2]/1000, origin="1970-01-01", tz="CET")
+      activity.start  <- strftime(inquiry.end, format = "%Y-%m-%d %H:%M:%S")
+      activity.end    <- strftime(as.POSIXct(fss.data[i, 1]/1000, origin="1970-01-01", tz="CET"), format = "%Y-%m-%d %H:%M:%S")
+      inquiry.end     <- strftime(as.POSIXct(fss.data[i, 2]/1000, origin="1970-01-01", tz="CET"), format = "%Y-%m-%d %H:%M:%S")
     }
     
     # Calculate fss factors
