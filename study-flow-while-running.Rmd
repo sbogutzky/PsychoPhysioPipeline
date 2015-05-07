@@ -56,52 +56,63 @@ Nach jedem Lauf übertrug ich die gesammelten Daten für die software-technische
 #### Flow-Kurzskala
 Aus den Fragebogen Daten berechnete die Faktoren der \ac{FKS}. In Tabelle \ref{tab:fks-merkmale} sind die Ergebnisse der \ac{FKS} des Laufes vom Donnerstag, den 31. Oktober 2013 dargestellt. In diesem Lauf z. B. steigt die \ac{AFP} kontinuirlich und am Ende des Laufes bewertet der Läufer sein Flow-Erleben am höchsten. 
 
-```{r calculate-fss-features, echo=FALSE, message=FALSE, warning=FALSE}
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+  
+  # Remove all variables
+  rm(list = ls(all = T)) 
+
+  # Set working directory
+  setwd("~/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures")
+
+  # Load libraries
   library("flow")
+  library("xtable")
+  
+  fss.features <- read.csv("./data/features/fss-features.csv")
   
   # Set start time
-  start.time <- as.POSIXct(strptime("2013-10-31--18-11-26", "%Y-%m-%d--%H-%M-%S"), tz="CET")
-  
+  start.time <- as.POSIXct("2013-10-31", tz="CET")
+
   # Set file path 
   file.path <- paste("./data/", format(start.time, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", sep="")
-  
-  # Load fss data
-  fss.data  <- read.csv(paste(file.path, "fss-data.csv", sep=""), header=T)
-  
-  # Calculate fss features
-  fss.features  <- data.frame()
-  for(i in 1:nrow(fss.data)) {
-    start       <- as.POSIXct(fss.data[i, 17]/1000, origin="1970-01-01", tz="CET")
-    end         <- as.POSIXct(fss.data[i, 18]/1000, origin="1970-01-01", tz="CET")
-    fss.results <- CalculateFlowShortScaleResults(c(t(fss.data[i, 1:16])), start=start, end=end)
-    
-    # Extract flow features
-    for(j in 1:length(fss.results[[1]][[1]])) {
-      fss.features <- rbind(fss.features, data.frame(fss.results[[1]][[1]][[j]], fss.results[[1]][[2]][[j]], format(start, format="%Y-%m-%d %H:%M:%S", tz="CET"), format(end, format="%Y-%m-%d %H:%M:%S", tz="CET"), j))
-    } 
-  }
-  colnames(fss.features)  <- c("m", "sd", "start", "end", "feature")
-  fss.features[,5]        <- as.factor(fss.features[,5])
-  
-  # Clean up
-  rm(fss.results)
 ```
 
-\begin{table}
-\caption{Ergebnisse vom `r strftime(start.time, format = "%A, den %d. %B %Y")`}
-\label{tab:fks-merkmale}
-\centering
 ```{r fks-merkmale, echo=FALSE, message=FALSE, results="asis"}
-  library(tables)
-  table.data            <- fss.features[,c(1:3, 5)]
-  table.data[,3]        <- factor(table.data[,3], levels(table.data[,3]), labels = c("Baseline", "Nach 15 Min.", "Nach 30 Min.", "Nach 45 Min.", "Nach 60 Min."))
-  table.data[,4]        <- factor(table.data[,4], levels(table.data[,4]), labels = c("Generalfaktor", "glatter Verlauf", "Absorbiertheit", "Besorgnis", "AFP"))
-  colnames(table.data)  <- c("M", "SD", "Beginn", "Merkmal")
-  tabular.data          <- tabular(Heading()*Merkmal ~ Heading()*Beginn*(`M` +`SD`)*Heading()*(identity)*Format(digits=2), data=table.data)
-  latex(tabular.data)
-  rm(tabular.data)
+    
+  # Subset features
+    fss.features.subset         <- fss.features[start.time + 60 * 60 * 24 > as.POSIXct(fss.features[,12], tz="CET") & as.POSIXct(fss.features[,12], tz="CET") > start.time, c(1:10, 14)]
+    
+  # Create table structure
+  fss.features.table          <- fss.features.subset[,1:10]
+  fss.features.table.factors  <- fss.features.table[,c(1,3,5,7,9)]
+  fss.features.table.sds      <- fss.features.table[,c(2,4,6,8,10)]
+  fss.features.table          <- data.frame()
+  for (i in 1:nrow(fss.features.subset)) {
+    fss.features.table          <- rbind(fss.features.table, as.numeric(fss.features.table.factors[i,]))
+    fss.features.table          <- rbind(fss.features.table, as.numeric(fss.features.table.sds[i,]))
+  }
+
+  # Clean up
+  fss.features.table          <- t(fss.features.table)
+  rm(fss.features.table.factors, fss.features.table.sds)
+  
+  # Name data
+  colnames(fss.features.table)  <- rep(c("M", "SD"), i)
+  rownames(fss.features.table)  <- c("Generalfaktor", "glatter Verlauf", "Absorbiertheit", "Besorgnis", "AFP")
+  
+  # Create latex table
+  table           <- xtable(fss.features.table, caption = paste("Ergebnisse vom", strftime(start.time, format = "%A, den %d. %B %Y")), label = "tab:fks-merkmale")
+
+  # Add second header
+  addtorow          <- list()
+  addtorow$pos      <- list()
+  addtorow$pos[[1]] <- 0
+  addtorow$command <- c("& \\multicolumn{2}{c}{Baseline} & \\multicolumn{2}{c}{Nach 15 Min.} & \\multicolumn{2}{c}{Nach 30 Min.} & \\multicolumn{2}{c}{Nach 45 Min.} & \\multicolumn{2}{c}{Nach 60 Min.} \\\\\n")
+  print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, add.to.row = addtorow, include.colnames = FALSE)
+  
+  # Clean up
+  rm(fss.features.table, table, addtorow)
 ```
-\end{table}
 
 Als Maßzahl nutze ich die zweite Subdimension \ac{FKS}, da Absorbiertheit laut \citet{Peifer2014} nur eintritt, wenn Anforderungen und Fähigkeiten sich in Balance befinden — somit ist sie ausschließlich im *Flow-Kanal* anzutreffen und deshalb ein repräsentativer Indikator für Flow als der Generalfaktor, der sich aus den zwei Subdimension zusammensetzt. Den Beleg hierfür geben \citet[S. 69]{Rheinberg2003a} in ihrer Studie. Sie stellten fest, dass Unterforderung keinen Einfluss auf den glatten Verlauf hat, jedoch die Absorbiertheit negativ beeinflusst. 
 
@@ -109,10 +120,10 @@ Als Maßzahl nutze ich die zweite Subdimension \ac{FKS}, da Absorbiertheit laut 
   par(mfcol=c(1, 1), mar=c(3.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8)
   
   # Plot data
-  plot(table.data[fss.features[,5] == 3, 1], type="b", xlab ="Zeitpunkt", ylab="Absorbiertheit", pch=21, ylim=c(3, 6), xaxt="n", yaxt="n")
+  plot(fss.features.subset[,5], type="b", xlab ="Zeitpunkt", ylab="Absorbiertheit", pch=21, ylim=c(3, 6), xaxt="n", yaxt="n")
 
   # Plot ticks
-  axis(1, at=1:5, label=table.data[fss.features[,5] == 3, 3])
+  axis(1, at=1:5, label=format(as.POSIXct(fss.features.subset[,11]),"%H:%M:%S"))
   axis(2, at=seq(3, 6, .5), labels=seq(3, 6, .5))
   axis(3, at=1:5, label=rep("", length(1:5)))
   axis(4, at=seq(3, 6, .5), labels=rep("", length(seq(3, 6, .5))))
