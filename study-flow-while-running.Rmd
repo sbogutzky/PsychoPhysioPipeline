@@ -54,7 +54,7 @@ Nach jedem Lauf übertrug ich die gesammelten Daten für die software-technische
 
 ### Datenverarbeitung
 #### Flow-Kurzskala
-Aus den Fragebogen Daten berechnete die Faktoren der \ac{FKS}. In Tabelle \ref{tab:fks-merkmale} sind die Ergebnisse der \ac{FKS} des Laufes vom Donnerstag, den 31. Oktober 2013 dargestellt. In diesem Lauf z. B. steigt die \ac{AFP} kontinuirlich und am Ende des Laufes bewertet der Läufer sein Flow-Erleben am höchsten. 
+Aus den Fragebogen Daten berechnete ich die Faktoren der \ac{FKS}. In Tabelle \ref{tab:fks-merkmale} sind die Ergebnisse der \ac{FKS} des Laufes vom Donnerstag, den 31. Oktober 2013 dargestellt. In dieser Sitzung z. B. steigt die \ac{AFP} kontinuirlich und beim Laufen bewertet der Läufer seine Absorbiertheit gleichbleibend im mittleren Bereich der Skala von 1 bis 7 (siehe Abbildung \ref{fig:bewertete-absorbiertheit-afp-glatter-verlauf}). 
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
   
@@ -68,20 +68,17 @@ Aus den Fragebogen Daten berechnete die Faktoren der \ac{FKS}. In Tabelle \ref{t
   library("flow")
   library("xtable")
   
-  fss.features <- read.csv("./data/features/fss-features.csv")
-  hrv.features <- read.csv("./data/features/hrv-features.csv")
+  fss.features <- read.csv("./data/features/fss-features.csv", stringsAsFactors = FALSE)
+  hrv.features <- read.csv("./data/features/hrv-features.csv", stringsAsFactors = FALSE)
   
   # Set start time
   start.time <- as.POSIXct("2013-10-31", tz="CET")
-
-  # Set file path 
-  file.path <- paste("./data/", format(start.time, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", sep="")
 ```
 
 ```{r fks-merkmale, echo=FALSE, message=FALSE, results="asis"}
     
   # Subset features
-    fss.features.subset         <- fss.features[start.time + 60 * 60 * 24 > as.POSIXct(fss.features[,12], tz="CET") & as.POSIXct(fss.features[,12], tz="CET") > start.time, c(1:10, 14)]
+    fss.features.subset         <- fss.features[start.time + 60 * 60 * 24 > as.POSIXct(fss.features[,12], tz="CET") & as.POSIXct(fss.features[,12], tz="CET") > start.time, c(1:10, 12:15)]
     
   # Create table structure
   fss.features.table          <- fss.features.subset[,1:10]
@@ -115,26 +112,33 @@ Aus den Fragebogen Daten berechnete die Faktoren der \ac{FKS}. In Tabelle \ref{t
   rm(fss.features.table, table, addtorow)
 ```
 
-Als Maßzahl nutze ich die zweite Subdimension \ac{FKS}, da Absorbiertheit laut \citet{Peifer2014} nur eintritt, wenn Anforderungen und Fähigkeiten sich in Balance befinden — somit ist sie ausschließlich im *Flow-Kanal* anzutreffen und deshalb ein repräsentativer Indikator für Flow als der Generalfaktor, der sich aus den zwei Subdimension zusammensetzt. Den Beleg hierfür geben \citet[S. 69]{Rheinberg2003a} in ihrer Studie. Sie stellten fest, dass Unterforderung keinen Einfluss auf den glatten Verlauf hat, jedoch die Absorbiertheit negativ beeinflusst. 
+Ich nutze hier die zweite Subdimension der \ac{FKS} zur Bewertung des subjektiven Flow-Zustands des Läufers. Laut \citet{Peifer2014} tritt Absorbiertheit nur ein, wenn Anforderungen und Fähigkeiten sich in Balance befinden — somit ist sie ausschließlich im *Flow-Kanal* anzutreffen und deshalb ein repräsentativer Indikator für Flow als der Generalfaktor, der sich aus den zwei Subdimension zusammensetzt. Den Beleg hierfür geben \citet[S. 69]{Rheinberg2003a} in ihrer Studie. Sie stellten fest, dass Unterforderung keinen Einfluss auf den glatten Verlauf hat, jedoch die Absorbiertheit negativ beeinflusst. Dies ist auch in der Abbildung \ref{fig:bewertete-absorbiertheit-afp-glatter-verlauf} zu erkennen. 
 
-```{r bewertete-absorbiertheit, echo=FALSE, warning=FALSE, dev='pdf', fig.height=2.5, fig.width=6.5, fig.pos='htbp', fig.cap='Bewertete Absorbiertheit'}
+\% Hier kommt noch was zum FKS-Gesamtergebnis hin oder etwas später
+
+```{r absorbiertheit-afp-verlauf, echo=FALSE, warning=FALSE, dev='pdf', fig.height=3, fig.width=6.5, fig.pos='htbp', fig.cap='Absorbiertheit, AFP und glatter Verlauf'}
   par(mfcol=c(1, 1), mar=c(3.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8)
   
   # Plot data
-  plot(fss.features.subset[,5], type="b", xlab ="Zeitpunkt", ylab="Absorbiertheit", pch=21, ylim=c(3, 6), xaxt="n", yaxt="n")
+
+  plot(as.POSIXct(fss.features.subset[,11]), fss.features.subset[,5], type="b", xlab ="Zeitpunkt", ylab="", pch=21, xlim = c(min(as.POSIXct(fss.features.subset[,11]))-60, max(as.POSIXct(fss.features.subset[,11]))+60), ylim=c(3, 6), xaxt="n", yaxt="n")
+  lines(as.POSIXct(fss.features.subset[,11]), fss.features.subset[,9], type = "b", pch=22)
+  lines(as.POSIXct(fss.features.subset[,11]), fss.features.subset[,3], type = "b", pch=23)
 
   # Plot ticks
-  axis(1, at=1:5, label=format(as.POSIXct(fss.features.subset[,11]),"%H:%M:%S"))
+  axis(1, at=as.POSIXct(fss.features.subset[,11]), label=format(as.POSIXct(fss.features.subset[,11]),"%H:%M:%S"))
   axis(2, at=seq(3, 6, .5), labels=seq(3, 6, .5))
-  axis(3, at=1:5, label=rep("", length(1:5)))
+  axis(3, at=as.POSIXct(fss.features.subset[,11]), label=rep("", length(fss.features.subset[,11])))
   axis(4, at=seq(3, 6, .5), labels=rep("", length(seq(3, 6, .5))))
+
+  legend("bottomright", inset=.05, c("Absorbiertheit", "AFP", "Glatter Verlauf"), pch = c(21:22), cex = .7)
 
   # Plot box again
   box()
 ```
 
 #### HRV-Analyse
-Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte. Zur schnelleren Bearbeitung teilte ich die 15-Minuten Abschnitte in jeweils drei fünf Minuten Abschnitte. Diese 90 fünf Minuten Abschnitte las ich in Kubios \ac{HRV} (Version 2.1) ein. Kubios \ac{HRV} automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. \ac{EKG}-Daten mit mehr als 2% an Artefakten habe ich aus der Datensammlung entfernt. 
+Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte (siehe Abbildung). Zur schnelleren Bearbeitung teilte ich die 15-Minuten Abschnitte in jeweils drei fünf Minuten Abschnitte. Diese 90 fünf Minuten Abschnitte las ich in Kubios \ac{HRV} (Version 2.1) ein. Kubios \ac{HRV} automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. \ac{EKG}-Daten mit mehr als 2% an Artefakten habe ich aus der Datensammlung entfernt. 
 Zur \ac{HRV}-Analyse nutze ich nur die letzten fünf Minuten jedes 15-Minuten Abschnittes. Das hatte folgende Gründe:
 
 - Die ersten fünf Minuten sind beeinfusst von der Ruhephase vor dem Lauf und nach jeder Befragung
@@ -180,15 +184,26 @@ Warum LF und HF?
 
 One particular approach to analyze HRV is to use spectral methods that provide information about how variance in HR ("power") distributes as a function of frequency (Task Force Guidelines, 1996). One of the relevant parameters in spectral analyses is the high-frequency component of the heart rate variability (HF-HRV), which reflects variance in the high frequency range (0.15-0.4 Hz). HF-HRV has been shown to be a reliable indicator for parasympathetic efferent activity (Porges, 1995) and increased task demands are related to a low level of HF-HRV (Backs et al., 1991; Mulder et al., 2002). Furthermore, increased HF-HRV is associated with efficient use of strategies for self-regulation and attention, which results in better performance in cognitive tasks (better accuracy and shorter reaction time) (Hansen et al, 2003; Thayer et al., 2009). In contrast, decreased HF-HRV is related to limited use of self-regulatory strategies (Thayer & Brosschot, 2005), for example, failure to recognize task relevant information or to habituate to novel, non-relevant stimuli (hypervigilance; Friedman, 2007; Thayer, Friedman, Borkovec, Johnsen, & Molina, 2000; Thayer et al., 2009). Focusing on task relevant stimuli and fading out task-irrelevant information are key components of flow. Therefore, one can assume a positive relation between flow and HF-HRV. However, prior studies suggest that moderate and increased task demands are related to lower levels of HF-HRV (Backs et al., 1991; Jorna, 1992; Mulder et al., 2002 Vicente et al., 1987). Based on these findings, we hypothesize a relation between flow and HF-HRV without making any assumptions regarding the direction of the relationship. Another parameter of HRV is the low-frequency component of the HRV (LF-HRV), which reflects the variance in the low frequency range (0.04-0.15 Hz) of heart rates. The meaning of this parameter is controversial in recent research. LF-HRV has been used as an indicator for sympathetic activity (Pagani et al., 1986; Malliani, Pagani, Lombardi, & Cerutti, 1991). However, a growing body of research disproved this assumption and showed that LF-HRV rather reflects baroreflex modulation (Heathers, 2014; Rahman, Pechnik, Gross, Sewall, Goldstein, 2011; Schroeder et al., 2003). The baroreflex is one of the elementary mechanisms through which acute changes in the heart rate and blood pressure is controlled (Guyton, 1980) Baroreflex activity has been associated with several cognitive functions such as mental stress (del Paso, Langewitz, Robles, & Pérez, 1996; Robbe et al., 1987, Steptoe & Sawada, 1989), cognitive-attentional demands (del Paso, González, & Hernández, 2004), and cognitive performance (Yasumasu, del Paso, Takahara, & Nakashima, 2006). According to Lacey's intake/rejection hypothesis (Lacey & Lacey, 1970), tasks containing cognitive elaboration are related to a baroreceptor-elicited cardiac acceleration (del Paso et al., 2004). In contrast, activities involving the detection of external stimuli are related to a baroreceptor-modulated cardiac deceleration (Bernardi, Porta, Spicuzza, & Sleight, 2005). Yasumasu et al. (2006) showed that activities that involve cognitive elaboration and rejection of external stimuli cause a decrease of baroreflex activity, which in turn causes an increase in cardiovascular activity (i.e., increase in heart rate). Cognitive involvement in an activity and rejection of external stimuli are crucial for experiencing flow. Furthermore, previous research suggests an inverted u-shaped function between flow and LF-HRV (Peifer et al., 2014b). Based on these results, we assume a relation between LF-HRV (as an indicator for baroreflex function) and flow experience and test this assumption in an experimental setting that addresses the aforementioned limitations of previous studies. (Tozman2015)
 
-```{r ekg-signalverarbeitung, echo=FALSE, warning=FALSE, dev='CairoPNG', dpi=800, fig.height=4.5, fig.width=6.5, fig.pos='htbp', fig.cap='EKG-Signalverarbeitung'}
+```{r ekg-signalverarbeitung, echo=FALSE, warning=FALSE, dev='CairoPNG', dpi=800, fig.height=4.5, fig.width=6.5, fig.pos='htbp', fig.cap='EKG-Signalverarbeitung', eval=FALSE}
   par(mfcol=c(4, 1), mar=c(3, 3, 1.5, 3) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="i", yaxs="i")
 
-  # Load ecg data 
-  ecg.data  <- read.csv(paste(file.path, "/ecg-data.csv", sep=""), header=T)
+  # Load ecg data  
+  ecg.data.file.path <- paste("./data/cleaned-data/running/buse-patrick/", strftime(as.POSIXct(fss.features.subset[2,11], tz="CET"), "%Y-%m-%d--%H-%M-%S"), "/", sep="")
+  ecg.data  <- read.csv(paste(ecg.data.file.path, "/ecg-data.csv", sep=""), header=T)
+
+    # Load Kubios HRV txt data
+  kubios.hrv.data.path  <- paste("./data/example-data/running/buse-patrick/", strftime(as.POSIXct(fss.features.subset[2,11], tz="CET"), "%Y-%m-%d--%H-%M-%S"), "/", sep="")
+  kubios.hrv.data       <- read.csv(paste(kubios.hrv.data.path, "/ecg-data-4_hrv.txt", sep = ""), header = F, na.strings = "", fill = T, skip = 117, stringsAsFactors = FALSE, col.names = c("", "Time", "RR.interval", "FFT.Frequency", "FFT.PSD", "AR.Frequency", "AR.PSD", "VLF.comp.", "LF.comp.", "HF.comp.", ""))[,2:10]
+  
+  # Get time and rr-intervals
+  time              <- kubios.hrv.data[, 1]
+  time              <- time[complete.cases(time)]
+  rr.interval       <- kubios.hrv.data[, 2]
+  rr.interval       <- rr.interval[complete.cases(rr.interval)]
   
   # Set time properties
-  starts    <- c(start.time, as.POSIXct(strptime(fss.features[fss.features[,5] == 3, 4][1:4], "%Y-%m-%d %H:%M:%S"), tz="CET"))
-  ends      <- c(as.POSIXct(strptime(fss.features[fss.features[,5] == 3, 3], "%Y-%m-%d %H:%M:%S"), tz="CET"))
+  starts    <- as.POSIXct(fss.features.subset[,11], tz="CET")
+  ends      <- as.POSIXct(fss.features.subset[,12], tz="CET")
   times     <- as.POSIXct(ecg.data[, 4]/1000, origin="1970-01-01", tz="CET")
   
   # Set data
@@ -254,15 +269,15 @@ One particular approach to analyze HRV is to use spectral methods that provide i
   plot(t, y, type="l", xlab="", ylab=expression("RR-Intervalle ["~s~"]"), xaxt="n", yaxt="n", xlim=xlim, col=1)
 
   # Mark interesting part
-  polygon(c(end.rr - 10 * 60, end.rr - 10 * 60, end.rr, end.rr), c(0, 1, 1, -0), col = rgb(1, 1, 1, .2), border = rgb(0, 0, 0, 0))
+  polygon(c(end.rr - 5 * 60, end.rr - 5 * 60, end.rr, end.rr), c(0, 1, 1, -0), col = rgb(1, 1, 1, .2), border = rgb(0, 0, 0, 0))
 
   # Plot ticks and vertical lines
-  marker <- c(start.rr, end.rr - 10 * 60, end.rr)
-  axis(1, at=marker, label=format(c(start, end - 10 * 60, end), "%H:%M:%S"))
+  marker <- c(start.rr, end.rr - 10 * 60, end.rr - 5 * 60, end.rr)
+  axis(1, at=marker, label=format(c(start, end - 10 * 60, end - 5 * 60, end), "%H:%M:%S"))
   axis(2, at=seq(.25, .50, .05), labels=seq(.25, .50, .05))
   axis(3, at=marker, label=rep("", length(marker)))
   axis(4, at=seq(.25, .50, .05), labels=rep("", length(seq(.25, .50, .05))))
-  abline(v=marker, lty = "dashed", col="grey")
+  abline(v=marker, lty = "dashed", col="darkgrey")
 
   # Plot box again
   box()
@@ -271,22 +286,22 @@ One particular approach to analyze HRV is to use spectral methods that provide i
   mtext("C", 4, line=2)
 
   # Set data
-  t         <- hrv.data$Beat$Time
-  y         <- hrv.data$Beat$RR / 1000
+  t         <- time[time > max(time) - 5 * 60]
+  y         <- rr.interval[time > max(time) - 5 * 60]
   end.rr    <- max(t)
   start.rr  <- min(t)
-  xlim      <- c(start.rr - 30, end.rr + 30)
+  xlim      <- c(start.rr - 10, end.rr + 10)
   
   # Plot rrIntervals
   plot(t, y, type="l", xlab="Zeit", ylab=expression("RR-Intervalle ["~s~"]"), xaxt="n", yaxt="n", xlim=xlim, col=1)
 
   # Plot ticks and vertical lines
   marker <- c(start.rr, end.rr)
-  axis(1, at=marker, label=format(c(end - 10 * 60, end), "%H:%M:%S"))
+  axis(1, at=marker, label=format(c(end - 5 * 60, end), "%H:%M:%S"))
   axis(2, at=seq(.25, .50, .025), labels=seq(.25, .50, .025))
   axis(3, at=marker, label=rep("", length(marker)))
   axis(4, at=seq(.25, .50, .025), labels=rep("", length(seq(.25, .50, .025))))
-  abline(v=c(min(t), max(t)), lty = "dashed", col="grey")
+  abline(v=c(min(t), max(t)), lty = "dashed", col="darkgrey")
 
   # Plot box again
   box()
@@ -295,7 +310,6 @@ One particular approach to analyze HRV is to use spectral methods that provide i
   mtext("D", 4, line=2)
 
   # Clean up
-  rm(ecg.data, end, end.rr, hrv.data, isIn, marker, rr.interval, start, start.rr, t, time, times, times.subset, xlim, y)
 ```
 
 ```{r hrv-merkmale, echo=FALSE, message=FALSE, results="asis"}
@@ -306,6 +320,7 @@ One particular approach to analyze HRV is to use spectral methods that provide i
   table.data            <- xtable(table.data, caption = paste("Ergebnisse vom", strftime(start.time, format = "%A, den %d. %B %Y")), align = "lrrrrr", label = "tab:hrv-ergebisse")
 
   print(table.data, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment=FALSE)
+  rm(ecg.data.file.path, ecg.data, kubios.hrv.data.path, kubios.hrv.data, ends, end, end.rr, isIn, marker, rr.interval, starts, start, start.rr, t, time, times, times.subset, xlim, y)
 ```
 
 ```{r baseline-laufen-vergleich, echo=FALSE, message=FALSE, warning=FALSE, results="asis"}
