@@ -414,15 +414,4 @@ One particular approach to analyze HRV is to use spectral methods that provide i
 Um zu testen, ob ein Unterschied zwischen den erhobenen Merkmalen aus den Baseline-Messungen und den Laufmessungen besteht, führte ich eine einfaktorielle Varianzanalyse (ANOVA) für jedes Merkmal durch. Das Ergebnis zeigt, dass alle Merkmale, außer dem Generalfaktor und dem Besorgnisfaktor, sich mindestens signifikant zwischen Baseline-Messungen und Laufmessungen unterscheiden (siehe Tabelle \ref{tab:baseline-laufen}). Das Ergebnis unterstützt meine Entscheidung Absorbiertheit als Maßzahl zu benutzen.  
 
 \bibliographystyle{agsm}
-\bibliography{./bibtex/library}
-
-```{r save-features, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
-  
-  # Append data
-  if(file.exists("./data/features.csv")) {
-    features <- read.csv("./data/features.csv")
-    write.csv(rbind(features, cbind(fss.features, hrv.features)), "./data/features.csv", row.names=FALSE)
-  } else {
-    write.csv(cbind(fss.features, hrv.features), "./data/features.csv", row.names=FALSE)
-  }
-```
+\bibliography{./bibtex/library}\bibliography{./bibtex/library}
