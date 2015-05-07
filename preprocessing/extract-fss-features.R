@@ -51,8 +51,8 @@ for (fss.data.file.name in fss.data.file.names) {
 
 # Write to csv file
 if(file.exists("../data/features/fss-features.csv")) {
-  features <- read.csv("../data/features/fss-features.csv")
-  write.csv(fss.features, "../data/features/fss-features.csv", row.names = FALSE)
+  features <- read.csv("../data/features/fss-features.csv", stringsAsFactors = FALSE)
+  write.csv(rbind(features, fss.features), "../data/features/fss-features.csv", row.names = FALSE)
 } else {
   write.csv(fss.features, "../data/features/fss-features.csv", row.names = FALSE)
 }

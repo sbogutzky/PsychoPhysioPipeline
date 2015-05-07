@@ -108,8 +108,8 @@ for (kubios.hrv.file.name in kubios.hrv.file.names) {
 
 # Write to csv file
 if(file.exists("../data/features/hrv-features.csv")) {
-  features <- read.csv("../data/features/hrv-features.csv")
-  write.csv(hrv.features, "../data/features/hrv-features.csv", row.names = FALSE)
+  features <- read.csv("../data/features/hrv-features.csv", stringsAsFactors = FALSE)
+  write.csv(rbind(features, hrv.features), "../data/features/hrv-features.csv", row.names = FALSE)
 } else {
   write.csv(hrv.features, "../data/features/hrv-features.csv", row.names = FALSE)
 }
