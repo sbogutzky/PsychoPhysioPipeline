@@ -69,6 +69,7 @@ Aus den Fragebogen Daten berechnete die Faktoren der \ac{FKS}. In Tabelle \ref{t
   library("xtable")
   
   fss.features <- read.csv("./data/features/fss-features.csv")
+  hrv.features <- read.csv("./data/features/hrv-features.csv")
   
   # Set start time
   start.time <- as.POSIXct("2013-10-31", tz="CET")
@@ -133,140 +134,12 @@ Als Maßzahl nutze ich die zweite Subdimension \ac{FKS}, da Absorbiertheit laut 
 ```
 
 #### HRV-Analyse
-Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte. Diese 15-Minuten Abschnitte las ich in Kubios \ac{HRV} (Version 2.1) ein. Kubios \ac{HRV} automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. \ac{EKG}-Daten mit mehr als 2% an Artefakten habe ich aus der Datensammlung entfernt.
+Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte. Zur schnelleren Bearbeitung teilte ich die 15-Minuten Abschnitte in jeweils drei fünf Minuten Abschnitte. Diese 90 fünf Minuten Abschnitte las ich in Kubios \ac{HRV} (Version 2.1) ein. Kubios \ac{HRV} automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. \ac{EKG}-Daten mit mehr als 2% an Artefakten habe ich aus der Datensammlung entfernt. 
+Zur \ac{HRV}-Analyse nutze ich nur die letzten fünf Minuten jedes 15-Minuten Abschnittes. Das hatte folgende Gründe:
 
-```{r subset-ecg-data, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
-
-  # Load ecg data 
-  ecg.data  <- read.csv(paste(file.path, "/ecg-data.csv", sep=""), header=T)
-  
-  # Set function attributes
-  starts    <- c(start.time, as.POSIXct(strptime(fss.features[fss.features[,5] == 3, 4][1:4], "%Y-%m-%d %H:%M:%S"), tz="CET"))
-  ends      <- c(as.POSIXct(strptime(fss.features[fss.features[,5] == 3, 3], "%Y-%m-%d %H:%M:%S"), tz="CET"))
-  times     <- as.POSIXct(ecg.data[, 4]/1000, origin="1970-01-01", tz="CET")
-  file.name <- "ecg-data"
-  
-  # Write subset in csv files
-  WriteDataSubsetInCSVFile(ecg.data, times, starts, ends, file.name=file.name, file.path=file.path)
-  
-  # Clean up
-  rm(file.name)
-```
-
-```{r calculate-hrv-features, echo=FALSE, message=FALSE, warning=FALSE}
-  library(RHRV)
-  
-  # Create feature vector
-  hrv.features <- c()
-
-  # HRV file indexes
-  hrv.file.index <- c(1, 2, 3, 4, 5)
-
-  for (j in hrv.file.index) {
-    
-    if(!is.na(j)) {
-    
-        # Set hrv file name
-        hrv.file.name <- paste(file.path, "ecg-data-", j, "_hrv.txt", sep="")
-        
-        # Load Kubios HRV txt data
-        hrv.kubios.data   <- read.csv(hrv.file.name, header = F, na.strings = "", fill = T, skip = 97, col.names = c("NA1", "Time", "RRInterval", "FFTFrequency", "FFTPSD", "ARFrequency", "ARPSD", "NA2", "NA3", "NA4", "NA5"))
-        
-        # Get time and rr-intervals
-        time              <- hrv.kubios.data$Time
-        time              <- time[complete.cases(time)]
-        rr.interval       <- hrv.kubios.data$RRInterval
-        rr.interval       <- rr.interval[complete.cases(rr.interval)]
-        
-        # Create hrv data of 10 minutes of the end of the whole data
-        hrv.data          <- CreateHRVData()
-        hrv.data          <- SetVerbose(hrv.data, FALSE)
-        hrv.data$Beat     <- data.frame("Time"=time[time >= time[length(time)] - 60 * 10])
-        
-        # Build not interpolated heart rates
-        hrv.data          <- BuildNIHR(hrv.data)
-        #PlotNIHR(hrv.data)
-        
-        # Remove artefact manually
-        #hrv.data          <- EditNIHR(hrv.data)
-        #PlotNIHR(hrv.data)
-        
-        # Filter niHR
-        s                 <- sd(hrv.data$Beat$niHR)
-        m                 <- mean(hrv.data$Beat$niHR)
-        minbpm            <- m - 3 * s
-        maxbpm            <- m + 3 * s
-        hrv.data          <-  FilterNIHR(hrv.data, long=50, last=13, minbpm=minbpm, maxbpm=maxbpm)
-        #PlotNIHR(hrv.data)
-        
-        # Linear Interpolate the data by 4 Hz (default)
-        hrv.data          <- InterpolateNIHR(hrv.data)
-        #PlotHR(hrv.data)
-        
-        # Create time analysis
-        #hrv.data          <- CreateTimeAnalysis(hrv.data, size=60)
-        
-        # Plot spectogram with Short-time Fourier transform 30 seconds window with 1 second shift for LF
-        #PlotSpectrogram(hrv.data, size=30, shift=1, freqRange=c(0.04, 0.15))
-        
-        # Plot spectogram with Short-time Fourier transform 30 seconds window with 1 second shift for HF-VHF
-        #PlotSpectrogram(hrv.data, size=10, shift=1, freqRange=c(0.15, 1))
-        
-        # Create Frequency analysis (CWT) with least asymmetric Daubechies of width 8 for ULF, VLF, LF and (HF + VHF) as HF 
-        hrv.data          <- CreateFreqAnalysis(hrv.data)
-        hrv.data          <- CalculatePowerBand(hrv.data, indexFreqAnalysis=1, type="wavelet", wavelet="la8", bandtolerance=0.005, ULFmin=0, ULFmax=0.0033, VLFmin=0.0033, VLFmax=0.04, LFmin=0.04, LFmax=0.15, HFmin=0.15, HFmax= 1)
-        
-        # Plot bands
-        #PlotPowerBand(hrv.data, indexFreqAnalysis=1, hr=TRUE)
-        
-        # Calculate HRV features
-        ulf.power.a       <- mean(hrv.data$FreqAnalysis[[1]]$ULF)
-        vlf.power.a       <- mean(hrv.data$FreqAnalysis[[1]]$VLF)
-        lf.power.a        <- mean(hrv.data$FreqAnalysis[[1]]$LF)
-        hf.power.a        <- mean(hrv.data$FreqAnalysis[[1]]$HF)
-        total.power       <- ulf.power.a + vlf.power.a + lf.power.a + hf.power.a
-        ulf.power.r       <- ulf.power.a/total.power * 100
-        vlf.power.r       <- vlf.power.a/total.power * 100
-        lf.power.r        <- lf.power.a/total.power * 100
-        hf.power.r        <- hf.power.a/total.power * 100
-        lf.power.nu       <- lf.power.a/(lf.power.a + hf.power.a) * 100
-        hf.power.nu       <- hf.power.a/(lf.power.a + hf.power.a) * 100
-        lfhf              <- lf.power.a/hf.power.a
-        mean.hr           <- mean(hrv.data$HR)
-        
-        # Add features to feature vector
-        hrv.features      <- c(hrv.features, mean.hr, lf.power.a, hf.power.a, total.power, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf)
-        
-        # Clean up
-        rm(ulf.power.a, vlf.power.a, lf.power.a, hf.power.a, total.power, ulf.power.r, vlf.power.r, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf, mean.hr)
-      } else {
-        # Calculate HRV features
-        ulf.power.a       <- NA
-        vlf.power.a       <- NA
-        lf.power.a        <- NA
-        hf.power.a        <- NA
-        total.power       <- NA
-        ulf.power.r       <- NA
-        vlf.power.r       <- NA
-        lf.power.r        <- NA
-        hf.power.r        <- NA
-        lf.power.nu       <- NA
-        hf.power.nu       <- NA
-        lfhf              <- NA
-        mean.hr           <- NA
-        
-        # Add features to feature vector
-        hrv.features      <- c(hrv.features, mean.hr, lf.power.a, hf.power.a, total.power, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf)
-      }
-  }
-  
-  # Make data frame
-  dimnames      <- list(row=c("mean.hr", "lf.power.a", "hf.power.a", "total.power", "lf.power.r", "hf.power.r", "lf.power.nu", "hf.power.nu", "lfhf"), col=1:i)
-  hrv.features  <- as.data.frame(t(matrix(hrv.features, ncol=i, nrow=9, dimnames=dimnames)))
-
-  # Clean up
-  rm(j, s, m, minbpm, maxbpm, hrv.kubios.data, dimnames)
-```
+- Die ersten fünf Minuten sind beeinfusst von der Ruhephase vor dem Lauf und nach jeder Befragung
+- Die letzten fünf Minuten liegen direkt vor der Befragung
+- Für die letzten fünf Minuten musste ich keinen Datensatz aufgrund von Artefakten aus der Datensammlung entfernen
 
 - Warum nur 10 Minunten?
 Wegen der Erholung am Anfang des Laufes und der Erholung nach den Befragungen (verweiß auf das Bild)
