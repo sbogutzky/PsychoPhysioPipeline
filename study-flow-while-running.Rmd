@@ -426,12 +426,33 @@ One particular approach to analyze HRV is to use spectral methods that provide i
 
 ```{r baseline-laufen-vergleich, echo=FALSE, message=FALSE, warning=FALSE, results="asis"}
   
+  # Examine my data
+  
   # Load feature data
   load("./data/features.RData")
 
   # Backup data
   features -> features.backup
   
+  # Count NAs
+  sapply(features, function(x) (sum(is.na(x))))
+  
+  # Data Summary
+  summary(features)
+
+  fss.features <- features[,1:6]
+  hrv.features <- features[, c(1, 7:15)]
+
+  plot(fss.features, main="FSS Feature Data", pch=19, col=fss.features$m)
+  plot(hrv.features, main="HRV Feature Data", pch=19, col=hrv.features$m)
+
+  par(mfrow = c(1,2))
+  for(i in 2:15) {
+    plot(features[features$m !=1,i], pch=19, col=features[features$m !=1,]$m)
+    boxplot(features[features$m !=1,i] ~ m, data=features[features$m !=1,], main=names(features[features$m !=1,])[i])
+    }
+  
+
   # Modify m 
   features[features[, 1] != 1, ][,1] = 2
 
