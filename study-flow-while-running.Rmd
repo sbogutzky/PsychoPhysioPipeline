@@ -10,6 +10,25 @@ header-includes: \usepackage{graphicx} \usepackage[printonlyused,withpage]{acron
   \usepackage{natbib}
 ---
 
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+  
+  # Remove all variables
+  rm(list = ls(all = T)) 
+
+  # Set working directory
+  setwd("~/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures")
+
+  # Load libraries
+  library("flow")
+  library("xtable")
+  
+  fss.features <- read.csv("./data/features/fss-features.csv", stringsAsFactors = FALSE)
+  hrv.features <- read.csv("./data/features/hrv-features.csv", stringsAsFactors = FALSE)
+  
+  # Set start time
+  start.time <- as.POSIXct("2013-10-31", tz="CET")
+```
+
 # Abkürzungsverzeichnis
 
 \begin{acronym}[TDMA]
@@ -48,32 +67,13 @@ Vor jedem Lauf rüstete ich ihn mit einem geladenen Smartphone, einem passenden 
 \label{fig:anordnung-des-equipments}
 \end{figure}
 
-Während jedes Laufes nutzte ich die dafür eigens entwickelte mobile Datenaufnahme App, um \ac{EKG} und Bewegungsdaten mit Hilfe der tragbaren Sensoren des Unternehmens Shimmer Research (Shimmer 2r) aufzuzeichnen. Die Datenaufnahme App läuft auf dem Android OS ab Version 4.4 und kommuniziert mit den Sensoren über Bluetooth. Die Bewegungssensoren besitzen einen Beschleunigungsmesser und ein Kreiselinstrument, die beide auf jeweils drei Achsen messen. Für das Experiment nutzte ich das Smartphone Samsung Galaxy Nexus, welches auch über einen Beschleunigungsmesser und ein Kreiselinstrument verfügt. Alle Bewegungssensoren arbeiten mit einer Datenrate von 100 Hz. Der \ac{EKG}-Sensor von Shimmer Research arbeitet mit vier Ableitungen. Im Experiment nutzte ich Knopfelektroden und eine Datenrate von 204.8 Hz. Alle 15 Minuten während jedes Laufes forderte die Datenaufnahme App mit einem Signal den Läufer auf, eine \ac{FKS} auszufüllen. Vor jedem Lauf führte der Läufer eine 15-minütige Baseline Messung durch. 
+Während jedes Laufes nutzte ich die dafür eigens entwickelte mobile Datenaufnahme App, um \ac{EKG} und Bewegungsdaten mit Hilfe der tragbaren Sensoren des Unternehmens Shimmer Research (Shimmer 2r) aufzuzeichnen. Die Datenaufnahme App läuft auf dem Android OS ab Version 4.4 und kommuniziert mit den Sensoren über Bluetooth. Die Bewegungssensoren besitzen einen Beschleunigungsmesser und ein Kreiselinstrument, die beide auf jeweils drei Achsen messen. Für das Experiment nutzte ich das Smartphone Samsung Galaxy Nexus, welches auch über einen Beschleunigungsmesser und ein Kreiselinstrument verfügt. Alle Bewegungssensoren arbeiten mit einer Datenrate von 100 Hz. Der \ac{EKG}-Sensor von Shimmer Research arbeitet mit vier Ableitungen. Im Experiment nutzte ich Knopfelektroden und eine Datenrate von 256 Hz. Alle 15 Minuten während jedes Laufes forderte die Datenaufnahme App mit einem Signal den Läufer auf, eine \ac{FKS} auszufüllen. Vor jedem Lauf führte der Läufer eine 15-minütige Baseline Messung durch. 
 
 Nach jedem Lauf übertrug ich die gesammelten Daten für die software-technische Analyse auf meinen Arbeitsrechner. Die Daten bestehen für jeden Lauf aus kontinuierlichen \ac{EKG}-Daten, \ac{GPS}-Positionen, Beschleunigungen und Winkelgeschwindigkeiten von den Körperpositionen Bein, Arm und Handgelenk. 
 
 ### Datenverarbeitung
 #### Flow-Kurzskala
-Aus den Fragebogen Daten berechnete ich die Faktoren der \ac{FKS}. In Tabelle \ref{tab:fks-merkmale} sind die Ergebnisse der \ac{FKS} des Laufes vom Donnerstag, den 31. Oktober 2013 dargestellt. In dieser Sitzung z. B. steigt die \ac{AFP} kontinuirlich und beim Laufen bewertet der Läufer seine Absorbiertheit gleichbleibend im mittleren Bereich der Skala von 1 bis 7 (siehe Abbildung \ref{fig:bewertete-absorbiertheit-afp-glatter-verlauf}). 
-
-```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
-  
-  # Remove all variables
-  rm(list = ls(all = T)) 
-
-  # Set working directory
-  setwd("~/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures")
-
-  # Load libraries
-  library("flow")
-  library("xtable")
-  
-  fss.features <- read.csv("./data/features/fss-features.csv", stringsAsFactors = FALSE)
-  hrv.features <- read.csv("./data/features/hrv-features.csv", stringsAsFactors = FALSE)
-  
-  # Set start time
-  start.time <- as.POSIXct("2013-10-31", tz="CET")
-```
+Aus den Fragebogen Daten berechnete ich die Faktoren der \ac{FKS}. In Tabelle \ref{tab:fks-merkmale} sind die Ergebnisse der \ac{FKS} des Laufes vom Donnerstag, den 31. Oktober 2013 dargestellt. In dieser Sitzung z. B. steigt die \ac{AFP} kontinuierlich und beim Laufen bewertet der Läufer seine Absorbiertheit gleichbleibend im mittleren Bereich der Skala von 1 bis 7 (siehe Abbildung \ref{fig:absorbiertheit-afp-verlauf}). 
 
 ```{r fks-merkmale, echo=FALSE, message=FALSE, results="asis"}
     
@@ -112,15 +112,14 @@ Aus den Fragebogen Daten berechnete ich die Faktoren der \ac{FKS}. In Tabelle \r
   rm(fss.features.table, table, addtorow)
 ```
 
-Ich nutze hier die zweite Subdimension der \ac{FKS} zur Bewertung des subjektiven Flow-Zustands des Läufers. Laut \citet{Peifer2014} tritt Absorbiertheit nur ein, wenn Anforderungen und Fähigkeiten sich in Balance befinden — somit ist sie ausschließlich im *Flow-Kanal* anzutreffen und deshalb ein repräsentativer Indikator für Flow als der Generalfaktor, der sich aus den zwei Subdimension zusammensetzt. Den Beleg hierfür geben \citet[S. 69]{Rheinberg2003a} in ihrer Studie. Sie stellten fest, dass Unterforderung keinen Einfluss auf den glatten Verlauf hat, jedoch die Absorbiertheit negativ beeinflusst. Dies ist auch in der Abbildung \ref{fig:bewertete-absorbiertheit-afp-glatter-verlauf} zu erkennen. 
+Ich nutze in der Studie die zweite Subdimension der \ac{FKS} zur Bewertung des subjektiven Flow-Zustands des Läufers. Laut \citet{Peifer2014} tritt Absorbiertheit nur ein, wenn Anforderungen und Fähigkeiten sich in Balance befinden — somit ist sie ausschließlich im *Flow-Kanal* anzutreffen und deshalb ein repräsentativer Indikator für Flow als der Generalfaktor, der sich aus den zwei Subdimension zusammensetzt. Den Beleg hierfür geben \citet[S. 69]{Rheinberg2003a} in ihrer Studie. Sie stellten fest, dass Unterforderung keinen Einfluss auf den glatten Verlauf hat, jedoch die Absorbiertheit negativ beeinflusst. Dies ist auch in der Abbildung \ref{fig:absorbiertheit-afp-verlauf} im Vergleich von Baseline (erste Messung) und Lauf zu erkennen. 
 
-\% Hier kommt noch was zum FKS-Gesamtergebnis hin oder etwas später
+<!-- Hier kommt noch was zum FKS-Gesamtergebnis hin oder etwas später -->
 
 ```{r absorbiertheit-afp-verlauf, echo=FALSE, warning=FALSE, dev='pdf', fig.height=3, fig.width=6.5, fig.pos='htbp', fig.cap='Absorbiertheit, AFP und glatter Verlauf'}
   par(mfcol=c(1, 1), mar=c(3.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8)
   
   # Plot data
-
   plot(as.POSIXct(fss.features.subset[,11]), fss.features.subset[,5], type="b", xlab ="Zeitpunkt", ylab="", pch=21, xlim = c(min(as.POSIXct(fss.features.subset[,11]))-60, max(as.POSIXct(fss.features.subset[,11]))+60), ylim=c(3, 6), xaxt="n", yaxt="n")
   lines(as.POSIXct(fss.features.subset[,11]), fss.features.subset[,9], type = "b", pch=22)
   lines(as.POSIXct(fss.features.subset[,11]), fss.features.subset[,3], type = "b", pch=23)
@@ -138,11 +137,11 @@ Ich nutze hier die zweite Subdimension der \ac{FKS} zur Bewertung des subjektive
 ```
 
 #### HRV-Analyse
-Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte (siehe Abbildung). Zur schnelleren Bearbeitung teilte ich die 15-Minuten Abschnitte in jeweils drei fünf Minuten Abschnitte. Diese 90 fünf Minuten Abschnitte las ich in Kubios \ac{HRV} (Version 2.1) ein. Kubios \ac{HRV} automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. \ac{EKG}-Daten mit mehr als 2% an Artefakten habe ich aus der Datensammlung entfernt. 
+Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Befragung und erhielt jeweils 15-Minuten Abschnitte (siehe Abbildung \ref{fig:ekg-signalverarbeitung} von A zu B). Zur schnelleren Bearbeitung teilte ich die 15-Minuten Abschnitte in jeweils drei fünf Minuten Abschnitte (siehe Abbildung \ref{fig:ekg-signalverarbeitung} C). Zur RR-Interval Berechnung las ich die 90 fünf Minuten Abschnitte in Kubios \ac{HRV} (Version 2.1) ein. Kubios \ac{HRV} automatische R-Spitzen-Erkennung erkennt die meisten Herzschläge. Trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. \ac{EKG}-Daten mit mehr als 2% an Artefakten habe ich aus der Datensammlung entfernt. 
 Zur \ac{HRV}-Analyse nutze ich nur die letzten fünf Minuten jedes 15-Minuten Abschnittes. Das hatte folgende Gründe:
 
-- Die ersten fünf Minuten sind beeinfusst von der Ruhephase vor dem Lauf und nach jeder Befragung
-- Die letzten fünf Minuten liegen direkt vor der Befragung
+- Die ersten fünf Minuten sind beeinflusst von der Ruhephase vor dem Lauf und nach jeder Befragung (siehe Abbildung \ref{fig:ekg-signalverarbeitung} C am Anfang)
+- Die letzten fünf Minuten liegen direkt vor der Befragung (siehe Abbildung \ref{fig:ekg-signalverarbeitung} C am Ende)
 - Für die letzten fünf Minuten musste ich keinen Datensatz aufgrund von Artefakten aus der Datensammlung entfernen
 
 - Warum nur 10 Minunten?
@@ -184,7 +183,7 @@ Warum LF und HF?
 
 One particular approach to analyze HRV is to use spectral methods that provide information about how variance in HR ("power") distributes as a function of frequency (Task Force Guidelines, 1996). One of the relevant parameters in spectral analyses is the high-frequency component of the heart rate variability (HF-HRV), which reflects variance in the high frequency range (0.15-0.4 Hz). HF-HRV has been shown to be a reliable indicator for parasympathetic efferent activity (Porges, 1995) and increased task demands are related to a low level of HF-HRV (Backs et al., 1991; Mulder et al., 2002). Furthermore, increased HF-HRV is associated with efficient use of strategies for self-regulation and attention, which results in better performance in cognitive tasks (better accuracy and shorter reaction time) (Hansen et al, 2003; Thayer et al., 2009). In contrast, decreased HF-HRV is related to limited use of self-regulatory strategies (Thayer & Brosschot, 2005), for example, failure to recognize task relevant information or to habituate to novel, non-relevant stimuli (hypervigilance; Friedman, 2007; Thayer, Friedman, Borkovec, Johnsen, & Molina, 2000; Thayer et al., 2009). Focusing on task relevant stimuli and fading out task-irrelevant information are key components of flow. Therefore, one can assume a positive relation between flow and HF-HRV. However, prior studies suggest that moderate and increased task demands are related to lower levels of HF-HRV (Backs et al., 1991; Jorna, 1992; Mulder et al., 2002 Vicente et al., 1987). Based on these findings, we hypothesize a relation between flow and HF-HRV without making any assumptions regarding the direction of the relationship. Another parameter of HRV is the low-frequency component of the HRV (LF-HRV), which reflects the variance in the low frequency range (0.04-0.15 Hz) of heart rates. The meaning of this parameter is controversial in recent research. LF-HRV has been used as an indicator for sympathetic activity (Pagani et al., 1986; Malliani, Pagani, Lombardi, & Cerutti, 1991). However, a growing body of research disproved this assumption and showed that LF-HRV rather reflects baroreflex modulation (Heathers, 2014; Rahman, Pechnik, Gross, Sewall, Goldstein, 2011; Schroeder et al., 2003). The baroreflex is one of the elementary mechanisms through which acute changes in the heart rate and blood pressure is controlled (Guyton, 1980) Baroreflex activity has been associated with several cognitive functions such as mental stress (del Paso, Langewitz, Robles, & Pérez, 1996; Robbe et al., 1987, Steptoe & Sawada, 1989), cognitive-attentional demands (del Paso, González, & Hernández, 2004), and cognitive performance (Yasumasu, del Paso, Takahara, & Nakashima, 2006). According to Lacey's intake/rejection hypothesis (Lacey & Lacey, 1970), tasks containing cognitive elaboration are related to a baroreceptor-elicited cardiac acceleration (del Paso et al., 2004). In contrast, activities involving the detection of external stimuli are related to a baroreceptor-modulated cardiac deceleration (Bernardi, Porta, Spicuzza, & Sleight, 2005). Yasumasu et al. (2006) showed that activities that involve cognitive elaboration and rejection of external stimuli cause a decrease of baroreflex activity, which in turn causes an increase in cardiovascular activity (i.e., increase in heart rate). Cognitive involvement in an activity and rejection of external stimuli are crucial for experiencing flow. Furthermore, previous research suggests an inverted u-shaped function between flow and LF-HRV (Peifer et al., 2014b). Based on these results, we assume a relation between LF-HRV (as an indicator for baroreflex function) and flow experience and test this assumption in an experimental setting that addresses the aforementioned limitations of previous studies. (Tozman2015)
 
-```{r ekg-signalverarbeitung, echo=FALSE, warning=FALSE, dev='CairoPNG', dpi=800, fig.height=4.5, fig.width=6.5, fig.pos='htbp', fig.cap='EKG-Signalverarbeitung', eval=FALSE}
+```{r ekg-signalverarbeitung, echo=FALSE, warning=FALSE, dev='CairoPNG', dpi=800, fig.height=4.5, fig.width=6.5, fig.pos='htbp', fig.cap='EKG-Signalverarbeitung'}
   par(mfcol=c(4, 1), mar=c(3, 3, 1.5, 3) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="i", yaxs="i")
 
   # Load ecg data  
@@ -298,9 +297,9 @@ One particular approach to analyze HRV is to use spectral methods that provide i
   # Plot ticks and vertical lines
   marker <- c(start.rr, end.rr)
   axis(1, at=marker, label=format(c(end - 5 * 60, end), "%H:%M:%S"))
-  axis(2, at=seq(.25, .50, .025), labels=seq(.25, .50, .025))
+  axis(2, at=seq(.2, .6, .02), labels=seq(.2, .6, .02))
   axis(3, at=marker, label=rep("", length(marker)))
-  axis(4, at=seq(.25, .50, .025), labels=rep("", length(seq(.25, .50, .025))))
+  axis(4, at=seq(.2, .6, .02), labels=rep("", length(seq(.2, .6, .02))))
   abline(v=c(min(t), max(t)), lty = "dashed", col="darkgrey")
 
   # Plot box again
@@ -429,4 +428,4 @@ One particular approach to analyze HRV is to use spectral methods that provide i
 Um zu testen, ob ein Unterschied zwischen den erhobenen Merkmalen aus den Baseline-Messungen und den Laufmessungen besteht, führte ich eine einfaktorielle Varianzanalyse (ANOVA) für jedes Merkmal durch. Das Ergebnis zeigt, dass alle Merkmale, außer dem Generalfaktor und dem Besorgnisfaktor, sich mindestens signifikant zwischen Baseline-Messungen und Laufmessungen unterscheiden (siehe Tabelle \ref{tab:baseline-laufen}). Das Ergebnis unterstützt meine Entscheidung Absorbiertheit als Maßzahl zu benutzen.  
 
 \bibliographystyle{agsm}
-\bibliography{./bibtex/library}\bibliography{./bibtex/library}
+\bibliography{./bibtex/library}
