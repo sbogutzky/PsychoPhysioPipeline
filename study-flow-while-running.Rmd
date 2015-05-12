@@ -355,6 +355,20 @@ One particular approach to analyze HRV is to use spectral methods that provide i
   
   # Keine Normalverteilung haben (visuell): anxiety, fit, lf.a.power, hf.a.power
 
+  for(i in 1:5) {
+    print(names(fss.features.subset[fss.features.subset[, 6] == "Running",])[i])
+    print(shapiro.test(fss.features.subset[fss.features.subset[, 6] == "Running",i]))
+    qqnorm(fss.features.subset[fss.features.subset[, 6] == "Running",i], ylab = names(fss.features.subset[fss.features.subset[, 6] == "Running",])[i])
+    qqline(fss.features.subset[fss.features.subset[, 6] == "Running",i])
+  }
+
+  for(i in 1:9) {
+    print(names(hrv.features.subset[hrv.features.subset[, 10] == "Running",])[i])
+    print(shapiro.test(hrv.features.subset[hrv.features.subset[, 10] == "Running",i]))
+    qqnorm(hrv.features.subset[hrv.features.subset[, 10] == "Running",i], ylab = names(hrv.features.subset[hrv.features.subset[, 10] == "Running",])[i])
+    qqline(hrv.features.subset[hrv.features.subset[, 10] == "Running",i])
+  } 
+
   # Modify m 
   features[features[, 1] != 1, ][,1] = 2
 
