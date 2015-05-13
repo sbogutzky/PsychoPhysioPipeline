@@ -367,8 +367,30 @@ One particular approach to analyze HRV is to use spectral methods that provide i
     print(shapiro.test(hrv.features.subset[hrv.features.subset[, 10] == "Running",i]))
     qqnorm(hrv.features.subset[hrv.features.subset[, 10] == "Running",i], ylab = names(hrv.features.subset[hrv.features.subset[, 10] == "Running",])[i])
     qqline(hrv.features.subset[hrv.features.subset[, 10] == "Running",i])
-  } 
+  }
 
+
+  # 
+
+  flow.baseline <- fss.features.subset[fss.features.subset[,8] == 1 & fss.features.subset[, 6] == "Baseline", 3]
+  flow.running  <- fss.features.subset[fss.features.subset[,8] == 1 & fss.features.subset[, 6] == "Running", 3]
+
+  x.mean.1 <- mean(flow.baseline)
+  x.mean.2 <- mean(flow.running)
+
+  s.1 <- var(flow.baseline)
+  s.2 <- var(flow.running)
+  
+  n.1 <- length(flow.baseline)
+  n.2 <- length(flow.running)
+
+  t <- (x.mean.1 - x.mean.2) / sqrt(s.1/n.1 + s.2/n.2)
+  
+  # Der berechnete t-Wert 3.254 von liegt über dem kritischen t-Wert von 1.812. Somit kann davon ausgegangen werden, dass die durchschnittliche Absorbiertheit der beiden Aktivitäten unterschiedlich hoch ist. Die Absorbiertheit in Ruhe sind also im Durchschnitt niedriger als die beim Laufen. 
+  t.test(flow.baseline, flow.running)
+
+  # Ein p-Wert von 0,05 oder geringer bedeutet demnach, dass die beiden Mittelwerte in den beiden Grundgesamt￼heiten zu einem Signifikanzniveau von mindestens 95 % unterschiedlich sind.
+ 
   # Modify m 
   features[features[, 1] != 1, ][,1] = 2
 
