@@ -146,7 +146,7 @@ Zur Bewertung des subjektiven Flow-Zustands verwende ich die zweite Subdimension
 ```
 
 #### HRV-Analyse
-Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Bewertung der \ac{FKS} und erhielt jeweils 15-Minuten Abschnitte (siehe Abbildung \ref{fig:ekg-signalverarbeitung} von A zu B). Zur effizienteren Verarbeitung in KubiosHRV teilte ich die 15-Minuten Abschnitte in jeweils drei fünf Minuten Abschnitte (siehe Abbildung \ref{fig:ekg-signalverarbeitung} C). Zur RR-Interval Berechnung las ich die 90 fünf Minuten Abschnitte in KubiosHRV (Version 2.1) ein. KubiosHRV R-Spitzen-Erkennung identifiziert grötenteils die Herzschläge automatisch, trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. \ac{EKG}-Daten mit mehr als 2% an Artefakten habe ich aus der Datensammlung entfernt. 
+Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Bewertung der \ac{FKS} und erhielt jeweils 15-Minuten Abschnitte (siehe Abbildung \ref{fig:ekg-signalverarbeitung} von A zu B). Zur effizienteren Verarbeitung in KubiosHRV teilte ich die 15-Minuten Abschnitte in jeweils drei fünf Minuten Abschnitte (siehe Abbildung \ref{fig:ekg-signalverarbeitung} C). Zur RR-Interval Berechnung las ich die 90 fünf Minuten Abschnitte in KubiosHRV (Version 2.1) ein. KubiosHRV R-Spitzen-Erkennung identifiziert grötenteils die Herzschläge automatisch, trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. \ac{EKG}-Daten mit mehr als 2% an abnormalen Erkennungen habe ich aus der Datensammlung entfernt. 
 Zur \ac{HRV}-Analyse nutze ich die letzten fünf Minuten jedes 15-Minuten Abschnittes. Das hatte folgende Gründe:
 
 - Die ersten fünf Minuten sind beeinflusst von der Ruhephase vor dem Lauf und nach jeder Befragung (siehe Abbildung \ref{fig:ekg-signalverarbeitung} C am Anfang)
@@ -320,19 +320,22 @@ One particular approach to analyze HRV is to use spectral methods that provide i
 ```{r examine-features, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
 
   fss.features.subset <- fss.features[,c(1,3,5,7,9,11,12,15)]
+  fss.features.subset[fss.features.subset[, 6] == "Running",]$measurement <- fss.features.subset[fss.features.subset[, 6] == "Running",]$measurement + 1
+  fss.features.subset <- fss.features.subset[order(as.Date(fss.features.subset$activity.start,format="%Y-%m-%d %H:%M:%S")),,drop=FALSE]
+  
   hrv.features.subset <- hrv.features[, c(1:11, 15)]
   
   par(mfrow = c(1,2))
   for(i in 1:5) {
-    plot(fss.features.subset[fss.features.subset[, 6] == "Running",i], pch=19, col=fss.features.subset[fss.features.subset[, 6] == "Running",]$measurement, ylab = names(fss.features.subset[fss.features.subset[, 6] == "Running",])[i])
-    boxplot(fss.features.subset[fss.features.subset[, 6] == "Running",i] ~ measurement, data=fss.features.subset[fss.features.subset[, 6] == "Running",])
+    plot(fss.features.subset[,i], pch=19, col=fss.features.subset$measurement, ylab = names(fss.features.subset)[i])
+    boxplot(fss.features.subset[,i] ~ measurement, data=fss.features.subset)
     }
 
   par(mfrow = c(1,1))
   for(i in 1:5) {
-    hist(fss.features.subset[fss.features.subset[, 6] == "Running",i], main = names(fss.features.subset[fss.features.subset[, 6] == "Running",])[i], xlab = names(fss.features.subset[fss.features.subset[, 6] == "Running",])[i])
-    lines(density(fss.features.subset[fss.features.subset[, 6] == "Running",i]))
-    rug(jitter(fss.features.subset[fss.features.subset[, 6] == "Running",i]))
+    hist(fss.features.subset[,i], main = names(fss.features.subset)[i], xlab = names(fss.features.subset)[i])
+    lines(density(fss.features.subset[,i]))
+    rug(jitter(fss.features.subset[,i]))
     } 
   
   par(mfrow = c(1,2))
@@ -352,8 +355,6 @@ One particular approach to analyze HRV is to use spectral methods that provide i
   # Lauf vom 7.11.2013 - 3 - Mittlere HR; hoher Absorbiertheit
   # Lauf vom 7.11.2013 - 4 - Sehr hohe HR; niedrige Absorbiertheit
   # Lauf vom 24.10.2014 - 3 u. 4 - Sehr niedrige HFnu und ansteigende HR
-  
-  # Keine Normalverteilung haben (visuell): anxiety, fit, lf.a.power, hf.a.power
 
   for(i in 1:5) {
     print(names(fss.features.subset[fss.features.subset[, 6] == "Running",])[i])
