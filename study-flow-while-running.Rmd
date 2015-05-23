@@ -286,7 +286,7 @@ Nach der Berechnung der RR-Intervalle analysierte ich die \ac{HRV} in R mit Hilf
 
 Ein Grundproblem der \ac{HRV}-Analyse unter sportlicher Belastung ist die Nichtstationarität des Herzfrequenzsignals (RR-Intervalle). Aus diesem Grund empfehlen \citet[S. 113]{Sarmiento2013} traditionelle Methoden der Spektralanalyse wie die \ac{FFT} nicht zu verwenden. Auch \citet[S. 61]{Hoos2010} schreibt von Autoren, die argumentieren, dass für hohe Intensitäten Ergebnisse der traditionellen Spektralanalyse der \ac{HRV} im Allgemeinen und insbesondere der absoluten Einheiten zur Beschreibung der autonomen Funktion unter sportlicher Belastung kaum geeignet sind. Sie führen dies einerseits auf methodische Probleme wie der belastungsbedingten Nichtstationarität und andererseits auf ihre mangelnde Vergleichbarkeit mit Ergebnissen unter schwachen Intensitäten zurück. Vgl. \citet[S. 61]{Hoos2010} lässt sich die gewohnte belastungsinduzierte Verschiebung von der vagalen zur sympathikotonen Dominanz oftmals nicht feststellen. 
 
-Daraus folgt laut \citet[S. 61f.]{Hoos2010} die Forderung deutlich adäquaterer Methoden einzusetzen. Zu diesen Methoden gehören alternative Spektralanalysemethoden (z. B. Coarse Graining Spektralanalyse (CGSA), Kurzzeitfourier-Analyse (STFT) oder kontinuierliche Wavelet Transformation (CWT)) oder nicht-linearer Verfahren (insbesondere Detrended Fluctuation Analysis (DFA), Sampie Entropie (SampEn)). Bei der Nutzung von alternativen Spektralanalysemethoden unter sportlicher Belastung fordern die von \citet[S. 62]{Hoos2010} zitierten Wissenschaftler die Verwendung von einer belastungsadäquaten Erweiterung des HF-Spektralbands mindestens bis zur maximalen Atemfrequenz ($\sim$1 Hz). Des Weiteren fordern sie eine Abkehr von der bisherigen Interpretation der Spektralbändern, da sich im \ac{HF}-Band bei sportlicher Belastung vor allem mechanisch bedingte Resonanz- und Kopplungsphänomene mit der Atmung und der motorischen Aktivität zu manifestieren scheinen. 
+Daraus folgt laut \citet[S. 61f.]{Hoos2010} die Forderung deutlich adäquaterer Methoden einzusetzen. Zu diesen Methoden gehören alternative Spektralanalysemethoden (z. B. Coarse Graining Spektralanalyse (CGSA), Kurzzeitfourier-Analyse (STFT) oder kontinuierliche Wavelet Transformation (CWT)) oder nicht-linearer Verfahren (insbesondere Detrended Fluctuation Analysis (DFA), Sampie Entropie (SampEn)). Bei der Nutzung von alternativen Spektralanalysemethoden unter sportlicher Belastung fordern die von \citet[S. 62]{Hoos2010} zitierten Wissenschaftler die Verwendung von einer belastungsadäquaten Erweiterung des HF-Spektralbands mindestens bis zur maximalen Atemfrequenz ($\sim$ 1 Hz). Des Weiteren fordern sie eine Abkehr von der bisherigen Interpretation der Spektralbändern, da sich im \ac{HF}-Band bei sportlicher Belastung vor allem mechanisch bedingte Resonanz- und Kopplungsphänomene mit der Atmung und der motorischen Aktivität zu manifestieren scheinen. 
 
 Aufgrund der vorgestellten Forderungen verwende ich eine \ac{WT} zur Spektralanalyse. Die \ac{WT} ist ein leistungsfähiges Werkzeug zur Analyse von nichtstationären Signalen wie der Zeitreihe der RR-Intervalle. Die Analyse basiert auf einem Mutter-Wavelet. Das Mutter-Wavelet ist eine lokalisierte, oszillierende, reguläre Funktion $\psi(t)$. Wavelet-Funktionen sind anders als die Sinusfunktionen, auf der die \ac{FFT} basiert, im Raum lokalisiert. Dadurch erhält die \ac{WT} die zeitliche und spektrale Dimension. Für die Analyse nichtstationärer Signale ist damit vgl. \citet[S. 207]{Rodriguez-Linares2010} die \ac{WT} der \ac{FFT} vorzuziehen.
 
@@ -294,7 +294,8 @@ Die Verwendung der \ac{WT} ermöglicht die detaillierte Bewertung der Entwicklun
 
 Die \ac{WT} führe ich in R mit der Hilfe des RHRV Packages durch. In RHRV implemtierten \citet{Rodriguez-Linares2010} eine Maximal Overlap Discrete Wavelet Packet Transform (MODWPT). Zur Analyse stehen mehrere Wavelet-Funktion mit unterschiedlichen Längen zur Verfügung. Allgemein besitzen kürzere Wavelet-Funktionen eine bessere zeitliche Auflösung, aber eine schlechtere Frequenzauflösung. Auf der anderen Seite, besitzen längere Wellen in der Regel schlechtere zeitliche Auflösung, aber bieten eine bessere Frequenzauflösung. Bessere zeitliche Auflösung ermöglicht es, kürzere Zeitabständen zu studieren. Ich verwende deshalb ein asymmetrische Daubechies Wavelet der Länge 8 (la8), das laut \citet{Rodriguez-Linares2010} einen guten Kompromiss zwischen Frequenz- und Zeitauflösung bietet.
 
-Zur Berechung der üblichen Spektralleistung der unterschiedlichen Bänder in $ms^2$ berechne ich das Mittel der Wavelet Koeffizienten. Die daraus resultierenden HRV-Merkmale des Laufes vom Donnerstag, den 31. Oktober 2013 bildet Tabelle \ref{tab:hrv-ergebisse} ab.
+Zur Berechung der üblichen Spektralleistung der unterschiedlichen Bänder in $ms^2$ berechne ich das Mittel der Wavelet Koeffizienten. Die daraus resultierenden \ac{HRV}-Merkmale des Laufes vom Donnerstag, den 31. Oktober 2013 bildet Tabelle \ref{tab:hrv-ergebisse} ab.
+
 
 ```{r hrv-merkmale, echo=FALSE, message=FALSE, results="asis"}
   
@@ -318,8 +319,7 @@ One particular approach to analyze HRV is to use spectral methods that provide i
 -->
 
 #### Statistische Analyse
-
-Die statische Analyse der einzelnen Merkmale führte ich mit R durch. Den Effekt des Zeitpunkts der Messung von Baseline bis zur Minute 60 des Laufens evaluierte ich mit einer einfachen ANOVA bei wiederholten Messungen (ggf. mit Greenhouse-Geisser oder Huynh-Feldt Korrektur). Um der Annahme der Normalverteilung folge zu leisten testete ich die Merkmale jedes Messabschnitts zahlenmäßig mit dem Shapiro Test und visuell in QQ-Plots. Das Merkmal Besorgnis entfernte ich aus der Datensammlung, da der Läufer sie niedrig und mit sehr wenig Abweichung bewertete. Einen abhängigen t-Test (auch Paardifferenzentest; engl. Paired t-Test) führte ich falls nötig durch, um die mittlere Differenz zweier Messabschnitte zu berechnen. 
+Die statistische Analyse der einzelnen Merkmale führte ich mit R durch. Der Effekt des Zeitpunkts der Messung von Baseline bis zur Minute 60 des Laufens evaluierte ich mit einer einfachen ANOVA bei wiederholten Messungen (ggf. mit Greenhouse-Geisser oder Huynh-Feldt Korrektur). Die Normalverteilung der Daten jeder Stichprobe prüfte zahlenmäßig mit dem Shapiro Test und visuell in QQ-Plots. Das Merkmal Besorgnis entfernte ich aus der Datensammlung, da der Läufer sie niedrig und mit mit geringer Abweichung bewertete. Einen abhängigen t-Test (Paardifferenzentest; engl. Paired t-Test) führte ich falls nötig durch, um die mittlere Differenz zweier Messabschnitte zu berechnen. P-Werte unter 0.05 sah ich als statistisch signifikant an.
 
 ```{r examine-features, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
 
@@ -412,7 +412,7 @@ Die statische Analyse der einzelnen Merkmale führte ich mit R durch. Den Effekt
     aov.out.3     <- Anova(model, idata = data.frame(design), idesign = ~design, type = "III")
     print(summary(aov.out.3, multivariate = F))
     
-    print(with(df, pairwise.t.test(value, treatment, p.adjust.method = "bonferroni", paired = T)))
+    print(with(df, pairwise.t.test(value, treatment, p.adjust.method = "none", paired = T)))
   }
   
   subject <- c()
@@ -433,14 +433,11 @@ Die statische Analyse der einzelnen Merkmale führte ich mit R durch. Den Effekt
 
 ### Ergebnis
 
+#### Effekt der Aktivität Laufen auf die Merkmale
+Der Generalfaktor unterscheidet sich nur bei der Messung nach der 30. Minute signifikant von Baseline-Messung zu Laufmessung [$t(5) = -2.6458, p < .05$]. In den letzten drei Messungen unterscheiden sich die mittleren Differenzen des angegebenen Flusses signifikat. Der Fluss sinkt von Baseline-Messung zum Laufen. Der Effekt auf die Absorbiertheit und die \ac{AFP} ist im Vergleich von Baseline-Messung zu den vier Laufmessungen in jedem der vier Stichprobenvergleiche signikant. Beide Merkmale steigen beim Laufen an. Für alle \ac{HRV}-Merkmale, außer der Gesamtleistung [jeweils $p < .1$] und dem relativen Wert der \ac{LF} [nach der 45. Minute und nach der 60. Minute, $p < .1$], ist der Effekt für jeden Stichprobenvergleich signifikant. Es steigen die mittlere Herzrate, der relative (%) und normalisierte Wert (n. u.) der \ac{HF}. Die restlichen Merkmale fallen von Baseline-Messung zum Laufen. Dieses Ergebnis bestätigt bestehende Arbeiten über die \ac{HRV} bei sportlicher Aktivität \citep{Pichon2004, Sarmiento2013, Hoos2010}. 
 
-<!-- Unterschied zwischen Baseline-Messungen und Laufmessungen -->
-
-<!-- Um zu testen, ob ein Unterschied zwischen den erhobenen Merkmalen aus den Baseline-Messungen und den Laufmessungen besteht, führte ich eine einfaktorielle Varianzanalyse (ANOVA) für jedes Merkmal durch. Das Ergebnis zeigt, dass alle Merkmale, außer dem Generalfaktor und dem Besorgnisfaktor, sich mindestens signifikant zwischen Baseline-Messungen und Laufmessungen unterscheiden (siehe Tabelle \ref{tab:baseline-laufen}). Das Ergebnis unterstützt meine Entscheidung Absorbiertheit als Maßzahl zu benutzen. -->
-
-<!-- Der berechnete t-Wert 3.254 von liegt über dem kritischen t-Wert von 1.812. Somit kann davon ausgegangen werden, dass die durchschnittliche Absorbiertheit der beiden Aktivitäten unterschiedlich hoch ist. Die Absorbiertheit in Ruhe sind also im Durchschnitt niedriger als die beim Laufen. -->  
-
-<!-- Ein p-Wert von 0,05 oder geringer bedeutet demnach, dass die beiden Mittelwerte in den beiden Grundgesamt￼heiten zu einem Signifikanzniveau von mindestens 95 % unterschiedlich sind. -->
+#### Effekt der Messzeitpunkts auf die Merkmale
+Für alle Merkmale, außer der \ac{AFP}, ist kein signifikanter Effekt zwischen den einzelnen Laufmessungen zu finden. Damit scheint der Messzeitpunkt auf diese Merkmale keinen Einfluss zu haben. Die gefühlte \ac{AFP} steigt signifikant von Messung der 15. Minute zur Messung der 30. Minute [$t(5) = -7, p < .001$] und von Messung der 30. Minute zur Messung der 45. Minute [$t(5) = -3.16, p < .05$].
 
 \bibliographystyle{agsm}
 \bibliography{./bibtex/library}
