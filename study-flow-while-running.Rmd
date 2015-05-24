@@ -321,14 +321,23 @@ One particular approach to analyze HRV is to use spectral methods that provide i
 #### Statistische Analyse
 Die statistische Analyse der einzelnen Merkmale führte ich mit R durch. Der Effekt des Zeitpunkts der Messung von Baseline bis zur Minute 60 des Laufens evaluierte ich mit einer einfachen ANOVA bei wiederholten Messungen (ggf. mit Greenhouse-Geisser oder Huynh-Feldt Korrektur). Die Normalverteilung der Daten jeder Stichprobe prüfte zahlenmäßig mit dem Shapiro Test und visuell in QQ-Plots. Das Merkmal Besorgnis entfernte ich aus der Datensammlung, da der Läufer sie niedrig und mit mit geringer Abweichung bewertete. Einen abhängigen t-Test (Paardifferenzentest; engl. Paired t-Test) führte ich falls nötig durch, um die mittlere Differenz zweier Messabschnitte zu berechnen. P-Werte unter 0.05 sah ich als statistisch signifikant an.
 
-```{r examine-features, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
-
-  # Examine fss features (visual)
+```{r subset-features, echo=FALSE, message=FALSE, warning=FALSE}
   fss.features.subset <- fss.features[,c(1,3,5,7,9,11,12,15)]
   fss.features.subset[fss.features.subset[, 6] == "Running",]$measurement <- fss.features.subset[fss.features.subset[, 6] == "Running",]$measurement + 1
   fss.features.subset <- fss.features.subset[order(as.Date(fss.features.subset$activity.start,format="%Y-%m-%d %H:%M:%S")),,drop=FALSE]
   fss.features.subset$measurement <- factor(fss.features.subset$measurement, levels = c(1,2,3,4,5), labels = c("baseline", "15", "30", "45", "60"))
   
+  hrv.features.subset <- hrv.features[, c(1:11, 15)  ]
+  hrv.features.subset[hrv.features.subset[, 10] == "Running",]$measurement <- hrv.features.subset[hrv.features.subset[, 10] == "Running",]$measurement + 1
+  hrv.features.subset <- hrv.features.subset[order(as.Date(hrv.features.subset$activity.start,format="%Y-%m-%d %H:%M:%S")),,drop=FALSE]
+  hrv.features.subset$measurement <- factor(hrv.features.subset$measurement, levels = c(1,2,3,4,5), labels = c("baseline", "15", "30", "45", "60"))
+
+```
+
+
+```{r examine-features, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+
+  # Examine fss features (visual)
   par(mfrow = c(1,2))
   for(i in 1:5) {
     plot(fss.features.subset[,i], pch=19, col=fss.features.subset$measurement, ylab = names(fss.features.subset)[i])
@@ -341,13 +350,8 @@ Die statistische Analyse der einzelnen Merkmale führte ich mit R durch. Der Eff
     lines(density(fss.features.subset[,i]))
     rug(jitter(fss.features.subset[,i]))
   } 
-  
-  # Examine hrv features (visual)
-  hrv.features.subset <- hrv.features[, c(1:11, 15)  ]
-  hrv.features.subset[hrv.features.subset[, 10] == "Running",]$measurement <- hrv.features.subset[hrv.features.subset[, 10] == "Running",]$measurement + 1
-  hrv.features.subset <- hrv.features.subset[order(as.Date(hrv.features.subset$activity.start,format="%Y-%m-%d %H:%M:%S")),,drop=FALSE]
-  hrv.features.subset$measurement <- factor(hrv.features.subset$measurement, levels = c(1,2,3,4,5), labels = c("baseline", "15", "30", "45", "60"))
 
+  # Examine hrv features (visual)
   par(mfrow = c(1,2))
   for(i in 1:9) {
     plot(hrv.features.subset[,i], pch=19, col=hrv.features.subset$measurement, ylab = names(hrv.features.subset)[i])
