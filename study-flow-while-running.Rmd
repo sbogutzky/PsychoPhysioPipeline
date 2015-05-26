@@ -27,11 +27,21 @@ documentclass: scrartcl
   library("xtable")
   library(gplots)
   
-  fss.features <- read.csv("./data/features/fss-features.csv", stringsAsFactors = FALSE)
-  hrv.features <- read.csv("./data/features/hrv-features.csv", stringsAsFactors = FALSE)
-  
-  # Set start time
-  start.time <- as.POSIXct("2013-10-31", tz="CET")
+  fss.features        <- read.csv("./data/features/fss-features.csv", stringsAsFactors = FALSE)
+  fss.feature.subset <- fss.features
+  fss.feature.subset[fss.feature.subset[, 11] == "Running",]$measurement <- fss.feature.subset[fss.feature.subset[, 11] == "Running",]$measurement + 1
+  fss.feature.subset <- fss.feature.subset[,c(1,3,5,7,9,12,15)]
+  fss.feature.subset <- fss.feature.subset[order(as.Date(fss.feature.subset$activity.start, format = "%Y-%m-%d %H:%M:%S")), , drop = FALSE]
+  fss.feature.subset$measurement <- factor(fss.feature.subset$measurement, levels = c(1, 2, 3, 4, 5), labels = c("Ruhe", "15'", "30'", "45'", "60'"))
+
+  hrv.features        <- read.csv("./data/features/hrv-features.csv", stringsAsFactors = FALSE)
+  hrv.feature.subset <- hrv.features
+  hrv.feature.subset[hrv.feature.subset[, 10] == "Running",]$measurement <- hrv.feature.subset[hrv.feature.subset[, 10] == "Running",]$measurement + 1
+  hrv.feature.subset <- hrv.feature.subset[, c(1:9, 11, 15)]
+  hrv.feature.subset <- hrv.feature.subset[order(as.Date(hrv.feature.subset$activity.start,format = "%Y-%m-%d %H:%M:%S")), , drop = FALSE]
+  hrv.feature.subset$measurement <- factor(hrv.feature.subset$measurement, levels = c(1, 2, 3, 4, 5), labels = c("Ruhe", "15'", "30'", "45'", "60'"))
+
+  hrv.feature.subset$activity.start <- fss.feature.subset$activity.start
 ```
 
 # Abkürzungsverzeichnis
@@ -73,72 +83,54 @@ Vor jedem Lauf rüstete ich ihn mit einem geladenen Smartphone, einem passenden 
 \begin{figure}[htbp]
 \centering
 \includegraphics[keepaspectratio,width=0.75\textwidth]{./figures/equipment-arrangement.pdf}
-\caption{Anordnung des Equipments}
+\caption{Anordnung des Equipments; Smartphone am Oberarm; Bewegungssensoren am Schienbein und Handgelenk; EKG-Sensor mit zwei Ableitungen am Oberkörper}
 \label{fig:anordnung-des-equipments}
 \end{figure}
 
-Während jedes Laufes zeichnete eine eigens entwickelte App \ac{EKG} und Bewegungsdaten mit Hilfe der tragbaren Sensoren des Unternehmens Shimmer Research (Shimmer 2r) auf. Die App läuft auf dem Android OS ab Version 4.4 und kommuniziert mit den Sensoren über Bluetooth. Die Bewegungssensoren besitzen einen Beschleunigungsmesser und ein Kreiselinstrument, die beide auf jeweils drei Achsen messen. Für das Experiment nutzte ich das Smartphone Samsung Galaxy Nexus, welches auch über einen Beschleunigungsmesser und ein Kreiselinstrument verfügt. Alle Bewegungssensoren arbeiten mit einer Datenrate von 100 Hz. Der \ac{EKG}-Sensor von Shimmer Research arbeitet mit vier Ableitungen. Im Experiment nutzte ich Knopfelektroden und eine Datenrate von 256 Hz. Alle 15 Minuten während jedes Laufes forderte die App mit einem Signal den Läufer auf, eine \ac{FKS} auszufüllen. Vor jedem Lauf führte der Läufer eine 15-minütige Baseline Messung durch. 
+Während jedes Laufes zeichnete eine eigens entwickelte App \ac{EKG} und Bewegungsdaten mit Hilfe der tragbaren Sensoren des Unternehmens Shimmer Research (Shimmer 2r) auf. Die App läuft auf dem Android OS ab Version 4.4 und kommuniziert mit den Sensoren über Bluetooth. Die Bewegungssensoren besitzen einen Beschleunigungsmesser und ein Kreiselinstrument, die beide auf jeweils drei Achsen messen. Für das Experiment nutzte ich das Smartphone Samsung Galaxy Nexus, welches auch über einen Beschleunigungsmesser und ein Kreiselinstrument verfügt. Alle Bewegungssensoren arbeiten mit einer Datenrate von 100 Hz. Der \ac{EKG}-Sensor von Shimmer Research arbeitet mit vier Ableitungen. Im Experiment nutzte ich Knopfelektroden und eine Datenrate von 256 Hz. Alle 15 Minuten während jedes Laufes forderte die App mit einem Signal den Läufer auf, eine \ac{FKS} auszufüllen. Vor jedem Lauf führte der Läufer eine 15-minütige Ruhemessung durch. 
 
 Nach jedem Lauf übertrug ich die gesammelten Daten für die software-technische Analyse auf meinen Arbeitsrechner. Die Daten bestehen für jeden Lauf aus der Bewertung der fünf \ac{FKS}, \ac{EKG}-Daten, \ac{GPS}-Positionen, Beschleunigungen und Winkelgeschwindigkeiten von den Körperpositionen Bein, Arm und Handgelenk. 
 
 ### Datenverarbeitung
 #### Flow-Kurzskala
-Aus der Bewertung der \ac{FKS} berechnete ich die Faktoren der \ac{FKS}. Tabelle \ref{tab:fks-merkmale} zeigt die Ergebnisse der \ac{FKS} des Laufes vom Donnerstag, den 31. Oktober 2013. In dieser Sitzung steigt z. B. die \ac{AFP} kontinuierlich und beim Laufen bewertet der Läufer seine Absorbiertheit gleichbleibend im mittleren Bereich (siehe Abbildung \ref{fig:absorbiertheit-afp-verlauf}). 
+Aus der Bewertung der \ac{FKS} berechnete ich die Faktoren der \ac{FKS}. Die Ergebnisse zeigt die Tabelle \ref{tab:fks-merkmale}. Im arithmetischen Mitte steigt die \ac{AFP} kontinuierlich Die Absorbiertheit steigt im arithmetischen Mittel bis zu 45-Minute. Danach fällt sie ein wenig. Der glatte Verlauf verhält sich gegenläufig (siehe Abbildung \ref{fig:absorbiertheit-afp-verlauf}). 
 
 ```{r fks-merkmale, echo=FALSE, message=FALSE, results="asis"}
     
-  # Subset features
-    fss.features.subset         <- fss.features[start.time + 60 * 60 * 24 > as.POSIXct(fss.features[,12], tz="CET") & as.POSIXct(fss.features[,12], tz="CET") > start.time, c(1:10, 12:15)]
-    
-  # Create table structure
-  fss.features.table          <- fss.features.subset[,1:10]
-  fss.features.table.factors  <- fss.features.table[,c(1,3,5,7,9)]
-  fss.features.table.sds      <- fss.features.table[,c(2,4,6,8,10)]
-  fss.features.table          <- data.frame()
-  for (i in 1:nrow(fss.features.subset)) {
-    fss.features.table          <- rbind(fss.features.table, as.numeric(fss.features.table.factors[i,]))
-    fss.features.table          <- rbind(fss.features.table, as.numeric(fss.features.table.sds[i,]))
+  # Create table
+  options(stringsAsFactors = FALSE)
+  feature.table           <- data.frame()
+  for (i in 1:5) {
+    feature.table <- rbind(feature.table, paste(formatC(round(tapply(fss.feature.subset[, i], fss.feature.subset[, 7], mean), 2), format = "f", digits = 2), "±", formatC(round(tapply(fss.feature.subset[, i], fss.feature.subset[, 7], sd), 2), format = "f", digits = 2)))
   }
-
-  # Clean up
-  fss.features.table          <- t(fss.features.table)
-  rm(fss.features.table.factors, fss.features.table.sds)
+  colnames(feature.table) <- levels(fss.feature.subset[, 7])
+  rownames(feature.table) <- c("Generalfaktor", "glatter Verlauf", "Absorbiertheit", "Besorgnis", "AFP")
   
-  # Name data
-  colnames(fss.features.table)  <- rep(c("M", "SD"), i)
-  rownames(fss.features.table)  <- c("Generalfaktor", "glatter Verlauf", "Absorbiertheit", "Besorgnis", "AFP")
-  
-  # Create latex table
-  table           <- xtable(fss.features.table, caption = paste("Ergebnisse vom", strftime(start.time, format = "%A, den %d. %B %Y")), label = "tab:fks-merkmale")
-
-  # Add second header
-  addtorow          <- list()
-  addtorow$pos      <- list()
-  addtorow$pos[[1]] <- 0
-  addtorow$command <- c("& \\multicolumn{2}{c}{Baseline} & \\multicolumn{2}{c}{Nach 15 Min.} & \\multicolumn{2}{c}{Nach 30 Min.} & \\multicolumn{2}{c}{Nach 45 Min.} & \\multicolumn{2}{c}{Nach 60 Min.} \\\\\n")
-  print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, add.to.row = addtorow, include.colnames = FALSE)
+  # Print latex table
+  table                   <- xtable(feature.table, label = "tab:fks-merkmale", align = "rccccc", caption = "Werte sind arithmetische Mittel ± Standardabweichung; Faktoren nach Ruhe, 15-, 30-, 45- und 60-Minuten Laufen [N = 6]") 
+  print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE)
   
   # Clean up
-  rm(fss.features.table, table, addtorow)
+  rm(feature.table, table)
 ```
 
-Zur Bewertung des subjektiven Flow-Zustands verwende ich die zweite Subdimension der \ac{FKS}. Denn die Absorbiertheit tritt laut \citet{Peifer2014} nur ein, wenn Anforderungen und Fähigkeiten sich in Balance befinden — somit ist sie ausschließlich im *Flow-Kanal* anzutreffen. Deshalb die Absorbiertheit ein repräsentativer Indikator für Flow als der Generalfaktor, der sich aus den zwei Subdimension zusammensetzt. Den Beleg hierfür geben \citet[S. 69]{Rheinberg2003a}. Sie stellten fest, dass Unterforderung keinen Einfluss auf den glatten Verlauf hat, jedoch die Absorbiertheit negativ beeinflusst. Auch im Vergleich von Baseline und Laufmessung (siehe Abbildung \ref{fig:absorbiertheit-afp-verlauf}) ist dieser Sachverhalt auszumachen. 
+Zur Bewertung des subjektiven Flow-Zustands verwende ich die zweite Subdimension der \ac{FKS}. Denn die Absorbiertheit tritt laut \citet{Peifer2014} nur ein, wenn Anforderungen und Fähigkeiten sich in Balance befinden — somit ist sie ausschließlich im *Flow-Kanal* anzutreffen. Deshalb die Absorbiertheit ein repräsentativer Indikator für Flow als der Generalfaktor, der sich aus den zwei Subdimension zusammensetzt. Den Beleg hierfür geben \citet[S. 69]{Rheinberg2003a}. Sie stellten fest, dass Unterforderung keinen Einfluss auf den glatten Verlauf hat, jedoch die Absorbiertheit negativ beeinflusst. Auch im Vergleich von Ruhe- und Laufmessung (siehe Abbildung \ref{fig:absorbiertheit-afp-verlauf}) ist dieser Sachverhalt auszumachen. 
 
 <!-- Hier kommt noch was zum FKS-Gesamtergebnis hin oder etwas später -->
 
-```{r absorbiertheit-afp-verlauf, echo=FALSE, warning=FALSE, dev='pdf', fig.height=3, fig.width=6.5, fig.pos='htbp', fig.cap='Absorbiertheit, AFP und glatter Verlauf'}
+```{r absorbiertheit-afp-verlauf, echo=FALSE, warning=FALSE, dev='pdf', fig.height=3, fig.width=6.5, fig.pos='htbp', fig.cap='Arithmetische Mittel von Absorbiertheit, AFP und glatten Verlauf nach Ruhe, 15-, 30-, 45- und 60-Minuten Laufen [N = 6]'}
   par(mfcol=c(1, 1), mar=c(3.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8)
-  
+
   # Plot data
-  plot(as.POSIXct(fss.features.subset[,11]), fss.features.subset[,5], type="b", xlab ="Zeitpunkt", ylab="", pch=21, xlim = c(min(as.POSIXct(fss.features.subset[,11]))-60, max(as.POSIXct(fss.features.subset[,11]))+60), ylim=c(3, 6), xaxt="n", yaxt="n")
-  lines(as.POSIXct(fss.features.subset[,11]), fss.features.subset[,9], type = "b", pch=22)
-  lines(as.POSIXct(fss.features.subset[,11]), fss.features.subset[,3], type = "b", pch=23)
+  plot(tapply(fss.feature.subset[, 3], fss.feature.subset[, 7], mean), type = "b", xlab = "Messung", ylab = "", pch = 21, ylim = c(3, 6), xaxt = "n", yaxt = "n")
+  lines(tapply(fss.feature.subset[, 5], fss.feature.subset[, 7], mean), type = "b", pch = 22)
+  lines(tapply(fss.feature.subset[, 2], fss.feature.subset[, 7], mean), type = "b", pch = 23)
 
   # Plot ticks
-  axis(1, at=as.POSIXct(fss.features.subset[,11]), label=format(as.POSIXct(fss.features.subset[,11]),"%H:%M:%S"))
-  axis(2, at=seq(3, 6, .5), labels=seq(3, 6, .5))
-  axis(3, at=as.POSIXct(fss.features.subset[,11]), label=rep("", length(fss.features.subset[,11])))
-  axis(4, at=seq(3, 6, .5), labels=rep("", length(seq(3, 6, .5))))
+  axis(1, at = 1:length(levels(fss.feature.subset$measurement)), label = levels(fss.feature.subset$measurement))
+  axis(2, at = seq(3, 6, .5), labels=seq(3, 6, .5))
+  axis(3, at = 1:length(levels(fss.feature.subset$measurement)), label = rep("", length(levels(fss.feature.subset$measurement))))
+  axis(4, at = seq(3, 6, .5), labels=rep("", length(seq(3, 6, .5))))
 
   legend("bottomright", inset=.05, c("Absorbiertheit", "AFP", "Glatter Verlauf"), pch = c(21:22), cex = .7)
 
@@ -154,15 +146,15 @@ Zur \ac{HRV}-Analyse nutze ich die letzten fünf Minuten jedes 15-Minuten Abschn
 - Die letzten fünf Minuten liegen direkt vor der Befragung (siehe Abbildung \ref{fig:ekg-signalverarbeitung} C am Ende)
 - Für die letzten fünf Minuten musste ich keinen Datensatz aufgrund von Artefakten aus der Datensammlung entfernen
 
-```{r ekg-signalverarbeitung, echo=FALSE, warning=FALSE, dev='CairoPNG', dpi=800, fig.height=4.5, fig.width=6.5, fig.pos='htbp', fig.cap='EKG-Signalverarbeitung'}
+```{r ekg-signalverarbeitung, echo=FALSE, warning=FALSE, dev='CairoPNG', dpi=800, fig.height=4.5, fig.width=6.5, fig.pos='htbp', fig.cap='EKG-Signalverarbeitung', eval=FALSE}
   par(mfcol=c(4, 1), mar=c(3, 3, 1.5, 3) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="i", yaxs="i")
 
   # Load ecg data  
-  ecg.data.file.path <- paste("./data/cleaned-data/running/buse-patrick/", strftime(as.POSIXct(fss.features.subset[2,11], tz="CET"), "%Y-%m-%d--%H-%M-%S"), "/", sep="")
+  ecg.data.file.path <- paste("./data/cleaned-data/running/buse-patrick/", strftime(as.POSIXct("2013-10-31 18:47:19", tz="CET"), "%Y-%m-%d--%H-%M-%S"), "/", sep="")
   ecg.data  <- read.csv(paste(ecg.data.file.path, "ecg-data.csv", sep=""), header=T)
 
-    # Load Kubios HRV txt data
-  kubios.hrv.data.path  <- paste("./data/example-data/running/buse-patrick/", strftime(as.POSIXct(fss.features.subset[2,11], tz="CET"), "%Y-%m-%d--%H-%M-%S"), "/", sep="")
+  # Load Kubios HRV txt data
+  kubios.hrv.data.path  <- paste("./data/example-data/running/buse-patrick/", strftime(as.POSIXct("2013-10-31 18:47:19", tz="CET"), "%Y-%m-%d--%H-%M-%S"), "/", sep="")
   kubios.hrv.data       <- read.csv(paste(kubios.hrv.data.path, "ecg-data-4_hrv.txt", sep = ""), header = F, na.strings = "", fill = T, skip = 117, stringsAsFactors = FALSE, col.names = c("", "Time", "RR.interval", "FFT.Frequency", "FFT.PSD", "AR.Frequency", "AR.PSD", "VLF.comp.", "LF.comp.", "HF.comp.", ""))[,2:10]
   
   # Get time and rr-intervals
@@ -172,8 +164,8 @@ Zur \ac{HRV}-Analyse nutze ich die letzten fünf Minuten jedes 15-Minuten Abschn
   rr.interval       <- rr.interval[complete.cases(rr.interval)]
   
   # Set time properties
-  starts    <- as.POSIXct(fss.features.subset[,11], tz="CET")
-  ends      <- as.POSIXct(fss.features.subset[,12], tz="CET")
+  starts    <- as.POSIXct(fss.feature.subset[,11], tz="CET")
+  ends      <- as.POSIXct(fss.feature.subset[,12], tz="CET")
   times     <- as.POSIXct(ecg.data[, 4]/1000, origin="1970-01-01", tz="CET")
   
   # Set data
@@ -295,22 +287,25 @@ Die Verwendung der \ac{WT} ermöglicht die detaillierte Bewertung der Entwicklun
 
 Die \ac{WT} führe ich in R mit der Hilfe des RHRV Packages durch. In RHRV implemtierten \citet{Rodriguez-Linares2010} eine Maximal Overlap Discrete Wavelet Packet Transform (MODWPT). Zur Analyse stehen mehrere Wavelet-Funktion mit unterschiedlichen Längen zur Verfügung. Allgemein besitzen kürzere Wavelet-Funktionen eine bessere zeitliche Auflösung, aber eine schlechtere Frequenzauflösung. Auf der anderen Seite, besitzen längere Wellen in der Regel schlechtere zeitliche Auflösung, aber bieten eine bessere Frequenzauflösung. Bessere zeitliche Auflösung ermöglicht es, kürzere Zeitabständen zu studieren. Ich verwende deshalb ein asymmetrische Daubechies Wavelet der Länge 8 (la8), das laut \citet{Rodriguez-Linares2010} einen guten Kompromiss zwischen Frequenz- und Zeitauflösung bietet.
 
-Zur Berechung der üblichen Spektralleistung der unterschiedlichen Bänder in $ms^2$ berechne ich das Mittel der Wavelet Koeffizienten. Die daraus resultierenden \ac{HRV}-Merkmale des Laufes vom Donnerstag, den 31. Oktober 2013 bildet Tabelle \ref{tab:hrv-ergebisse} ab.
-
+Zur Berechung der Spektralleistung der unterschiedlichen Bänder in $ms^2$ berechne ich das Mittel der Wavelet Koeffizienten. Die daraus resultierenden \ac{HRV}-Merkmale bildet Tabelle \ref{tab:hrv-ergebisse} ab.
 
 ```{r hrv-merkmale, echo=FALSE, message=FALSE, results="asis"}
+    
+  # Create table
+  options(stringsAsFactors = FALSE)
+  feature.table           <- data.frame()
+  for (i in 1:9) {
+    feature.table <- rbind(feature.table, paste(formatC(round(tapply(hrv.feature.subset[, i], hrv.feature.subset[, 11], mean), 2), format = "f", digits = 2), "±", formatC(round(tapply(hrv.feature.subset[, i], hrv.feature.subset[, 11], sd), 2), format = "f", digits = 2)))
+  }
+  colnames(feature.table) <- levels(hrv.feature.subset[, 11])
+  rownames(feature.table)  <- c("Herzrate (BPM)", "LF ($ms^2$)", "HF-VHF ($ms^2$)", "Gesamt ($ms^2$)", "LF (\\%)", "HF (\\%)", "LF (n. u.)", "HF-VHF (n. u.)", "LF/HF-VHF")
   
-  # Subset features
-  hrv.features.subset   <- hrv.features[start.time + 60 * 60 * 24 > as.POSIXct(hrv.features[,13], tz="CET") & as.POSIXct(hrv.features[,13], tz="CET") > start.time, c(1:9)]
-
-  table.data                <- t(hrv.features.subset)
-  colnames(table.data)  <- c("Baseline", "Nach 15 Min.", "Nach 30 Min.", "Nach 45 Min.", "Nach 60 Min.")
-  rownames(table.data)  <- c("Mittlere Herzrate (BPM)", "LF ($ms^2$)", "HF-VHF ($ms^2$)", "Gesamt ($ms^2$)", "LF (\\%)", "HF (\\%)", "LF (n. u.)", "HF-VHF (n. u.)", "LF/HF-VHF")
-  table.data            <- xtable(table.data, caption = paste("Ergebnisse vom", strftime(start.time, format = "%A, den %d. %B %Y")), align = "lrrrrr", label = "tab:hrv-ergebisse")
-
-  print(table.data, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment=FALSE)
+  # Print latex table
+  table                   <- xtable(feature.table, label = "tab:hrv-merkmale", align = "rccccc", caption = "Werte sind arithmetische Mittel ± Standardabweichung; Parameter nach Ruhe, 15-, 30-, 45- und 60-Minuten Laufen [N = 6]") 
+  print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE)
   
-  rm(table.data)
+  # Clean up
+  rm(feature.table, table)
 ```
 
 <!--
@@ -322,49 +317,38 @@ One particular approach to analyze HRV is to use spectral methods that provide i
 #### Statistische Analyse
 Die statistische Analyse der einzelnen Merkmale führte ich mit R durch. Der Effekt des Zeitpunkts der Messung von Baseline bis zur Minute 60 des Laufens evaluierte ich mit einer einfachen ANOVA bei wiederholten Messungen (ggf. mit Greenhouse-Geisser oder Huynh-Feldt Korrektur). Die Normalverteilung der Daten jeder Stichprobe prüfte zahlenmäßig mit dem Shapiro Test und visuell in QQ-Plots. Das Merkmal Besorgnis entfernte ich aus der Datensammlung, da der Läufer sie niedrig und mit mit geringer Abweichung bewertete. Einen abhängigen t-Test (Paardifferenzentest; engl. Paired t-Test) führte ich falls nötig durch, um die mittlere Differenz zweier Messabschnitte zu berechnen. P-Werte unter 0.05 sah ich als statistisch signifikant an.
 
-```{r subset-features, echo=FALSE, message=FALSE, warning=FALSE}
-  fss.features.subset <- fss.features[,c(1,3,5,7,9,11,12,15)]
-  fss.features.subset[fss.features.subset[, 6] == "Running",]$measurement <- fss.features.subset[fss.features.subset[, 6] == "Running",]$measurement + 1
-  fss.features.subset <- fss.features.subset[order(as.Date(fss.features.subset$activity.start,format="%Y-%m-%d %H:%M:%S")),,drop=FALSE]
-  fss.features.subset$measurement <- factor(fss.features.subset$measurement, levels = c(1,2,3,4,5), labels = c("baseline", "15", "30", "45", "60"))
-  
-  hrv.features.subset <- hrv.features[, c(1:11, 15)  ]
-  hrv.features.subset[hrv.features.subset[, 10] == "Running",]$measurement <- hrv.features.subset[hrv.features.subset[, 10] == "Running",]$measurement + 1
-  hrv.features.subset <- hrv.features.subset[order(as.Date(hrv.features.subset$activity.start,format="%Y-%m-%d %H:%M:%S")),,drop=FALSE]
-  hrv.features.subset$measurement <- factor(hrv.features.subset$measurement, levels = c(1,2,3,4,5), labels = c("baseline", "15", "30", "45", "60"))
-
-```
-
 
 ```{r examine-features, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
 
   # Examine fss features (visual)
   par(mfrow = c(1,2))
   for(i in 1:5) {
-    plot(fss.features.subset[,i], pch=19, col=fss.features.subset$measurement, ylab = names(fss.features.subset)[i])
-    boxplot(fss.features.subset[,i] ~ measurement, data=fss.features.subset)
+    plot(fss.feature.subset[,i], pch=19, col=fss.feature.subset$measurement, ylab = names(fss.feature.subset)[i])
+    boxplot(fss.feature.subset[,i] ~ measurement, data=fss.feature.subset)
   }
 
   par(mfrow = c(1,1))
   for(i in 1:5) {
-    hist(fss.features.subset[,i], main = names(fss.features.subset)[i], xlab = names(fss.features.subset)[i])
-    lines(density(fss.features.subset[,i]))
-    rug(jitter(fss.features.subset[,i]))
+    hist(fss.feature.subset[,i], main = names(fss.feature.subset)[i], xlab = names(fss.feature.subset)[i])
+    lines(density(fss.feature.subset[,i]))
+    rug(jitter(fss.feature.subset[,i]))
   } 
 
   # Examine hrv features (visual)
   par(mfrow = c(1,2))
   for(i in 1:9) {
-    plot(hrv.features.subset[,i], pch=19, col=hrv.features.subset$measurement, ylab = names(hrv.features.subset)[i])
-    boxplot(hrv.features.subset[,i] ~ measurement, data=hrv.features.subset)
+    plot(hrv.feature.subset[,i], pch=19, col=hrv.feature.subset$measurement, ylab = names(hrv.feature.subset)[i])
+    boxplot(hrv.feature.subset[,i] ~ measurement, data=hrv.feature.subset)
   }
   
   par(mfrow = c(1,1))
   for(i in 1:9) {
-    hist(hrv.features.subset[,i], main = names(hrv.features.subset)[i], xlab = names(hrv.features.subset)[i])
-    lines(density(hrv.features.subset[,i]))
-    rug(jitter(hrv.features.subset[,i]))
+    hist(hrv.feature.subset[,i], main = names(hrv.feature.subset)[i], xlab = names(hrv.feature.subset)[i])
+    lines(density(hrv.feature.subset[,i]))
+    rug(jitter(hrv.feature.subset[,i]))
   } 
+
+  rm(i, j)
 ```
   
 ```{r check-normality, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
@@ -373,25 +357,27 @@ Die statistische Analyse der einzelnen Merkmale führte ich mit R durch. Der Eff
   
   par(mfrow = c(2,1))
   for(i in 1:5) {
-    for(j in levels(fss.features.subset$measurement)) {    
-      print(paste(names(fss.features.subset[fss.features.subset$measurement == j,])[i], fss.features.subset[fss.features.subset$measurement == j,]$measurement[1]))
-      print(shapiro.test(fss.features.subset[fss.features.subset$measurement == j, i]))
-      qqnorm(fss.features.subset[fss.features.subset$measurement == j, i], ylab = paste(names(fss.features.subset[fss.features.subset$measurement == j,])[i], fss.features.subset[fss.features.subset$measurement == j,]$measurement[1]))
-      qqline(fss.features.subset[fss.features.subset$measurement == j, i])
-      plot(fss.features.subset[fss.features.subset$measurement == j, i], ylab = paste(names(fss.features.subset[fss.features.subset$measurement == j,])[i], fss.features.subset[fss.features.subset$measurement == j,]$measurement[1]))
+    for(j in levels(fss.feature.subset$measurement)) {    
+      print(paste(names(fss.feature.subset[fss.feature.subset$measurement == j,])[i], fss.feature.subset[fss.feature.subset$measurement == j,]$measurement[1]))
+      print(shapiro.test(fss.feature.subset[fss.feature.subset$measurement == j, i]))
+      qqnorm(fss.feature.subset[fss.feature.subset$measurement == j, i], ylab = paste(names(fss.feature.subset[fss.feature.subset$measurement == j,])[i], fss.feature.subset[fss.feature.subset$measurement == j,]$measurement[1]))
+      qqline(fss.feature.subset[fss.feature.subset$measurement == j, i])
+      plot(fss.feature.subset[fss.feature.subset$measurement == j, i], ylab = paste(names(fss.feature.subset[fss.feature.subset$measurement == j,])[i], fss.feature.subset[fss.feature.subset$measurement == j,]$measurement[1]))
     }
   }
   
   par(mfrow = c(2,1))
   for(i in 1:9) {
-    for(j in levels(hrv.features.subset$measurement)) {    
-      print(paste(names(hrv.features.subset[hrv.features.subset$measurement == j,])[i], hrv.features.subset[hrv.features.subset$measurement == j,]$measurement[1]))
-      print(shapiro.test(hrv.features.subset[hrv.features.subset$measurement == j, i]))
-      qqnorm(hrv.features.subset[hrv.features.subset$measurement == j, i], ylab = paste(names(hrv.features.subset[hrv.features.subset$measurement == j,])[i], hrv.features.subset[hrv.features.subset$measurement == j,]$measurement[1]))
-      qqline(hrv.features.subset[hrv.features.subset$measurement == j, i])
-      plot(hrv.features.subset[hrv.features.subset$measurement == j, i], ylab = paste(names(hrv.features.subset[hrv.features.subset$measurement == j,])[i], hrv.features.subset[hrv.features.subset$measurement == j,]$measurement[1]))
+    for(j in levels(hrv.feature.subset$measurement)) {    
+      print(paste(names(hrv.feature.subset[hrv.feature.subset$measurement == j,])[i], hrv.feature.subset[hrv.feature.subset$measurement == j,]$measurement[1]))
+      print(shapiro.test(hrv.feature.subset[hrv.feature.subset$measurement == j, i]))
+      qqnorm(hrv.feature.subset[hrv.feature.subset$measurement == j, i], ylab = paste(names(hrv.feature.subset[hrv.feature.subset$measurement == j,])[i], hrv.feature.subset[hrv.feature.subset$measurement == j,]$measurement[1]))
+      qqline(hrv.feature.subset[hrv.feature.subset$measurement == j, i])
+      plot(hrv.feature.subset[hrv.feature.subset$measurement == j, i], ylab = paste(names(hrv.feature.subset[hrv.feature.subset$measurement == j,])[i], hrv.feature.subset[hrv.feature.subset$measurement == j,]$measurement[1]))
     }
   }
+  
+  rm(i, j)
 ```
 
 ```{r repeated-anova, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
@@ -422,18 +408,20 @@ Die statistische Analyse der einzelnen Merkmale führte ich mit R durch. Der Eff
   
   subject <- c()
   for(i in 1:6) {
-      subject       <- c(subject, rep(i, length(levels(hrv.features.subset$measurement))))
+      subject       <- c(subject, rep(i, length(levels(hrv.feature.subset$measurement))))
   }
   
-  for(i in 1:(ncol(fss.features.subset) - 3)) {
-    print(colnames(fss.features.subset)[i])
-    calculateRepeatedAnova(subject, fss.features.subset$measurement, fss.features.subset[,i]) 
+  for(i in 1:(ncol(fss.feature.subset) - 2)) {
+    print(colnames(fss.feature.subset)[i])
+    calculateRepeatedAnova(subject, fss.feature.subset$measurement, fss.feature.subset[,i]) 
   }
   
-  for(i in 1:(ncol(hrv.features.subset) - 3)) {
-    print(colnames(hrv.features.subset)[i])
-    calculateRepeatedAnova(subject, hrv.features.subset$measurement, hrv.features.subset[,i]) 
+  for(i in 1:(ncol(hrv.feature.subset) - 2)) {
+    print(colnames(hrv.feature.subset)[i])
+    calculateRepeatedAnova(subject, hrv.feature.subset$measurement, hrv.feature.subset[,i]) 
   }
+  
+  rm(i, subject)
 ```
 
 ### Ergebnis
@@ -445,9 +433,9 @@ Der Generalfaktor unterscheidet sich nur bei der Messung nach der 30. Minute sig
 Für alle Merkmale, außer der \ac{AFP}, ist kein signifikanter Effekt zwischen den einzelnen Laufmessungen zu finden. Damit scheint der Messzeitpunkt auf diese Merkmale keinen Einfluss zu haben. Die gefühlte \ac{AFP} steigt signifikant von Messung der 15. Minute zur Messung der 30. Minute [$t(5) = -7, p < .001$] und von Messung der 30. Minute zur Messung der 45. Minute [$t(5) = -3.16, p < .05$] (siehe Abbildung \ref{fig:zeit-effekt-auf-afp}).
 
 ```{r zeit-effekt-auf-afp, echo=FALSE, warning=FALSE, dev='pdf', fig.height=5, fig.width=6.5, fig.pos='htbp', fig.cap='Effekt der Messzeitpunkts auf die AFP'}
-  treatment   <- fss.features.subset$measurement
+  treatment   <- fss.feature.subset$measurement
   treatments  <- levels(treatment)
-  value       <- fss.features.subset[,5]
+  value       <- fss.feature.subset[,5]
   df          <- c()
   for(i in 1:length(treatments)) 
     {
@@ -513,6 +501,12 @@ Für alle Merkmale, außer der \ac{AFP}, ist kein signifikanter Effekt zwischen 
   }
 }
 ```
+
+<!--
+Wir wollen dort Mechanismen kennenlernen, mit deren Hilfe auch das gewöhnliche eben erfreulicher gestaltet werden.
+
+Wenn wir einmal in der Lage sind, flow operational zu definieren, haben wir die Möglichkeit, dieses Konzept als Maß des gesellschaftlichen Fortschrittes zu verwenden - ein Maß, welches die gegenwärtig geläufigen einseitigen Indikatoren materieller Leistung ergänzen würde. 
+-->
 
 \bibliographystyle{agsm}
 \bibliography{./bibtex/library}
