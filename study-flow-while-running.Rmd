@@ -92,7 +92,7 @@ Nach jedem Lauf übertrug ich die gesammelten Daten für die software-technische
 
 ### Datenverarbeitung
 #### Flow-Kurzskala
-Aus der Bewertung der \ac{FKS} berechnete ich die Faktoren der \ac{FKS}. Die Ergebnisse zeigt die Tabelle \ref{tab:fks-merkmale}. Im arithmetischen Mitte steigt die \ac{AFP} kontinuierlich Die Absorbiertheit steigt im arithmetischen Mittel bis zu 45-Minute. Danach fällt sie ein wenig. Der glatte Verlauf verhält sich gegenläufig (siehe Abbildung \ref{fig:absorbiertheit-afp-verlauf}). 
+Aus der Bewertung der \ac{FKS} berechnete ich die Faktoren der \ac{FKS}. Die Ergebnisse zeigt die Tabelle \ref{tab:fks-merkmale}. Im arithmetischen Mitte steigt die \ac{AFP} kontinuierlich Die Absorbiertheit steigt im arithmetischen Mittel bis zur 45-Minute. Danach fällt sie ein wenig. Der glatte Verlauf verhält sich gegenläufig (siehe Abbildung \ref{fig:absorbiertheit-afp-verlauf}). 
 
 ```{r fks-merkmale, echo=FALSE, message=FALSE, warning=FALSE, results="asis"}
     
@@ -286,7 +286,7 @@ Die Verwendung der \ac{WT} ermöglicht die detaillierte Bewertung der Entwicklun
 
 Die \ac{WT} führe ich in R mit der Hilfe des RHRV Packages durch. In RHRV implemtierten \citet{Rodriguez-Linares2010} eine Maximal Overlap Discrete Wavelet Packet Transform (MODWPT). Zur Analyse stehen mehrere Wavelet-Funktion mit unterschiedlichen Längen zur Verfügung. Allgemein besitzen kürzere Wavelet-Funktionen eine bessere zeitliche Auflösung, aber eine schlechtere Frequenzauflösung. Auf der anderen Seite, besitzen längere Wellen in der Regel schlechtere zeitliche Auflösung, aber bieten eine bessere Frequenzauflösung. Bessere zeitliche Auflösung ermöglicht es, kürzere Zeitabständen zu studieren. Ich verwende deshalb ein asymmetrische Daubechies Wavelet der Länge 8 (la8), das laut \citet{Rodriguez-Linares2010} einen guten Kompromiss zwischen Frequenz- und Zeitauflösung bietet.
 
-Zur Berechung der Spektralleistung der unterschiedlichen Bänder in $ms^2$ berechne ich das Mittel der Wavelet Koeffizienten. Die daraus resultierenden \ac{HRV}-Merkmale bildet Tabelle \ref{tab:hrv-ergebisse} ab.
+Zur Berechung der Spektralleistung der unterschiedlichen Bänder in $ms^2$ berechne ich das Mittel der Wavelet Koeffizienten. Die daraus resultierenden \ac{HRV}-Merkmale bildet Tabelle \ref{tab:hrv-merkmale} ab.
 
 ```{r hrv-merkmale, echo=FALSE, message=FALSE, warning=FALSE, results="asis"}
     
