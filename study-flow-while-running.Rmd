@@ -9,7 +9,7 @@ output:
     highlight: null
     keep_tex: yes
 header-includes: \usepackage[ngerman]{babel} \usepackage[printonlyused,withpage]{acronym}
-  \usepackage{setspace} \usepackage{natbib} \usepackage{booktabs} \onehalfspacing
+  \usepackage{setspace} \usepackage{natbib} \usepackage{booktabs} \usepackage{dcolumn} \onehalfspacing \newcolumntype{x}{D{,}{\pm}{3.3}} \newcolumntype{y}{D{,}{\pm}{5.3}} \newcolumntype{z}{D{,}{\pm}{7.7}}
 fontsize: 11pt
 documentclass: scrartcl
 ---
@@ -83,8 +83,7 @@ Vor jedem Lauf rüstete ich ihn mit einem geladenen Smartphone, einem passenden 
 \begin{figure}[htbp]
 \centering
 \includegraphics[keepaspectratio,width=0.75\textwidth]{./figures/equipment-arrangement.pdf}
-\caption{Anordnung des Equipments; Smartphone am Oberarm; Bewegungssensoren am Schienbein und Handgelenk; EKG-Sensor mit zwei Ableitungen am Oberkörper}
-\label{fig:anordnung-des-equipments}
+\caption{Anordnung des Equipments; Smartphone am Oberarm; Bewegungssensoren am Schienbein und Handgelenk; EKG-Sensor mit zwei Ableitungen am Oberkörper \label{fig:anordnung-des-equipments}}
 \end{figure}
 
 Während jedes Laufes zeichnete eine eigens entwickelte App \ac{EKG} und Bewegungsdaten mit Hilfe der tragbaren Sensoren des Unternehmens Shimmer Research (Shimmer 2r) auf. Die App läuft auf dem Android OS ab Version 4.4 und kommuniziert mit den Sensoren über Bluetooth. Die Bewegungssensoren besitzen einen Beschleunigungsmesser und ein Kreiselinstrument, die beide auf jeweils drei Achsen messen. Für das Experiment nutzte ich das Smartphone Samsung Galaxy Nexus, welches auch über einen Beschleunigungsmesser und ein Kreiselinstrument verfügt. Alle Bewegungssensoren arbeiten mit einer Datenrate von 100 Hz. Der \ac{EKG}-Sensor von Shimmer Research arbeitet mit vier Ableitungen. Im Experiment nutzte ich Knopfelektroden und eine Datenrate von 256 Hz. Alle 15 Minuten während jedes Laufes forderte die App mit einem Signal den Läufer auf, eine \ac{FKS} auszufüllen. Vor jedem Lauf führte der Läufer eine 15-minütige Ruhemessung durch. 
@@ -95,20 +94,20 @@ Nach jedem Lauf übertrug ich die gesammelten Daten für die software-technische
 #### Flow-Kurzskala
 Aus der Bewertung der \ac{FKS} berechnete ich die Faktoren der \ac{FKS}. Die Ergebnisse zeigt die Tabelle \ref{tab:fks-merkmale}. Im arithmetischen Mitte steigt die \ac{AFP} kontinuierlich Die Absorbiertheit steigt im arithmetischen Mittel bis zu 45-Minute. Danach fällt sie ein wenig. Der glatte Verlauf verhält sich gegenläufig (siehe Abbildung \ref{fig:absorbiertheit-afp-verlauf}). 
 
-```{r fks-merkmale, echo=FALSE, message=FALSE, results="asis"}
+```{r fks-merkmale, echo=FALSE, message=FALSE, warning=FALSE, results="asis"}
     
   # Create table
   options(stringsAsFactors = FALSE)
   feature.table           <- data.frame()
   for (i in 1:5) {
-    feature.table <- rbind(feature.table, paste(formatC(round(tapply(fss.feature.subset[, i], fss.feature.subset[, 7], mean), 2), format = "f", digits = 2), "±", formatC(round(tapply(fss.feature.subset[, i], fss.feature.subset[, 7], sd), 2), format = "f", digits = 2)))
+    feature.table <- rbind(feature.table, paste(formatC(round(tapply(fss.feature.subset[, i], fss.feature.subset[, 7], mean), 2), format = "f", digits = 2), ",", formatC(round(tapply(fss.feature.subset[, i], fss.feature.subset[, 7], sd), 2), format = "f", digits = 2)))
   }
   colnames(feature.table) <- levels(fss.feature.subset[, 7])
   rownames(feature.table) <- c("Generalfaktor", "glatter Verlauf", "Absorbiertheit", "Besorgnis", "AFP")
   
   # Print latex table
-  table                   <- xtable(feature.table, label = "tab:fks-merkmale", align = "rccccc", caption = "Werte sind arithmetische Mittel ± Standardabweichung; Faktoren nach Ruhe, 15-, 30-, 45- und 60-Minuten Laufen [N = 6]") 
-  print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE)
+  table                   <- xtable(feature.table, label = "tab:fks-merkmale", align = "rxxxxx", caption = "Werte sind arithmetische Mittel ± Standardabweichung; Faktoren nach Ruhe, 15-, 30-, 45- und 60-Minuten Laufen [N = 6]") 
+  print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
   # Clean up
   rm(feature.table, table)
@@ -118,7 +117,7 @@ Zur Bewertung des subjektiven Flow-Zustands verwende ich die zweite Subdimension
 
 <!-- Hier kommt noch was zum FKS-Gesamtergebnis hin oder etwas später -->
 
-```{r absorbiertheit-afp-verlauf, echo=FALSE, warning=FALSE, dev='pdf', fig.height=3, fig.width=6.5, fig.pos='htbp', fig.cap='Arithmetische Mittel von Absorbiertheit, AFP und glatten Verlauf nach Ruhe, 15-, 30-, 45- und 60-Minuten Laufen [N = 6]'}
+```{r absorbiertheit-afp-verlauf, echo=FALSE, warning=FALSE, dev='pdf', fig.height=3, fig.width=6.5, fig.pos='htbp', fig.cap='Arithmetische Mittel von Absorbiertheit, AFP und glatten Verlauf nach Ruhe, 15-, 30-, 45- und 60-Minuten Laufen [N = 6] \\label{fig:absorbiertheit-afp-verlauf}'}
   par(mfcol=c(1, 1), mar=c(3.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8)
 
   # Plot data
@@ -146,7 +145,7 @@ Zur \ac{HRV}-Analyse nutze ich die letzten fünf Minuten jedes 15-Minuten Abschn
 - Die letzten fünf Minuten liegen direkt vor der Befragung (siehe Abbildung \ref{fig:ekg-signalverarbeitung} C am Ende)
 - Für die letzten fünf Minuten musste ich keinen Datensatz aufgrund von Artefakten aus der Datensammlung entfernen
 
-```{r ekg-signalverarbeitung, echo=FALSE, warning=FALSE, dev='CairoPNG', dpi=800, fig.height=4.5, fig.width=6.5, fig.pos='htbp', fig.cap='EKG-Signalverarbeitung', eval=FALSE}
+```{r ekg-signalverarbeitung, echo=FALSE, warning=FALSE, dev='CairoPNG', dpi=800, fig.height=4.5, fig.width=6.5, fig.pos='htbp', fig.cap='EKG-Signalverarbeitung \\label{fig:ekg-signalverarbeitung}', eval=FALSE}
   par(mfcol=c(4, 1), mar=c(3, 3, 1.5, 3) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="i", yaxs="i")
 
   # Load ecg data  
@@ -289,20 +288,20 @@ Die \ac{WT} führe ich in R mit der Hilfe des RHRV Packages durch. In RHRV imple
 
 Zur Berechung der Spektralleistung der unterschiedlichen Bänder in $ms^2$ berechne ich das Mittel der Wavelet Koeffizienten. Die daraus resultierenden \ac{HRV}-Merkmale bildet Tabelle \ref{tab:hrv-ergebisse} ab.
 
-```{r hrv-merkmale, echo=FALSE, message=FALSE, results="asis"}
+```{r hrv-merkmale, echo=FALSE, message=FALSE, warning=FALSE, results="asis"}
     
   # Create table
   options(stringsAsFactors = FALSE)
   feature.table           <- data.frame()
   for (i in 1:9) {
-    feature.table <- rbind(feature.table, paste(formatC(round(tapply(hrv.feature.subset[, i], hrv.feature.subset[, 11], mean), 2), format = "f", digits = 2), "±", formatC(round(tapply(hrv.feature.subset[, i], hrv.feature.subset[, 11], sd), 2), format = "f", digits = 2)))
+    feature.table <- rbind(feature.table, paste(formatC(round(tapply(hrv.feature.subset[, i], hrv.feature.subset[, 11], mean), 2), format = "f", digits = 2), ",", formatC(round(tapply(hrv.feature.subset[, i], hrv.feature.subset[, 11], sd), 2), format = "f", digits = 2)))
   }
   colnames(feature.table) <- levels(hrv.feature.subset[, 11])
   rownames(feature.table)  <- c("Herzrate (BPM)", "LF ($ms^2$)", "HF-VHF ($ms^2$)", "Gesamt ($ms^2$)", "LF (\\%)", "HF (\\%)", "LF (n. u.)", "HF-VHF (n. u.)", "LF/HF-VHF")
   
   # Print latex table
-  table                   <- xtable(feature.table, label = "tab:hrv-merkmale", align = "rccccc", caption = "Werte sind arithmetische Mittel ± Standardabweichung; Parameter nach Ruhe, 15-, 30-, 45- und 60-Minuten Laufen [N = 6]") 
-  print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE)
+  table                   <- xtable(feature.table, label = "tab:hrv-merkmale", align = "rzyyyy", caption = "Werte sind arithmetische Mittel ± Standardabweichung; Parameter nach Ruhe, 15-, 30-, 45- und 60-Minuten Laufen [N = 6]") 
+  print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
   # Clean up
   rm(feature.table, table)
@@ -315,7 +314,7 @@ One particular approach to analyze HRV is to use spectral methods that provide i
 -->
 
 #### Statistische Analyse
-Die statistische Analyse der einzelnen Merkmale führte ich mit R durch. Der Effekt des Zeitpunkts der Messung von Baseline bis zur Minute 60 des Laufens evaluierte ich mit einer einfachen ANOVA bei wiederholten Messungen (ggf. mit Greenhouse-Geisser oder Huynh-Feldt Korrektur). Die Normalverteilung der Daten jeder Stichprobe prüfte zahlenmäßig mit dem Shapiro Test und visuell in QQ-Plots. Das Merkmal Besorgnis entfernte ich aus der Datensammlung, da der Läufer sie niedrig und mit mit geringer Abweichung bewertete. Einen abhängigen t-Test (Paardifferenzentest; engl. Paired t-Test) führte ich falls nötig durch, um die mittlere Differenz zweier Messabschnitte zu berechnen. P-Werte unter 0.05 sah ich als statistisch signifikant an.
+Die statistische Analyse der einzelnen Merkmale führte ich mit R durch. Der Effekt des Zeitpunkts der Messung von Ruhe bis zur Minute 60 des Laufens evaluierte ich mit einer einfachen ANOVA bei wiederholten Messungen (ggf. mit Greenhouse-Geisser oder Huynh-Feldt Korrektur). Die Normalverteilung der Daten jeder Stichprobe prüfte zahlenmäßig mit dem Shapiro Test und visuell in QQ-Plots. Das Merkmal Besorgnis entfernte ich aus der Datensammlung, da der Läufer sie niedrig und mit mit geringer Abweichung bewertete. Einen abhängigen t-Test (Paardifferenzentest; engl. Paired t-Test) führte ich falls nötig durch, um die mittlere Differenz zweier Messabschnitte zu berechnen. P-Werte unter 0.05 sah ich als statistisch signifikant an.
 
 
 ```{r examine-features, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
@@ -427,12 +426,12 @@ Die statistische Analyse der einzelnen Merkmale führte ich mit R durch. Der Eff
 ### Ergebnis
 
 #### Effekt der Aktivität Laufen auf die Merkmale
-Der Generalfaktor unterscheidet sich nur bei der Messung nach der 30. Minute signifikant von Baseline-Messung zu Laufmessung [$t(5) = -2.6458, p < .05$]. In den letzten drei Messungen unterscheiden sich die mittleren Differenzen des angegebenen Flusses signifikat. Der Fluss sinkt von Baseline-Messung zum Laufen. Der Effekt auf die Absorbiertheit und die \ac{AFP} ist im Vergleich von Baseline-Messung zu den vier Laufmessungen in jedem der vier Stichprobenvergleiche signikant. Beide Merkmale steigen beim Laufen an. Für alle \ac{HRV}-Merkmale, außer der Gesamtleistung [jeweils $p < .1$] und dem relativen Wert der \ac{LF} [nach der 45. Minute und nach der 60. Minute, $p < .1$], ist der Effekt für jeden Stichprobenvergleich signifikant. Es steigen die mittlere Herzrate, der relative (%) und normalisierte Wert (n. u.) der \ac{HF}. Die restlichen Merkmale fallen von Baseline-Messung zum Laufen. Dieses Ergebnis bestätigt bestehende Arbeiten über die \ac{HRV} bei sportlicher Aktivität \citep{Pichon2004, Sarmiento2013, Hoos2010}. 
+Der Generalfaktor unterscheidet sich nur bei der Messung nach der 30. Minute signifikant von der Ruhemessung zu Laufmessung [$t(5) = -2.6458, p < .05$]. In den letzten drei Messungen unterscheiden sich die mittleren Differenzen des angegebenen Flusses signifikat. Der Fluss sinkt von Ruhemessung zum Laufen. Der Effekt auf die Absorbiertheit und die \ac{AFP} ist im Vergleich von Ruhemessung zu den vier Laufmessungen in jedem der vier Stichprobenvergleiche signikant. Beide Merkmale steigen beim Laufen an. Für alle \ac{HRV}-Merkmale, außer der Gesamtleistung [jeweils $p < .1$] und dem relativen Wert der \ac{LF} [nach der 45. Minute und nach der 60. Minute, $p < .1$], ist der Effekt für jeden Stichprobenvergleich signifikant. Es steigen die mittlere Herzrate, der relative (%) und normalisierte Wert (n. u.) der \ac{HF}. Die restlichen Merkmale fallen von Ruhemessung zum Laufen. Dieses Ergebnis bestätigt bestehende Arbeiten über die \ac{HRV} bei sportlicher Aktivität \citep{Pichon2004, Sarmiento2013, Hoos2010}. 
 
 #### Effekt der Messzeitpunkts auf die Merkmale
 Für alle Merkmale, außer der \ac{AFP}, ist kein signifikanter Effekt zwischen den einzelnen Laufmessungen zu finden. Damit scheint der Messzeitpunkt auf diese Merkmale keinen Einfluss zu haben. Die gefühlte \ac{AFP} steigt signifikant von Messung der 15. Minute zur Messung der 30. Minute [$t(5) = -7, p < .001$] und von Messung der 30. Minute zur Messung der 45. Minute [$t(5) = -3.16, p < .05$] (siehe Abbildung \ref{fig:zeit-effekt-auf-afp}).
 
-```{r zeit-effekt-auf-afp, echo=FALSE, warning=FALSE, dev='pdf', fig.height=5, fig.width=6.5, fig.pos='htbp', fig.cap='Effekt der Messzeitpunkts auf die AFP'}
+```{r zeit-effekt-auf-afp, echo=FALSE, warning=FALSE, dev='pdf', fig.height=3, fig.width=6.5, fig.pos='htbp', fig.cap='Effekt des Messzeitpunkts auf die AFP \\label{fig:zeit-effekt-auf-afp}'}
   treatment   <- fss.feature.subset$measurement
   treatments  <- levels(treatment)
   value       <- fss.feature.subset[,5]
@@ -442,7 +441,7 @@ Für alle Merkmale, außer der \ac{AFP}, ist kein signifikanter Effekt zwischen 
     df <- cbind(df, value[treatment==treatments[i]])
   }
   df           <- as.data.frame(df)
-  colnames(df) <- c("Baseline", "15'", "30'", "45'", "60'")
+  colnames(df) <- levels(fss.feature.subset$measurement)
   
   alpha = 0.05
   means   <- sapply(df, mean)
@@ -474,7 +473,7 @@ Für alle Merkmale, außer der \ac{AFP}, ist kein signifikanter Effekt zwischen 
   # Signif. codes: 0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
   x.cord.star   <- x.cord[1, ] + c(diff(x.cord[1, ]) / 2, 0)
-  y.cord.star   <- c(y.cord[2, 1] + .08, y.cord[2, 1] + .58, y.cord[2, 1] + 1.08, 0)
+  y.cord.star   <- c(y.cord[2, 1] + .2, y.cord[2, 1] + .7, y.cord[2, 1] + 1.2, 0)
 
   df            <- data.frame(treatment, value)
   df$treatment  <- as.factor(df$treatment)
