@@ -508,6 +508,15 @@ Wenn wir einmal in der Lage sind, flow operational zu definieren, haben wir die 
 -->
 
 ```{r correlation-analysis, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+
+  lmp <- function (modelobject) {
+    if (class(modelobject) != "lm") stop("Not an object of class 'lm' ")
+    f <- summary(modelobject)$fstatistic
+    p <- pf(f[1],f[2],f[3],lower.tail=F)
+    attributes(p) <- NULL
+    return(p)
+  }
+
   fss.feature.subset.running <- fss.feature.subset[fss.feature.subset$measurement != "Ruhe", ]
   fss.feature.subset.running <- fss.feature.subset.running[c(1:10, 12:24),]
   
@@ -528,7 +537,7 @@ Wenn wir einmal in der Lage sind, flow operational zu definieren, haben wir die 
       I <- c(I, i)
   }
 
-  hrv.feature.subset.running <- hrv.feature.subset[hrv.feature.subset$measurement != "Ruhe", ] # & hrv.feature.subset$measurement != "15'", ]
+  hrv.feature.subset.running <- hrv.feature.subset[hrv.feature.subset$measurement != "Ruhe", ]
   hrv.feature.subset.running <- hrv.feature.subset.running[c(1:10, 12:24),]
   
   J <- c()
@@ -552,41 +561,47 @@ Wenn wir einmal in der Lage sind, flow operational zu definieren, haben wir die 
   for(i in I) {
     for (j in J) {
       print(paste(names(fss.feature.subset.running)[i], "~", names(hrv.feature.subset.running)[j]))
-      print(cor.test(hrv.feature.subset.running[, j], fss.feature.subset.running[, i]))
       plot(hrv.feature.subset.running[, j], fss.feature.subset.running[, i], xlab = names(hrv.feature.subset.running)[j], ylab = names(fss.feature.subset.running)[i], pch = 21)
       abline(lm(fss.feature.subset.running[, i] ~ hrv.feature.subset.running[, j]))
-      #print(summary(lm(fss.feature.subset.running[, i] ~ hrv.feature.subset.running[, j])))
+      corr <- cor.test(hrv.feature.subset.running[, j], fss.feature.subset.running[, i])
       hrv   <- hrv.feature.subset.running[, j]
       hrv.2 <- hrv.feature.subset.running[, j]^2
       quadratic.model <-lm(fss.feature.subset.running[, i] ~ hrv + hrv.2)
-      print(summary(quadratic.model))
-      
-      values <- seq(min(hrv), max(hrv), 0.01)
+      values <- seq(min(hrv), max(hrv), .01)
       predicted.values <- predict(quadratic.model, list(hrv = values, hrv.2 = values^2))
       lines(values, predicted.values, col = "darkgreen", lwd = 3)
+      
+      if(corr$p.value < .1) {
+        print(cor.test(hrv.feature.subset.running[, j], fss.feature.subset.running[, i]))
+        #print(summary(lm(fss.feature.subset.running[, i] ~ hrv.feature.subset.running[, j])))
+      }
+      
+      if(lmp(quadratic.model) < .1)
+        print(summary(quadratic.model))
     }
   }
 
   # Clean up
-  rm(hrv, hrv.2, I, i, J, j, predicted.values, quadratic.model, st, values)
+  rm(hrv, hrv.2, I, i, J, j, corr, predicted.values, quadratic.model, st, values)
 ```
 
 <!--
-  Ohne Ausreißer 11 
+  () - Ohne Ausreißer Datensatz 11 
   Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-  flow ~ hf.power.r p < 0.01 . Hohe Werte des Gesamtfaktors korrelieren linear mit niedrigen relativen Werten der HF r = 0.39
-  flow ~ lf.power.nu p < 0.01 . Hohe des Gesamtfaktors korrelieren linear mit hohen normalisierten Werten der LF r = 0.41.
-  flow ~ hf.power.nu p < 0.01 . Hohe Werte des Gesamtfaktors korrelieren linear mit niedrigen normalisierten Werten der HF r = 0.41
-  flow ~ lfhf p < 0.05 * Hohe Werte des Gesamtfaktors korrelieren linear mit dem hohen Werten von LF/HF r = 0.42
   
-  fluency ~ hf.power.r p < 0.05 * Hohe Werte des glatten Verlaufs korrelieren linear mit niedrigen relativen Werten der HF r = 0.44
-  fluency ~ hf.power.r p < 0.01 . Hohe Werte des glatten Verlaufs korrelieren mit moderaten relativen Werten der HF r2 = 0.21
-  fluency ~ lf.power.nu p < 0.01 . Hohe des glatten Verlaufs korrelieren linear mit hohen normalisierten Werten der LF r = 0.41
-  fluency ~ hf.power.nu p < 0.01 . Hohe Werte des glatten Verlaufs korrelieren linear mit niedrigen normalisierten Werten der HF r = 0.41
-  fluency ~ lfhf p < 0.01 . Hohe Werte des glatten Verlaufs korrelieren linear mit dem hohen Werten von LF/HF r = 0.41
+  flow ~ hf.power.r p < 0.1 . Hohe Werte des Gesamtfaktors korrelieren linear mit niedrigen relativen Werten der HF r = 0.36 (0.39)
+  flow ~ lf.power.nu p < 0.1 . Hohe des Gesamtfaktors korrelieren linear mit hohen normalisierten Werten der LF r = 0.34 (0.41)
+  flow ~ hf.power.nu p < 0.1 . Hohe Werte des Gesamtfaktors korrelieren linear mit niedrigen normalisierten Werten der HF r = 0.34 (0.41)
+  flow ~ lfhf p < 0.05 * (0.1 .) Hohe Werte des Gesamtfaktors korrelieren linear mit dem hohen Werten von LF/HF r = 0.36 (0.42)
   
-  fit ~ mean.hr p < 0.001 ***  Hohe AFP Werte korrelieren linear mit hohen Werten der mittleren Herzrate r = 0.69
-  fit ~ mean.hr p < 0.01 **  Hohe AFP Werte korrelieren mit moderaten Werten der mittleren Herzrate r2 = 0.49
+  fluency ~ hf.power.r p < 0.05 . Hohe Werte des glatten Verlaufs korrelieren linear mit niedrigen relativen Werten der HF r = 0.41 (0.44)*
+  (fluency ~ hf.power.r p < 0.1 . Hohe Werte des glatten Verlaufs korrelieren mit moderaten relativen Werten der HF r2 = 0.21)
+  fluency ~ lf.power.nu p < 0.1 . Hohe des glatten Verlaufs korrelieren linear mit hohen normalisierten Werten der LF r = 0.34 (0.41)
+  fluency ~ hf.power.nu p < 0.1 . Hohe Werte des glatten Verlaufs korrelieren linear mit niedrigen normalisierten Werten der HF r = 0.34 (0.41)
+  fluency ~ lfhf p < 0.1 . Hohe Werte des glatten Verlaufs korrelieren linear mit dem hohen Werten von LF/HF r = 0.35 (0.41)
+  
+  fit ~ mean.hr p < 0.001 ***  Hohe AFP Werte korrelieren linear mit hohen Werten der mittleren Herzrate r = 0.67 (0.69)*
+  fit ~ mean.hr p < 0.01 **  Hohe AFP Werte korrelieren mit moderaten Werten der mittleren Herzrate r2 =  0.46 (0.49)*
 -->
 
 \bibliographystyle{agsm}
