@@ -350,7 +350,7 @@ Die statistische Analyse der einzelnen Merkmale führte ich mit R durch. Der Eff
   rm(i, j)
 ```
   
-```{r check-normality, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r check-group-normality, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
 
   # Check: Underlying Assumptions: Normality
   
@@ -505,6 +505,88 @@ Für alle Merkmale, außer der \ac{AFP}, ist kein signifikanter Effekt zwischen 
 Wir wollen dort Mechanismen kennenlernen, mit deren Hilfe auch das gewöhnliche eben erfreulicher gestaltet werden.
 
 Wenn wir einmal in der Lage sind, flow operational zu definieren, haben wir die Möglichkeit, dieses Konzept als Maß des gesellschaftlichen Fortschrittes zu verwenden - ein Maß, welches die gegenwärtig geläufigen einseitigen Indikatoren materieller Leistung ergänzen würde. 
+-->
+
+```{r correlation-analysis, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+  fss.feature.subset.running <- fss.feature.subset[fss.feature.subset$measurement != "Ruhe", ]
+  fss.feature.subset.running <- fss.feature.subset.running[c(1:10, 12:24),]
+  
+  I <- c()
+  par(mfrow = c(2,2))
+  for(i in 1:5) {
+    plot(fss.feature.subset.running[, i], ylab = names(fss.feature.subset.running)[i])
+    qqnorm(fss.feature.subset.running[, i], ylab = names(fss.feature.subset.running)[i])
+    qqline(fss.feature.subset.running[, i])
+    boxplot(fss.feature.subset.running[, i])
+    hist(fss.feature.subset.running[,i], main = names(fss.feature.subset.running)[i], xlab = names(fss.feature.subset.running)[i])
+    lines(density(fss.feature.subset.running[,i]))
+    rug(jitter(fss.feature.subset.running[,i]))
+    print(names(fss.feature.subset.running)[i])
+    st <- shapiro.test(fss.feature.subset.running[, i])
+    print(st)
+    if(st$p.value > .05)
+      I <- c(I, i)
+  }
+
+  hrv.feature.subset.running <- hrv.feature.subset[hrv.feature.subset$measurement != "Ruhe", ] # & hrv.feature.subset$measurement != "15'", ]
+  hrv.feature.subset.running <- hrv.feature.subset.running[c(1:10, 12:24),]
+  
+  J <- c()
+  par(mfrow = c(2,2))
+  for(j in 1:9) {
+    plot(hrv.feature.subset.running[, j], ylab = names(hrv.feature.subset.running)[j])
+    qqnorm(hrv.feature.subset.running[, j], ylab = names(hrv.feature.subset.running)[j])
+    qqline(hrv.feature.subset.running[, j])
+    boxplot(hrv.feature.subset.running[, j])
+    hist(hrv.feature.subset.running[,j], main = names(hrv.feature.subset.running)[j], xlab = names(hrv.feature.subset.running)[j])
+    lines(density(hrv.feature.subset.running[,j]))
+    rug(jitter(hrv.feature.subset.running[,j]))
+    print(names(hrv.feature.subset.running)[j])
+    st <- shapiro.test(hrv.feature.subset.running[, j])
+    print(st)
+    if(st$p.value > .05)
+      J <- c(J, j)
+  }
+
+  par(mfrow = c(1,1))
+  for(i in I) {
+    for (j in J) {
+      print(paste(names(fss.feature.subset.running)[i], "~", names(hrv.feature.subset.running)[j]))
+      print(cor.test(hrv.feature.subset.running[, j], fss.feature.subset.running[, i]))
+      plot(hrv.feature.subset.running[, j], fss.feature.subset.running[, i], xlab = names(hrv.feature.subset.running)[j], ylab = names(fss.feature.subset.running)[i], pch = 21)
+      abline(lm(fss.feature.subset.running[, i] ~ hrv.feature.subset.running[, j]))
+      #print(summary(lm(fss.feature.subset.running[, i] ~ hrv.feature.subset.running[, j])))
+      hrv   <- hrv.feature.subset.running[, j]
+      hrv.2 <- hrv.feature.subset.running[, j]^2
+      quadratic.model <-lm(fss.feature.subset.running[, i] ~ hrv + hrv.2)
+      print(summary(quadratic.model))
+      
+      values <- seq(min(hrv), max(hrv), 0.01)
+      predicted.values <- predict(quadratic.model, list(hrv = values, hrv.2 = values^2))
+      lines(values, predicted.values, col = "darkgreen", lwd = 3)
+    }
+  }
+
+  # Clean up
+  rm(hrv, hrv.2, I, i, J, j, predicted.values, quadratic.model, st, values)
+```
+
+<!--
+  Ohne Ausreißer 11 
+  Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+  flow ~ hf.power.r p < 0.01 . Hohe Werte des Gesamtfaktors korrelieren linear mit niedrigen relativen Werten der HF r = 0.39
+  flow ~ lf.power.nu p < 0.01 . Hohe des Gesamtfaktors korrelieren linear mit hohen normalisierten Werten der LF r = 0.41.
+  flow ~ hf.power.nu p < 0.01 . Hohe Werte des Gesamtfaktors korrelieren linear mit niedrigen normalisierten Werten der HF r = 0.41
+  flow ~ lfhf p < 0.05 * Hohe Werte des Gesamtfaktors korrelieren linear mit dem hohen Werten von LF/HF r = 0.42
+  
+  fluency ~ hf.power.r p < 0.05 * Hohe Werte des glatten Verlaufs korrelieren linear mit niedrigen relativen Werten der HF r = 0.44
+  fluency ~ hf.power.r p < 0.01 . Hohe Werte des glatten Verlaufs korrelieren mit moderaten relativen Werten der HF r2 = 0.21
+  fluency ~ lf.power.nu p < 0.01 . Hohe des glatten Verlaufs korrelieren linear mit hohen normalisierten Werten der LF r = 0.41
+  fluency ~ hf.power.nu p < 0.01 . Hohe Werte des glatten Verlaufs korrelieren linear mit niedrigen normalisierten Werten der HF r = 0.41
+  fluency ~ lfhf p < 0.01 . Hohe Werte des glatten Verlaufs korrelieren linear mit dem hohen Werten von LF/HF r = 0.41
+  
+  fit ~ mean.hr p < 0.001 ***  Hohe AFP Werte korrelieren linear mit hohen Werten der mittleren Herzrate r = 0.69
+  fit ~ mean.hr p < 0.01 **  Hohe AFP Werte korrelieren mit moderaten Werten der mittleren Herzrate r2 = 0.49
 -->
 
 \bibliographystyle{agsm}
