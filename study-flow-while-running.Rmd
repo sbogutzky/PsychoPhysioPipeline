@@ -539,6 +539,7 @@ Für alle Merkmale, außer der \ac{AFP}, ist kein signifikanter Effekt zwischen 
 
   
   hrv.feature.subset.running <- hrv.feature.subset[hrv.feature.subset$measurement != "Ruhe", ] # & hrv.feature.subset$measurement != "15'", ]
+  hrv.feature.subset.running <- hrv.feature.subset.running[c(1:10, 12:24),]
 
   # baseline correction
 #   hrv.feature.subset.baseline <- hrv.feature.subset[hrv.feature.subset$measurement == "Ruhe", ]
