@@ -14,6 +14,12 @@ fontsize: 11pt
 documentclass: scrartcl
 ---
 
+<!--
+Wir wollen dort Mechanismen kennenlernen, mit deren Hilfe auch das gewöhnliche eben erfreulicher gestaltet werden.
+
+Wenn wir einmal in der Lage sind, flow operational zu definieren, haben wir die Möglichkeit, dieses Konzept als Maß des gesellschaftlichen Fortschrittes zu verwenden - ein Maß, welches die gegenwärtig geläufigen einseitigen Indikatoren materieller Leistung ergänzen würde. 
+-->
+
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
   
   # Remove all variables
@@ -500,12 +506,6 @@ Für alle Merkmale, außer der \ac{AFP}, ist kein signifikanter Effekt zwischen 
   }
 }
 ```
-
-<!--
-Wir wollen dort Mechanismen kennenlernen, mit deren Hilfe auch das gewöhnliche eben erfreulicher gestaltet werden.
-
-Wenn wir einmal in der Lage sind, flow operational zu definieren, haben wir die Möglichkeit, dieses Konzept als Maß des gesellschaftlichen Fortschrittes zu verwenden - ein Maß, welches die gegenwärtig geläufigen einseitigen Indikatoren materieller Leistung ergänzen würde. 
--->
 
 ```{r correlation-analysis, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
 
