@@ -517,7 +517,7 @@ Wenn wir einmal in der Lage sind, flow operational zu definieren, haben wir die 
     return(p)
   }
 
-  fss.feature.subset.running <- fss.feature.subset[fss.feature.subset$measurement != "Ruhe", ]
+  fss.feature.subset.running <- fss.feature.subset[fss.feature.subset$measurement != "Ruhe", ] # & fss.feature.subset$measurement != "15'", ]
   fss.feature.subset.running <- fss.feature.subset.running[c(1:10, 12:24),]
   
   I <- c()
@@ -537,9 +537,22 @@ Wenn wir einmal in der Lage sind, flow operational zu definieren, haben wir die 
       I <- c(I, i)
   }
 
-  hrv.feature.subset.running <- hrv.feature.subset[hrv.feature.subset$measurement != "Ruhe", ]
-  hrv.feature.subset.running <- hrv.feature.subset.running[c(1:10, 12:24),]
   
+  hrv.feature.subset.running <- hrv.feature.subset[hrv.feature.subset$measurement != "Ruhe", ] # & hrv.feature.subset$measurement != "15'", ]
+
+  # baseline correction
+#   hrv.feature.subset.baseline <- hrv.feature.subset[hrv.feature.subset$measurement == "Ruhe", ]
+#   hf.power.a.corrected        <- hrv.feature.subset.running$hf.power.a - c(rep(hrv.feature.subset.baseline$hf.power.a[1], 4), rep(hrv.feature.subset.baseline$hf.power.a[2], 4), rep(hrv.feature.subset.baseline$hf.power.a[3], 4), rep(hrv.feature.subset.baseline$hf.power.a[4], 4), rep(hrv.feature.subset.baseline$hf.power.a[5], 4), rep(hrv.feature.subset.baseline$hf.power.a[6], 4))
+#   lf.power.a.corrected        <- hrv.feature.subset.running$lf.power.a - mean(hrv.feature.subset.baseline$lf.power.a) - c(rep(hrv.feature.subset.baseline$lf.power.a[1], 4), rep(hrv.feature.subset.baseline$lf.power.a[2], 4), rep(hrv.feature.subset.baseline$lf.power.a[3], 4), rep(hrv.feature.subset.baseline$lf.power.a[4], 4), rep(hrv.feature.subset.baseline$lf.power.a[5], 4), rep(hrv.feature.subset.baseline$lf.power.a[6], 4))
+#   lf.power.nu                 <- lf.power.a.corrected/(lf.power.a.corrected + hf.power.a.corrected) * 100
+#   hf.power.nu                 <- hf.power.a.corrected/(lf.power.a.corrected + hf.power.a.corrected) * 100
+#   lfhf                        <- lf.power.a.corrected/hf.power.a.corrected
+#   hrv.feature.subset.running$lf.power.a   <- lf.power.a.corrected
+#   hrv.feature.subset.running$hf.power.a   <- hf.power.a.corrected
+#   hrv.feature.subset.running$lf.power.nu  <- lf.power.nu
+#   hrv.feature.subset.running$hf.power.nu  <- hf.power.nu
+#   hrv.feature.subset.running$lfhf         <- lfhf 
+
   J <- c()
   par(mfrow = c(2,2))
   for(j in 1:9) {
