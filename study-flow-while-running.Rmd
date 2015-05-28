@@ -435,7 +435,7 @@ Die statistische Analyse der einzelnen Merkmale führte ich mit R durch. Der Eff
 Der Generalfaktor unterscheidet sich nur bei der Messung nach der 30. Minute signifikant von der Ruhemessung zu Laufmessung [$t(5) = -2.6458, p < .05$]. In den letzten drei Messungen unterscheiden sich die mittleren Differenzen des angegebenen Flusses signifikat. Der Fluss sinkt von Ruhemessung zum Laufen. Der Effekt auf die Absorbiertheit und die \ac{AFP} ist im Vergleich von Ruhemessung zu den vier Laufmessungen in jedem der vier Stichprobenvergleiche signikant. Beide Merkmale steigen beim Laufen an. Für alle \ac{HRV}-Merkmale, außer der Gesamtleistung [jeweils $p < .1$] und dem relativen Wert der \ac{LF} [nach der 45. Minute und nach der 60. Minute, $p < .1$], ist der Effekt für jeden Stichprobenvergleich signifikant. Es steigen die mittlere Herzrate, der relative (%) und normalisierte Wert (n. u.) der \ac{HF}. Die restlichen Merkmale fallen von Ruhemessung zum Laufen. Dieses Ergebnis bestätigt bestehende Arbeiten über die \ac{HRV} bei sportlicher Aktivität \citep{Pichon2004, Sarmiento2013, Hoos2010}. 
 
 #### Effekt der Messzeitpunkts auf die Merkmale
-Für alle Merkmale, außer der \ac{AFP}, ist kein signifikanter Effekt zwischen den einzelnen Laufmessungen zu finden. Damit scheint der Messzeitpunkt auf diese Merkmale keinen Einfluss zu haben. Die gefühlte \ac{AFP} steigt signifikant von Messung der 15. Minute zur Messung der 30. Minute [$t(5) = -7, p < .001$] und von Messung der 30. Minute zur Messung der 45. Minute [$t(5) = -3.16, p < .05$] (siehe Abbildung \ref{fig:zeit-effekt-auf-afp}).
+Für alle Merkmale, außer der \ac{AFP} und der mittleren Herzfrequenz, ist kein signifikanter Effekt zwischen den einzelnen Laufmessungen zu finden. Damit scheint der Messzeitpunkt auf diese Merkmale keinen Einfluss zu haben. Die gefühlte \ac{AFP} steigt signifikant von Messung der 15. Minute zur Messung der 30. Minute [$t(5) = -7, p < .001$] und von Messung der 30. Minute zur Messung der 45. Minute [$t(5) = -3.16, p < .05$] (siehe Abbildung \ref{fig:zeit-effekt-auf-afp}). Die mittlere Herzfrequenz nach der 15. Minuten unterscheidet sich jeweils von der Messung nach der 30., 45. und 60. Minute [jeweils $p < .1$].
 
 ```{r zeit-effekt-auf-afp, echo=FALSE, warning=FALSE, dev='pdf', fig.height=3, fig.width=6.5, fig.pos='htbp', fig.cap='Effekt des Messzeitpunkts auf die AFP \\label{fig:zeit-effekt-auf-afp}'}
   treatment   <- fss.feature.subset$measurement
@@ -600,22 +600,22 @@ Für alle Merkmale, außer der \ac{AFP}, ist kein signifikanter Effekt zwischen 
 ```
 
 <!--
-  () - Ohne Ausreißer Datensatz 11 
+  () - Ohne Ausreißer Datensatz Lauf 3 45' wegen Pause Prüfen
   Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
   
-  flow ~ hf.power.r p < 0.1 . Hohe Werte des Gesamtfaktors korrelieren linear mit niedrigen relativen Werten der HF r = 0.36 (0.39)
+  flow ~ hf.power.r p < 0.1 . Hohe Werte des Gesamtfaktors korrelieren linear mit niedrigen relativen Werten der HF r = 0.37 (0.39)
   flow ~ lf.power.nu p < 0.1 . Hohe des Gesamtfaktors korrelieren linear mit hohen normalisierten Werten der LF r = 0.34 (0.41)
   flow ~ hf.power.nu p < 0.1 . Hohe Werte des Gesamtfaktors korrelieren linear mit niedrigen normalisierten Werten der HF r = 0.34 (0.41)
-  flow ~ lfhf p < 0.05 * (0.1 .) Hohe Werte des Gesamtfaktors korrelieren linear mit dem hohen Werten von LF/HF r = 0.36 (0.42)
+  flow ~ lfhf p < 0.1 . (0.05 *) Hohe Werte des Gesamtfaktors korrelieren linear mit dem hohen Werten von LF/HF r = 0.36 (0.42)
   
-  fluency ~ hf.power.r p < 0.05 . Hohe Werte des glatten Verlaufs korrelieren linear mit niedrigen relativen Werten der HF r = 0.41 (0.44)*
-  (fluency ~ hf.power.r p < 0.1 . Hohe Werte des glatten Verlaufs korrelieren mit moderaten relativen Werten der HF r2 = 0.21)
-  fluency ~ lf.power.nu p < 0.1 . Hohe des glatten Verlaufs korrelieren linear mit hohen normalisierten Werten der LF r = 0.34 (0.41)
-  fluency ~ hf.power.nu p < 0.1 . Hohe Werte des glatten Verlaufs korrelieren linear mit niedrigen normalisierten Werten der HF r = 0.34 (0.41)
+  fluency ~ hf.power.r p < 0.05 * Hohe Werte des glatten Verlaufs korrelieren linear mit niedrigen relativen Werten der HF r = 0.42 (0.44)
+  (fluency ~ hf.power.r p < 0.1 . Hohe Werte des glatten Verlaufs korrelieren mit moderaten relativen Werten der HF r2 = 0.22)
+  (fluency ~ lf.power.nu p < 0.1 . Hohe des glatten Verlaufs korrelieren linear mit hohen normalisierten Werten der LF r = 0.41)
+  (fluency ~ hf.power.nu p < 0.1 . Hohe Werte des glatten Verlaufs korrelieren linear mit niedrigen normalisierten Werten der HF r = 0.41)
   fluency ~ lfhf p < 0.1 . Hohe Werte des glatten Verlaufs korrelieren linear mit dem hohen Werten von LF/HF r = 0.35 (0.41)
   
-  fit ~ mean.hr p < 0.001 ***  Hohe AFP Werte korrelieren linear mit hohen Werten der mittleren Herzrate r = 0.67 (0.69)*
-  fit ~ mean.hr p < 0.01 **  Hohe AFP Werte korrelieren mit moderaten Werten der mittleren Herzrate r2 =  0.46 (0.49)*
+  fit ~ mean.hr p < 0.001 ***  Hohe AFP Werte korrelieren linear mit hohen Werten der mittleren Herzrate r = 0.67 (0.69)
+  fit ~ mean.hr p < 0.01 **  Hohe AFP Werte korrelieren mit moderaten Werten der mittleren Herzrate r2 =  0.46 (0.49) 
 -->
 
 \bibliographystyle{agsm}
