@@ -29,7 +29,7 @@ for (kubios.hrv.file.name in kubios.hrv.file.names) {
   kubios.hrv.data   <- read.csv(paste(data.path, kubios.hrv.file.name, sep = ""), header = F, na.strings = "", fill = T, skip = 117, stringsAsFactors = FALSE, col.names = c("", "Time", "RR.interval", "FFT.Frequency", "FFT.PSD", "AR.Frequency", "AR.PSD", "VLF.comp.", "LF.comp.", "HF.comp.", ""))[,2:10]
   
   # Get time and rr-intervals
-  time              <- kubios.hrv.data[, 1]
+  time              <- kubios.hrv.data[, 1] - kubios.hrv.data[1, 1]
   time              <- time[complete.cases(time)]
   rr.interval       <- kubios.hrv.data[, 2]
   rr.interval       <- rr.interval[complete.cases(rr.interval)]
@@ -98,7 +98,7 @@ for (kubios.hrv.file.name in kubios.hrv.file.names) {
   
   # Extract properties
   activity.start    <- as.POSIXct(strptime(regmatches(kubios.hrv.file.name, regexpr("[0-9]{4}-[0-9]{2}-[0-9]{2}--[0-9]{2}-[0-9]{2}-[0-9]{2}", kubios.hrv.file.name)), "%Y-%m-%d--%H-%M-%S"))
-  measurement.start <- activity.start + 10 * 60
+  measurement.start <- activity.start + measurement.start.after * 60
   measurement.end   <- measurement.start + time[length(time)]
   measurement       <- substr(regmatches(kubios.hrv.file.name, regexpr("[1-9]{1}_", kubios.hrv.file.name)), 1, 1)
   
