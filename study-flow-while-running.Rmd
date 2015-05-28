@@ -145,15 +145,15 @@ Zur \ac{HRV}-Analyse nutze ich die letzten fünf Minuten jedes 15-Minuten Abschn
 - Die letzten fünf Minuten liegen direkt vor der Befragung (siehe Abbildung \ref{fig:ekg-signalverarbeitung} C am Ende)
 - Für die letzten fünf Minuten musste ich keinen Datensatz aufgrund von Artefakten aus der Datensammlung entfernen
 
-```{r ekg-signalverarbeitung, echo=FALSE, warning=FALSE, dev='CairoPNG', dpi=800, fig.height=4.5, fig.width=6.5, fig.pos='htbp', fig.cap='EKG-Signalverarbeitung \\label{fig:ekg-signalverarbeitung}', eval=FALSE}
+```{r ekg-signalverarbeitung, echo=FALSE, warning=FALSE, dev='CairoPNG', dpi=800, fig.height=4.5, fig.width=6.5, fig.pos='htbp', fig.cap='EKG-Signalverarbeitung: A - Gesamtes EKG-Signal; B - 15 Minuten EKG-Signal des Laufens; C - Berechnete RR-Intervalle der 15 Minunten; D - Abschließenden fünf Minuten RR-Intervalle vor der Befragung \\label{fig:ekg-signalverarbeitung}'}
   par(mfcol=c(4, 1), mar=c(3, 3, 1.5, 3) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="i", yaxs="i")
 
   # Load ecg data  
-  ecg.data.file.path <- paste("./data/cleaned-data/running/buse-patrick/", strftime(as.POSIXct("2013-10-31 18:47:19", tz="CET"), "%Y-%m-%d--%H-%M-%S"), "/", sep="")
+  ecg.data.file.path <- paste("./data/example-data/running/buse-patrick/2013-10-31--18-31-19/", sep="")
   ecg.data  <- read.csv(paste(ecg.data.file.path, "ecg-data.csv", sep=""), header=T)
 
   # Load Kubios HRV txt data
-  kubios.hrv.data.path  <- paste("./data/example-data/running/buse-patrick/", strftime(as.POSIXct("2013-10-31 18:47:19", tz="CET"), "%Y-%m-%d--%H-%M-%S"), "/", sep="")
+  kubios.hrv.data.path  <- paste("./data/example-data/running/buse-patrick/2013-10-31--18-31-19/", sep="")
   kubios.hrv.data       <- read.csv(paste(kubios.hrv.data.path, "ecg-data-4_hrv.txt", sep = ""), header = F, na.strings = "", fill = T, skip = 117, stringsAsFactors = FALSE, col.names = c("", "Time", "RR.interval", "FFT.Frequency", "FFT.PSD", "AR.Frequency", "AR.PSD", "VLF.comp.", "LF.comp.", "HF.comp.", ""))[,2:10]
   
   # Get time and rr-intervals
@@ -163,8 +163,8 @@ Zur \ac{HRV}-Analyse nutze ich die letzten fünf Minuten jedes 15-Minuten Abschn
   rr.interval       <- rr.interval[complete.cases(rr.interval)]
   
   # Set time properties
-  starts    <- as.POSIXct(fss.feature.subset[,11], tz="CET")
-  ends      <- as.POSIXct(fss.feature.subset[,12], tz="CET")
+  starts    <- as.POSIXct(fss.features[c(5, 23:26), 12], tz="CET")
+  ends      <- as.POSIXct(fss.features[c(5, 23:26), 13], tz="CET")
   times     <- as.POSIXct(ecg.data[, 4]/1000, origin="1970-01-01", tz="CET")
   
   # Set data
