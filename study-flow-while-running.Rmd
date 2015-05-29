@@ -1,7 +1,7 @@
 ---
 title: 'Studie: Flow beim Laufen'
 author: "Simon Bogutzky"
-date: "April 2015"
+date: "Mai 2015"
 output:
   pdf_document:
     fig_caption: yes
@@ -13,12 +13,6 @@ header-includes: \usepackage[ngerman]{babel} \usepackage[printonlyused,withpage]
 fontsize: 11pt
 documentclass: scrartcl
 ---
-
-<!--
-Wir wollen dort Mechanismen kennenlernen, mit deren Hilfe auch das gewöhnliche eben erfreulicher gestaltet werden.
-
-Wenn wir einmal in der Lage sind, flow operational zu definieren, haben wir die Möglichkeit, dieses Konzept als Maß des gesellschaftlichen Fortschrittes zu verwenden - ein Maß, welches die gegenwärtig geläufigen einseitigen Indikatoren materieller Leistung ergänzen würde. 
--->
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
   
@@ -61,7 +55,7 @@ Wenn wir einmal in der Lage sind, flow operational zu definieren, haben wir die 
 	\acro{FKS}{Flow-Kurzskala}
 	\acro{GPS}{Global Positioning System}
   \acro{HF}{High Frequency}
-	\acro{HRV}{Herzratenvariabilität}
+	\acro{HRV}{Herzfrequenzvariabilität}
   \acro{LF}{Low Frequency}
   \acro{VHF}{Very High Frequency}
   \acro{WT}{Wavelet Transformation}
@@ -70,16 +64,19 @@ Wenn wir einmal in der Lage sind, flow operational zu definieren, haben wir die 
 # Ziel
 Die Studie diente dazu statistische Beziehungen zwischen:
 
-* Flow und der Aktivität des autonomen Nervensystems
-* Flow und dem Bewegungsfluss
+* Flow und der \ac{HRV}
+<!-- * Flow und dem Bewegungsfluss -->
 
-beim Laufen herzustellen. Des Weiteren suchte ich in den Daten nach markanten Mustern, die den Eintritt in den Flow, Flow selbst und den Austritt aus dem Flow markieren.
+beim Laufen herzustellen. <!-- Des Weiteren suchte ich in den Daten nach markanten Mustern, die den Eintritt in den Flow, Flow selbst und den Austritt aus dem Flow markieren. -->
 
 # Methode
 ## Flow-Diagnostik
 ### Flow-Kurzskala
 
 Zur subjektiven Erfassung des Flow-Erlebens kam die \ac{FKS} von \citet{Rheinberg2003} zum Einsatz. Die \ac{FKS} besteht aus insgesamt 16 Items. Die ersten zehn Items bilden anhand einer 7-Punkte-Likert-Skala ("trifft nicht zu" = 1 bis "trifft zu" = 7) Komponenten des Flow-Erlebens ab und \citet{Rheinberg2003} fassen sie als Generalfaktor zusammen. Zur Differenzierung des Flow-Konstrukts ist der Generalfaktor der \ac{FKS} in zwei Faktoren (Subdimensionen) unterteilt. Faktor I umfasst sechs Items, die Aussagen zum "Glatten automatisierten Verlauf" einer Tätigkeit beschreiben. Faktor II beinhaltet vier Items, die mit "Absorbiertheit" in Zusammenhang stehen. Der Reliabilitätskoeffizient der zehn Items im Generalfaktor (Cronbachs Alpha) liegt nach Angaben von \citet[S. 9]{Rheinberg2003} im Bereich um $\alpha = 0.90$. Da nicht damit zu rechnen ist, dass in Anforderungssituationen ausschließlich Flow entsteht, sondern Anforderungssituationen auch Angst und Besorgnis auslösen können, erweiterten \citet{Rheinberg2003} die \ac{FKS} durch eine "Besorgniskomponente". Diese besteht aus drei Items (Nr. 11 bis 13, Cronbachs $\alpha = 0.80$ bis $\alpha = 0.90$). Am Ende der \ac{FKS} nehmen die Probanden drei Einschätzungen zur \ac{AFP} (auf einer 9-Punkte-Skala) vor. Das Item 14 fokussiert sich auf einen Vergleich der Schwierigkeit der jetzigen Tätigkeit mit allen anderen Tätigkeiten (leicht vs. schwer) und das Item 15 auf die eigene Leistungsfähigkeit (niedrig vs. hoch). Das Item 16 fragt direkt, auf die aktuelle Tätigkeit bezogen, nach der subjektiv wahrgenommenen \ac{AFP} (zu gering vs. zu hoch). 
+
+### Herzfrequenzvariabilität
+Die \ac{HRV} operationalisiert die Fluktuationen der Herzperiodendauer in einem festgelegten Zeitraum und wird aus der Zeitreihe der aufeinanderfolgenden RR-Intervalle mit Hilfe verschiedener Kenngrößen bestimmt \citep{TaskForce1996, Berntson1997}. Zwischen einzelnen Kenngrößen bzw. Merkmalen der \ac{HRV} und Flow-Erleben suche ich einen Zusammenhang.
 
 ## Untersuchungsdesign 
 Ein männlicher Freizeitläufer (29) nahm am Experiment teil. Er lief in sechs aufeinanderfolgenden Wochen an einem Tag 60 Minuten jeweils die gleiche Strecke und zur gleichen Tageszeit.
@@ -89,16 +86,16 @@ Vor jedem Lauf rüstete ich ihn mit einem geladenen Smartphone, einem passenden 
 \begin{figure}[htbp]
 \centering
 \includegraphics[keepaspectratio,width=0.75\textwidth]{./figures/equipment-arrangement.pdf}
-\caption{Anordnung des Equipments; Smartphone am Oberarm; Bewegungssensoren am Schienbein und Handgelenk; EKG-Sensor mit zwei Ableitungen am Oberkörper \label{fig:anordnung-des-equipments}}
+\caption{Anordnung des Equipments — Smartphone am Oberarm; Bewegungssensoren am Handgelenk und Schienbein; EKG-Sensor mit vier Ableitungen am Oberkörper \label{fig:anordnung-des-equipments}}
 \end{figure}
 
 Während jedes Laufes zeichnete eine eigens entwickelte App \ac{EKG} und Bewegungsdaten mit Hilfe der tragbaren Sensoren des Unternehmens Shimmer Research (Shimmer 2r) auf. Die App läuft auf dem Android OS ab Version 4.4 und kommuniziert mit den Sensoren über Bluetooth. Die Bewegungssensoren besitzen einen Beschleunigungsmesser und ein Kreiselinstrument, die beide auf jeweils drei Achsen messen. Für das Experiment nutzte ich das Smartphone Samsung Galaxy Nexus, welches auch über einen Beschleunigungsmesser und ein Kreiselinstrument verfügt. Alle Bewegungssensoren arbeiten mit einer Datenrate von 100 Hz. Der \ac{EKG}-Sensor von Shimmer Research arbeitet mit vier Ableitungen. Im Experiment nutzte ich Knopfelektroden und eine Datenrate von 256 Hz. Alle 15 Minuten während jedes Laufes forderte die App mit einem Signal den Läufer auf, eine \ac{FKS} auszufüllen. Vor jedem Lauf führte der Läufer eine 15-minütige Ruhemessung durch. 
 
 Nach jedem Lauf übertrug ich die gesammelten Daten für die software-technische Analyse auf meinen Arbeitsrechner. Die Daten bestehen für jeden Lauf aus der Bewertung der fünf \ac{FKS}, \ac{EKG}-Daten, \ac{GPS}-Positionen, Beschleunigungen und Winkelgeschwindigkeiten von den Körperpositionen Bein, Arm und Handgelenk. 
 
-### Datenverarbeitung
-#### Flow-Kurzskala
-Aus der Bewertung der \ac{FKS} berechnete ich die Faktoren der \ac{FKS}. Die Ergebnisse zeigt die Tabelle \ref{tab:fks-merkmale}. Im arithmetischen Mitte steigt die \ac{AFP} kontinuierlich Die Absorbiertheit steigt im arithmetischen Mittel bis zur 45-Minute. Danach fällt sie ein wenig. Der glatte Verlauf verhält sich gegenläufig (siehe Abbildung \ref{fig:absorbiertheit-afp-verlauf}). 
+## Datenverarbeitung
+### Flow-Kurzskala
+Aus der Bewertung der \ac{FKS} berechnete ich die Faktoren der \ac{FKS}. Die Ergebnisse zeigt die Tabelle \ref{tab:fks-merkmale}. Der Gesamtfaktor steigt im arithmetischen Mittel von Ruhemessung zur ersten Laufmessung. Danach sinkt er ein wenig. Der glatte Verlauf fällt im arithmetischen Mittel bis zur 45-Minute. Danach steigt er ein wenig. Die Absorbiertheit verhält sich gegenläufig. Im arithmetischen Mitte steigt die \ac{AFP} kontinuierlich (siehe Abbildung \ref{fig:fks-faktoren}). 
 
 ```{r fks-merkmale, echo=FALSE, message=FALSE, warning=FALSE, results="asis"}
     
@@ -119,17 +116,16 @@ Aus der Bewertung der \ac{FKS} berechnete ich die Faktoren der \ac{FKS}. Die Erg
   rm(feature.table, table)
 ```
 
-Zur Bewertung des subjektiven Flow-Zustands verwende ich die zweite Subdimension der \ac{FKS}. Denn die Absorbiertheit tritt laut \citet{Peifer2014} nur ein, wenn Anforderungen und Fähigkeiten sich in Balance befinden — somit ist sie ausschließlich im *Flow-Kanal* anzutreffen. Deshalb die Absorbiertheit ein repräsentativer Indikator für Flow als der Generalfaktor, der sich aus den zwei Subdimension zusammensetzt. Den Beleg hierfür geben \citet[S. 69]{Rheinberg2003a}. Sie stellten fest, dass Unterforderung keinen Einfluss auf den glatten Verlauf hat, jedoch die Absorbiertheit negativ beeinflusst. Auch im Vergleich von Ruhe- und Laufmessung (siehe Abbildung \ref{fig:absorbiertheit-afp-verlauf}) ist dieser Sachverhalt auszumachen. 
+<!-- Zur Bewertung des subjektiven Flow-Zustands verwende ich die zweite Subdimension der \ac{FKS}. Denn die Absorbiertheit tritt laut \citet{Peifer2014} nur ein, wenn Anforderungen und Fähigkeiten sich in Balance befinden — somit ist sie ausschließlich im *Flow-Kanal* anzutreffen. Deshalb die Absorbiertheit ein repräsentativer Indikator für Flow als der Generalfaktor, der sich aus den zwei Subdimension zusammensetzt. Den Beleg hierfür geben \citet[S. 69]{Rheinberg2003a}. Sie stellten fest, dass Unterforderung keinen Einfluss auf den glatten Verlauf hat, jedoch die Absorbiertheit negativ beeinflusst. Auch im Vergleich von Ruhe- und Laufmessung (siehe Abbildung \ref{fig:absorbiertheit-afp-verlauf}) ist dieser Sachverhalt auszumachen. -->
 
-<!-- Hier kommt noch was zum FKS-Gesamtergebnis hin oder etwas später -->
-
-```{r absorbiertheit-afp-verlauf, echo=FALSE, warning=FALSE, dev='pdf', fig.height=3, fig.width=6.5, fig.pos='htbp', fig.cap='Arithmetische Mittel von Absorbiertheit, AFP und glatten Verlauf nach Ruhe, 15-, 30-, 45- und 60-Minuten Laufen [N = 6] \\label{fig:absorbiertheit-afp-verlauf}'}
+```{r fks-faktoren, echo=FALSE, warning=FALSE, dev='pdf', fig.height=3, fig.width=6.5, fig.pos='htbp', fig.cap='Arithmetische Mittel von Absorbiertheit, AFP und glatten Verlauf nach Ruhe, 15-, 30-, 45- und 60-Minuten Laufen [N = 6] \\label{fig:fks-merkmale}'}
   par(mfcol=c(1, 1), mar=c(3.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8)
 
   # Plot data
-  plot(tapply(fss.feature.subset[, 3], fss.feature.subset[, 7], mean), type = "b", xlab = "Messung", ylab = "", pch = 21, ylim = c(3, 6), xaxt = "n", yaxt = "n")
-  lines(tapply(fss.feature.subset[, 5], fss.feature.subset[, 7], mean), type = "b", pch = 22)
-  lines(tapply(fss.feature.subset[, 2], fss.feature.subset[, 7], mean), type = "b", pch = 23)
+  plot(tapply(fss.feature.subset[, 1], fss.feature.subset[, 7], mean), type = "b", xlab = "Messung", ylab = "", pch = 21, ylim = c(3, 6), xaxt = "n", yaxt = "n")
+  lines(tapply(fss.feature.subset[, 2], fss.feature.subset[, 7], mean), type = "b", pch = 22)
+  lines(tapply(fss.feature.subset[, 3], fss.feature.subset[, 7], mean), type = "b", pch = 23)
+  lines(tapply(fss.feature.subset[, 5], fss.feature.subset[, 7], mean), type = "b", pch = 24)
 
   # Plot ticks
   axis(1, at = 1:length(levels(fss.feature.subset$measurement)), label = levels(fss.feature.subset$measurement))
@@ -137,21 +133,21 @@ Zur Bewertung des subjektiven Flow-Zustands verwende ich die zweite Subdimension
   axis(3, at = 1:length(levels(fss.feature.subset$measurement)), label = rep("", length(levels(fss.feature.subset$measurement))))
   axis(4, at = seq(3, 6, .5), labels=rep("", length(seq(3, 6, .5))))
 
-  legend("bottomright", inset=.05, c("Absorbiertheit", "AFP", "Glatter Verlauf"), pch = c(21:22), cex = .7)
+  legend("bottomright", inset=.05, c("Gesamtfaktor", "Glatter Verlauf", "Absorbiertheit", "AFP"), pch = c(21:24), cex = .7)
 
   # Plot box again
   box()
 ```
 
-#### HRV-Analyse
-Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Bewertung der \ac{FKS} und erhielt jeweils 15-Minuten Abschnitte (siehe Abbildung \ref{fig:ekg-signalverarbeitung} von A zu B). Zur effizienteren Verarbeitung in KubiosHRV teilte ich die 15-Minuten Abschnitte in jeweils drei fünf Minuten Abschnitte (siehe Abbildung \ref{fig:ekg-signalverarbeitung} C). Zur RR-Interval Berechnung las ich die 90 fünf Minuten Abschnitte in KubiosHRV (Version 2.1) ein. KubiosHRV R-Spitzen-Erkennung identifiziert grötenteils die Herzschläge automatisch, trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. \ac{EKG}-Daten mit mehr als 2% an abnormalen Erkennungen habe ich aus der Datensammlung entfernt. 
+### HRV-Analyse
+Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Bewertung der \ac{FKS} und erhielt jeweils 15-Minuten Abschnitte (siehe Abbildung \ref{fig:ekg-signalverarbeitung} von A zu B). Zur effizienteren Verarbeitung in KubiosHRV \citep{Tarvainen2014} teilte ich die 15-Minuten Abschnitte in jeweils drei fünf Minuten Abschnitte (siehe Abbildung \ref{fig:ekg-signalverarbeitung} C). Zur RR-Interval Berechnung las ich die 90 fünf Minuten Abschnitte in KubiosHRV (Version 2.1) ein. Die R-Spitzen-Erkennung von KubiosHRV identifiziert grötenteils die Herzschläge automatisch, trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zuviel erkannte Herzschläge entfernte ich. \ac{EKG}-Daten mit mehr als 2% an abnormalen Erkennungen habe ich aus der Datensammlung entfernt. 
 Zur \ac{HRV}-Analyse nutze ich die letzten fünf Minuten jedes 15-Minuten Abschnittes. Das hatte folgende Gründe:
 
-- Die ersten fünf Minuten sind beeinflusst von der Ruhephase vor dem Lauf und nach jeder Befragung (siehe Abbildung \ref{fig:ekg-signalverarbeitung} C am Anfang)
-- Die letzten fünf Minuten liegen direkt vor der Befragung (siehe Abbildung \ref{fig:ekg-signalverarbeitung} C am Ende)
+- Die ersten fünf Minuten sind beeinflusst von der Ruhephase vor dem Lauf und nach jeder Bewertung der \ac{FKS} (siehe Abbildung \ref{fig:ekg-signalverarbeitung} C am Anfang)
+- Die letzten fünf Minuten liegen direkt vor der Bewertung der \ac{FKS} (siehe Abbildung \ref{fig:ekg-signalverarbeitung} C am Ende)
 - Für die letzten fünf Minuten musste ich keinen Datensatz aufgrund von Artefakten aus der Datensammlung entfernen
 
-```{r ekg-signalverarbeitung, echo=FALSE, warning=FALSE, dev='CairoPNG', dpi=800, fig.height=4.5, fig.width=6.5, fig.pos='htbp', fig.cap='EKG-Signalverarbeitung: A - Gesamtes EKG-Signal; B - 15 Minuten EKG-Signal des Laufens; C - Berechnete RR-Intervalle der 15 Minunten; D - Abschließenden fünf Minuten RR-Intervalle vor der Befragung \\label{fig:ekg-signalverarbeitung}'}
+```{r ekg-signalverarbeitung, echo=FALSE, warning=FALSE, dev='CairoPNG', dpi=800, fig.height=4.5, fig.width=6.5, fig.pos='htbp', fig.cap='EKG-Signalverarbeitung — (A) Gesamtes EKG-Signal; (B) 15 Minuten EKG-Signal des Laufens; (C) Berechnete RR-Intervalle der 15 Minunten; (D) Abschließenden fünf Minuten RR-Intervalle vor der Bewertung der FKS \\label{fig:ekg-signalverarbeitung}'}
   par(mfcol=c(4, 1), mar=c(3, 3, 1.5, 3) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="i", yaxs="i")
 
   # Load ecg data  
@@ -282,9 +278,9 @@ Zur \ac{HRV}-Analyse nutze ich die letzten fünf Minuten jedes 15-Minuten Abschn
 
 Nach der Berechnung der RR-Intervalle analysierte ich die \ac{HRV} in R mit Hilfe des Package RHRV \citep{Rodriguez-Linares2010}. Im ersten Schritt filterte ich die RR-Intervalle mit der in RHRV integrierten Filterfunktion. Sie implementiert einen Algorithmus, der einen adaptiven Grenzwert nutzt, um RR-Intervalle abzulehnen oder zu akzeptieren. Der Algorithmus vergleich den gegenwärtigen RR-Intervall mit dem vorherigen RR-Intervall, dem nachfolgenden RR-Intervall und einem Mittel der letzten 50 RR-Intervalle. Der Unterschied zwischen den drei Vergleichen darf für eine Akzeptanz nicht mehr als 13% betragen. Zusätzlich muss der gegenwärtige RR-Intervall zwischen einem Maximalwert und Minimalwert von drei Standabweichungen vom Mittel liegen, damit die Funktion ihn nicht herausgefiltert (wie bei \citet{DeManzano2010}). Im nächsten Schritt interpolierte ich linear (4 Hz) die RR-Intervalle, damit ein gleicher zeitlicher Abstand zwischen den Datensätzen gewährleistet ist. 
 
-Ein Grundproblem der \ac{HRV}-Analyse unter sportlicher Belastung ist die Nichtstationarität des Herzfrequenzsignals (RR-Intervalle). Aus diesem Grund empfehlen \citet[S. 113]{Sarmiento2013} traditionelle Methoden der Spektralanalyse wie die \ac{FFT} nicht zu verwenden. Auch \citet[S. 61]{Hoos2010} schreibt von Autoren, die argumentieren, dass für hohe Intensitäten Ergebnisse der traditionellen Spektralanalyse der \ac{HRV} im Allgemeinen und insbesondere der absoluten Einheiten zur Beschreibung der autonomen Funktion unter sportlicher Belastung kaum geeignet sind. Sie führen dies einerseits auf methodische Probleme wie der belastungsbedingten Nichtstationarität und andererseits auf ihre mangelnde Vergleichbarkeit mit Ergebnissen unter schwachen Intensitäten zurück. Vgl. \citet[S. 61]{Hoos2010} lässt sich die gewohnte belastungsinduzierte Verschiebung von der vagalen zur sympathikotonen Dominanz oftmals nicht feststellen. 
+Ein Grundproblem der \ac{HRV}-Analyse unter körperlicher bzw. sportlicher Belastung ist die Nichtstationarität der Zeitreihe der aufeinanderfolgenden RR-Intervalle. Aus diesem Grund empfehlen \citet[S. 113]{Sarmiento2013} traditionelle Methoden der Spektralanalyse wie die \ac{FFT} nicht zu verwenden. Auch \citet[S. 61]{Hoos2010} schreibt von Autoren, die argumentieren, dass für hohe Intensitäten Ergebnisse der traditionellen Spektralanalyse der \ac{HRV} im Allgemeinen und insbesondere der absoluten Einheiten zur Beschreibung der autonomen Funktion unter körperlicher bzw. sportlicher Belastung kaum geeignet sind. Sie führen dies einerseits auf methodische Probleme wie der belastungsbedingten Nichtstationarität und andererseits auf ihre mangelnde Vergleichbarkeit mit Ergebnissen unter schwachen Intensitäten zurück. Vgl. \citet[S. 61]{Hoos2010} lässt sich die gewohnte belastungsinduzierte Verschiebung von der vagalen zur sympathikotonen Dominanz oftmals nicht feststellen. 
 
-Daraus folgt laut \citet[S. 61f.]{Hoos2010} die Forderung deutlich adäquaterer Methoden einzusetzen. Zu diesen Methoden gehören alternative Spektralanalysemethoden (z. B. Coarse Graining Spektralanalyse (CGSA), Kurzzeitfourier-Analyse (STFT) oder kontinuierliche Wavelet Transformation (CWT)) oder nicht-linearer Verfahren (insbesondere Detrended Fluctuation Analysis (DFA), Sampie Entropie (SampEn)). Bei der Nutzung von alternativen Spektralanalysemethoden unter sportlicher Belastung fordern die von \citet[S. 62]{Hoos2010} zitierten Wissenschaftler die Verwendung von einer belastungsadäquaten Erweiterung des HF-Spektralbands mindestens bis zur maximalen Atemfrequenz ($\sim$ 1 Hz). Des Weiteren fordern sie eine Abkehr von der bisherigen Interpretation der Spektralbändern, da sich im \ac{HF}-Band bei sportlicher Belastung vor allem mechanisch bedingte Resonanz- und Kopplungsphänomene mit der Atmung und der motorischen Aktivität zu manifestieren scheinen. 
+Daraus folgt laut \citet[S. 61f.]{Hoos2010} die Forderung deutlich adäquaterer Methoden einzusetzen. Zu diesen Methoden gehören alternative Spektralanalysemethoden (z. B. Coarse Graining Spektralanalyse (CGSA), Kurzzeitfourier-Analyse (STFT) oder kontinuierliche Wavelet Transformation (CWT)) oder nicht-linearer Verfahren (insbesondere Detrended Fluctuation Analysis (DFA), Sampie Entropie (SampEn)). Bei der Nutzung von alternativen Spektralanalysemethoden unter körperlicher bzw. sportlicher Belastung fordern die von \citet[S. 62]{Hoos2010} zitierten Wissenschaftler die Verwendung von einer belastungsadäquaten Erweiterung des HF-Spektralbands mindestens bis zur maximalen Atemfrequenz ($\sim$ 1 Hz). Des Weiteren fordern sie eine Abkehr von der bisherigen Interpretation der Spektralbändern, da sich im \ac{HF}-Band bei körperlicher bzw. sportlicher Belastung vor allem mechanisch bedingte Resonanz- und Kopplungsphänomene mit der Atmung und der motorischen Aktivität zu manifestieren scheinen. 
 
 Aufgrund der vorgestellten Forderungen verwende ich eine \ac{WT} zur Spektralanalyse. Die \ac{WT} ist ein leistungsfähiges Werkzeug zur Analyse von nichtstationären Signalen wie der Zeitreihe der RR-Intervalle. Die Analyse basiert auf einem Mutter-Wavelet. Das Mutter-Wavelet ist eine lokalisierte, oszillierende, reguläre Funktion $\psi(t)$. Wavelet-Funktionen sind anders als die Sinusfunktionen, auf der die \ac{FFT} basiert, im Raum lokalisiert. Dadurch erhält die \ac{WT} die zeitliche und spektrale Dimension. Für die Analyse nichtstationärer Signale ist damit vgl. \citet[S. 207]{Rodriguez-Linares2010} die \ac{WT} der \ac{FFT} vorzuziehen.
 
@@ -303,7 +299,7 @@ Zur Berechung der Spektralleistung der unterschiedlichen Bänder in $ms^2$ berec
     feature.table <- rbind(feature.table, paste(formatC(round(tapply(hrv.feature.subset[, i], hrv.feature.subset[, 11], mean), 2), format = "f", digits = 2), ",", formatC(round(tapply(hrv.feature.subset[, i], hrv.feature.subset[, 11], sd), 2), format = "f", digits = 2)))
   }
   colnames(feature.table) <- levels(hrv.feature.subset[, 11])
-  rownames(feature.table)  <- c("Herzrate (BPM)", "LF ($ms^2$)", "HF-VHF ($ms^2$)", "Gesamt ($ms^2$)", "LF (\\%)", "HF (\\%)", "LF (n. u.)", "HF-VHF (n. u.)", "LF/HF-VHF")
+  rownames(feature.table)  <- c("Herzfrequenz (BPM)", "LF ($ms^2$)", "HF-VHF ($ms^2$)", "Gesamt ($ms^2$)", "LF (\\%)", "HF (\\%)", "LF (n. u.)", "HF-VHF (n. u.)", "LF/HF-VHF")
   
   # Print latex table
   table                   <- xtable(feature.table, label = "tab:hrv-merkmale", align = "rzyyyy", caption = "Werte sind arithmetische Mittel ± Standardabweichung; Parameter nach Ruhe, 15-, 30-, 45- und 60-Minuten Laufen [N = 6]") 
@@ -313,15 +309,10 @@ Zur Berechung der Spektralleistung der unterschiedlichen Bänder in $ms^2$ berec
   rm(feature.table, table)
 ```
 
-<!--
-Warum LF und HF?
+## Statistische Analyse
 
-One particular approach to analyze HRV is to use spectral methods that provide information about how variance in HR ("power") distributes as a function of frequency (Task Force Guidelines, 1996). One of the relevant parameters in spectral analyses is the high-frequency component of the heart rate variability (HF-HRV), which reflects variance in the high frequency range (0.15-0.4 Hz). HF-HRV has been shown to be a reliable indicator for parasympathetic efferent activity (Porges, 1995) and increased task demands are related to a low level of HF-HRV (Backs et al., 1991; Mulder et al., 2002). Furthermore, increased HF-HRV is associated with efficient use of strategies for self-regulation and attention, which results in better performance in cognitive tasks (better accuracy and shorter reaction time) (Hansen et al, 2003; Thayer et al., 2009). In contrast, decreased HF-HRV is related to limited use of self-regulatory strategies (Thayer & Brosschot, 2005), for example, failure to recognize task relevant information or to habituate to novel, non-relevant stimuli (hypervigilance; Friedman, 2007; Thayer, Friedman, Borkovec, Johnsen, & Molina, 2000; Thayer et al., 2009). Focusing on task relevant stimuli and fading out task-irrelevant information are key components of flow. Therefore, one can assume a positive relation between flow and HF-HRV. However, prior studies suggest that moderate and increased task demands are related to lower levels of HF-HRV (Backs et al., 1991; Jorna, 1992; Mulder et al., 2002 Vicente et al., 1987). Based on these findings, we hypothesize a relation between flow and HF-HRV without making any assumptions regarding the direction of the relationship. Another parameter of HRV is the low-frequency component of the HRV (LF-HRV), which reflects the variance in the low frequency range (0.04-0.15 Hz) of heart rates. The meaning of this parameter is controversial in recent research. LF-HRV has been used as an indicator for sympathetic activity (Pagani et al., 1986; Malliani, Pagani, Lombardi, & Cerutti, 1991). However, a growing body of research disproved this assumption and showed that LF-HRV rather reflects baroreflex modulation (Heathers, 2014; Rahman, Pechnik, Gross, Sewall, Goldstein, 2011; Schroeder et al., 2003). The baroreflex is one of the elementary mechanisms through which acute changes in the heart rate and blood pressure is controlled (Guyton, 1980) Baroreflex activity has been associated with several cognitive functions such as mental stress (del Paso, Langewitz, Robles, & Pérez, 1996; Robbe et al., 1987, Steptoe & Sawada, 1989), cognitive-attentional demands (del Paso, González, & Hernández, 2004), and cognitive performance (Yasumasu, del Paso, Takahara, & Nakashima, 2006). According to Lacey's intake/rejection hypothesis (Lacey & Lacey, 1970), tasks containing cognitive elaboration are related to a baroreceptor-elicited cardiac acceleration (del Paso et al., 2004). In contrast, activities involving the detection of external stimuli are related to a baroreceptor-modulated cardiac deceleration (Bernardi, Porta, Spicuzza, & Sleight, 2005). Yasumasu et al. (2006) showed that activities that involve cognitive elaboration and rejection of external stimuli cause a decrease of baroreflex activity, which in turn causes an increase in cardiovascular activity (i.e., increase in heart rate). Cognitive involvement in an activity and rejection of external stimuli are crucial for experiencing flow. Furthermore, previous research suggests an inverted u-shaped function between flow and LF-HRV (Peifer et al., 2014b). Based on these results, we assume a relation between LF-HRV (as an indicator for baroreflex function) and flow experience and test this assumption in an experimental setting that addresses the aforementioned limitations of previous studies.
--->
-
-#### Statistische Analyse
-Die statistische Analyse der einzelnen Merkmale führte ich mit R durch. Der Effekt des Zeitpunkts der Messung von Ruhe bis zur Minute 60 des Laufens evaluierte ich mit einer einfachen ANOVA bei wiederholten Messungen (ggf. mit Greenhouse-Geisser oder Huynh-Feldt Korrektur). Die Normalverteilung der Daten jeder Stichprobe prüfte zahlenmäßig mit dem Shapiro Test und visuell in QQ-Plots. Das Merkmal Besorgnis entfernte ich aus der Datensammlung, da der Läufer sie niedrig und mit mit geringer Abweichung bewertete. Einen abhängigen t-Test (Paardifferenzentest; engl. Paired t-Test) führte ich falls nötig durch, um die mittlere Differenz zweier Messabschnitte zu berechnen. P-Werte unter 0.05 sah ich als statistisch signifikant an.
-
+### Varianzanalyse
+Die statistische Analyse der einzelnen Merkmale führte ich mit R durch. Der Effekt des Zeitpunkts der Messung von Ruhe bis zur Minute 60 des Laufens evaluierte ich mit einer einfachen ANOVA bei wiederholten Messungen (ggf. mit Greenhouse-Geisser oder Huynh-Feldt Korrektur). Die Normalverteilung der Daten jeder Stichprobe prüfte ich zahlenmäßig mit dem Shapiro Test und visuell in QQ-Plots. Das Merkmal Besorgnis entfernte ich aus der Datensammlung, da der Läufer sie niedrig und mit geringer Abweichung bewertete. Einen abhängigen t-Test (Paardifferenzentest; engl. Paired t-Test) führte ich falls nötig durch, um die mittlere Differenz zweier Messabschnitte zu berechnen. P-Werte unter 0.05 sah ich als statistisch signifikant an.
 
 ```{r examine-features, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
 
@@ -429,83 +420,8 @@ Die statistische Analyse der einzelnen Merkmale führte ich mit R durch. Der Eff
   rm(i, subject)
 ```
 
-### Ergebnis
-
-#### Effekt der Aktivität Laufen auf die Merkmale
-Der Generalfaktor unterscheidet sich nur bei der Messung nach der 30. Minute signifikant von der Ruhemessung zu Laufmessung [$t(5) = -2.6458, p < .05$]. In den letzten drei Messungen unterscheiden sich die mittleren Differenzen des angegebenen Flusses signifikat. Der Fluss sinkt von Ruhemessung zum Laufen. Der Effekt auf die Absorbiertheit und die \ac{AFP} ist im Vergleich von Ruhemessung zu den vier Laufmessungen in jedem der vier Stichprobenvergleiche signikant. Beide Merkmale steigen beim Laufen an. Für alle \ac{HRV}-Merkmale, außer der Gesamtleistung [jeweils $p < .1$] und dem relativen Wert der \ac{LF} [nach der 45. Minute und nach der 60. Minute, $p < .1$], ist der Effekt für jeden Stichprobenvergleich signifikant. Es steigen die mittlere Herzrate, der relative (%) und normalisierte Wert (n. u.) der \ac{HF}. Die restlichen Merkmale fallen von Ruhemessung zum Laufen. Dieses Ergebnis bestätigt bestehende Arbeiten über die \ac{HRV} bei sportlicher Aktivität \citep{Pichon2004, Sarmiento2013, Hoos2010}. 
-
-#### Effekt der Messzeitpunkts auf die Merkmale
-Für alle Merkmale, außer der \ac{AFP} und der mittleren Herzfrequenz, ist kein signifikanter Effekt zwischen den einzelnen Laufmessungen zu finden. Damit scheint der Messzeitpunkt auf diese Merkmale keinen Einfluss zu haben. Die gefühlte \ac{AFP} steigt signifikant von Messung der 15. Minute zur Messung der 30. Minute [$t(5) = -7, p < .001$] und von Messung der 30. Minute zur Messung der 45. Minute [$t(5) = -3.16, p < .05$] (siehe Abbildung \ref{fig:zeit-effekt-auf-afp}). Die mittlere Herzfrequenz nach der 15. Minuten unterscheidet sich jeweils von der Messung nach der 30., 45. und 60. Minute [jeweils $p < .1$].
-
-```{r zeit-effekt-auf-afp, echo=FALSE, warning=FALSE, dev='pdf', fig.height=3, fig.width=6.5, fig.pos='htbp', fig.cap='Effekt des Messzeitpunkts auf die AFP \\label{fig:zeit-effekt-auf-afp}'}
-  treatment   <- fss.feature.subset$measurement
-  treatments  <- levels(treatment)
-  value       <- fss.feature.subset[,5]
-  df          <- c()
-  for(i in 1:length(treatments)) 
-    {
-    df <- cbind(df, value[treatment==treatments[i]])
-  }
-  df           <- as.data.frame(df)
-  colnames(df) <- levels(fss.feature.subset$measurement)
-  
-  alpha = 0.05
-  means   <- sapply(df, mean)
-  lowers  <- sapply(df, function(v) t.test(v, conf.level = 1 - alpha)$conf.int[1])
-  uppers  <- sapply(df, function(v) t.test(v, conf.level = 1 - alpha)$conf.int[2])
-
-  ymax    <- max(uppers)
-
-  # Bar plot with 95% confidence interval
-  bp <- barplot2(means, plot.ci = TRUE, ci.l = lowers, ci.u = uppers, xpd = FALSE, ylim = c(0, 7), axes = F, ylab = "Anforderungs-Fähigkeits-Passung")
-
-  # Add connection lines
-  x.cord <- sapply(bp, function(x) rep(x, 2))
-  y.cord <- rbind(c(uppers * 1.01), rep(1.05 * ymax, length(uppers)))
-  
-  lines(x.cord[, 1], y.cord[, 1])
-  lines(x.cord[, 2], c(y.cord[1, 2], y.cord[2, 2] + .5))
-  lines(x.cord[, 3], c(y.cord[1, 3], y.cord[2, 3] + 1))
-  lines(x.cord[, 4], c(y.cord[1, 4], y.cord[2, 4] + 1.5))
-  lines(x.cord[, 5], c(y.cord[1, 5], y.cord[2, 5] + 1.5))
-  lines(x.cord[2, ], y.cord[2, ], lty = 1)
-  lines(x.cord[2, 2:5], y.cord[2, 2:5] + .5)
-  lines(x.cord[2, 3:5], y.cord[2, 3:5] + 1)
-  lines(x.cord[2, 4:5], y.cord[2, 4:5] + 1.5)
-
-  axis(2, at = 0:5, labels = 0:5)
-  
-  # Add significant star
-  # Signif. codes: 0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-  x.cord.star   <- x.cord[1, ] + c(diff(x.cord[1, ]) / 2, 0)
-  y.cord.star   <- c(y.cord[2, 1] + .2, y.cord[2, 1] + .7, y.cord[2, 1] + 1.2, 0)
-
-  df            <- data.frame(treatment, value)
-  df$treatment  <- as.factor(df$treatment)
-  p             <- with(df, pairwise.t.test(value, treatment, p.adjust.method = "none", paired = T))
-
-  for(i in 1:4) {
-    for (j in 1:4) {
-      p.value <- p$p.value[j,i]
-      star = " "
-      if(!is.na(p.value)) {
-        if (p.value < 0.001) {
-          star = "***"
-        } else if (p.value < 0.01) {
-          star = "**"
-        } else if (p.value < 0.05) {
-          star = "*"
-        } else if (p.value < 0.1) {
-          star = "."
-        } else {
-          star = " "
-        }
-      }
-    text(star, x = x.cord.star[j], y = y.cord.star[i])
-  }
-}
-```
+### Korrelationsanalyse
+Um mögliche Zusammenhänge zwischen den Faktoren der \ac{FKS} und der Merkmale der \ac{HRV} beim Laufen aufzuklären, berechnete ich den bivariate Korrelationskoeffizient nach Pearson für alle Kombination von \ac{FKS}-Faktoren und \ac{HRV}-Mermalen. Die Normalverteilung verifizierte ich mit dem Shapiro Test und QQ-Plots. Gleichzeitig prüfte ich die Beziehung zweier Werte im Streudigramm. Da dieses Vorgehen nur auf lineare Zusammenhänge testet, ermittelte ich zusätzlich wie \citet{Peifer2014} einen quadratischen Zusammenhang. Für alle Zusammenhänge testete R die statistische Signifikanz. P-Werte unter 0.05 sah ich als statistisch signifikant an.  
 
 ```{r correlation-analysis, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
 
@@ -587,7 +503,7 @@ Für alle Merkmale, außer der \ac{AFP} und der mittleren Herzfrequenz, ist kein
       
       if(corr$p.value < .1) {
         print(cor.test(hrv.feature.subset.running[, j], fss.feature.subset.running[, i]))
-        #print(summary(lm(fss.feature.subset.running[, i] ~ hrv.feature.subset.running[, j])))
+        print(summary(lm(fss.feature.subset.running[, i] ~ hrv.feature.subset.running[, j])))
       }
       
       if(lmp(quadratic.model) < .1)
@@ -596,26 +512,99 @@ Für alle Merkmale, außer der \ac{AFP} und der mittleren Herzfrequenz, ist kein
   }
 
   # Clean up
-  rm(hrv, hrv.2, I, i, J, j, corr, predicted.values, quadratic.model, st, values)
+  rm(hrv, hrv.2, i, j, corr, predicted.values, quadratic.model, st, values)
 ```
 
+# Ergebnis
+
+## Effekt der Aktivität Laufen auf die Merkmale
+Der Generalfaktor unterscheidet sich nur bei der Messung nach der 30. Minute signifikant von der Ruhemessung zu Laufmessung [$t(5) = -2.6458, p < .05$]. In den letzten drei Messungen unterscheiden sich die mittleren Differenzen des angegebene Verlaufs signifikat. Der glatte Verlauf sinkt von Ruhemessung zum Laufen. Der Effekt auf die Absorbiertheit und die \ac{AFP} ist im Vergleich von Ruhemessung zu den vier Laufmessungen in jedem der vier Stichprobenvergleiche signikant. Beide Merkmale steigen beim Laufen an. Für alle \ac{HRV}-Merkmale, außer der Gesamtleistung [jeweils $p < .1$] und dem relativen Wert der \ac{LF} [nach der 45. Minute und nach der 60. Minute, $p < .1$], ist der Effekt für jeden Stichprobenvergleich signifikant. Es steigen die mittlere Herzfrequenz, der relative (%) und normalisierte Wert (n. u.) der \ac{HF}. Die restlichen Merkmale fallen von Ruhemessung zum Laufen. Dieses Ergebnis bestätigt bestehende Arbeiten über die \ac{HRV} bei körperlicher bzw. sportlicher Belastung \citep{Pichon2004, Sarmiento2013, Hoos2010}. 
+
+## Effekt der Messzeitpunkts auf die Merkmale
+Für alle Merkmale, außer der \ac{AFP} und der mittleren Herzfrequenz, ist kein signifikanter Effekt zwischen den einzelnen Laufmessungen zu finden. Damit scheint der Messzeitpunkt auf diese Merkmale keinen Einfluss zu haben. Die gefühlte \ac{AFP} steigt signifikant von Messung der 15. Minute zur Messung der 30. Minute [$t(5) = -7, p < .001$] und von Messung der 30. Minute zur Messung der 45. Minute [$t(5) = -3.16, p < .05$] (siehe Abbildung \ref{fig:zeit-effekt-auf-afp}). Die mittlere Herzfrequenz nach der 15. Minuten unterscheidet sich jeweils von der Messung nach der 30., 45. und 60. Minute [jeweils $p < .1$].
+
+```{r zeit-effekt-auf-afp, echo=FALSE, warning=FALSE, dev='pdf', fig.height=3, fig.width=6.5, fig.pos='htbp', fig.cap='Effekt des Messzeitpunkts auf die AFP \\label{fig:zeit-effekt-auf-afp}'}
+  treatment   <- fss.feature.subset$measurement
+  treatments  <- levels(treatment)
+  value       <- fss.feature.subset[,5]
+  df          <- c()
+  for(i in 1:length(treatments)) 
+    {
+    df <- cbind(df, value[treatment==treatments[i]])
+  }
+  df           <- as.data.frame(df)
+  colnames(df) <- levels(fss.feature.subset$measurement)
+  
+  alpha = 0.05
+  means   <- sapply(df, mean)
+  lowers  <- sapply(df, function(v) t.test(v, conf.level = 1 - alpha)$conf.int[1])
+  uppers  <- sapply(df, function(v) t.test(v, conf.level = 1 - alpha)$conf.int[2])
+
+  ymax    <- max(uppers)
+
+  # Bar plot with 95% confidence interval
+  bp <- barplot2(means, plot.ci = TRUE, ci.l = lowers, ci.u = uppers, xpd = FALSE, ylim = c(0, 7), axes = F, ylab = "Anforderungs-Fähigkeits-Passung")
+
+  # Add connection lines
+  x.cord <- sapply(bp, function(x) rep(x, 2))
+  y.cord <- rbind(c(uppers * 1.01), rep(1.05 * ymax, length(uppers)))
+  
+  lines(x.cord[, 1], y.cord[, 1])
+  lines(x.cord[, 2], c(y.cord[1, 2], y.cord[2, 2] + .5))
+  lines(x.cord[, 3], c(y.cord[1, 3], y.cord[2, 3] + 1))
+  lines(x.cord[, 4], c(y.cord[1, 4], y.cord[2, 4] + 1.5))
+  lines(x.cord[, 5], c(y.cord[1, 5], y.cord[2, 5] + 1.5))
+  lines(x.cord[2, ], y.cord[2, ], lty = 1)
+  lines(x.cord[2, 2:5], y.cord[2, 2:5] + .5)
+  lines(x.cord[2, 3:5], y.cord[2, 3:5] + 1)
+  lines(x.cord[2, 4:5], y.cord[2, 4:5] + 1.5)
+
+  axis(2, at = 0:5, labels = 0:5)
+  
+  # Add significant star
+  # Signif. codes: 0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+  x.cord.star   <- x.cord[1, ] + c(diff(x.cord[1, ]) / 2, 0)
+  y.cord.star   <- c(y.cord[2, 1] + .2, y.cord[2, 1] + .7, y.cord[2, 1] + 1.2, 0)
+
+  df            <- data.frame(treatment, value)
+  df$treatment  <- as.factor(df$treatment)
+  p             <- with(df, pairwise.t.test(value, treatment, p.adjust.method = "none", paired = T))
+
+  for(i in 1:4) {
+    for (j in 1:4) {
+      p.value <- p$p.value[j,i]
+      star = " "
+      if(!is.na(p.value)) {
+        if (p.value < 0.001) {
+          star = "***"
+        } else if (p.value < 0.01) {
+          star = "**"
+        } else if (p.value < 0.05) {
+          star = "*"
+        } else if (p.value < 0.1) {
+          star = "."
+        } else {
+          star = " "
+        }
+      }
+    text(star, x = x.cord.star[j], y = y.cord.star[i])
+  }
+}
+```
+
+## Zusammenhänge von Flow-Erleben und HRV
+Der Shapiro Test ergab für die Besorgnis, für die absoluten Werte der \ac{LF} und \ac{HF} und dem relativen Wert des \ac{LF} keine Normalverteilung. Für diese Faktoren und  Merkmale führte ich keine Korrelationsanalyse durch. Bei ersten Observation der Streudigramme fand ich einen Ausreißer in der Bewertung der \ac{FKS} beim dritten Lauf bei Minute 45. Nach der Begutachtung der Bewegungsdaten stellte ich fest, dass der Läufer vor der 45 Minute eine kurze Pause eingelegt hatte. Aus diesem Grund entfernte ich den gesamten Datensatz aus der Datensammlung. 
+
+Mit unter 20% Varianzaufklärung beobachtete ich für den linearen Zusammenhang eine schlechte Vorhersagbarkeit des Gesamtfaktors durch die \ac{HRV}-Merkmalen \ac{HF} (%), \ac{LF} (n.u.), \ac{HF} (n.u.) oder LF/HF. Das Verhältnis von \ac{LF} und \ac{HF} mit der größten Varianzaufklärung von 18% lag unter dem Signifikanzneviau von $p < 0.05$. Die anderen drei \ac{HRV}-Merkmalen lagen jeweils bei $p < 0.1$. Alle weiteren Zusammenhänge hatten ein Signifikanzniviau von weit über $p < 0.1$. Daraus ergibt sich, dass hohe Werte der der relativen \ac{HF} und normalisieren \ac{HF} mit niedrigen Werten des Gesamtenfaktors in Zusammenhang stehen. Der Zusammenhang von Gesamtfaktor und normalisierte \ac{LF} oder dem Verhältnis von \ac{LF} und \ac{HF} verhält sich anders herum. Die Vorhersagbarkeit durch einen linearen Zusammenhang des glatten Verlauf und der \ac{HRV}-Merkmale der \ac{HF} (%), \ac{LF} (n.u.), \ac{HF} (n.u.) oder LF/HF ist sehr ähnlich. Einen nicht zufälliger systematischen Zusammenhang von Absorbiertheit und einem \ac{HRV}-Merkmal fand ich nicht.
+
+Ein Indiz das der Läufer die \ac{FKS} sehr gewissenhaft ausgefüllt hat, zeigt der Zusammenhang von \ac{AFP} und mittlerer Herzfrequenz. Mit 47% Varianzaufklärung beobachte ich eine mittlere Vorhersagbarkeit. Es besteht ein nicht zufälliger systematischen Zusammenhang zwischen der \ac{AFP} und der mittlere Herzfrequenz [$p < 0.001$].
+Daraufhin kann geschlossen werden, je größer die \ac{AFP} desto größer die mittlere Herzfrequenz.
+
 <!--
-  () - Ohne Ausreißer Datensatz Lauf 3 45' wegen Pause Prüfen
-  Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-  
-  flow ~ hf.power.r p < 0.1 . Hohe Werte des Gesamtfaktors korrelieren linear mit niedrigen relativen Werten der HF r = 0.37 (0.39)
-  flow ~ lf.power.nu p < 0.1 . Hohe des Gesamtfaktors korrelieren linear mit hohen normalisierten Werten der LF r = 0.34 (0.41)
-  flow ~ hf.power.nu p < 0.1 . Hohe Werte des Gesamtfaktors korrelieren linear mit niedrigen normalisierten Werten der HF r = 0.34 (0.41)
-  flow ~ lfhf p < 0.1 . (0.05 *) Hohe Werte des Gesamtfaktors korrelieren linear mit dem hohen Werten von LF/HF r = 0.36 (0.42)
-  
-  fluency ~ hf.power.r p < 0.05 * Hohe Werte des glatten Verlaufs korrelieren linear mit niedrigen relativen Werten der HF r = 0.42 (0.44)
-  (fluency ~ hf.power.r p < 0.1 . Hohe Werte des glatten Verlaufs korrelieren mit moderaten relativen Werten der HF r2 = 0.22)
-  (fluency ~ lf.power.nu p < 0.1 . Hohe des glatten Verlaufs korrelieren linear mit hohen normalisierten Werten der LF r = 0.41)
-  (fluency ~ hf.power.nu p < 0.1 . Hohe Werte des glatten Verlaufs korrelieren linear mit niedrigen normalisierten Werten der HF r = 0.41)
-  fluency ~ lfhf p < 0.1 . Hohe Werte des glatten Verlaufs korrelieren linear mit dem hohen Werten von LF/HF r = 0.35 (0.41)
-  
-  fit ~ mean.hr p < 0.001 ***  Hohe AFP Werte korrelieren linear mit hohen Werten der mittleren Herzrate r = 0.67 (0.69)
-  fit ~ mean.hr p < 0.01 **  Hohe AFP Werte korrelieren mit moderaten Werten der mittleren Herzrate r2 =  0.46 (0.49) 
+Interpretation
+
+One particular approach to analyze HRV is to use spectral methods that provide information about how variance in HR ("power") distributes as a function of frequency (Task Force Guidelines, 1996). One of the relevant parameters in spectral analyses is the high-frequency component of the heart rate variability (HF-HRV), which reflects variance in the high frequency range (0.15-0.4 Hz). HF-HRV has been shown to be a reliable indicator for parasympathetic efferent activity (Porges, 1995) and increased task demands are related to a low level of HF-HRV (Backs et al., 1991; Mulder et al., 2002). Furthermore, increased HF-HRV is associated with efficient use of strategies for self-regulation and attention, which results in better performance in cognitive tasks (better accuracy and shorter reaction time) (Hansen et al, 2003; Thayer et al., 2009). In contrast, decreased HF-HRV is related to limited use of self-regulatory strategies (Thayer & Brosschot, 2005), for example, failure to recognize task relevant information or to habituate to novel, non-relevant stimuli (hypervigilance; Friedman, 2007; Thayer, Friedman, Borkovec, Johnsen, & Molina, 2000; Thayer et al., 2009). Focusing on task relevant stimuli and fading out task-irrelevant information are key components of flow. Therefore, one can assume a positive relation between flow and HF-HRV. However, prior studies suggest that moderate and increased task demands are related to lower levels of HF-HRV (Backs et al., 1991; Jorna, 1992; Mulder et al., 2002 Vicente et al., 1987). Based on these findings, we hypothesize a relation between flow and HF-HRV without making any assumptions regarding the direction of the relationship. Another parameter of HRV is the low-frequency component of the HRV (LF-HRV), which reflects the variance in the low frequency range (0.04-0.15 Hz) of heart rates. The meaning of this parameter is controversial in recent research. LF-HRV has been used as an indicator for sympathetic activity (Pagani et al., 1986; Malliani, Pagani, Lombardi, & Cerutti, 1991). However, a growing body of research disproved this assumption and showed that LF-HRV rather reflects baroreflex modulation (Heathers, 2014; Rahman, Pechnik, Gross, Sewall, Goldstein, 2011; Schroeder et al., 2003). The baroreflex is one of the elementary mechanisms through which acute changes in the heart rate and blood pressure is controlled (Guyton, 1980) Baroreflex activity has been associated with several cognitive functions such as mental stress (del Paso, Langewitz, Robles, & Pérez, 1996; Robbe et al., 1987, Steptoe & Sawada, 1989), cognitive-attentional demands (del Paso, González, & Hernández, 2004), and cognitive performance (Yasumasu, del Paso, Takahara, & Nakashima, 2006). According to Lacey's intake/rejection hypothesis (Lacey & Lacey, 1970), tasks containing cognitive elaboration are related to a baroreceptor-elicited cardiac acceleration (del Paso et al., 2004). In contrast, activities involving the detection of external stimuli are related to a baroreceptor-modulated cardiac deceleration (Bernardi, Porta, Spicuzza, & Sleight, 2005). Yasumasu et al. (2006) showed that activities that involve cognitive elaboration and rejection of external stimuli cause a decrease of baroreflex activity, which in turn causes an increase in cardiovascular activity (i.e., increase in heart rate). Cognitive involvement in an activity and rejection of external stimuli are crucial for experiencing flow. Furthermore, previous research suggests an inverted u-shaped function between flow and LF-HRV (Peifer et al., 2014b). Based on these results, we assume a relation between LF-HRV (as an indicator for baroreflex function) and flow experience and test this assumption in an experimental setting that addresses the aforementioned limitations of previous studies.
 -->
 
 \bibliographystyle{agsm}

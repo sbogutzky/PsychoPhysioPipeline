@@ -1,0 +1,5 @@
+Motivation
+
+Wir wollen dort Mechanismen kennenlernen, mit deren Hilfe auch das gewöhnliche eben erfreulicher gestaltet werden.
+
+Wenn wir einmal in der Lage sind, flow operational zu definieren, haben wir die Möglichkeit, dieses Konzept als Maß des gesellschaftlichen Fortschrittes zu verwenden - ein Maß, welches die gegenwärtig geläufigen einseitigen Indikatoren materieller Leistung ergänzen würde. 
