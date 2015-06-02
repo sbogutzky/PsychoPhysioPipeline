@@ -5,7 +5,6 @@ rm(list = ls(all = T))
 setwd("~/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/preprocessing")
 
 # Load libraries
-library(flow)
 library(signal)
 
 # Set properties
@@ -16,7 +15,6 @@ fs                <- 256
 
 # Read feature data
 fss.features    <- read.csv(feature.path)
-ecg.data        <- data.frame()
 
 for (i in 1:nrow(fss.features)) {
 
@@ -28,11 +26,18 @@ for (i in 1:nrow(fss.features)) {
   measurement     <- fss.features[i, 15]
   
   if(measurement == 1) {
+    ecg.data        <- data.frame()
     
     # Read data, if needed
     ecg.data.path <- paste(root.data.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", format(activity.start, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/ecg-data.csv", sep="")
     if(file.exists(ecg.data.path)) {
       ecg.data      <- read.csv(ecg.data.path)
+      
+      # Set ecg data timestamp to zero 
+      ecg.data[,1] <- (ecg.data[,1] - ecg.data[1,1]) / 1000
+      
+      # Correct ecg data system time
+      ecg.data[,8] <- ecg.data[1,8] / 1000 + ecg.data[,1] 
       
       # Create directory, if needed
       output.directory <- paste("../data/preprocessed-data/", tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", format(activity.start, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", sep="")
@@ -48,16 +53,20 @@ for (i in 1:nrow(fss.features)) {
   # Subset ecg data
   if(nrow(ecg.data) > 0) {
     
-    ecg.data.subset <- ecg.data[activity.end - 5 * 60 <= as.POSIXct(ecg.data[,4]/1000, origin = "1970-01-01") & as.POSIXct(ecg.data[,4]/1000, origin = "1970-01-01") <= activity.end,]
-    print(as.POSIXct(ecg.data.subset[nrow(ecg.data.subset),4]/1000, origin = "1970-01-01") - as.POSIXct(ecg.data.subset[1,4]/1000, origin = "1970-01-01"))
+    start.time        <- activity.end - 5 * 60
+    ecg.data.subset   <- ecg.data[start.time <= as.POSIXct(ecg.data[,4], origin = "1970-01-01") & as.POSIXct(ecg.data[,4], origin = "1970-01-01") <= activity.end,]
+    time.difference   <- as.POSIXct(ecg.data.subset[1,4], origin = "1970-01-01") - (activity.end - 5 * 60)
+    print(time.difference)
+    print(as.POSIXct(ecg.data.subset[nrow(ecg.data.subset),4], origin = "1970-01-01") - as.POSIXct(ecg.data.subset[1,4], origin = "1970-01-01") + time.difference)
     
-    # Set timestamp to zero
-    ecg.data.subset[,1] <- (ecg.data.subset[,1] - ecg.data.subset[1, 1]) / 1000
+    # Set subset timestamp to zero
+    ecg.data.subset[,1] <- ecg.data.subset[,1] - ecg.data.subset[1, 1]
     
     # Interpolate
     t         <- seq(ecg.data.subset[1, 1], ecg.data.subset[nrow(ecg.data.subset), 1], by = 1/fs)
     ecg.rall  <- interp1(ecg.data.subset[,1], ecg.data.subset[, 2], t, method = "spline")
     ecg.lall  <- interp1(ecg.data.subset[,1], ecg.data.subset[, 3], t, method = "spline")
+    t         <- t + time.difference
   
     # Write csv file
     output.file.path <- paste(output.directory, "ecg-data-", measurement, ".csv", sep = "")
