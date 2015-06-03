@@ -19,14 +19,15 @@ sampling.rate           <- 64
 
 # Load all file names
 data.path               <- paste(root.data.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/",  sep = "")
-motion.file.names       <- list.files(path = data.path, pattern = paste(file.name.prefix, "-data-[1-9].csv", sep=""), recursive = T)
+motion.file.names       <- list.files(path = data.path, pattern = paste(file.name.prefix, "-motion-data-[1-9].csv", sep=""), recursive = T)
 
 for (motion.file.name in motion.file.names) {
   
   # Load motion data
   motion.data           <- read.csv(paste(data.path, motion.file.name, sep=""))
   
-  # Find main frequency        
+  # Find main frequency   
+  par(mfcol=c(3, 1))
   rotation.rate.x.spectrum <- TSA::periodogram(motion.data[, 5], plot = T, main = "Rotation Rate X")
   rotation.rate.y.spectrum <- TSA::periodogram(motion.data[, 6], plot = T, main = "Rotation Rate Y")
   rotation.rate.z.spectrum <- TSA::periodogram(motion.data[, 7], plot = T, main = "Rotation Rate Z")
@@ -53,7 +54,7 @@ for (motion.file.name in motion.file.names) {
   # Low pass signal
   #main.frequency         <- .5
   main.frequency          <- floor(main.frequency * 10) / 10
-  butterworth.filter      <- butter(1, main.frequency * main.frequency, "low")
+  butterworth.filter      <- butter(1, 1/sampling.rate * main.frequency, "low")
   filtered.rotation.rate  <- filtfilt(butterworth.filter, motion.data[, axis + 4])
   
   # Search for minima
@@ -64,18 +65,20 @@ for (motion.file.name in motion.file.names) {
   s <- sd(filtered.rotation.rate[minima])
   minima <- minima[m + s * 1 > filtered.rotation.rate[minima]]
   
-#   hist(filtered.rotation.rate[minima])
-#   plot(motion.data[, 1], motion.data[, axis + 4], type="l")
-#   abline(v = motion.data[minima, 1])
-#   plot(motion.data[, 1], filtered.rotation.rate, type="l")
-#   abline(v = motion.data[minima, 1])
+  par(mfcol=c(2, 1))
+  plot(motion.data[, 1], motion.data[, axis + 4], type="l", xlab="t [s]", ylab=paste("Rotation Rate [deg/s] around", axis.label))
+  abline(v = motion.data[minima, 1])
+  plot(motion.data[, 1], filtered.rotation.rate, type="l", xlab="t [s]", ylab=paste("Filtered Rotation Rate [deg/s] around", axis.label))
+  abline(v = motion.data[minima, 1])
 
   t               <- motion.data[minima, 1]
   cycle.interval  <- diff(t)
   t               <- t[-1]
 
-  summary(cycle.interval)
-  plot(t, cycle.interval, type="l", xlab="time [s]", ylab="cycle interval [s]")
+  print(summary(cycle.interval))
+  par(mfcol=c(2, 1))
+  hist(cycle.interval)
+  plot(t, cycle.interval, type="l", xlab="t [s]", ylab="Motion Cycle Interval [s]")
   
   # Extract properties
   activity.start    <- as.POSIXct(strptime(regmatches(motion.file.name, regexpr("[0-9]{4}-[0-9]{2}-[0-9]{2}--[0-9]{2}-[0-9]{2}-[0-9]{2}", motion.file.name)), "%Y-%m-%d--%H-%M-%S"))
@@ -88,7 +91,7 @@ for (motion.file.name in motion.file.names) {
   }
 
   # Write csv file
-  output.file.path <- paste(output.directory, file.name.prefix, "-time-data-", measurement, ".csv", sep = "")
+  output.file.path <- paste(output.directory, file.name.prefix, "-motion-time-data-", measurement, ".csv", sep = "")
   write.csv(data.frame(t, cycle.interval), output.file.path, row.names = FALSE)
   print(output.file.path)
 }
