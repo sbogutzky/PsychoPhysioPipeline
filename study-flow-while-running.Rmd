@@ -263,7 +263,7 @@ Zur \ac{HRV}-Analyse nutze ich die letzten fünf Minuten jedes 15-Minuten Abschn
   axis(2, at=seq(.2, .6, .02), labels=seq(.2, .6, .02))
   axis(3, at=marker, label=rep("", length(marker)))
   axis(4, at=seq(.2, .6, .02), labels=rep("", length(seq(.2, .6, .02))))
-  abline(v=c(min(t), max(t)), lty = "dashed", col="darkgrey")
+  abline(v=c(min(t), max(t)), lty = "dashed", col=1)
 
   # Plot box again
   box()
