@@ -37,13 +37,18 @@ for (i in 1:nrow(fss.features)) {
       ecg.data[,1] <- (ecg.data[,1] - ecg.data[1,1]) / 1000
       
       # Correct ecg data system time
-      ecg.data[,8] <- ecg.data[1,8] / 1000 + ecg.data[,1] 
+      ecg.data[,4] <- ecg.data[1,4] / 1000 + ecg.data[,1] 
       
       # Create directory, if needed
       output.directory <- paste("../data/preprocessed-data/", tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", format(activity.start, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", sep="")
       if(!file.exists(output.directory)) {
         dir.create(output.directory, recursive = TRUE)
       }
+      
+      par(mfcol=c(2, 1))
+      plot(ecg.data[,1], ecg.data[,3], type = "l", xlab = "t [s]", ylab = "ECG LALL [mV]")
+      plot(ecg.data[ecg.data[,1] > 1800 & ecg.data[,1] < 1810,1], ecg.data[ecg.data[,1] > 1800 & ecg.data[,1] < 1810,3], type = "l", xlab = "t [s]", ylab = "ECG RALL [mV]")
+      
       
     } else {
       print("No ecg data")

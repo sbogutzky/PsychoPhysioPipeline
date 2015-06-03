@@ -30,7 +30,7 @@ for (i in 1:nrow(fss.features)) {
     motion.data        <- data.frame()
     
     # Read data, if needed
-    motion.data.path <- paste(root.data.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", format(activity.start, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", file.name.prefix, "-data.csv", sep="")
+    motion.data.path <- paste(root.data.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", format(activity.start, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", file.name.prefix, "-motion-data.csv", sep="")
     if(file.exists(motion.data.path)) {
       motion.data      <- read.csv(motion.data.path)
       
@@ -45,6 +45,10 @@ for (i in 1:nrow(fss.features)) {
       if(!file.exists(output.directory)) {
         dir.create(output.directory, recursive = TRUE)
       }
+      
+      par(mfcol=c(2, 1))
+      plot(motion.data[,1], motion.data[,5], type = "l", xlab = "t [s]", ylab = "Rotation Rate X [deg/s]")
+      plot(motion.data[motion.data[,1] > 1800 & motion.data[,1] < 1810,1], motion.data[motion.data[,1] > 1800 & motion.data[,1] < 1810,5], type = "l", xlab = "t [s]", ylab = "Rotation Rate X [deg/s]")
       
     } else {
       print("No motion data")
@@ -74,7 +78,7 @@ for (i in 1:nrow(fss.features)) {
     t                       <- t + time.difference
   
     # Write csv file
-    output.file.path <- paste(output.directory, file.name.prefix, "-data-", measurement, ".csv", sep = "")
+    output.file.path <- paste(output.directory, file.name.prefix, "-motion-data-", measurement, ".csv", sep = "")
     write.csv(data.frame(t, motion.acceleration.x, motion.acceleration.y, motion.acceleration.z, motion.rotation.rate.x, motion.rotation.rate.y, motion.rotation.rate.z), output.file.path, row.names = FALSE)
     print(output.file.path)
   }
