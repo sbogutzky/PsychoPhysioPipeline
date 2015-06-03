@@ -88,7 +88,7 @@ for (motion.file.name in motion.file.names) {
   }
 
   # Write csv file
-  output.file.path <- paste(output.directory, file.name.prefix, "-data-", measurement, ".csv", sep = "")
+  output.file.path <- paste(output.directory, file.name.prefix, "-time-data-", measurement, ".csv", sep = "")
   write.csv(data.frame(t, cycle.interval), output.file.path, row.names = FALSE)
   print(output.file.path)
 }
