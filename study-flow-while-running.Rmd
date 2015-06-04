@@ -648,5 +648,11 @@ Ein Indiz dafür, dass der Läufer die \ac{FKS} gewissenhaft ausgefüllt hat, ze
 
 Im Gegensatz zu den Ergebnissen in \citet{Peifer2014} verhält sich der Zusammenhang zwischen Flow (bestimmt durch den Generalfaktor) und der \ac{HF} beim Laufen genau anders herum. Grund dafür ist die körperliche bzw. sportliche Belastung und die dadurch notwendige Anpassung der Frequenzbänder. Durch die Anpassung ist die übliche rein neuro-vegetative, sympathiko-vagale Interpretation der Spektralbänder nicht möglich, da sich im \ac{HF}-Band bei körperlicher bzw. sportlicher Belastung vor allem mechanisch bedingte Resonanz- und Kopplungsphänomene mit der Atmung und der motorischen Aktivität zu manifestieren scheinen \citep[S. 62]{Hoos2010}. Eine Zugehörigkeitsbestimmung der \ac{HF} zur vagalen Aktivität des \ac{ANS}s, wie bei der rein neuro-vegetativen, sympathiko-vagalen Interpretation, wäre deshalb fehlerhaft. Der Zusammenhang zwischen Flow und dem Verhältnis von \ac{LF} und \ac{HF} verhält sich auch gegenläufig der Interpretation von \citet{Peifer2014}, da das Verhältnis bei hohen Werten des Generalfaktors steigt (siehe Abbildung \ref{fig:zusammenhaenge-von-flow-und-hrv} A). Das bedeutet, dass sich die Leistung der \ac{LF} gegenüber der \ac{HF} vergrößert. Was die \ac{LF} und die \ac{HF} außerhalb der üblichen euro-vegetativen, sympathiko-vagalen Interpretation der Spektralbänder über die Prozesse in unserem Körper sagen, kann ich zum jetzigen Zeitpunkt nicht sagen. Deswegen bietet sich für mich, die weitere Nutzung der \ac{HRV}-Merkmale nur in individuellen Schwellenkonzepten an. In einem weiteren Ansatz könnte ich den direkten Zusammenhang zwischen der zeitvarianten spektralen Kenngröße der \ac{HF} mit ventilatorischen Schwellenkonzepten nach \citet{Cottin2007} untersuchen. Der Ansatz könnte mit Hilfe der Herzfrequenzmessung einen Zusammenhang der Atemfrequenz und Flow ermöglichen. 
 
+## Jerk Cost
+
+\begin{equation}
+  JC = \int_0^T dt ((\frac{d^3x}{dt^3})^2 + (\frac{d^3y}{dt^3})^2 + (\frac{d^3z}{dt^3})^2 ) 
+\end{equation}
+
 \bibliographystyle{agsm}
 \bibliography{./bibtex/library}
