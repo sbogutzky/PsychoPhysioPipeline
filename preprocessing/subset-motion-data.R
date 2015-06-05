@@ -48,6 +48,7 @@ for (i in 1:nrow(fss.features)) {
       
       par(mfcol=c(2, 1))
       plot(motion.data[,1], motion.data[,5], type = "l", xlab = "t [s]", ylab = "Rotation Rate X [deg/s]")
+      title(format(activity.start, format="%Y-%m-%d--%H-%M-%S", tz="CET"))
       plot(motion.data[motion.data[,1] > 1800 & motion.data[,1] < 1810,1], motion.data[motion.data[,1] > 1800 & motion.data[,1] < 1810,5], type = "l", xlab = "t [s]", ylab = "Rotation Rate X [deg/s]")
       
     } else {

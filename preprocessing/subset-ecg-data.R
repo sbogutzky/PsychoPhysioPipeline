@@ -47,8 +47,8 @@ for (i in 1:nrow(fss.features)) {
       
       par(mfcol=c(2, 1))
       plot(ecg.data[,1], ecg.data[,3], type = "l", xlab = "t [s]", ylab = "ECG LALL [mV]")
+      title(format(activity.start, format="%Y-%m-%d--%H-%M-%S", tz="CET"))
       plot(ecg.data[ecg.data[,1] > 1800 & ecg.data[,1] < 1810,1], ecg.data[ecg.data[,1] > 1800 & ecg.data[,1] < 1810,3], type = "l", xlab = "t [s]", ylab = "ECG LALL [mV]")
-      
       
     } else {
       print("No ecg data")
