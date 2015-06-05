@@ -108,8 +108,8 @@ for (i in 1:nrow(fss.features)) {
     rm(ulf.power.a, vlf.power.a, lf.power.a, hf.power.a, total.power, ulf.power.r, vlf.power.r, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf, mean.hr)
     
     # Compute start and end of the measurement
-    measurement.start <- as.POSIXct(activity.end) - measurement.started.before * 60
-    measurement.end   <- as.POSIXct(activity.end) - measurement.ended.before * 60
+    measurement.start <- strftime(as.POSIXct(activity.end) - measurement.started.before * 60, format = "%Y-%m-%d %H:%M:%S")
+    measurement.end   <- strftime(as.POSIXct(activity.end) - measurement.started.before * 60, format = "%Y-%m-%d %H:%M:%S")
     
     # Add parameter to feature vector
     hrv.features    <- rbind(hrv.features, data.frame(round(hrv.parameters, 2), activity, activity.start, activity.end, measurement.start, measurement.end, measurement, last.name, first.name, date.of.birth))
