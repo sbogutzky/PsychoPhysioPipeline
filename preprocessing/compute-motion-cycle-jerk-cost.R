@@ -70,10 +70,11 @@ for (motion.file.name in motion.file.names) {
   }
   
   if (length(jerk.costs) > 0) {
+    jerk.costs <- c(NA, jerk.costs)
     print(summary(jerk.costs))
     par(mfcol=c(2, 1))
     hist(jerk.costs)
-    t <- motion.time.data[,1][-1]
+    t <- motion.time.data[,1]
     plot(t, jerk.costs, type="l", xlab="t [s]", ylab="Jerk Cost [m^2 s^-5]")
     
     # Extract properties

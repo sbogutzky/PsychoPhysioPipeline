@@ -8,7 +8,6 @@ setwd("~/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/preproce
 library(RHRV)
 
 # Set paths
-feature.path            <- "../data/features/"
 preprocessed.data.path  <- "../data/preprocessed-data/"
 
 # How many minutes before the activity end the measurement started?

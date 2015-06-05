@@ -7,30 +7,37 @@ setwd("~/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/preproce
 # Load libraries
 library(signal)
 
-# Set properties
-feature.path      <- "../data/features/fss-features.csv"
+# Set paths
 root.data.path    <- "../data/cleaned-data/"
-file.name.prefix  <- "leg"
-subset.length     <- 5 # in minutes
-fs                <- 64
 
-# Read feature data
-fss.features    <- read.csv(feature.path)
-fss.features    <- fss.features[order(as.Date(fss.features$activity.start, format = "%Y-%m-%d %H:%M:%S")), , drop = FALSE]
+# How many minutes before the activity end the measurement started?
+measurement.started.before  <- 5
+
+# Where do you measure the data?
+body.position <- "leg"
+
+# Which sampling rate do you wish?
+sampling.rate  <- 64
+
+# Load sampling.rates features
+fss.features        <- read.csv("../data/features/fss-features.csv", stringsAsFactors = F)
 
 for (i in 1:nrow(fss.features)) {
-  activity        <- as.character(fss.features[i, 11])
-  activity.start  <- as.POSIXct(fss.features[i, 12])
-  activity.end    <- as.POSIXct(fss.features[i, 13])
-  last.name       <- as.character(fss.features[i, 16])
-  first.name      <- as.character(fss.features[i, 17])
-  measurement     <- fss.features[i, 15]
+  
+  properties      <- fss.features[i, c(6:13)]
+  activity        <- properties[, 1]
+  activity.start  <- as.POSIXct(properties[, 2])
+  activity.end    <- as.POSIXct(properties[, 3])
+  measurement     <- properties[, 5]
+  last.name       <- properties[, 6]
+  first.name      <- properties[, 7]
+  date.of.birth   <- properties[, 8]
   
   if(measurement == 1) {
     motion.data        <- data.frame()
     
     # Read data, if needed
-    motion.data.path <- paste(root.data.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", format(activity.start, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", file.name.prefix, "-motion-data.csv", sep="")
+    motion.data.path <- paste(root.data.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", format(activity.start, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", body.position, "-motion-data.csv", sep="")
     if(file.exists(motion.data.path)) {
       motion.data      <- read.csv(motion.data.path)
       
@@ -59,9 +66,9 @@ for (i in 1:nrow(fss.features)) {
   # Subset motion data
   if(nrow(motion.data) > 0) {
     
-    start.time         <- activity.end - 5 * 60
+    start.time         <- activity.end - measurement.started.before * 60
     motion.data.subset <- motion.data[start.time <= as.POSIXct(motion.data[,8], origin = "1970-01-01") & as.POSIXct(motion.data[,8], origin = "1970-01-01") <= activity.end,]
-    time.difference    <- as.POSIXct(motion.data.subset[1,8], origin = "1970-01-01") - (activity.end - 5 * 60)
+    time.difference    <- as.POSIXct(motion.data.subset[1,8], origin = "1970-01-01") - (activity.end - measurement.started.before * 60)
     print(time.difference)
     print(as.POSIXct(motion.data.subset[nrow(motion.data.subset),8], origin = "1970-01-01") - as.POSIXct(motion.data.subset[1,8], origin = "1970-01-01") + time.difference)
     
@@ -69,7 +76,7 @@ for (i in 1:nrow(fss.features)) {
     motion.data.subset[,1] <- motion.data.subset[,1] - motion.data.subset[1, 1]
     
     # Interpolate
-    t                       <- seq(motion.data.subset[1, 1], motion.data.subset[nrow(motion.data.subset), 1], by = 1/fs)
+    t                       <- seq(motion.data.subset[1, 1], motion.data.subset[nrow(motion.data.subset), 1], by = 1/sampling.rate)
     motion.acceleration.x   <- interp1(motion.data.subset[,1], motion.data.subset[,2], t, method = "spline")
     motion.acceleration.y   <- interp1(motion.data.subset[,1], motion.data.subset[,3], t, method = "spline")
     motion.acceleration.z   <- interp1(motion.data.subset[,1], motion.data.subset[,4], t, method = "spline")
@@ -79,7 +86,7 @@ for (i in 1:nrow(fss.features)) {
     t                       <- t + time.difference
   
     # Write csv file
-    output.file.path <- paste(output.directory, file.name.prefix, "-motion-data-", measurement, ".csv", sep = "")
+    output.file.path <- paste(output.directory, body.position, "-motion-data-", measurement, ".csv", sep = "")
     write.csv(data.frame(t, motion.acceleration.x, motion.acceleration.y, motion.acceleration.z, motion.rotation.rate.x, motion.rotation.rate.y, motion.rotation.rate.z), output.file.path, row.names = FALSE)
     print(output.file.path)
   }

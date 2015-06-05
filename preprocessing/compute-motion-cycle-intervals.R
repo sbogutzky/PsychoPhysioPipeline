@@ -72,8 +72,7 @@ for (motion.file.name in motion.file.names) {
   abline(v = motion.data[minima, 1])
 
   t               <- motion.data[minima, 1]
-  cycle.interval  <- diff(t)
-  t               <- t[-1]
+  cycle.interval  <- c(NA, diff(t))
 
   print(summary(cycle.interval))
   par(mfcol=c(2, 1))
