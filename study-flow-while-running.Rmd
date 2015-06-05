@@ -263,7 +263,7 @@ Zur \ac{HRV}-Analyse nutze ich die letzten fünf Minuten jedes 15-Minuten Abschn
   axis(2, at=seq(.2, .6, .02), labels=seq(.2, .6, .02))
   axis(3, at=marker, label=rep("", length(marker)))
   axis(4, at=seq(.2, .6, .02), labels=rep("", length(seq(.2, .6, .02))))
-  abline(v=c(min(t), max(t)), lty = "dashed", col="darkgrey")
+  abline(v=c(min(t), max(t)), lty = "dashed", col=1)
 
   # Plot box again
   box()
@@ -648,101 +648,11 @@ Ein Indiz dafür, dass der Läufer die \ac{FKS} gewissenhaft ausgefüllt hat, ze
 
 Im Gegensatz zu den Ergebnissen in \citet{Peifer2014} verhält sich der Zusammenhang zwischen Flow (bestimmt durch den Generalfaktor) und der \ac{HF} beim Laufen genau anders herum. Grund dafür ist die körperliche bzw. sportliche Belastung und die dadurch notwendige Anpassung der Frequenzbänder. Durch die Anpassung ist die übliche rein neuro-vegetative, sympathiko-vagale Interpretation der Spektralbänder nicht möglich, da sich im \ac{HF}-Band bei körperlicher bzw. sportlicher Belastung vor allem mechanisch bedingte Resonanz- und Kopplungsphänomene mit der Atmung und der motorischen Aktivität zu manifestieren scheinen \citep[S. 62]{Hoos2010}. Eine Zugehörigkeitsbestimmung der \ac{HF} zur vagalen Aktivität des \ac{ANS}s, wie bei der rein neuro-vegetativen, sympathiko-vagalen Interpretation, wäre deshalb fehlerhaft. Der Zusammenhang zwischen Flow und dem Verhältnis von \ac{LF} und \ac{HF} verhält sich auch gegenläufig der Interpretation von \citet{Peifer2014}, da das Verhältnis bei hohen Werten des Generalfaktors steigt (siehe Abbildung \ref{fig:zusammenhaenge-von-flow-und-hrv} A). Das bedeutet, dass sich die Leistung der \ac{LF} gegenüber der \ac{HF} vergrößert. Was die \ac{LF} und die \ac{HF} außerhalb der üblichen euro-vegetativen, sympathiko-vagalen Interpretation der Spektralbänder über die Prozesse in unserem Körper sagen, kann ich zum jetzigen Zeitpunkt nicht sagen. Deswegen bietet sich für mich, die weitere Nutzung der \ac{HRV}-Merkmale nur in individuellen Schwellenkonzepten an. In einem weiteren Ansatz könnte ich den direkten Zusammenhang zwischen der zeitvarianten spektralen Kenngröße der \ac{HF} mit ventilatorischen Schwellenkonzepten nach \citet{Cottin2007} untersuchen. Der Ansatz könnte mit Hilfe der Herzfrequenzmessung einen Zusammenhang der Atemfrequenz und Flow ermöglichen. 
 
-85.33 hz
+## Jerk Cost
 
-```{r subset-leg-motion-data, echo=FALSE, message=FALSE, warning=FALSE}
-
-  # Load ecg data 
-  leg.motion.data  <- read.csv(paste(file.path, "/leg-motion-data.csv", sep=""), header=T)
-  
-  # Set function attributes
-  starts    <- c(start.time, fss.features.list[1][[1]][[3]][[2]], fss.features.list[2][[1]][[3]][[2]], fss.features.list[3][[1]][[3]][[2]], fss.features.list[4][[1]][[3]][[2]])
-  ends      <- c(fss.features.list[1][[1]][[3]][[1]], fss.features.list[2][[1]][[3]][[1]], fss.features.list[3][[1]][[3]][[1]], fss.features.list[4][[1]][[3]][[1]], fss.features.list[5][[1]][[3]][[1]])
-  times     <- as.POSIXct(leg.motion.data[, 8]/1000, origin="1970-01-01", tz="CET")
-
-  i <- 2
-#       for(i in 1:length(starts)) {
-
-  # Subset data
-  leg.motion.data.subset     <- leg.motion.data[starts[i] <= times & ends[i] > times, ]
-  
-#   t     <- times[starts[i] <= times & ends[i] > times]
-#   start <- t[1]
-#   end   <- t[length(t)]
-#   message(paste("Data from ", start, " to ", end, " (", format(round(end-start, 2), nsmall=2), ")", sep=""))
-          
-  # Find main frequency        
-  require(TSA)
-  rotation.rate.x.spectrum <- TSA::periodogram(leg.motion.data.subset[, 5], plot = T)
-#   rotation.rate.y.spectrum <- TSA::periodogram(leg.motion.data.subset[, 6], plot = T)
-#   rotation.rate.z.spectrum <- TSA::periodogram(leg.motion.data.subset[, 7], plot = T)
-  index.max               <- which.max(rotation.rate.x.spectrum[[2]])
-  main.frequency          <- rotation.rate.x.spectrum[[1]][index.max]
-
-  # Low pass signal
-  require(signal)
-  butterworth.filter      <- butter(1, main.frequency * .5, "low")
-  filtered.rotation.rate  <- filtfilt(butterworth.filter, leg.motion.data.subset[, 5])
-  
-  # Search for minima
-  minima <- SearchExtrema(filtered.rotation.rate, which = "minima")
-
-  # Remove some minima
-  m <- mean(filtered.rotation.rate[minima])
-  s <- sd(filtered.rotation.rate[minima])
-  minima <- minima[m + s * .5 > filtered.rotation.rate[minima]]
-
-#   hist(filtered.rotation.rate[minima])
-#   plot(leg.motion.data.subset[, 1]/1000, leg.motion.data.subset[, 5], type="l", xlim = c(1800, 1900))
-#   abline(v = leg.motion.data.subset[minima, 1]/1000)
-#   plot(leg.motion.data.subset[, 1]/1000, filtered.rotation.rate, type="l", xlim = c(1800, 1900))
-#   abline(v = leg.motion.data.subset[minima, 1]/1000)
-#   require("zoom")
-#   session.zoom()
-
-  cycle.time      <- leg.motion.data.subset[minima, 1] / 1000
-  cycle.duration  <- diff(cycle.time)
-
-  cycle.duration  <- cycle.duration[cycle.time >= cycle.time[length(cycle.time)] - 60 * 10]
-  cycle.time      <- cycle.time[cycle.time >= cycle.time[length(cycle.time)] - 60 * 10]
-
-#   plot(cycle.time, cycle.duration, type="l")
-
-  # Compute jerk cost per cycle
-  # Isolate gravity from acceleration
-  n  <- nrow(leg.motion.data.subset) 
-  fs <- n / ((leg.motion.data.subset[n, 1] - leg.motion.data.subset[1, 1]) / 1000)
-  butterworth.filter  <- butter(1, 1/fs * 0.8, "low")
-  gravity.x           <- filtfilt(butterworth.filter, leg.motion.data.subset[, 2])
-  gravity.y           <- filtfilt(butterworth.filter, leg.motion.data.subset[, 3])
-  gravity.z           <- filtfilt(butterworth.filter, leg.motion.data.subset[, 4])
-
-  # Compute linear acceleration (mit Hilfe der Rotation, die Schwerkraft errechnen)
-  linear.acceleration.x <- leg.motion.data.subset[, 2] - gravity.x
-  linear.acceleration.y <- leg.motion.data.subset[, 3] - gravity.y
-  linear.acceleration.z <- leg.motion.data.subset[, 4] - gravity.z
-
-  if (length(minima) > 1) {
-      jerk.costs    <- c()
-      for(i in 1:(length(minima) - 1)) {
-        
-        # Compute jerk cost of each cycle
-        t.subset                      <- leg.motion.data.subset[minima[i]:minima[i + 1], 1]
-        linear.acceleration.x.subset  <- linear.acceleration.x[minima[i]:minima[i + 1]]
-        linear.acceleration.y.subset  <- linear.acceleration.y[minima[i]:minima[i + 1]]
-        linear.acceleration.z.subset  <- linear.acceleration.z[minima[i]:minima[i + 1]]
-        jerk.cost                     <- CalculateJerkCost(t.subset, linear.acceleration.x.subset, linear.acceleration.y.subset, linear.acceleration.z.subset, plot = T)
-        
-#         # Normalized by cycle length
-#         jerk.cost   <- jerk.cost / cycle.duration[i]
-        jerk.costs  <- c(jerk.costs, jerk.cost)
-      }
-      jerk.costs <- c(jerk.costs, 0)
-  } else {
-    print("Has no cycle indicators")
-  }
-    
-```
+\begin{equation}
+  JC = \int_0^T dt ((\frac{d^3x}{dt^3})^2 + (\frac{d^3y}{dt^3})^2 + (\frac{d^3z}{dt^3})^2 ) 
+\end{equation}
 
 \bibliographystyle{agsm}
 \bibliography{./bibtex/library}
