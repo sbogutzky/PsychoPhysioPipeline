@@ -39,14 +39,10 @@ CalculateJerkCost <- function(t, x, y, z, normalized = F, plot = F) {
   jerk.cost <- mean(jerk.x^2 + jerk.y^2 + jerk.z^2)
   # jerk.cost <- trapz(p[-1],jerk.x^2 + jerk.y^2 + jerk.z^2)
   
-  
-  
   if (normalized) {
     jerk.cost <- jerk.cost * cycle.interval
     # jerk.cost <- trapz(t[-1], jerk.x^2 + jerk.y^2 + jerk.z^2)
   }
-  
-  #jerk.cost <- sqrt(jerk.cost)
   
   return(jerk.cost)
 }
