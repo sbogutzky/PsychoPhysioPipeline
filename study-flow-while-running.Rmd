@@ -29,19 +29,17 @@ documentclass: scrartcl
   
   fss.features        <- read.csv("./data/features/fss-features.csv", stringsAsFactors = FALSE)
   fss.feature.subset <- fss.features
-  fss.feature.subset[fss.feature.subset[, 11] == "Running",]$measurement <- fss.feature.subset[fss.feature.subset[, 11] == "Running",]$measurement + 1
-  fss.feature.subset <- fss.feature.subset[,c(1,3,5,7,9,12,15)]
+  fss.feature.subset[fss.feature.subset$activity == "Running",]$measurement <- fss.feature.subset[fss.feature.subset$activity == "Running",]$measurement + 1
+  fss.feature.subset <- fss.feature.subset[,c(1:5, 7, 10)]
   fss.feature.subset <- fss.feature.subset[order(as.Date(fss.feature.subset$activity.start, format = "%Y-%m-%d %H:%M:%S")), , drop = FALSE]
   fss.feature.subset$measurement <- factor(fss.feature.subset$measurement, levels = c(1, 2, 3, 4, 5), labels = c("Ruhe", "15'", "30'", "45'", "60'"))
 
   hrv.features        <- read.csv("./data/features/hrv-features.csv", stringsAsFactors = FALSE)
   hrv.feature.subset <- hrv.features
-  hrv.feature.subset[hrv.feature.subset[, 10] == "Running",]$measurement <- hrv.feature.subset[hrv.feature.subset[, 10] == "Running",]$measurement + 1
+  hrv.feature.subset[hrv.feature.subset$activity == "Running",]$measurement <- hrv.feature.subset[hrv.feature.subset$activity == "Running",]$measurement + 1
   hrv.feature.subset <- hrv.feature.subset[, c(1:9, 11, 15)]
   hrv.feature.subset <- hrv.feature.subset[order(as.Date(hrv.feature.subset$activity.start,format = "%Y-%m-%d %H:%M:%S")), , drop = FALSE]
   hrv.feature.subset$measurement <- factor(hrv.feature.subset$measurement, levels = c(1, 2, 3, 4, 5), labels = c("Ruhe", "15'", "30'", "45'", "60'"))
-
-  hrv.feature.subset$activity.start <- fss.feature.subset$activity.start
 ```
 
 # Abkürzungsverzeichnis
@@ -155,7 +153,7 @@ Zur \ac{HRV}-Analyse nutze ich die letzten fünf Minuten jedes 15-Minuten Abschn
 
   # Load Kubios HRV txt data
   kubios.hrv.data.path  <- paste("./data/example-data/running/buse-patrick/2013-10-31--18-31-19/", sep="")
-  kubios.hrv.data       <- read.csv(paste(kubios.hrv.data.path, "ecg-data-4_hrv.txt", sep = ""), header = F, na.strings = "", fill = T, skip = 117, stringsAsFactors = FALSE, col.names = c("", "Time", "RR.interval", "FFT.Frequency", "FFT.PSD", "AR.Frequency", "AR.PSD", "VLF.comp.", "LF.comp.", "HF.comp.", ""))[,2:10]
+  kubios.hrv.data       <- read.csv(paste(kubios.hrv.data.path, "ecg-data-4_hrv.txt", sep = ""), header = F, na.strings = "", fill = T, skip = 117, stringsAsFactors = FALSE, col.names = c("", "Time", "RR.interval", "FFT.Frequency", "FFT.PSD", "AR.Frequency", "AR.PSD", "VLF.comp.", "LF.comp.", "HF.comp.", ""))[,2:3]
   
   # Get time and rr-intervals
   time              <- kubios.hrv.data[, 1]
@@ -164,8 +162,8 @@ Zur \ac{HRV}-Analyse nutze ich die letzten fünf Minuten jedes 15-Minuten Abschn
   rr.interval       <- rr.interval[complete.cases(rr.interval)]
   
   # Set time properties
-  starts    <- as.POSIXct(fss.features[c(5, 23:26), 12], tz="CET")
-  ends      <- as.POSIXct(fss.features[c(5, 23:26), 13], tz="CET")
+  starts    <- as.POSIXct(fss.features[c(5, 23:26), 7], tz="CET")
+  ends      <- as.POSIXct(fss.features[c(5, 23:26), 8], tz="CET")
   times     <- as.POSIXct(ecg.data[, 4]/1000, origin="1970-01-01", tz="CET")
   
   # Set data
@@ -598,7 +596,7 @@ Für alle Merkmale, außer der \ac{AFP} und der mittleren Herzfrequenz, ist kein
 ```
 
 ## Zusammenhänge von Flow-Erleben und HRV
-Der Shapiro Test ergab für die Besorgnis, für den relativen Wert des \ac{LF} und die absoluten Werte der \ac{LF} und der \ac{HF} keine Normalverteilung. Für diese Faktoren und  Merkmale führte ich keine Korrelationsanalyse durch. Bei der ersten Observation der Streudiagramme fand ich einen Ausreißer in der Bewertung der \ac{FKS} beim dritten Lauf (Minute 45). Nach der Begutachtung der Bewegungsdaten stellte ich fest, dass der Läufer vor der 45 Minute eine kurze Pause eingelegt hatte. Aus diesem Grund entfernte ich den gesamten Datensatz aus der Datensammlung. 
+Der Shapiro Test ergab für die Besorgnis, für den relativen Wert des \ac{LF} und die absoluten Werte der \ac{LF} und der \ac{HF} keine Normalverteilung. Für diese Faktoren und  Merkmale führte ich keine Korrelationsanalyse durch. Bei der ersten Observation der Streudiagramme fand ich einen Ausreißer in der Bewertung der \ac{FKS} beim dritten Lauf (Minute 45). ~~Nach der Begutachtung der Bewegungsdaten stellte ich fest, dass der Läufer vor der 45 Minute eine kurze Pause eingelegt hatte. Aus diesem Grund entfernte ich den gesamten Datensatz aus der Datensammlung.~~
 
 Mit unter 20% Varianzaufklärung beobachtete ich für den linearen Zusammenhang eine schlechte Vorhersagbarkeit des Generalfaktors durch die \ac{HRV}-Merkmalen \ac{HF} (%), \ac{LF} (n.u.), \ac{HF} (n.u.) oder LF/HF. Das Verhältnis von \ac{LF} und \ac{HF} mit der größten Varianzaufklärung von 18% lag unter dem Signifikanzniveau von $p < 0.05$ (siehe Abbildung \ref{fig:zusammenhaenge-von-flow-und-hrv} A). Die anderen drei \ac{HRV}-Merkmale lagen jeweils bei $p < 0.1$. Alle weiteren Zusammenhänge hatten ein Signifikanzniveau von weit über $p < 0.1$. Daraus ergibt sich, dass hohe Werte der der relativen \ac{HF} und normalisieren \ac{HF} mit niedrigen Werten des Generalfaktors in Zusammenhang stehen. Der Zusammenhang von Generalfaktor und normalisierte \ac{LF} oder dem Verhältnis von \ac{LF} und \ac{HF} verhält sich anders herum. Die Vorhersagbarkeit durch einen linearen Zusammenhang des glatten Verlauf und der \ac{HRV}-Merkmale der \ac{HF} (%), \ac{LF} (n.u.), \ac{HF} (n.u.) oder LF/HF ist sehr ähnlich. Einen nicht zufälliger systematischen Zusammenhang von Absorbiertheit und einem der \ac{HRV}-Merkmale fand ich nicht.
 
