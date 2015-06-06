@@ -46,8 +46,8 @@ for (i in 1:nrow(fss.features)) {
     motion.time.data        <- read.csv(current.file.path.1)
     motion.jerk.cost.data   <- read.csv(current.file.path.2)
     
-    mean.jc             <- round(mean(motion.jerk.cost.data$jerk.costs), 2)
-    mean.cycle.interval <- round(mean(motion.time.data$cycle.interval), 3)
+    mean.jc             <- round(mean(motion.jerk.cost.data$jerk.costs, na.rm = T), 2)
+    mean.cycle.interval <- round(mean(motion.time.data$cycle.interval, na.rm = T), 3)
     
     # Compute start and end of the measurement
     measurement.start <- strftime(as.POSIXct(activity.end) - measurement.started.before * 60, format = "%Y-%m-%d %H:%M:%S")
