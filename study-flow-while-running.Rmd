@@ -614,12 +614,30 @@ Für alle Merkmale, außer der \ac{AFP} und der mittleren Herzfrequenz, ist kein
   
   # Clean up
   rm(i, j, df, bp, x.cord, y.cord, alpha, lowers, means, p, p.value, star, treatment, treatments, uppers, value, x.cord.star, y.cord.star, ymax)
+
+
+
+
 ```
 
 ## Zusammenhänge von Flow-Erleben und HRV
-Der Shapiro Test ergab für die Besorgnis, für den relativen Wert des \ac{LF} und die absoluten Werte der \ac{LF} und der \ac{HF} keine Normalverteilung. Für diese Faktoren und  Merkmale führte ich keine Korrelationsanalyse durch. Bei der ersten Observation der Streudiagramme fand ich einen Ausreißer in der Bewertung der \ac{FKS} beim dritten Lauf (Minute 45). ~~Nach der Begutachtung der Bewegungsdaten stellte ich fest, dass der Läufer vor der 45 Minute eine kurze Pause eingelegt hatte. Aus diesem Grund entfernte ich den gesamten Datensatz aus der Datensammlung.~~
+Der Shapiro Test ergab für das Merkmal Besorgnis, für die absoluten Werte der \ac{LF} und \ac{HF} und deren Verhältnis (LH/HF) keine Normalverteilung. Das Merkmal Besorgnis entfernte ich wie bei der Varianzanalyse aus der Datensammlung. Um die Effizienz der Kleinste-Quadrate-Schätzer im linearen Regressionsmodell für die absoluten Werte der \ac{LF} und \ac{HF} und deren Verhältnis zu erhalten, zog ich die Wurzel der Werte. 
 
-Mit unter 20% Varianzaufklärung beobachtete ich für den linearen Zusammenhang eine schlechte Vorhersagbarkeit des Generalfaktors durch die \ac{HRV}-Merkmalen \ac{HF} (%), \ac{LF} (n.u.), \ac{HF} (n.u.) oder LF/HF. Das Verhältnis von \ac{LF} und \ac{HF} mit der größten Varianzaufklärung von 18% lag unter dem Signifikanzniveau von $p < 0.05$ (siehe Abbildung \ref{fig:zusammenhaenge-von-flow-und-hrv} A). Die anderen drei \ac{HRV}-Merkmale lagen jeweils bei $p < 0.1$. Alle weiteren Zusammenhänge hatten ein Signifikanzniveau von weit über $p < 0.1$. Daraus ergibt sich, dass hohe Werte der der relativen \ac{HF} und normalisieren \ac{HF} mit niedrigen Werten des Generalfaktors in Zusammenhang stehen. Der Zusammenhang von Generalfaktor und normalisierte \ac{LF} oder dem Verhältnis von \ac{LF} und \ac{HF} verhält sich anders herum. Die Vorhersagbarkeit durch einen linearen Zusammenhang des glatten Verlauf und der \ac{HRV}-Merkmale der \ac{HF} (%), \ac{LF} (n.u.), \ac{HF} (n.u.) oder LF/HF ist sehr ähnlich. Einen nicht zufälliger systematischen Zusammenhang von Absorbiertheit und einem der \ac{HRV}-Merkmale fand ich nicht.
+<!--
+flow    lf.power-a^-0.5  r2 .21  p .083 . inverted-u
+flow    hf.power.r       r2 .14  p .075 . \
+flow    lf.power.nu      r2 .14  p .073 . /
+flow    hf.power.nu      r2 .14  p .073 . \
+flow    lfhf^-0.5        r2 .14  p .077 . /
+fluency hf.power.r       r2 .19  p .032 * \
+fluency lf.power.nu      r2 .18  p .046 * /
+fluency hf.power.nu      r2 .18  p .046 * \
+fluency lfhf^-0.5        r2 .18  p .040 * /
+fit     mean.hr          r2 .45  p .0003 *** /
+fit     mean.hr          r2 .46  p .0015 ** inverted-u
+-->
+
+Mit jeweils 14% Varianzaufklärung beobachte ich eine schlechte Vorhersagbarkeit des Generalfaktors durch die \ac{HRV}-Merkmale \ac{HF} (%), \ac{LF} (n.u.), \ac{HF} (n.u.) oder LF/HF. Ihre linearen Zusammenhänge liegen jeweils bei einem Signifikanzniveau von $p < 0.1$. Alle weiteren Zusammenhänge liegen bei einem Signifikanzniveau von weit über $p < 0.1$. Die linearen Zusammenhänge zwischen dem glatten Verlauf und den vier genannten \ac{HRV}-Merkmalen verhalten sich sehr ähnlich. Ihre Varianzaufklärung liegt jeweils bei 18% und mit einen Signifikanzniveau von unter $p < 0.05$ sind diese Zusammenhänge nicht mehr als zufällig zu betrachten. Einen nicht zufälliger systematischen Zusammenhang von Absorbiertheit und einem der \ac{HRV}-Merkmale, wie \citet{Peifer2014}, konnte ich nicht finden. Dafür fand ich auch einen quadratischen Zusammenhang mit den absoluten Werten der \ac{LF} (siehe Abbildung ). 
 
 ```{r zusammenhaenge-von-flow-und-hrv, echo=FALSE, warning=FALSE, dev='pdf', fig.height=3, fig.width=6.5, fig.pos='htbp', fig.cap='Systematische lineare Zusammenhänge von (A) Flow und dem Verhältnis von LF und HF [R2 = .18, F(1, 21) = 4.5, p < .05]; (B) der AFP und der mittleren Herzfrequenz [R2 = .48, F(1, 21) = 19.25, p < .001] \\label{fig:zusammenhaenge-von-flow-und-hrv}'}
   par(mfcol=c(1, 2), mar=c(3.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="r", yaxs="r")
@@ -661,11 +679,12 @@ Mit unter 20% Varianzaufklärung beobachtete ich für den linearen Zusammenhang 
   mtext("B", 3, line=.2)
 ```
 
-Ein Indiz dafür, dass der Läufer die \ac{FKS} gewissenhaft ausgefüllt hat, zeigt der Zusammenhang von \ac{AFP} und mittlerer Herzfrequenz. Mit 48% Varianzaufklärung beobachte ich eine mittlere Vorhersagbarkeit. Es besteht ein nicht zufälliger systematischer Zusammenhang zwischen der \ac{AFP} und der mittleren Herzfrequenz [p < 0.001]. Daraufhin kann man schließen, je größer die \ac{AFP} desto größer die mittlere Herzfrequenz (siehe Abbildung \ref{fig:zusammenhaenge-von-flow-und-hrv} B).
+Ein Indiz dafür, dass der Läufer die \ac{FKS} gewissenhaft ausgefüllt hat, zeigt der Zusammenhang von \ac{AFP} und mittlerer Herzfrequenz. Mit 45% Varianzaufklärung beobachte ich eine mittlere Vorhersagbarkeit. Es besteht ein nicht zufälliger systematischer linearer Zusammenhang zwischen der \ac{AFP} und der mittleren Herzfrequenz [$p < 0.001$]. Aber ich stellte auch einen nicht zufälliger systematischer quadrischer Zusammenhang von \ac{AFP} und mittlerer Herzfrequenz [$p < 0.01$]. Die Varianzaufklärung durch ein quadratisches Modell erhöhte sich auf 46% (siehe Abbildung \ref{fig:zusammenhaenge-von-flow-und-hrv} B).
 
 ## Interpretation
 
-Im Gegensatz zu den Ergebnissen in \citet{Peifer2014} verhält sich der Zusammenhang zwischen Flow (bestimmt durch den Generalfaktor) und der \ac{HF} beim Laufen genau anders herum. Grund dafür ist die körperliche bzw. sportliche Belastung und die dadurch notwendige Anpassung der Frequenzbänder. Durch die Anpassung ist die übliche rein neuro-vegetative, sympathiko-vagale Interpretation der Spektralbänder nicht möglich, da sich im \ac{HF}-Band bei körperlicher bzw. sportlicher Belastung vor allem mechanisch bedingte Resonanz- und Kopplungsphänomene mit der Atmung und der motorischen Aktivität zu manifestieren scheinen \citep[S. 62]{Hoos2010}. Eine Zugehörigkeitsbestimmung der \ac{HF} zur vagalen Aktivität des \ac{ANS}s, wie bei der rein neuro-vegetativen, sympathiko-vagalen Interpretation, wäre deshalb fehlerhaft. Der Zusammenhang zwischen Flow und dem Verhältnis von \ac{LF} und \ac{HF} verhält sich auch gegenläufig der Interpretation von \citet{Peifer2014}, da das Verhältnis bei hohen Werten des Generalfaktors steigt (siehe Abbildung \ref{fig:zusammenhaenge-von-flow-und-hrv} A). Das bedeutet, dass sich die Leistung der \ac{LF} gegenüber der \ac{HF} vergrößert. Was die \ac{LF} und die \ac{HF} außerhalb der üblichen euro-vegetativen, sympathiko-vagalen Interpretation der Spektralbänder über die Prozesse in unserem Körper sagen, kann ich zum jetzigen Zeitpunkt nicht sagen. Deswegen bietet sich für mich, die weitere Nutzung der \ac{HRV}-Merkmale nur in individuellen Schwellenkonzepten an. In einem weiteren Ansatz könnte ich den direkten Zusammenhang zwischen der zeitvarianten spektralen Kenngröße der \ac{HF} mit ventilatorischen Schwellenkonzepten nach \citet{Cottin2007} untersuchen. Der Ansatz könnte mit Hilfe der Herzfrequenzmessung einen Zusammenhang der Atemfrequenz und Flow ermöglichen. 
+Im Gegensatz zu den Ergebnissen in \citet{Peifer2014} verhält sich der Zusammenhang zwischen Flow (bestimmt durch den Generalfaktor) und der \ac{HF} (siehe Abbildung \ref{fig:zusammenhaenge-von-flow-und-hrv} B) beim Laufen genau anders herum. Den Grund dafür ist die körperliche bzw. sportliche Belastung und die dadurch notwendige Anpassung der Frequenzbänder. Durch die Anpassung ist die übliche rein neuro-vegetative, sympathiko-vagale Interpretation der Spektralbänder nicht möglich, da sich im \ac{HF}-Band bei körperlicher bzw. sportlicher Belastung vor allem mechanisch bedingte Resonanz- und Kopplungsphänomene mit der Atmung und der motorischen Aktivität zu manifestieren scheinen \citep[S. 62]{Hoos2010}. Eine Zugehörigkeitsbestimmung der \ac{HF} zur vagalen Aktivität des \ac{ANS}s, wie bei der rein neuro-vegetativen, sympathiko-vagalen Interpretation, wäre deshalb fehlerhaft. Was \ac{HF} außerhalb der üblichen euro-vegetativen, sympathiko-vagalen Interpretation der Spektralbänder über die Prozesse in unserem Körper sagen, kann ich zum jetzigen Zeitpunkt nicht sagen. Deswegen bietet sich für mich, die weitere Nutzung der \ac{HRV}-Merkmale nur in individuellen Schwellenkonzepten an. In einem weiteren Ansatz könnte ich den direkten Zusammenhang zwischen der zeitvarianten spektralen Kenngröße der \ac{HF} mit ventilatorischen Schwellenkonzepten nach \citet{Cottin2007} untersuchen. Der Ansatz könnte mit Hilfe der Herzfrequenzmessung einen Zusammenhang der Atemfrequenz und Flow ermöglichen. 
+Der Zusammenhang zwischen Flow und den absoluten Werten der \ac{LF} verhält sich wie bei \citet{Peifer2014} und stellt sich als umgedrehtes U dar. Dies spricht dafür, dass eine moderate Beanspruchung durch die Tätigkeit für Flow gegeben sein muss. Für diese Annahme spricht auch der nicht zufälliger systematischer quadrischer Zusammenhang von \ac{AFP} und mittlerer Herzfrequenz. Über eine bestimmte Herzfrequenz hinweg fällt die \ac{AFP}. Leider konnte ich keinen Zusammenhang zwischen Generalfaktor und \ac{AFP} oder mittlerer Herzfrequenz herstellen.
 
 ## Jerk Cost
 
