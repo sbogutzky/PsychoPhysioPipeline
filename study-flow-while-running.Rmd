@@ -614,10 +614,6 @@ Für alle Merkmale, außer der \ac{AFP} und der mittleren Herzfrequenz, ist kein
   
   # Clean up
   rm(i, j, df, bp, x.cord, y.cord, alpha, lowers, means, p, p.value, star, treatment, treatments, uppers, value, x.cord.star, y.cord.star, ymax)
-
-
-
-
 ```
 
 ## Zusammenhänge von Flow-Erleben und HRV
@@ -637,21 +633,50 @@ fit     mean.hr          r2 .45  p .0003 *** /
 fit     mean.hr          r2 .46  p .0015 ** inverted-u
 -->
 
-Mit jeweils 14% Varianzaufklärung beobachte ich eine schlechte Vorhersagbarkeit des Generalfaktors durch die \ac{HRV}-Merkmale \ac{HF} (%), \ac{LF} (n.u.), \ac{HF} (n.u.) oder LF/HF. Ihre linearen Zusammenhänge liegen jeweils bei einem Signifikanzniveau von $p < 0.1$. Alle weiteren Zusammenhänge liegen bei einem Signifikanzniveau von weit über $p < 0.1$. Die linearen Zusammenhänge zwischen dem glatten Verlauf und den vier genannten \ac{HRV}-Merkmalen verhalten sich sehr ähnlich. Ihre Varianzaufklärung liegt jeweils bei 18% und mit einen Signifikanzniveau von unter $p < 0.05$ sind diese Zusammenhänge nicht mehr als zufällig zu betrachten. Einen nicht zufälliger systematischen Zusammenhang von Absorbiertheit und einem der \ac{HRV}-Merkmale, wie \citet{Peifer2014}, konnte ich nicht finden. Dafür fand ich auch einen quadratischen Zusammenhang mit den absoluten Werten der \ac{LF} (siehe Abbildung ). 
+Mit jeweils 14% Varianzaufklärung beobachte ich eine schlechte Vorhersagbarkeit des Generalfaktors durch die \ac{HRV}-Merkmale \ac{HF} (%), \ac{LF} (n.u.), \ac{HF} (n.u.) oder LF/HF. Ihre linearen Zusammenhänge liegen jeweils bei einem Signifikanzniveau von $p < 0.1$. Alle weiteren Zusammenhänge liegen bei einem Signifikanzniveau von weit über $p < 0.1$. Die linearen Zusammenhänge zwischen dem glatten Verlauf und den vier genannten \ac{HRV}-Merkmalen verhalten sich ähnlich der Zusammenhänge mit dem Gesamtfaktor. Ihre Varianzaufklärung liegt jeweils bei 18% und mit einem Signifikanzniveau von unter $p < 0.05$ sind diese Zusammenhänge nicht mehr als zufällig zu betrachten. Einen nicht zufälliger systematischen Zusammenhang von Absorbiertheit und einem der \ac{HRV}-Merkmale, wie \citet{Peifer2014} fanden, konnte ich nicht feststellen. Dafür fand ich auch einen quadratischen Zusammenhang mit den absoluten Werten der \ac{LF} (siehe Abbildung \ref{fig:zusammenhaenge-von-flow-und-hrv} A). 
 
 ```{r zusammenhaenge-von-flow-und-hrv, echo=FALSE, warning=FALSE, dev='pdf', fig.height=3, fig.width=6.5, fig.pos='htbp', fig.cap='Systematische lineare Zusammenhänge von (A) Flow und dem Verhältnis von LF und HF [R2 = .18, F(1, 21) = 4.5, p < .05]; (B) der AFP und der mittleren Herzfrequenz [R2 = .48, F(1, 21) = 19.25, p < .001] \\label{fig:zusammenhaenge-von-flow-und-hrv}'}
-  par(mfcol=c(1, 2), mar=c(3.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="r", yaxs="r")
+  par(mfcol=c(1, 3), mar=c(3.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="r", yaxs="r")
 
-  fss.feature.subset.running <- fss.feature.subset[fss.feature.subset$measurement != "Ruhe", ] # & fss.feature.subset$measurement != "15'", ]
+  fss.feature.subset.running <- fss.feature.subset[fss.feature.subset$measurement != "Ruhe", ] 
   fss.feature.subset.running <- fss.feature.subset.running[c(1:10, 12:24),]
 
-  hrv.feature.subset.running <- hrv.feature.subset[hrv.feature.subset$measurement != "Ruhe", ] # & hrv.feature.subset$measurement != "15'", ]
+  hrv.feature.subset.running <- hrv.feature.subset[hrv.feature.subset$measurement != "Ruhe", ] 
   hrv.feature.subset.running <- hrv.feature.subset.running[c(1:10, 12:24),]
+  
+  fss.feature         <- fss.feature.subset.running[, 1]
+  hrv.feature         <- hrv.feature.subset.running[, 2]
+  hrv.feature.squared <- hrv.feature^2
 
   # Plot data
-  plot(hrv.feature.subset.running[, 9], fss.feature.subset.running[, 1], xlab = "LF/HF", ylab = "Flow", pch = 21, bg = "#1D70B7", ylim = c(3, 6))
-  
-  abline(lm(fss.feature.subset.running[, 1] ~ hrv.feature.subset.running[, 9]))
+  plot(hrv.feature, fss.feature, xlab = expression("LF [" ~ ms^2 ~ "]"), ylab = "Flow", pch = 21, bg = "#1D70B7", ylim = c(3, 6))
+
+  quadratic.model  <- lm(fss.feature ~ hrv.feature + hrv.feature.squared)
+  values           <- seq(min(hrv.feature) - 1, max(hrv.feature) + 1, .01)
+  predicted.values <- predict(quadratic.model, list(hrv.feature = values, hrv.feature.squared = values^2))
+  lines(values, predicted.values, lty = 2)
+
+  # Plot tick
+  axis(3, label = NA)
+  axis(4, label = NA)
+
+  # Plot box again
+  box()
+
+  # Add reference letter  
+  mtext("A", 3, line=.2)
+
+  fss.feature         <- fss.feature.subset.running[, 1]
+  hrv.feature         <- hrv.feature.subset.running[, 2]
+  hrv.feature.squared <- hrv.feature^2
+
+  # Plot data
+  plot(hrv.feature, fss.feature, xlab = expression("LF [" ~ ms^2 ~ "]"), ylab = "Flow", pch = 21, bg = "#1D70B7", ylim = c(3, 6))
+
+  quadratic.model  <- lm(fss.feature ~ hrv.feature + hrv.feature.squared)
+  values           <- seq(min(hrv.feature) - 1, max(hrv.feature) + 1, .01)
+  predicted.values <- predict(quadratic.model, list(hrv.feature = values, hrv.feature.squared = values^2))
+  lines(values, predicted.values, lty = 2)
 
   # Plot tick
   axis(3, label = NA)
@@ -679,12 +704,12 @@ Mit jeweils 14% Varianzaufklärung beobachte ich eine schlechte Vorhersagbarkeit
   mtext("B", 3, line=.2)
 ```
 
-Ein Indiz dafür, dass der Läufer die \ac{FKS} gewissenhaft ausgefüllt hat, zeigt der Zusammenhang von \ac{AFP} und mittlerer Herzfrequenz. Mit 45% Varianzaufklärung beobachte ich eine mittlere Vorhersagbarkeit. Es besteht ein nicht zufälliger systematischer linearer Zusammenhang zwischen der \ac{AFP} und der mittleren Herzfrequenz [$p < 0.001$]. Aber ich stellte auch einen nicht zufälliger systematischer quadrischer Zusammenhang von \ac{AFP} und mittlerer Herzfrequenz [$p < 0.01$]. Die Varianzaufklärung durch ein quadratisches Modell erhöhte sich auf 46% (siehe Abbildung \ref{fig:zusammenhaenge-von-flow-und-hrv} B).
+Ein Indiz dafür, dass der Läufer die \ac{FKS} gewissenhaft ausgefüllt hat, zeigt der Zusammenhang zwischen \ac{AFP} und mittlerer Herzfrequenz. Mit 45% Varianzaufklärung beobachte ich eine mittlere Vorhersagbarkeit. Es besteht ein nicht zufälliger systematischer linearer Zusammenhang zwischen der \ac{AFP} und der mittleren Herzfrequenz [$p < 0.001$]. Aber ich stelle auch einen nicht zufälligen systematischen quadrischen Zusammenhang zwischen \ac{AFP} und mittlerer Herzfrequenz [$p < 0.01$]. Durch ein quadratisches Modell erhöht sich die Varianzaufklärung auf 46% (siehe Abbildung \ref{fig:zusammenhaenge-von-flow-und-hrv} B).
 
 ## Interpretation
 
-Im Gegensatz zu den Ergebnissen in \citet{Peifer2014} verhält sich der Zusammenhang zwischen Flow (bestimmt durch den Generalfaktor) und der \ac{HF} (siehe Abbildung \ref{fig:zusammenhaenge-von-flow-und-hrv} B) beim Laufen genau anders herum. Den Grund dafür ist die körperliche bzw. sportliche Belastung und die dadurch notwendige Anpassung der Frequenzbänder. Durch die Anpassung ist die übliche rein neuro-vegetative, sympathiko-vagale Interpretation der Spektralbänder nicht möglich, da sich im \ac{HF}-Band bei körperlicher bzw. sportlicher Belastung vor allem mechanisch bedingte Resonanz- und Kopplungsphänomene mit der Atmung und der motorischen Aktivität zu manifestieren scheinen \citep[S. 62]{Hoos2010}. Eine Zugehörigkeitsbestimmung der \ac{HF} zur vagalen Aktivität des \ac{ANS}s, wie bei der rein neuro-vegetativen, sympathiko-vagalen Interpretation, wäre deshalb fehlerhaft. Was \ac{HF} außerhalb der üblichen euro-vegetativen, sympathiko-vagalen Interpretation der Spektralbänder über die Prozesse in unserem Körper sagen, kann ich zum jetzigen Zeitpunkt nicht sagen. Deswegen bietet sich für mich, die weitere Nutzung der \ac{HRV}-Merkmale nur in individuellen Schwellenkonzepten an. In einem weiteren Ansatz könnte ich den direkten Zusammenhang zwischen der zeitvarianten spektralen Kenngröße der \ac{HF} mit ventilatorischen Schwellenkonzepten nach \citet{Cottin2007} untersuchen. Der Ansatz könnte mit Hilfe der Herzfrequenzmessung einen Zusammenhang der Atemfrequenz und Flow ermöglichen. 
-Der Zusammenhang zwischen Flow und den absoluten Werten der \ac{LF} verhält sich wie bei \citet{Peifer2014} und stellt sich als umgedrehtes U dar. Dies spricht dafür, dass eine moderate Beanspruchung durch die Tätigkeit für Flow gegeben sein muss. Für diese Annahme spricht auch der nicht zufälliger systematischer quadrischer Zusammenhang von \ac{AFP} und mittlerer Herzfrequenz. Über eine bestimmte Herzfrequenz hinweg fällt die \ac{AFP}. Leider konnte ich keinen Zusammenhang zwischen Generalfaktor und \ac{AFP} oder mittlerer Herzfrequenz herstellen.
+Im Gegensatz zu den Ergebnissen in \citet{Peifer2014} verhält sich der Zusammenhang zwischen Flow (bestimmt durch den Generalfaktor) und der \ac{HF} beim Laufen genau anders herum (siehe Abbildung \ref{fig:zusammenhaenge-von-flow-und-hrv} B). Der Grund dafür ist die körperliche bzw. sportliche Belastung und die dadurch notwendige Anpassung der Frequenzbänder. Durch die Anpassung ist die übliche rein neuro-vegetative, sympathiko-vagale Interpretation der Spektralbänder nicht möglich, da sich im \ac{HF}-Band bei körperlicher bzw. sportlicher Belastung vor allem mechanisch bedingte Resonanz- und Kopplungsphänomene mit der Atmung und der motorischen Aktivität zu manifestieren scheinen \citep[S. 62]{Hoos2010}. Eine Zugehörigkeitsbestimmung der \ac{HF} zur vagalen Aktivität des \ac{ANS}s, wie bei der rein neuro-vegetativen, sympathiko-vagalen Interpretation, wäre deshalb fehlerhaft. Was \ac{HF} außerhalb der üblichen euro-vegetativen, sympathiko-vagalen Interpretation der Spektralbänder über die Prozesse in unserem Körper sagen, kann ich zum jetzigen Zeitpunkt nicht sagen. Deswegen bietet sich für mich, die weitere Nutzung des \ac{HRV}-Merkmals \ac{HF} nur in individuellen Schwellenkonzepten an. In einem weiteren Ansatz könnte ich den direkten Zusammenhang zwischen der zeitvarianten spektralen Kenngröße der \ac{HF} mit ventilatorischen Schwellenkonzepten nach \citet{Cottin2007} untersuchen. Der Ansatz könnte mit Hilfe der Herzfrequenzmessung einen Zusammenhang der Atemfrequenz und Flow ermöglichen. 
+Der Zusammenhang zwischen Flow und den absoluten Werten der \ac{LF} verhält sich wie bei \citet{Peifer2014} und stellt sich als umgedrehtes U dar. Dies spricht dafür, dass eine moderate Beanspruchung durch die Tätigkeit für Flow gegeben sein muss. Für diese Annahme spricht auch der nicht zufälliger systematischer quadrischer Zusammenhang von \ac{AFP} und mittlerer Herzfrequenz. Steigt die Herzfrequenz über einen individuellen Maximalwert hinweg, fällt die \ac{AFP}. Leider konnte ich keinen Zusammenhang zwischen Generalfaktor und \ac{AFP} oder mittlerer Herzfrequenz herstellen.
 
 ## Jerk Cost
 
