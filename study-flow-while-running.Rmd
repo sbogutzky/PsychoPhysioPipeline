@@ -40,6 +40,14 @@ documentclass: scrartcl
   hrv.feature.subset <- hrv.feature.subset[, c(1:9, 11, 15)]
   hrv.feature.subset <- hrv.feature.subset[order(as.Date(hrv.feature.subset$activity.start,format = "%Y-%m-%d %H:%M:%S")), , drop = FALSE]
   hrv.feature.subset$measurement <- factor(hrv.feature.subset$measurement, levels = c(1, 2, 3, 4, 5), labels = c("Ruhe", "15'", "30'", "45'", "60'"))
+
+  leg.motion.features       <- read.csv("./data/features/leg-motion-features.csv", stringsAsFactors = F)
+  leg.motion.feature.subset <- leg.motion.features
+  leg.motion.feature.subset[leg.motion.feature.subset$activity == "Running",]$measurement <- leg.motion.feature.subset[leg.motion.feature.subset$activity == "Running",]$measurement + 1
+  leg.motion.feature.subset <- leg.motion.feature.subset[, c(1:2, 4, 8)]
+  leg.motion.feature.subset <- leg.motion.feature.subset[order(as.Date(leg.motion.feature.subset$activity.start,format = "%Y-%m-%d %H:%M:%S")), , drop = FALSE]
+  leg.motion.feature.subset$measurement <- factor(leg.motion.feature.subset$measurement, levels = c(2, 3, 4, 5), labels = c("15'", "30'", "45'", "60'"))
+
 ```
 
 # Abkürzungsverzeichnis
@@ -76,6 +84,10 @@ Zur subjektiven Erfassung des Flow-Erlebens kam die \ac{FKS} von \citet{Rheinber
 ### Herzfrequenzvariabilität
 Die \ac{HRV} operationalisiert die Fluktuationen der Herzperiodendauer in einem festgelegten Zeitraum und wird aus der Zeitreihe der aufeinanderfolgenden RR-Intervalle mit Hilfe verschiedener Kenngrößen bestimmt \citep{TaskForce1996, Berntson1997}. Zwischen einzelnen Kenngrößen bzw. Merkmalen der \ac{HRV} und Flow-Erleben suche ich einen Zusammenhang.
 
+### Bewegungsfluss
+
+Weit hinten, hinter den Wortbergen, fern der Länder Vokalien und Konsonantien leben die Blindtexte. Abgeschieden wohnen sie in Buchstabhausen an der Küste des Semantik, eines großen Sprachozeans. Ein kleines Bächlein namens Duden fließt durch ihren Ort und versorgt sie mit den nötigen Regelialien. Es ist ein paradiesmatisches Land, in dem einem gebratene Satzteile in den Mund fliegen. Nicht einmal von der allmächtigen Interpunktion werden die Blindtexte beherrscht – ein geradezu unorthographisches Leben. Eines Tages aber beschloß eine kleine Zeile Blindtext, ihr Name war Lorem Ipsum, hinaus zu gehen in die weite Grammatik. Der große Oxmox riet ihr davon ab, da es dort wimmele von bösen Kommata, wilden Fragezeichen und hinterhältigen Semikoli, doch das Blindtextchen ließ sich nicht beirren. Es packte seine sieben Versalien, schob sich sein Initial in den Gürtel und machte sich auf den Weg. Als es die ersten Hügel des Kursivgebirges erklommen hatte, warf es einen letzten Blick zurück auf die Skyline seiner Heimatstadt Buchstabhausen, die Headline von Alphabetdorf und die Subline seiner eigenen Straße, der Zeilengasse. Wehmütig lief ihm eine rhetorische Frage über die Wange, dann setzte es seinen Weg fort. Unterwegs traf es eine Copy. Die Copy warnte das Blindtextchen, da, wo sie herkäme wäre sie
+
 ## Untersuchungsdesign 
 Ein männlicher Freizeitläufer (29) nahm am Experiment teil. Er lief in sechs aufeinanderfolgenden Wochen an einem Tag 60 Minuten jeweils die gleiche Strecke und zur gleichen Tageszeit.
 
@@ -92,7 +104,7 @@ Während jedes Laufes zeichnete eine eigens entwickelte App \ac{EKG} und Bewegun
 Nach jedem Lauf übertrug ich die gesammelten Daten für die software-technische Analyse auf meinen Arbeitsrechner. Die Daten bestehen für jeden Lauf aus der Bewertung der fünf \ac{FKS}, \ac{EKG}-Daten, \ac{GPS}-Positionen, Beschleunigungen und Winkelgeschwindigkeiten von den Körperpositionen Bein, Arm und Handgelenk. 
 
 ## Datenverarbeitung
-### Flow-Kurzskala
+### Faktorenberechnung der Flow-Kurzskala
 Aus der Bewertung der \ac{FKS} berechnete ich die Faktoren der \ac{FKS}. Die Ergebnisse zeigt die Tabelle \ref{tab:fks-merkmale}. Der Generalfaktor steigt im arithmetischen Mittel von Ruhemessung zur ersten Laufmessung. Danach sinkt er ein wenig. Der glatte Verlauf fällt im arithmetischen Mittel bis zur 45-Minute. Danach steigt er ein wenig. Die Absorbiertheit verhält sich gegenläufig. Im arithmetischen Mitte steigt die \ac{AFP} kontinuierlich (siehe Abbildung \ref{fig:fks-faktoren}). 
 
 ```{r fks-merkmale, echo=FALSE, message=FALSE, warning=FALSE, results="asis"}
@@ -116,7 +128,7 @@ Aus der Bewertung der \ac{FKS} berechnete ich die Faktoren der \ac{FKS}. Die Erg
 
 <!-- Zur Bewertung des subjektiven Flow-Zustands verwende ich die zweite Subdimension der \ac{FKS}. Denn die Absorbiertheit tritt laut \citet{Peifer2014} nur ein, wenn Anforderungen und Fähigkeiten sich in Balance befinden — somit ist sie ausschließlich im *Flow-Kanal* anzutreffen. Deshalb die Absorbiertheit ein repräsentativer Indikator für Flow als der Generalfaktor, der sich aus den zwei Subdimension zusammensetzt. Den Beleg hierfür geben \citet[S. 69]{Rheinberg2003a}. Sie stellten fest, dass Unterforderung keinen Einfluss auf den glatten Verlauf hat, jedoch die Absorbiertheit negativ beeinflusst. Auch im Vergleich von Ruhe- und Laufmessung (siehe Abbildung \ref{fig:absorbiertheit-afp-verlauf}) ist dieser Sachverhalt auszumachen. -->
 
-```{r fks-faktoren, echo=FALSE, warning=FALSE, dev='pdf', fig.height=3, fig.width=6.5, fig.pos='htbp', fig.cap='Arithmetische Mittel von Absorbiertheit, AFP und glatten Verlauf nach Ruhe, 15-, 30-, 45- und 60-Minuten Laufen [N = 6] \\label{fig:fks-faktoren}'}
+```{r fks-faktoren, echo=FALSE, warning=FALSE, dev='pdf', fig.height=3, fig.width=6.5, fig.pos='htbp', fig.cap='Arithmetische Mittel des Gesamtfaktors, des glatten Verlaufs, der Absorbiertheit und der AFP nach Ruhe, 15-, 30-, 45- und 60-Minuten Laufen [N = 6] \\label{fig:fks-faktoren}'}
   par(mfcol=c(1, 1), mar=c(3.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="r", yaxs="r")
 
   # Plot data
@@ -136,7 +148,7 @@ Aus der Bewertung der \ac{FKS} berechnete ich die Faktoren der \ac{FKS}. Die Erg
   box()
 ```
 
-### HRV-Analyse
+### Analyse der HRV
 Von den \ac{EKG}-Daten entfernte ich die Zeiten für die Bewertung der \ac{FKS} und erhielt jeweils 15-Minuten Abschnitte (siehe Abbildung \ref{fig:ekg-signalverarbeitung} von A zu B). Zur effizienteren Verarbeitung in KubiosHRV \citep{Tarvainen2014} teilte ich die 15-Minuten Abschnitte in jeweils drei fünf Minuten Abschnitte (siehe Abbildung \ref{fig:ekg-signalverarbeitung} C). Zur RR-Intervall Berechnung las ich die 90 fünf Minuten Abschnitte in KubiosHRV (Version 2.1) ein. Die R-Spitzen-Erkennung von KubiosHRV identifiziert größtenteils die Herzschläge automatisch, trotzdem ist eine manuelle Nachbearbeitung notwendig. Nicht erkannte Herzschläge fügte ich hinzu und zu viel erkannte Herzschläge entfernte ich. \ac{EKG}-Daten mit mehr als 2% an abnormalen Erkennungen habe ich aus der Datensammlung entfernt. 
 Zur \ac{HRV}-Analyse nutze ich die letzten fünf Minuten jedes 15-Minuten Abschnittes. Das hatte folgende Gründe:
 
@@ -306,74 +318,86 @@ Zur Berechnung der Spektralleistung der unterschiedlichen Bänder in $ms^2$ bere
   rm(feature.table, table, i)
 ```
 
+### Berechnung des Begungsaufwandes als quantitative Beschreibung des Bewegungsflusses
+
+\begin{equation}
+  JC = \int_0^T dt ((\frac{d^3x}{dt^3})^2 + (\frac{d^3y}{dt^3})^2 + (\frac{d^3z}{dt^3})^2 ) 
+\end{equation}
+
+Weit hinten, hinter den Wortbergen, fern der Länder Vokalien und Konsonantien leben die Blindtexte. Abgeschieden wohnen sie in Buchstabhausen an der Küste des Semantik, eines großen Sprachozeans. Ein kleines Bächlein namens Duden fließt durch ihren Ort und versorgt sie mit den nötigen Regelialien. Es ist ein paradiesmatisches Land, in dem einem gebratene Satzteile in den Mund fliegen. Nicht einmal von der allmächtigen Interpunktion werden die Blindtexte beherrscht – ein geradezu unorthographisches Leben. Eines Tages aber beschloß eine kleine Zeile Blindtext, ihr Name war Lorem Ipsum, hinaus zu gehen in die weite Grammatik. Der große Oxmox riet ihr davon ab, da es dort wimmele von bösen Kommata, wilden Fragezeichen und hinterhältigen Semikoli, doch das Blindtextchen ließ sich nicht beirren. Es packte seine sieben Versalien, schob sich sein Initial in den Gürtel und machte sich auf den Weg. Als es die ersten Hügel des Kursivgebirges erklommen hatte, warf es einen letzten Blick zurück auf die Skyline seiner Heimatstadt Buchstabhausen, die Headline von Alphabetdorf und die Subline seiner eigenen Straße, der Zeilengasse. Wehmütig lief ihm eine rhetorische Frage über die Wange, dann setzte es seinen Weg fort. Unterwegs traf es eine Copy. Die Copy warnte das Blindtextchen, da, wo sie herkäme wäre sie
+
+Weit hinten, hinter den Wortbergen, fern der Länder Vokalien und Konsonantien leben die Blindtexte. Abgeschieden wohnen sie in Buchstabhausen an der Küste des Semantik, eines großen Sprachozeans. Ein kleines Bächlein namens Duden fließt durch ihren Ort und versorgt sie mit den nötigen Regelialien. Es ist ein paradiesmatisches Land, in dem einem gebratene Satzteile in den Mund fliegen. Nicht einmal von der allmächtigen Interpunktion werden die Blindtexte beherrscht – ein geradezu unorthographisches Leben. Eines Tages aber beschloß eine kleine Zeile Blindtext, ihr Name war Lorem Ipsum, hinaus zu gehen in die weite Grammatik. Der große Oxmox riet ihr davon ab, da es dort wimmele von bösen Kommata, wilden Fragezeichen und hinterhältigen Semikoli, doch das Blindtextchen ließ sich nicht beirren. Es packte seine sieben Versalien, schob sich sein Initial in den Gürtel und machte sich auf den Weg. Als es die ersten Hügel des Kursivgebirges erklommen hatte, warf es einen letzten Blick zurück auf die Skyline seiner Heimatstadt Buchstabhausen, die Headline von Alphabetdorf und die Subline seiner eigenen Straße, der Zeilengasse. Wehmütig lief ihm eine rhetorische Frage über die Wange, dann setzte es seinen Weg fort. Unterwegs traf es eine Copy. Die Copy warnte das Blindtextchen, da, wo sie herkäme wäre sie
+
+Weit hinten, hinter den Wortbergen, fern der Länder Vokalien und Konsonantien leben die Blindtexte. Abgeschieden wohnen sie in Buchstabhausen an der Küste des Semantik, eines großen Sprachozeans. Ein kleines Bächlein namens Duden fließt durch ihren Ort und versorgt sie mit den nötigen Regelialien. Es ist ein paradiesmatisches Land, in dem einem gebratene Satzteile in den Mund fliegen. Nicht einmal von der allmächtigen Interpunktion werden die Blindtexte beherrscht – ein geradezu unorthographisches Leben. Eines Tages aber beschloß eine kleine Zeile Blindtext, ihr Name war Lorem Ipsum, hinaus zu gehen in die weite Grammatik. Der große Oxmox riet ihr davon ab, da es dort wimmele von bösen Kommata, wilden Fragezeichen und hinterhältigen Semikoli, doch das Blindtextchen ließ sich nicht beirren. Es packte seine sieben Versalien, schob sich sein Initial in den Gürtel und machte sich auf den Weg. Als es die ersten Hügel des Kursivgebirges erklommen hatte, warf es einen letzten Blick zurück auf die Skyline seiner Heimatstadt Buchstabhausen, die Headline von Alphabetdorf und die Subline seiner eigenen Straße, der Zeilengasse. Wehmütig lief ihm eine rhetorische Frage über die Wange, dann setzte es seinen Weg fort. Unterwegs traf es eine Copy. Die Copy warnte das Blindtextchen, da, wo sie herkäme wäre sie
+
+```{r bewegungsaufwand, echo=FALSE, warning=FALSE, dev='pdf', fig.height=3, fig.width=6.5, fig.pos='htbp', fig.cap='Arithmetische Mittel des Bewegungsaufwands nach 15-, 30-, 45- und 60-Minuten Laufen [N = 6] \\label{fig:bewegungsaufwand}'}
+  par(mfcol=c(1, 1), mar=c(3.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="r", yaxs="r")
+
+  means <- tapply(leg.motion.feature.subset[, 1], leg.motion.feature.subset[, 4], mean)[2:5]
+  barplot2(means/10^5, plot.ci = F, xpd = FALSE, ylab = expression("Mittlerer Bewegungsaufwand [x"~10^5~m^2*s^{-5}~"]"), col = "#1D70B7")
+```
+
 ## Statistische Analyse
 
 ### Varianzanalyse
 Die statistische Analyse der einzelnen Merkmale führte ich mit R durch. Der Effekt des Zeitpunkts der Messung von Ruhe bis zur Minute 60 des Laufens evaluierte ich mit einer einfachen ANOVA bei wiederholten Messungen (ggf. mit Greenhouse-Geisser oder Huynh-Feldt Korrektur). Die Normalverteilung der Daten jeder Stichprobe prüfte ich zahlenmäßig mit dem Shapiro Test und visuell in QQ-Plots. Das Merkmal Besorgnis entfernte ich aus der Datensammlung, da der Läufer sie niedrig und mit geringer Abweichung bewertete. Einen abhängigen t-Test (Paardifferenzentest; engl. Paired t-Test) führte ich falls nötig durch, um die mittlere Differenz zweier Messabschnitte zu berechnen. P-Werte unter 0.05 sah ich als statistisch signifikant an.
 
-```{r examine-features, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
-
-  # Examine fss features (visual)
-  par(mfrow = c(1,2), xaxs="r", yaxs="r")
-  for(i in 1:5) {
-    plot(fss.feature.subset[,i], pch=20 + as.numeric(hrv.feature.subset$measurement), ylab = names(fss.feature.subset)[i])
-    boxplot(fss.feature.subset[,i] ~ measurement, data=fss.feature.subset)
+```{r variance-analysis, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+  
+  plotFeaturesInGroups <- function(feature.subset, f) {
+      for(i in 1:length(feature.subset)) {
+        feature       <- feature.subset[, i]
+        feature.name  <- names(feature.subset)[i]
+        
+        par(mfrow = c(3, 1), xaxs = "r", yaxs = "r")
+        plot(feature, pch = 20 + as.numeric(f), main = feature.name, ylab = feature.name)
+        legend
+        
+        boxplot(feature ~ f, data = feature.subset, main = feature.name, ylab = feature.name)
+        
+        hist(feature, main = feature.name, xlab = feature.name)
+        lines(density(feature))
+        rug(jitter(feature))
+    } 
   }
-
-  par(mfrow = c(1,1), xaxs="r", yaxs="r")
-  for(i in 1:5) {
-    hist(fss.feature.subset[,i], main = names(fss.feature.subset)[i], xlab = names(fss.feature.subset)[i])
-    lines(density(fss.feature.subset[,i]))
-    rug(jitter(fss.feature.subset[,i]))
-  } 
+  
+  # Examine fss features (visual)
+  plotFeaturesInGroups(fss.feature.subset[, 1:5], fss.feature.subset$measurement)
 
   # Examine hrv features (visual)
-  par(mfrow = c(1,2), xaxs="r", yaxs="r")
-  for(i in 1:9) {
-    plot(hrv.feature.subset[,i], pch=20 + as.numeric(hrv.feature.subset$measurement), ylab = names(hrv.feature.subset)[i])
-    boxplot(hrv.feature.subset[,i] ~ measurement, data=hrv.feature.subset)
-  }
-  
-  par(mfrow = c(1,1), xaxs="r", yaxs="r")
-  for(i in 1:9) {
-    hist(hrv.feature.subset[,i], main = names(hrv.feature.subset)[i], xlab = names(hrv.feature.subset)[i])
-    lines(density(hrv.feature.subset[,i]))
-    rug(jitter(hrv.feature.subset[,i]))
-  } 
+  plotFeaturesInGroups(hrv.feature.subset[, 1:9], hrv.feature.subset$measurement)
 
-  rm(i)
-```
-  
-```{r check-group-normality, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+  # Examine motion features (visual)
+  plotFeaturesInGroups(leg.motion.feature.subset[, 1:2], leg.motion.feature.subset$measurement)
 
-  # Check: Underlying Assumptions: Normality
-  
-  par(mfrow = c(2,1), xaxs="r", yaxs="r")
-  for(i in 1:5) {
-    for(j in levels(fss.feature.subset$measurement)) {    
-      print(paste(names(fss.feature.subset[fss.feature.subset$measurement == j,])[i], fss.feature.subset[fss.feature.subset$measurement == j,]$measurement[1]))
-      print(shapiro.test(fss.feature.subset[fss.feature.subset$measurement == j, i]))
-      qqnorm(fss.feature.subset[fss.feature.subset$measurement == j, i], ylab = paste(names(fss.feature.subset[fss.feature.subset$measurement == j,])[i], fss.feature.subset[fss.feature.subset$measurement == j,]$measurement[1]))
-      qqline(fss.feature.subset[fss.feature.subset$measurement == j, i])
-      plot(fss.feature.subset[fss.feature.subset$measurement == j, i], ylab = paste(names(fss.feature.subset[fss.feature.subset$measurement == j,])[i], fss.feature.subset[fss.feature.subset$measurement == j,]$measurement[1]))
+  checkFeaturesNormalityInGroups <- function(feature.subset, f, plot = F) {
+    for(i in 1:length(feature.subset)) {
+      feature.name <- names(feature.subset)[i]
+      for(j in levels(f)) { 
+        features <- feature.subset[f == j, i]
+          
+        print(paste(feature.name, j))
+        print(shapiro.test(features))
+          
+        if(plot) {
+          par(mfrow = c(2, 1), xaxs="r", yaxs="r")
+          qqnorm(features, ylab = paste(feature.name, j))
+          qqline(features)
+          plot(features, ylab = paste(feature.name, j))
+        }
+      }
     }
   }
   
-  par(mfrow = c(2,1), xaxs="r", yaxs="r")
-  for(i in 1:9) {
-    for(j in levels(hrv.feature.subset$measurement)) {    
-      print(paste(names(hrv.feature.subset[hrv.feature.subset$measurement == j,])[i], hrv.feature.subset[hrv.feature.subset$measurement == j,]$measurement[1]))
-      print(shapiro.test(hrv.feature.subset[hrv.feature.subset$measurement == j, i]))
-      qqnorm(hrv.feature.subset[hrv.feature.subset$measurement == j, i], ylab = paste(names(hrv.feature.subset[hrv.feature.subset$measurement == j,])[i], hrv.feature.subset[hrv.feature.subset$measurement == j,]$measurement[1]))
-      qqline(hrv.feature.subset[hrv.feature.subset$measurement == j, i])
-      plot(hrv.feature.subset[hrv.feature.subset$measurement == j, i], ylab = paste(names(hrv.feature.subset[hrv.feature.subset$measurement == j,])[i], hrv.feature.subset[hrv.feature.subset$measurement == j,]$measurement[1]))
-    }
-  }
-  
-  rm(i, j)
-```
+  # Check group normality of fss features 
+  checkFeaturesNormalityInGroups(fss.feature.subset[, 1:5], fss.feature.subset$measurement, T)
 
-```{r repeated-anova, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+  # Check group normality of hrv features 
+  checkFeaturesNormalityInGroups(hrv.feature.subset[, 1:9], hrv.feature.subset$measurement, T)
+
+  # Check group normality of motion features 
+  checkFeaturesNormalityInGroups(leg.motion.feature.subset[, 1:2], leg.motion.feature.subset$measurement, T)
+  
   calculateRepeatedAnova <- function(subject, treatment, value) {
     df            <- data.frame(subject, treatment, value)
     df$subject    <- as.factor(df$subject)
@@ -398,29 +422,89 @@ Die statistische Analyse der einzelnen Merkmale führte ich mit R durch. Der Eff
     
     print(with(df, pairwise.t.test(value, treatment, p.adjust.method = "none", paired = T)))
   }
-  
-  subject <- c()
-  for(i in 1:6) {
-      subject       <- c(subject, rep(i, length(levels(hrv.feature.subset$measurement))))
+
+  calulateFeaturesRepeatedAnova <- function(feature.subset, f, l) {
+    subject <- c()
+    for(i in 1:l) {
+      subject       <- c(subject, rep(i, length(levels(f))))
+    }
+    
+    for(i in 1:length(feature.subset)) {
+      feature       <- feature.subset[, i]
+      feature.name  <- names(feature.subset)[i]
+      
+      print(feature)
+      calculateRepeatedAnova(subject, f, feature) 
+    }
   }
-  
-  for(i in 1:(ncol(fss.feature.subset) - 2)) {
-    print(colnames(fss.feature.subset)[i])
-    calculateRepeatedAnova(subject, fss.feature.subset$measurement, fss.feature.subset[,i]) 
-  }
-  
-  for(i in 1:(ncol(hrv.feature.subset) - 2)) {
-    print(colnames(hrv.feature.subset)[i])
-    calculateRepeatedAnova(subject, hrv.feature.subset$measurement, hrv.feature.subset[,i]) 
-  }
-  
-  rm(i, subject)
+
+  # Calulate repeated anova of fss features 
+  calulateFeaturesRepeatedAnova(fss.feature.subset[, 1:5], fss.feature.subset$measurement, 6)
+
+  # Calulate repeated anova of hrv features 
+  calulateFeaturesRepeatedAnova(hrv.feature.subset[, 1:9], hrv.feature.subset$measurement, 6)
+
+  # Calulate repeated anova of motion features 
+  calulateFeaturesRepeatedAnova(leg.motion.feature.subset[, 1:2], leg.motion.feature.subset$measurement, 6) 
 ```
 
 ### Korrelationsanalyse
 Um mögliche Zusammenhänge zwischen den Faktoren der \ac{FKS} und der Merkmale der \ac{HRV} beim Laufen aufzuklären, berechnete ich den bivariaten Korrelationskoeffizient nach Pearson für alle Kombination von \ac{FKS}-Faktoren und \ac{HRV}-Merkmalen. Die Normalverteilung verifizierte ich mit dem Shapiro Test und QQ-Plots. Gleichzeitig prüfte ich die Beziehung zweier Werte im Streudiagramm. Da dieses Vorgehen nur auf lineare Zusammenhänge testet, berechnete ich zusätzlich wie \citet{Peifer2014} einen möglichen quadratischen Zusammenhang. Für alle Regressionskoeffizienten testete ich mit R die statistische Signifikanz. P-Werte unter 0.05 sah ich als statistisch signifikant an.  
 
 ```{r correlation-analysis, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+
+  fss.feature.subset.running <- fss.feature.subset[fss.feature.subset$measurement != "Ruhe", 1:5]
+  hrv.feature.subset.running <- hrv.feature.subset[hrv.feature.subset$measurement != "Ruhe", 1:9]
+
+  plotFeatures <- function(feature.subset) {
+    for(i in 1:length(feature.subset)) { 
+      feature      <- feature.subset[, i]
+      feature.name <- names(feature.subset)[i]
+    
+      par(mfrow = c(2, 2), xaxs = "r", yaxs = "r")
+      plot(feature, main = feature.name, ylab = feature.name)
+      qqnorm(feature, main = feature.name, ylab = feature.name)
+      qqline(feature)
+      boxplot(feature, main = feature.name, ylab = feature.name)
+      hist(feature, main = feature.name, xlab = feature.name)
+      lines(density(feature))
+      rug(jitter(feature))
+    }
+  }
+
+  # Examine fss features (visual)
+  plotFeatures(fss.feature.subset.running)
+
+  # Examine hrv features (visual)
+  plotFeatures(hrv.feature.subset.running)
+
+  # Examine motion features (visual)
+  plotFeatures(leg.motion.feature.subset[, 1:2])
+
+  checkFeaturesNormality <- function(feature.subset) {
+    for(i in 1:length(feature.subset)) { 
+      feature      <- feature.subset[, i]
+      feature.name <- names(feature.subset)[i]
+    
+      print(feature.name)
+      shapiro.test.result <- shapiro.test(feature)
+      if(shapiro.test.result$p.value <= .1) {
+        print(shapiro.test.result)
+      }
+    }
+  }
+
+  # Check normality of fss features 
+  checkFeaturesNormality(fss.feature.subset.running)
+
+  # Check normality of hrv features 
+  checkFeaturesNormality(hrv.feature.subset.running)
+
+  # Check normality of transformed hrv features 
+  checkFeaturesNormality(sqrt(hrv.feature.subset.running[, c(2, 3, 9)]))
+
+  # Check normality of features
+  checkFeaturesNormality(leg.motion.feature.subset[, 1:2])
 
   lmp <- function (modelobject) {
     if (class(modelobject) != "lm") stop("Not an object of class 'lm' ")
@@ -430,107 +514,69 @@ Um mögliche Zusammenhänge zwischen den Faktoren der \ac{FKS} und der Merkmale 
     return(p)
   }
 
-  fss.feature.subset.running <- fss.feature.subset[fss.feature.subset$measurement != "Ruhe", ]
-  hrv.feature.subset.running <- hrv.feature.subset[hrv.feature.subset$measurement != "Ruhe", ]
-
-  for(i in c(1:5)) { 
-    
-    fss.feature      <- fss.feature.subset.running[, i]
-    fss.feature.name <- names(fss.feature.subset.running)[i]
-    
-    par(mfrow = c(2,2), xaxs="r", yaxs="r")
-    plot(fss.feature, ylab = fss.feature.name)
-    qqnorm(fss.feature, ylab = fss.feature.name)
-    qqline(fss.feature)
-    boxplot(fss.feature)
-    hist(fss.feature, main = fss.feature.name, xlab = fss.feature.name)
-    lines(density(fss.feature))
-    rug(jitter(fss.feature))
-    
-    print(fss.feature.name)
-    shapiro.test.result.fss.feature <- shapiro.test(fss.feature)
-    if(shapiro.test.result.fss.feature$p.value <= .1) {
-      print(shapiro.test.result.fss.feature)
-    }
-  }
-
-  for (j in 1:9) {
+  calculateCorrelationBetweenFeatures <- function(feature.subset.1, feature.subset.2) {
+    for(i in 1:length(feature.subset.1)) {
+      feature.1       <- feature.subset.1[, i]
+      feature.1.name  <- names(feature.subset.1)[i]
       
-    hrv.feature      <- hrv.feature.subset.running[, j]
-    hrv.feature.name <- names(hrv.feature.subset.running)[j]
-    
-    if(j == 2 | j == 3 |j == 9) {
-        hrv.feature <- sqrt(hrv.feature)
-        hrv.feature.name <- paste(hrv.feature.name, "^-.5", sep = "")
-      }
+      for(j in 1:length(feature.subset.2)) {
+        feature.2       <- feature.subset.2[, j]
+        feature.2.name  <- names(feature.subset.2)[j]
+        
+        print(paste(feature.1.name, "~", feature.2.name))
       
-    par(mfrow = c(2,2), xaxs="r", yaxs="r")
-    plot(hrv.feature, ylab = hrv.feature.name)
-    qqnorm(hrv.feature, ylab = hrv.feature.name)
-    qqline(hrv.feature)
-    boxplot(hrv.feature)
-    hist(hrv.feature, main = hrv.feature.name, xlab = hrv.feature.name)
-    lines(density(hrv.feature))
-    rug(jitter(hrv.feature))
+        # linear regression
+        linear.model <- lm(feature.1 ~ feature.2)
+        
+        # regression with a quadratic model
+        feature.2.squared <- feature.2^2
+        quadratic.model     <- lm(feature.1 ~ feature.2 + feature.2.squared)
       
-    print(hrv.feature.name)
-    shapiro.test.result.hrv.feature <- shapiro.test(hrv.feature)
-    if(shapiro.test.result.hrv.feature$p.value <= .1) {
-      print(shapiro.test.result.hrv.feature)
-    }
-  }
-    
-  for(i in c(1:3, 5)) {
-    
-    fss.feature      <- fss.feature.subset.running[, i]
-    fss.feature.name <- names(fss.feature.subset.running)[i]
-    
-    for (j in 1:9) {
-      
-      hrv.feature      <- hrv.feature.subset.running[, j]
-      hrv.feature.name <- names(hrv.feature.subset.running)[j]
-      
-      if(j == 2 | j == 3 |j == 9) {
-        hrv.feature <- sqrt(hrv.feature)
-        hrv.feature.name <- paste(hrv.feature.name, "^0.5", sep = "")
-      }
-      
-      print(paste(fss.feature.name, "~", hrv.feature.name))
-      
-      # linear regression
-      linear.model <- lm(fss.feature ~ hrv.feature)
-      
-      # regression with a quadratic model
-      hrv.feature.squared <- hrv.feature^2
-      quadratic.model     <- lm(fss.feature ~ hrv.feature + hrv.feature.squared)
-    
-      linear.model.p.value    <- lmp(linear.model)
-      quadratic.model.p.value <- lmp(quadratic.model)
-      
-      plot.linear.model       <- linear.model.p.value < .1
-      plot.quadratic.model    <- quadratic.model.p.value < .1
+        linear.model.p.value    <- lmp(linear.model)
+        quadratic.model.p.value <- lmp(quadratic.model)
+        
+        plot.linear.model       <- linear.model.p.value < .1
+        plot.quadratic.model    <- quadratic.model.p.value < .1
+            
+        if(plot.linear.model | plot.quadratic.model) {
+          par(mfrow = c(1,1), xaxs="r", yaxs="r")
+          plot(feature.2, feature.1, xlab = feature.2.name, ylab = feature.1.name, pch = 21)
+        }
           
-      if(plot.linear.model | plot.quadratic.model) {
-        par(mfrow = c(1,1), xaxs="r", yaxs="r")
-        plot(hrv.feature, fss.feature, xlab = hrv.feature.name, ylab = fss.feature.name, pch = 21)
+        if(plot.linear.model) {
+          abline(linear.model)
+          print(summary(linear.model))
+        }
+          
+        if(plot.quadratic.model) { 
+          p <- max(feature.2) - min(feature.2)
+          values           <- seq(min(feature.2), max(feature.2), p / 1000)
+          predicted.values <- predict(quadratic.model, list(feature.2 = values, feature.2.squared = values^2))
+          lines(values, predicted.values, lty = 2)
+          print(summary(quadratic.model))
+        } 
       }
-        
-      if(plot.linear.model) {
-        abline(linear.model)
-        print(summary(linear.model))
-      }
-        
-      if(plot.quadratic.model) { 
-        values           <- seq(min(hrv.feature), max(hrv.feature), .01)
-        predicted.values <- predict(quadratic.model, list(hrv.feature = values, hrv.feature.squared = values^2))
-        lines(values, predicted.values, lty = 2)
-        print(summary(quadratic.model))
-      } 
     }
   }
 
-  # Clean up
-  rm(fss.feature, fss.feature.name, hrv.feature, hrv.feature.name, hrv.feature.squared, i, j, linear.model, linear.model.p.value, quadratic.model, quadratic.model.p.value, plot.linear.model, plot.quadratic.model, shapiro.test.result.fss.feature, shapiro.test.result.hrv.feature, predicted.values, values)
+  # Check norm feature correlation (fss ~ hrv)
+  calculateCorrelationBetweenFeatures(fss.feature.subset.running[, -4], hrv.feature.subset.running[, c(-2, -3, -9)])
+
+  # Check transformed feature correlation (fss ~ hrv)
+  calculateCorrelationBetweenFeatures(fss.feature.subset.running[, -4], sqrt(hrv.feature.subset.running[, c(2, 3, 9)]))
+
+  # Check norm feature correlation (fss ~ fit)
+  calculateCorrelationBetweenFeatures(fss.feature.subset.running[, -4][, 1:3], data.frame(fit = fss.feature.subset.running[, -4][, 4]))
+
+  # Check norm feature correlation (fss ~ motion)
+  calculateCorrelationBetweenFeatures(fss.feature.subset.running[, -4], leg.motion.feature.subset[, 1:2])
+  
+  # Check norm feature correlation (hrv ~ motion)
+  calculateCorrelationBetweenFeatures(hrv.feature.subset.running[, c(-2, -3, -9)], leg.motion.feature.subset[, 1:2])
+
+  # Check transformed feature correlation (hrv ~ motion)
+  calculateCorrelationBetweenFeatures(sqrt(hrv.feature.subset.running[, c(2, 3, 9)]), leg.motion.feature.subset[, 1:2])
+  
 ```
 
 # Ergebnis
@@ -540,6 +586,12 @@ Der Generalfaktor unterscheidet sich nur bei der Messung nach der 30. Minute sig
 
 ## Effekt der Messzeitpunkts auf die Merkmale
 Für alle Merkmale, außer der \ac{AFP} und der mittleren Herzfrequenz, ist kein signifikanter Effekt zwischen den einzelnen Laufmessungen zu finden. Damit scheint der Messzeitpunkt auf diese Merkmale keinen Einfluss zu haben. Die gefühlte \ac{AFP} steigt signifikant von Messung der 15. Minute zur Messung der 30. Minute [$t(5) = -7, p < .001$] und von Messung der 30. Minute zur Messung der 45. Minute [$t(5) = -3.16, p < .05$] (siehe Abbildung \ref{fig:zeit-effekt-auf-afp}). Die mittlere Herzfrequenz nach der 15. Minuten unterscheidet sich jeweils von der Messung nach der 30., 45. und 60. Minute [jeweils $p < .1$].
+
+<!--
+Results
+mean.jc:              15, 45 p < 0.01 ; 30, 45 p < 0.05 ; 45, 60 p < 0.1
+mean.cycle.interval:  15, 30 p < 0.1  ; 15, 45 p < 0.01 ; 45, 60 p < 0.1
+-->
 
 ```{r zeit-effekt-auf-afp, echo=FALSE, warning=FALSE, dev='pdf', fig.height=3, fig.width=6.5, fig.pos='htbp', fig.cap='Effekt des Messzeitpunkts auf die AFP \\label{fig:zeit-effekt-auf-afp}'}
   par(mfcol=c(1, 1), mar=c(3.5, 3.5, 1.5, 3.5) + 0.1, mgp=c(2, .5, 0), las=1, cex.axis=0.8, tck=.01, cex.lab=.8, xaxs="r", yaxs="r")
@@ -620,17 +672,43 @@ Für alle Merkmale, außer der \ac{AFP} und der mittleren Herzfrequenz, ist kein
 Der Shapiro Test ergab für das Merkmal Besorgnis, für die absoluten Werte der \ac{LF} und \ac{HF} und deren Verhältnis (LH/HF) keine Normalverteilung. Das Merkmal Besorgnis entfernte ich wie bei der Varianzanalyse aus der Datensammlung. Um die Effizienz der Kleinste-Quadrate-Schätzer im linearen Regressionsmodell für die absoluten Werte der \ac{LF} und \ac{HF} und deren Verhältnis zu erhalten, zog ich die Wurzel der Werte. 
 
 <!--
-flow    lf.power-a^0.5    r2 .21  p .083 . inverted-u
-flow    hf.power.r       r2 .14  p .075 . \
-flow    lf.power.nu      r2 .14  p .073 . /
-flow    hf.power.nu      r2 .14  p .073 . \
-flow    lfhf^0.5          r2 .14  p .077 . /
-fluency hf.power.r       r2 .19  p .032 * \
-fluency lf.power.nu      r2 .18  p .046 * /
-fluency hf.power.nu      r2 .18  p .046 * \
-fluency lfhf^0.5          r2 .18  p .040 * /
-fit     mean.hr          r2 .45  p .0003 *** /
-fit     mean.hr          r2 .46  p .0015 ** inverted-u
+Results
+flow        hf.power.r          r2 .14  p .075 .    \
+flow        lf.power.nu         r2 .14  p .073 .    /
+flow        hf.power.nu         r2 .14  p .073 .    \
+
+fluency     hf.power.r          r2 .19  p .032 *    \
+fluency     lf.power.nu         r2 .18  p .046 *    /
+fluency     hf.power.nu         r2 .18  p .046 *    \
+
+fit         mean.hr             r2 .45  p .0003 *** /
+fit         mean.hr             r2 .46  p .0015 **  inverted-u
+
+flow        lf.power-a^0.5      r2 .21  p .083 .    inverted-u
+flow        lfhf^0.5            r2 .14  p .077 .    /
+
+fluency     lfhf^0.5            r2 .18  p .040 *    /
+
+absorption  fit                 r2 .24  p .057 .    inverted-u
+
+flow        mean.jc             r2  27  p .010 **   /
+flow        mean.jc             r2  29  p .027 *    /
+flow        mean.cycle.interval r2 .31  p .021 *    inverted-u
+fluency     mean.jc             r2 .34  p .003 **   /
+fluency     mean.jc             r2 .41  p .004 **   inverted-u
+fluency     mean.cycle.interval r2 .32  p .012 *    inverted-u
+absorption  mean.cycle.interval r2 .25  p .044 *    inverted-u
+
+hf.power.r  mean.jc             r2 .27  p .010 *    \ 
+hf.power.r  mean.jc             r2 .30  p .023 *    inverted-u
+lf.power.nu mean.jc             r2 .34  p .002 **   /
+lf.power.nu mean.jc             r2 .34  p .011 *    inverted-u
+hf.power.nu mean.jc             r2 .34  p .002 **   \
+hf.power.nu mean.jc             r2 .34  p .011 *    u
+
+hf.power.a  mean.jc             r2 .17  p .048 *    \
+lfhf^0.5    mean.jc             r2 .35  p .002 **   /  
+lfhf^0.5    mean.jc             r2 .36  p .010 **   U       
 -->
 
 Mit jeweils 14% Varianzaufklärung beobachte ich eine schlechte Vorhersagbarkeit des Generalfaktors durch die \ac{HRV}-Merkmale \ac{HF} (%), \ac{LF} (n.u.), \ac{HF} (n.u.) oder LF/HF. Ihre linearen Zusammenhänge liegen jeweils bei einem Signifikanzniveau von $p < 0.1$. Alle weiteren Zusammenhänge liegen bei einem Signifikanzniveau von weit über $p < 0.1$. Die linearen Zusammenhänge zwischen dem glatten Verlauf und den vier genannten \ac{HRV}-Merkmalen verhalten sich ähnlich der Zusammenhänge mit dem Gesamtfaktor. Ihre Varianzaufklärung liegt jeweils bei 18% und mit einem Signifikanzniveau von unter $p < 0.05$ sind diese Zusammenhänge nicht mehr als zufällig zu betrachten. Einen nicht zufälliger systematischen Zusammenhang von Absorbiertheit und einem der \ac{HRV}-Merkmale, wie \citet{Peifer2014} fanden, konnte ich nicht feststellen. Dafür fand ich auch einen quadratischen Zusammenhang mit den absoluten Werten der \ac{LF} (siehe Abbildung \ref{fig:zusammenhaenge-von-flow-und-hrv} A). 
@@ -722,15 +800,6 @@ Ein Indiz dafür, dass der Läufer die \ac{FKS} gewissenhaft ausgefüllt hat, ze
 
 Im Gegensatz zu den Ergebnissen in \citet{Peifer2014} verhält sich der Zusammenhang zwischen Flow (bestimmt durch den Generalfaktor) und der \ac{HF} beim Laufen genau anders herum (siehe Abbildung \ref{fig:zusammenhaenge-von-flow-und-hrv} B). Der Grund dafür ist die körperliche bzw. sportliche Belastung und die dadurch notwendige Anpassung der Frequenzbänder. Durch die Anpassung ist die übliche rein neuro-vegetative, sympathiko-vagale Interpretation der Spektralbänder nicht möglich, da sich im \ac{HF}-Band bei körperlicher bzw. sportlicher Belastung vor allem mechanisch bedingte Resonanz- und Kopplungsphänomene mit der Atmung und der motorischen Aktivität zu manifestieren scheinen \citep[S. 62]{Hoos2010}. Eine Zugehörigkeitsbestimmung der \ac{HF} zur vagalen Aktivität des \ac{ANS}s, wie bei der rein neuro-vegetativen, sympathiko-vagalen Interpretation, wäre deshalb fehlerhaft. Was \ac{HF} außerhalb der üblichen euro-vegetativen, sympathiko-vagalen Interpretation der Spektralbänder über die Prozesse in unserem Körper sagen, kann ich zum jetzigen Zeitpunkt nicht sagen. Deswegen bietet sich für mich, die weitere Nutzung des \ac{HRV}-Merkmals \ac{HF} nur in individuellen Schwellenkonzepten an. In einem weiteren Ansatz könnte ich den direkten Zusammenhang zwischen der zeitvarianten spektralen Kenngröße der \ac{HF} mit ventilatorischen Schwellenkonzepten nach \citet{Cottin2007} untersuchen. Der Ansatz könnte mit Hilfe der Herzfrequenzmessung einen Zusammenhang der Atemfrequenz und Flow ermöglichen. 
 Der Zusammenhang zwischen Flow und den absoluten Werten der \ac{LF} verhält sich wie bei \citet{Peifer2014} und stellt sich als umgedrehtes U dar. Dies spricht dafür, dass eine moderate Beanspruchung durch die Tätigkeit für Flow gegeben sein muss. Für diese Annahme spricht auch der nicht zufälliger systematischer quadrischer Zusammenhang von \ac{AFP} und mittlerer Herzfrequenz. Steigt die Herzfrequenz über einen individuellen Maximalwert hinweg, fällt die \ac{AFP}. Leider konnte ich keinen Zusammenhang zwischen Generalfaktor und \ac{AFP} oder mittlerer Herzfrequenz herstellen.
-
-<!--
-## Jerk Cost
-
-\begin{equation}
-  JC = \int_0^T dt ((\frac{d^3x}{dt^3})^2 + (\frac{d^3y}{dt^3})^2 + (\frac{d^3z}{dt^3})^2 ) 
-\end{equation}
-
--->
 
 \bibliographystyle{agsm}
 \bibliography{./bibtex/library}
