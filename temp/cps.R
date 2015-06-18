@@ -1,5 +1,6 @@
-leg.motion.time.data  <- read.csv("~/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/preprocessed-data/running/buse-patrick/2013-10-17--18-07-11/leg-motion-time-data-2.csv")
-kubios.hrv.data       <- read.csv("~/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/preprocessed-data/running/buse-patrick/2013-10-17--18-07-11/ecg-data-2_hrv.txt", header = F, na.strings = "", fill = T, skip = 117, stringsAsFactors = FALSE, col.names = c("", "t", "rr.interval", "FFT.Frequency", "FFT.PSD", "AR.Frequency", "AR.PSD", "VLF.comp.", "LF.comp.", "HF.comp.", ""))[,2:3]
+load("../cps-example-data.RData")
+
+require(flow)
 
 n   <- 0
 m   <- 300
@@ -16,12 +17,12 @@ par(mfcol=c(2, 1))
 plot(t.1, y.1, type = "l")
 plot(t.2, y.2, type = "l")
 
-t   <- seq(1, 9, .25)
-t.1 <- seq(1, 3, .5)
-t.2 <- seq(1, 3, 1)
+# t   <- seq(1, 9, .25)
+# t.1 <- seq(1, 3, .5)
+# t.2 <- seq(1, 3, 1)
 
-t.1 <- c(t.1, seq(3.5, 6, .5), seq(3, 6, .5))
-t.2 <- c(t.2, seq(6, 9, .5), seq(6, 9, 1))
+# t.1 <- c(t.1, seq(3.5, 6, .5), seq(3, 6, .5))
+# t.2 <- c(t.2, seq(6, 9, .5), seq(6, 9, 1))
 
 par(mfcol=c(3, 1))
 
@@ -40,7 +41,7 @@ psi <- (fi %% (2*pi*m)) / (2*pi*m)
 plot(t.1, psi, col = rep(c(1,2), length(fi)))
 
 # Conditional Probability Index
-window.size <- 1
+window.size <- 6
 n    <- 1
 m    <- 1
 cpi <- rep(NA, window.size)
