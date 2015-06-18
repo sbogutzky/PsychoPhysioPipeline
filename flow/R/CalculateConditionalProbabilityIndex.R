@@ -11,7 +11,7 @@
 #' @param plot. Logical if should plot phase in circles.
 #' @return conditional probability index
 
-CalculateConditionalProbabilityIndexes <- function(times, time.series.1, time.series.2, n, m, bins = 16, plot = F) {
+CalculateConditionalProbabilityIndex <- function(times, time.series.1, time.series.2, n, m, bins = 16, plot = F) {
   
   fi.1 <- CalculateInstantaneousPhases(times, time.series.1) %% (2*pi*n)
   
@@ -25,17 +25,21 @@ CalculateConditionalProbabilityIndexes <- function(times, time.series.1, time.se
       polygon(xcoords, ycoords, ...)
     }
     
-    par(mfcol=c(1, 1))
-    plot(-1:1, type = "n", xlim = c(-1,1), ylim = c(-1,1), asp = 1, bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
-    circle(0,0,1)
-    segments(rep(0,bins-1),rep(0,bins-1),sin(bin.breaks[-1]),cos(bin.breaks[-1]), lty = "dashed")
-    segments(rep(0,length(fi.1)),rep(0,length(fi.1)),sin(fi.1),cos(fi.1))
-    points(sin(fi.1), cos(fi.1), pch = 19)
+    plotPhases <- function(fi) {
     
-    mtext(expression(pi), side = 1, line = 0)
-    mtext(expression(pi/2), side = 4, line = 0)
-    mtext(expression(0), side = 3, line = 0)
-    mtext(expression(2*pi/3), side = 2, line = 0)
+      par(mfcol=c(1, 1))
+      plot(-1:1, type = "n", xlim = c(-1,1), ylim = c(-1,1), asp = 1, bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
+      circle(0,0,1)
+      segments(rep(0,bins-1),rep(0,bins-1),sin(bin.breaks[-1]),cos(bin.breaks[-1]), lty = "dashed")
+      mtext(expression(pi), side = 1, line = 0)
+      mtext(expression(pi/2), side = 4, line = 0)
+      mtext(expression(0), side = 3, line = 0)
+      mtext(expression(2*pi/3), side = 2, line = 0)
+    
+      segments(rep(0,length(fi)),rep(0,length(fi)),sin(fi),cos(fi))
+      points(sin(fi), cos(fi), pch = 19)
+    }
+    plotPhases(fi)
   }
   
   lambda <- c()
@@ -49,17 +53,7 @@ CalculateConditionalProbabilityIndexes <- function(times, time.series.1, time.se
     lambda.l <- M.l^-1 * sqrt(sum(cos(eta/m))^2 + sum(sin(eta/m))^2)
     
     if(plot) {
-      par(mfcol=c(1, 1))
-      plot(-1:1, type = "n", xlim = c(-1,1), ylim = c(-1,1), asp = 1, bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
-      circle(0,0,1)
-      segments(rep(0,length(eta)),rep(0,length(eta)),sin(eta/m),cos(eta/m))
-      points(sin(eta/m), cos(eta/m), pch = 19)
-    
-      mtext(expression(pi), side = 1, line = 0)
-      mtext(expression(pi/2), side = 4, line = 0)
-      mtext(expression(0), side = 3, line = 0)
-      mtext(expression(2*pi/3), side = 2, line = 0)
-    
+      plotPhases(eta/m)
       print(paste("From", round(bin.breaks[l], 3), "to", round(bin.breaks[l+1], 3), "; Count:", M.l, "; dependent:", length(eta), "; lambda:", round(lambda.l, 3)))
     }
     lambda <- c(lambda, lambda.l)
