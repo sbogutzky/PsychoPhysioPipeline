@@ -17,9 +17,9 @@ par(mfcol=c(2, 1))
 plot(t.1, y.1, type = "l")
 plot(t.2, y.2, type = "l")
 
-t   <- seq(1, 9, .25)
-t.1 <- seq(1, 9, .5)
-t.2 <- c(seq(1, 3, 1), seq(3.5, 6, .5), seq(7, 9, 1))
+# t   <- seq(1, 9, .25)
+# t.1 <- seq(1, 9, .5)
+# t.2 <- c(seq(1, 3, 1), seq(3.5, 6, .5), seq(7, 9, 1))
 
 par(mfcol=c(3, 1))
 
