@@ -38,7 +38,7 @@ psi <- (fi %% (2*pi*m)) / (2*pi*m)
 plot(t.1, psi, col = rep(c(1,2), length(fi)))
 
 # Conditional Probability Index
-window.size <- 1
+window.size <- 20 * 4
 n    <- 2
 m    <- 1
 cpi <- rep(NA, window.size)
