@@ -1,4 +1,4 @@
-load("../cps-example-data.RData")
+load("./cps-example-data.RData")
 
 require(flow)
 
@@ -32,20 +32,28 @@ gpd <- abs(n * fi.1 - m * fi.2)
 plot(t, round(gpd / 2*pi, 3), type= "l")
 
 # Stroboscopic Technique
+window.size <- 20 * 4
 fi  <- CalculateInstantaneousPhases(t.1, t.2)
-m   <- .5
+m   <- 1
 psi <- (fi %% (2*pi*m)) / (2*pi*m)
-plot(t.1, psi, col = rep(c(1,2), length(fi)))
+plot(t.1, psi, col = rep(c(1,2), length(fi)), xaxt = "n")
+
+axis(1, seq(0, 300, window.size/4), seq(0, 300, window.size/4))
+abline(v = seq(0, 300, window.size/4), col = "lightgray", lty = "dotted")
 
 # Conditional Probability Index
-window.size <- 20 * 4
 n    <- 2
 m    <- 1
 cpi <- rep(NA, window.size)
 for(i in 1:(length(t) - window.size)) {
     cpi <- c(cpi, CalculateConditionalProbabilityIndex(t[i:(i+window.size)], t.1, t.2, n, m, 16, F)) 
 }
-plot(t, cpi, type = "l", ylim = c(0,1))
+plot(t, cpi, type = "l", ylim = c(0,1), xaxt = "n")
+
+axis(1, seq(0, 300, window.size/4), seq(0, 300, window.size/4))
+abline(v = seq(0, 300, window.size/4), col = "lightgray", lty = "dotted")
+
+
 mean(cpi, na.rm = T)
 
 CalculateConditionalProbabilityIndex(t[i:(i+window.size)], t.1, t.2, n, m, 16, T)
