@@ -16,8 +16,8 @@ measurement.started.before  <- 5
 # Where do you measure the data?
 body.position <- "leg"
 
-# Which sampling rate do you wish?
-sampling.rate  <- 64
+# # Which sampling rate do you wish?
+# sampling.rate  <- 64
 
 # Load sampling.rates features
 fss.features        <- read.csv("../data/features/fss-features.csv", stringsAsFactors = F)
@@ -75,15 +75,23 @@ for (i in 1:nrow(fss.features)) {
     # Set subset timestamp to zero
     motion.data.subset[,1] <- motion.data.subset[,1] - motion.data.subset[1, 1]
     
-    # Interpolate
-    t                       <- seq(motion.data.subset[1, 1], motion.data.subset[nrow(motion.data.subset), 1], by = 1/sampling.rate)
-    motion.acceleration.x   <- interp1(motion.data.subset[,1], motion.data.subset[,2], t, method = "spline")
-    motion.acceleration.y   <- interp1(motion.data.subset[,1], motion.data.subset[,3], t, method = "spline")
-    motion.acceleration.z   <- interp1(motion.data.subset[,1], motion.data.subset[,4], t, method = "spline")
-    motion.rotation.rate.x  <- interp1(motion.data.subset[,1], motion.data.subset[,5], t, method = "spline")
-    motion.rotation.rate.y  <- interp1(motion.data.subset[,1], motion.data.subset[,6], t, method = "spline")
-    motion.rotation.rate.z  <- interp1(motion.data.subset[,1], motion.data.subset[,7], t, method = "spline")
-    t                       <- t + time.difference
+#     # Interpolate
+#     t                       <- seq(motion.data.subset[1, 1], motion.data.subset[nrow(motion.data.subset), 1], by = 1/sampling.rate)
+#     motion.acceleration.x   <- interp1(motion.data.subset[,1], motion.data.subset[,2], t, method = "spline")
+#     motion.acceleration.y   <- interp1(motion.data.subset[,1], motion.data.subset[,3], t, method = "spline")
+#     motion.acceleration.z   <- interp1(motion.data.subset[,1], motion.data.subset[,4], t, method = "spline")
+#     motion.rotation.rate.x  <- interp1(motion.data.subset[,1], motion.data.subset[,5], t, method = "spline")
+#     motion.rotation.rate.y  <- interp1(motion.data.subset[,1], motion.data.subset[,6], t, method = "spline")
+#     motion.rotation.rate.z  <- interp1(motion.data.subset[,1], motion.data.subset[,7], t, method = "spline")
+#     t                       <- t + time.difference
+    
+    t                       <- motion.data.subset[,1] + time.difference
+    motion.acceleration.x   <- motion.data.subset[,2]
+    motion.acceleration.y   <- motion.data.subset[,3]
+    motion.acceleration.z   <- motion.data.subset[,4]
+    motion.rotation.rate.x  <- motion.data.subset[,5]
+    motion.rotation.rate.y  <- motion.data.subset[,6]
+    motion.rotation.rate.z  <- motion.data.subset[,7]
   
     # Write csv file
     output.file.path <- paste(output.directory, body.position, "-motion-data-", measurement, ".csv", sep = "")
