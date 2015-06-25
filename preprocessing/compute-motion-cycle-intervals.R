@@ -15,7 +15,7 @@ first.name              <- "Patrick"
 last.name               <- "Buse"
 activity                <- "Running"
 file.name.prefix        <- "leg"
-sampling.rate           <- 64
+sampling.rate           <- 2000
 
 # Load all file names
 data.path               <- paste(root.data.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/",  sep = "")
@@ -33,43 +33,47 @@ for (motion.file.name in motion.file.names) {
   rotation.rate.z.spectrum <- TSA::periodogram(motion.data[, 7], plot = T, main = "Rotation Rate Z")
   
   axis <- which.max(c(max(rotation.rate.x.spectrum[[2]]), max(rotation.rate.y.spectrum[[2]]), max(rotation.rate.z.spectrum[[2]])))
-  if(axis == 1) {
-    axis.label      <- "X-Axis"
-    index           <- which.max(rotation.rate.x.spectrum[[2]])
-    main.frequency  <- rotation.rate.x.spectrum[[1]][index] * sampling.rate
-  }
+#   if(axis == 1) {
+#     axis.label      <- "X-Axis"
+#     index           <- which.max(rotation.rate.x.spectrum[[2]])
+#     main.frequency  <- rotation.rate.x.spectrum[[1]][index] * sampling.rate
+#   }
+# 
+#   if(axis == 2) {
+#     axis.label      <- "Y-Axis"
+#     index           <- which.max(rotation.rate.y.spectrum[[2]])
+#     main.frequency  <- rotation.rate.y.spectrum[[1]][index] * sampling.rate
+#   }
+# 
+#   if(axis == 3) {
+#     axis.label      <- "Z-Axis"
+#     index           <- which.max(rotation.rate.z.spectrum[[2]])
+#     main.frequency  <- rotation.rate.z.spectrum[[1]][index] * sampling.rate
+#   }
 
-  if(axis == 2) {
-    axis.label      <- "Y-Axis"
-    index           <- which.max(rotation.rate.y.spectrum[[2]])
-    main.frequency  <- rotation.rate.y.spectrum[[1]][index] * sampling.rate
-  }
+  # Upsampling
+  t               <- seq(motion.data[1, 1], motion.data[nrow(motion.data), 1], by = 1/2000)
+  rotation.rate   <- interp1(motion.data[,1], motion.data[, axis + 4], t, method = "spline")
 
-  if(axis == 3) {
-    axis.label      <- "Z-Axis"
-    index           <- which.max(rotation.rate.z.spectrum[[2]])
-    main.frequency  <- rotation.rate.z.spectrum[[1]][index] * sampling.rate
-  }
-  
-  # Low pass signal
-  #main.frequency         <- .5
-  main.frequency          <- floor(main.frequency * 10) / 10
-  butterworth.filter      <- butter(1, 1/sampling.rate * main.frequency, "low")
-  filtered.rotation.rate  <- filtfilt(butterworth.filter, motion.data[, axis + 4])
+#   # Low pass signal
+#   #main.frequency         <- .5
+#   main.frequency          <- floor(main.frequency * 10) / 10
+#   butterworth.filter      <- butter(1, 1/sampling.rate * main.frequency, "low")
+#   filtered.rotation.rate  <- filtfilt(butterworth.filter, motion.data[, axis + 4])
   
   # Search for minima
-  minima <- SearchExtrema(filtered.rotation.rate, which = "minima")
+  minima <- SearchExtrema(rotation.rate, which = "minima")
   
   # Remove some minima
-  m <- mean(filtered.rotation.rate[minima])
-  s <- sd(filtered.rotation.rate[minima])
-  minima <- minima[m + s * 1 > filtered.rotation.rate[minima]]
+  m <- mean(rotation.rate[minima])
+  s <- sd(rotation.rate[minima])
+  minima <- minima[m + s * .5 > rotation.rate[minima]]
   
-  par(mfcol=c(2, 1))
-  plot(motion.data[, 1], motion.data[, axis + 4], type="l", xlab="t [s]", ylab=paste("Rotation Rate [deg/s] around", axis.label))
-  abline(v = motion.data[minima, 1])
-  plot(motion.data[, 1], filtered.rotation.rate, type="l", xlab="t [s]", ylab=paste("Filtered Rotation Rate [deg/s] around", axis.label))
-  abline(v = motion.data[minima, 1])
+#   par(mfcol=c(2, 1))
+#   plot(motion.data[, 1], motion.data[, axis + 4], type="l", xlab="t [s]", ylab=paste("Rotation Rate [deg/s]"))
+#   abline(v = motion.data[minima, 1])
+  plot(t, rotation.rate, type="l", xlab="t [s]", ylab=paste("Filtered Rotation Rate [deg/s]"), xlim = c(0,2))
+  abline(v = t[minima])
 
   t               <- motion.data[minima, 1]
   cycle.interval  <- c(NA, diff(t))
