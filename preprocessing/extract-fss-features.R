@@ -2,17 +2,17 @@
 rm(list = ls(all = T))  
 
 # Set working directory
-setwd("~/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/preprocessing")
+setwd("//gangstore.ddns.net/flow/Documents/simon-bogutzky/data")
 
 # Load libraries
 library(flow)
 
 # Set properties
-root.data.path    <- "../data/cleaned-data/"
-first.name        <- "Patrick"
-last.name         <- "Buse"
-date.of.birth     <- "1984-05-05"
-activity          <- "Baseline" # Running
+root.data.path    <- "./cleaned-data/"
+first.name        <- "Barbara"
+last.name         <- "Grueter"
+date.of.birth     <- "1950-04-15"
+activity          <- "Walking"
 
 # Load all file names
 data.path           <- paste(root.data.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/",  sep = "")
@@ -33,7 +33,6 @@ for (fss.data.file.name in fss.data.file.names) {
     # Extract times
     if(i == 1) {
       activity.start  <- fss.data[i, 1] - 15 * 60000
-      print(strftime(as.POSIXct((fss.data[i, 1] - 15 * 60000) / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S"))
     } else {
       activity.start  <- inquiry.end
     }
@@ -49,10 +48,16 @@ for (fss.data.file.name in fss.data.file.names) {
   }
 }
 
+# Create output directory, if needed
+output.directory <- "./features"
+if(!file.exists(output.directory)) {
+  dir.create(output.directory, recursive = TRUE)
+}
+
 # Write to csv file
-if(file.exists("../data/features/fss-features.csv")) {
-  features <- read.csv("../data/features/fss-features.csv", stringsAsFactors = FALSE)
-  write.csv(rbind(features, fss.features), "../data/features/fss-features.csv", row.names = FALSE)
+if(file.exists("./features/fss-features.csv")) {
+  features <- read.csv("./features/fss-features.csv", stringsAsFactors = FALSE)
+  write.csv(unique(rbind(features, fss.features)), "../data/features/fss-features.csv", row.names = FALSE)
 } else {
-  write.csv(fss.features, "../data/features/fss-features.csv", row.names = FALSE)
+  write.csv(fss.features, "./features/fss-features.csv", row.names = FALSE)
 }
