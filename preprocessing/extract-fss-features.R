@@ -2,7 +2,11 @@
 rm(list = ls(all = T))  
 
 # Set working directory
-setwd("//gangstore.ddns.net/flow/Documents/simon-bogutzky/data")
+if(file.exists("/Volumes/flow/Documents/simon-bogutzky/data")) {
+  setwd("/Volumes/flow/Documents/simon-bogutzky/data")
+} else {
+  setwd("//gangstore.ddns.net/flow/flow/Documents/simon-bogutzky/data")
+}
 
 # Load libraries
 library(flow)
