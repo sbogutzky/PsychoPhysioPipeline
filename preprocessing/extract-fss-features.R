@@ -32,7 +32,8 @@ for (fss.data.file.name in fss.data.file.names) {
     
     # Extract times
     if(i == 1) {
-      activity.start  <- as.numeric(strptime(substr(fss.data.file.name, 1, 20), "%Y-%m-%d--%H-%M-%S"), tz="CET") * 1000
+      activity.start  <- fss.data[i, 1] - 15 * 60000
+      print(strftime(as.POSIXct((fss.data[i, 1] - 15 * 60000) / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S"))
     } else {
       activity.start  <- inquiry.end
     }
