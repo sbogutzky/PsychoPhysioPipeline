@@ -5,7 +5,7 @@ rm(list = ls(all = T))
 if(file.exists("/Volumes/flow/Documents/simon-bogutzky/data")) {
   setwd("/Volumes/flow/Documents/simon-bogutzky/data")
 } else {
-  setwd("//gangstore.ddns.net/flow/flow/Documents/simon-bogutzky/data")
+  setwd("//gangstore.ddns.net/flow/Documents/simon-bogutzky/data")
 }
 
 # Load libraries
