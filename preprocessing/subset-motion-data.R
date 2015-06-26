@@ -75,8 +75,17 @@ for (i in 1:nrow(fss.features)) {
     motion.rot.rate.y.deg.s  <- motion.data.subset[,6]
     motion.rot.rate.z.deg.s  <- motion.data.subset[,7]
     
+    if(mean(motion.accel.y.ms.2) < 0) {
+      motion.accel.x.ms.2      <- -motion.accel.x.ms.2 
+      motion.accel.y.ms.2      <- -motion.accel.y.ms.2
+      motion.rot.rate.x.deg.s  <- -motion.rot.rate.x.deg.s
+      motion.rot.rate.y.deg.s  <- -motion.rot.rate.y.deg.s
+      
+      print("Axis switch!")
+    } 
+    
     # Plot data
-    plot(t.ms / 1000, motion.rot.rate.x.deg.s, type = "l", xlab = "t [s]", ylab = "Rotation Rate X [deg/s]")
+    plot(t.ms / 1000, motion.rot.rate.x.deg.s, type = "l", xlab = "t [s]", ylab = "Rotation Rate X [deg/s]", xlim = c(140, 150))
     title(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y/%m/%d %H:%M"))
     
     # Write csv file
