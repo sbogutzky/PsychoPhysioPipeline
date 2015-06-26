@@ -67,7 +67,7 @@ for (i in 1:nrow(fss.features)) {
     print(paste("Total time      (ms):", round(motion.data.subset[nrow(motion.data.subset),1] - motion.data.subset[1,1] + time.difference, 3)))
     
     # Extract data
-    t.ms                     <- motion.data.subset[,1]
+    t.ms                     <- motion.data.subset[,1] - motion.data.subset[1,1] + time.difference
     motion.accel.x.ms.2      <- motion.data.subset[,2]
     motion.accel.y.ms.2      <- motion.data.subset[,3]
     motion.accel.z.ms.2      <- motion.data.subset[,4]
