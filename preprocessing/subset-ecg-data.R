@@ -1,19 +1,21 @@
 # Remove all variables
-rm(list = ls(all = T))  
+rm(list = ls(all = T)) 
+
+require(signal)
 
 # Set network directory
-network.directory <- "//gangstore.ddns.net/flow/Documents/simon-bogutzky/data"
+network.directory <- "//gangstore.ddns.net/flow/Documents/simon-bogutzky/data/"
 if(file.exists("/Volumes/flow/Documents/simon-bogutzky/data"))
-  network.directory <- "/Volumes/flow/Documents/simon-bogutzky/data"
+  network.directory <- "/Volumes/flow/Documents/simon-bogutzky/data/"
 
 # Set network cleaned data directory
-cleaned.data.directory    <- paste(network.directory, "/cleaned-data/", sep = "")
+cleaned.data.directory    <- paste(network.directory, "cleaned-data/", sep = "")
 
 # Set local processed data directory
 processed.data.directory <- "./data/preprocessed-data/"
 
 # Load fss features
-fss.features        <- read.csv(paste(network.directory, "/features/fss-features.csv", sep = ""), stringsAsFactors = F)
+fss.features        <- read.csv(paste(network.directory, "features/fss-features.csv", sep = ""), stringsAsFactors = F)
 
 for (i in 1:nrow(fss.features)) {
   
@@ -63,11 +65,16 @@ for (i in 1:nrow(fss.features)) {
     print(paste("Time difference (ms):", round(time.difference, 3)))
     print(paste("Total time      (ms):", round(ecg.data.subset[nrow(ecg.data.subset),1] - ecg.data.subset[1,1] + time.difference, 3)))
     
-    # Extract data
-    t.ms      <- ecg.data.subset[,1]
-    lead.1.mv <- ecg.data.subset[,3] - ecg.data.subset[,2]
-    lead.2.mv <- ecg.data.subset[,2]
-    lead.3.mv <- ecg.data.subset[,3]
+    # Interpolate for Kubios HRV
+    n.subset <- nrow(ecg.data.subset)
+    n.subset / ((ecg.data.subset[n.subset,1] - ecg.data.subset[1,1]) / 1000)
+    fs <- 512 #round(n.subset / ((ecg.data.subset[n.subset,1] - ecg.data.subset[1,1]) / 1000))
+    
+    t.ms      <- seq(ecg.data.subset[1, 1], ecg.data.subset[n.subset, 1], by = 1000/fs)
+    lead.1.mv <- interp1(ecg.data.subset[, 1], ecg.data.subset[,3] - ecg.data.subset[,2], t.ms, method = "spline")
+    lead.2.mv <- interp1(ecg.data.subset[, 1], ecg.data.subset[,2], t.ms, method = "spline")
+    lead.3.mv <- interp1(ecg.data.subset[, 1], ecg.data.subset[,3], t.ms, method = "spline")
+    t.ms      <- t.ms - t.ms[1] + time.difference
     
     # Plot data
     par(mfcol=c(3, 1))
