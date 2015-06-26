@@ -1,17 +1,19 @@
 # Remove all variables
 rm(list = ls(all = T))  
 
-# Set working directory
-setwd("~/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/preprocessing")
+# Set network directory
+network.directory <- "//gangstore.ddns.net/flow/Documents/simon-bogutzky/data"
+if(file.exists("/Volumes/flow/Documents/simon-bogutzky/data"))
+  network.directory <- "/Volumes/flow/Documents/simon-bogutzky/data"
 
-# Load libraries
-library(signal)
+# Set network cleaned data directory
+cleaned.data.directory    <- paste(network.directory, "/cleaned-data/", sep = "")
 
-# Set paths
-root.data.path    <- "../data/cleaned-data/"
+# Set local processed data directory
+processed.data.directory <- "./data/preprocessed-data/"
 
 # Load fss features
-fss.features        <- read.csv("../data/features/fss-features.csv", stringsAsFactors = F)
+fss.features        <- read.csv(paste(network.directory, "/features/fss-features.csv", sep = ""), stringsAsFactors = F)
 
 for (i in 1:nrow(fss.features)) {
   
@@ -30,7 +32,7 @@ for (i in 1:nrow(fss.features)) {
     n               <- 0
     
     # Read data, if needed
-    ecg.data.path <- paste(root.data.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, "/ecg-data.csv", sep="")
+    ecg.data.path <- paste(cleaned.data.directory, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, "/ecg-data.csv", sep="")
     if(file.exists(ecg.data.path)) {
       ecg.data      <- read.csv(ecg.data.path)
       
@@ -44,7 +46,7 @@ for (i in 1:nrow(fss.features)) {
       first.timestamp <- ecg.data[1,4]
       
       # Create output directory, if needed
-      output.directory <- paste("../data/preprocessed-data/", tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, "/", sep="")
+      output.directory <- paste(processed.data.directory, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, sep="")
       if(!file.exists(output.directory)) {
         dir.create(output.directory, recursive = TRUE)
       }
@@ -75,7 +77,7 @@ for (i in 1:nrow(fss.features)) {
     plot(t.ms[0:1024] / 1000, lead.3.mv[0:1024], type = "l", xlab = "t [s]", ylab = "Lead III [mV]")
     
     # Write csv file
-    output.file.path <- paste(output.directory, "ecg-data-", measurement, ".csv", sep = "")
+    output.file.path <- paste(output.directory, "/ecg-data-", measurement, ".csv", sep = "")
     write.csv(data.frame(t.ms, lead.1.mv, lead.2.mv, lead.3.mv), output.file.path, row.names = FALSE)
     print(paste("Wrote:", output.file.path))
   }
