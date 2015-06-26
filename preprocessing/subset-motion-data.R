@@ -1,101 +1,87 @@
 # Remove all variables
 rm(list = ls(all = T))  
 
-# Set working directory
-setwd("~/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/preprocessing")
+# Set network directory
+network.directory <- "//gangstore.ddns.net/flow/Documents/simon-bogutzky/data"
+if(file.exists("/Volumes/flow/Documents/simon-bogutzky/data"))
+  network.directory <- "/Volumes/flow/Documents/simon-bogutzky/data"
 
-# Load libraries
-library(signal)
+# Set network cleaned data directory
+cleaned.data.directory    <- paste(network.directory, "/cleaned-data/", sep = "")
 
-# Set paths
-root.data.path    <- "../data/cleaned-data/"
+# Set local processed data directory
+processed.data.directory <- "./data/preprocessed-data/"
 
-# How many minutes before the activity end the measurement started?
-measurement.started.before  <- 5
+# Load fss features
+fss.features <- read.csv(paste(network.directory, "/features/fss-features.csv", sep = ""), stringsAsFactors = F)
 
-# Where do you measure the data?
+# Set body position
 body.position <- "leg"
-
-# # Which sampling rate do you wish?
-# sampling.rate  <- 64
-
-# Load sampling.rates features
-fss.features        <- read.csv("../data/features/fss-features.csv", stringsAsFactors = F)
 
 for (i in 1:nrow(fss.features)) {
   
   properties      <- fss.features[i, c(6:13)]
   activity        <- properties[, 1]
-  activity.start  <- as.POSIXct(properties[, 2])
-  activity.end    <- as.POSIXct(properties[, 3])
+  activity.start  <- properties[, 2]
+  activity.end    <- properties[, 3]
   measurement     <- properties[, 5]
   last.name       <- properties[, 6]
   first.name      <- properties[, 7]
   date.of.birth   <- properties[, 8]
+  date.directory  <- strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S")
   
   if(measurement == 1) {
     motion.data        <- data.frame()
+    n               <- 0
     
     # Read data, if needed
-    motion.data.path <- paste(root.data.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", format(activity.start, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", body.position, "-motion-data.csv", sep="")
+    motion.data.path <- paste(cleaned.data.directory, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, "/", body.position, "-motion-data.csv", sep="")
     if(file.exists(motion.data.path)) {
       motion.data      <- read.csv(motion.data.path)
       
+      # Number of data rows
+      n <- nrow(motion.data)
+      
       # Set motion data timestamp to zero 
-      motion.data[,1] <- (motion.data[,1] - motion.data[1,1]) / 1000
+      motion.data[,1] <- motion.data[,1] - motion.data[1,1]
       
-      # Correct motion data system time
-      motion.data[,8] <- motion.data[1,8] / 1000 + motion.data[,1] 
+      # Set first timestamp
+      first.timestamp <- motion.data[1,8]
       
-      # Create directory, if needed
-      output.directory <- paste("../data/preprocessed-data/", tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", format(activity.start, format="%Y-%m-%d--%H-%M-%S", tz="CET"), "/", sep="")
+      # Create output directory, if needed
+      output.directory <- paste(processed.data.directory, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, sep="")
       if(!file.exists(output.directory)) {
         dir.create(output.directory, recursive = TRUE)
       }
-      
-      par(mfcol=c(2, 1))
-      plot(motion.data[,1], motion.data[,5], type = "l", xlab = "t [s]", ylab = "Rotation Rate X [deg/s]")
-      title(format(activity.start, format="%Y-%m-%d--%H-%M-%S", tz="CET"))
-      plot(motion.data[motion.data[,1] > 1800 & motion.data[,1] < 1810,1], motion.data[motion.data[,1] > 1800 & motion.data[,1] < 1810,5], type = "l", xlab = "t [s]", ylab = "Rotation Rate X [deg/s]")
-      
     } else {
       print("No motion data")
     }
   }
   
-  # Subset motion data
-  if(nrow(motion.data) > 0) {
+  if(n > 0) {
     
-    start.time         <- activity.end - measurement.started.before * 60
-    motion.data.subset <- motion.data[start.time <= as.POSIXct(motion.data[,8], origin = "1970-01-01") & as.POSIXct(motion.data[,8], origin = "1970-01-01") <= activity.end,]
-    time.difference    <- as.POSIXct(motion.data.subset[1,8], origin = "1970-01-01") - (activity.end - measurement.started.before * 60)
-    print(time.difference)
-    print(as.POSIXct(motion.data.subset[nrow(motion.data.subset),8], origin = "1970-01-01") - as.POSIXct(motion.data.subset[1,8], origin = "1970-01-01") + time.difference)
+    # Subset motion data
+    motion.data.subset   <- motion.data[activity.start <= first.timestamp + motion.data[,1] & first.timestamp + motion.data[,1] < activity.end,]
+    time.difference   <- first.timestamp + motion.data.subset[1,1] - activity.start
+    print(paste("Time difference (ms):", round(time.difference, 3)))
+    print(paste("Total time      (ms):", round(motion.data.subset[nrow(motion.data.subset),1] - motion.data.subset[1,1] + time.difference, 3)))
     
-    # Set subset timestamp to zero
-    motion.data.subset[,1] <- motion.data.subset[,1] - motion.data.subset[1, 1]
+    # Extract data
+    t.ms                     <- motion.data.subset[,1]
+    motion.accel.x.ms.2      <- motion.data.subset[,2]
+    motion.accel.y.ms.2      <- motion.data.subset[,3]
+    motion.accel.z.ms.2      <- motion.data.subset[,4]
+    motion.rot.rate.x.deg.s  <- motion.data.subset[,5]
+    motion.rot.rate.y.deg.s  <- motion.data.subset[,6]
+    motion.rot.rate.z.deg.s  <- motion.data.subset[,7]
     
-#     # Interpolate
-#     t                       <- seq(motion.data.subset[1, 1], motion.data.subset[nrow(motion.data.subset), 1], by = 1/sampling.rate)
-#     motion.acceleration.x   <- interp1(motion.data.subset[,1], motion.data.subset[,2], t, method = "spline")
-#     motion.acceleration.y   <- interp1(motion.data.subset[,1], motion.data.subset[,3], t, method = "spline")
-#     motion.acceleration.z   <- interp1(motion.data.subset[,1], motion.data.subset[,4], t, method = "spline")
-#     motion.rotation.rate.x  <- interp1(motion.data.subset[,1], motion.data.subset[,5], t, method = "spline")
-#     motion.rotation.rate.y  <- interp1(motion.data.subset[,1], motion.data.subset[,6], t, method = "spline")
-#     motion.rotation.rate.z  <- interp1(motion.data.subset[,1], motion.data.subset[,7], t, method = "spline")
-#     t                       <- t + time.difference
+    # Plot data
+    plot(t.ms / 1000, motion.rot.rate.x.deg.s, type = "l", xlab = "t [s]", ylab = "Rotation Rate X [deg/s]")
+    title(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y/%m/%d %H:%M"))
     
-    t                       <- motion.data.subset[,1] + time.difference
-    motion.acceleration.x   <- motion.data.subset[,2]
-    motion.acceleration.y   <- motion.data.subset[,3]
-    motion.acceleration.z   <- motion.data.subset[,4]
-    motion.rotation.rate.x  <- motion.data.subset[,5]
-    motion.rotation.rate.y  <- motion.data.subset[,6]
-    motion.rotation.rate.z  <- motion.data.subset[,7]
-  
     # Write csv file
-    output.file.path <- paste(output.directory, body.position, "-motion-data-", measurement, ".csv", sep = "")
-    write.csv(data.frame(t, motion.acceleration.x, motion.acceleration.y, motion.acceleration.z, motion.rotation.rate.x, motion.rotation.rate.y, motion.rotation.rate.z), output.file.path, row.names = FALSE)
-    print(output.file.path)
+    output.file.path <- paste(output.directory, "/", body.position, "-motion-data-", measurement, ".csv", sep = "")
+    write.csv(data.frame(t.ms, motion.accel.x.ms.2, motion.accel.y.ms.2, motion.accel.z.ms.2, motion.rot.rate.x.deg.s, motion.rot.rate.y.deg.s, motion.rot.rate.z.deg.s), output.file.path, row.names = FALSE)
+    print(paste("Wrote:", output.file.path))
   }
 }
