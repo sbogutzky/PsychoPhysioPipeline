@@ -1,13 +1,8 @@
-beat.times <- read.csv("/Users/simonbogutzky/Desktop/ecg-data-3_hrv.txt", header = F, na.strings = "", fill = T, skip = 117, stringsAsFactors = F, col.names = c("", "Time", "RR.interval", "FFT.Frequency", "FFT.PSD", "AR.Frequency", "AR.PSD", "VLF.comp.", "LF.comp.", "HF.comp.", ""))[,2]
-stride.times <- read.csv("/Users/simonbogutzky/Desktop/leg-motion-time-data-3_hrv.txt", header = F, na.strings = "", fill = T, skip = 117, stringsAsFactors = F, col.names = c("", "Time", "RR.interval", "FFT.Frequency", "FFT.PSD", "AR.Frequency", "AR.PSD", "VLF.comp.", "LF.comp.", "HF.comp.", ""))[,2]
-leg.motion.data.3 <- read.csv("~/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/preprocessed-data/running/bogutzky-simon/2014-05-19--17-12-43/leg-motion-data-3.csv")
+t.1 <- read.csv("/Volumes/flow/Documents/simon-bogutzky/data/preprocessed-data/running/buse-patrick/2013-11-07--17-34-06/ecg-data-1_hrv.txt", header = F, na.strings = "", fill = T, skip = 117, stringsAsFactors = F, col.names = c("", "Time", "RR.interval", "FFT.Frequency", "FFT.PSD", "AR.Frequency", "AR.PSD", "VLF.comp.", "LF.comp.", "HF.comp.", ""))[,2]
+t.2 <- read.csv("~/Entwicklung/bogutzky/repositories/non-disruptive-flow-measures/data/preprocessed-data/running/buse-patrick/2013-11-07--17-34-06/leg-motion-time-data-1.csv")[,1]
 
-
-plot(beat.times[-1], 60/diff(beat.times))
-points(stride.times[-1], 120/diff(stride.times))
-
-t.1 <- beat.times
-t.2 <- stride.times
+plot(t.1[-1], 60/diff(t.1))
+points(t.2[-1], 120/diff(t.2), col = 2)
 
 require(flow)
 fi  <- CalculateInstantaneousPhases(t.1, t.2)
