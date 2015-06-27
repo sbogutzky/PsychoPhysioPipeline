@@ -1,21 +1,29 @@
 # Remove all variables
 rm(list = ls(all = T)) 
 
+# Load libraries
 require(signal)
 
-# Set network directory
-network.directory <- "//gangstore.ddns.net/flow/Documents/simon-bogutzky/data/"
+# Set root data directory path
+root.data.directory.path <- ""
+if(file.exists("C:/Users/Simon Bogutzky/Documents/flow/data"))
+  root.data.directory.path <- "C:/Users/Simon Bogutzky/Documents/flow/data/"
 if(file.exists("/Volumes/flow/Documents/simon-bogutzky/data"))
-  network.directory <- "/Volumes/flow/Documents/simon-bogutzky/data/"
+  root.data.directory.path <- "/Volumes/flow/Documents/simon-bogutzky/data/"
+if(file.exists("//gangstore.ddns.net/flow/Documents/simon-bogutzky/data"))
+  root.data.directory.path <- "//gangstore.ddns.net/flow/Documents/simon-bogutzky/data/"
 
-# Set network cleaned data directory
-cleaned.data.directory    <- paste(network.directory, "cleaned-data/", sep = "")
+# Set cleaned data directory path
+cleaned.data.directory.path <- paste(root.data.directory.path, "cleaned-data/", sep = "")
 
-# Set local processed data directory
-processed.data.directory <- "./data/preprocessed-data/"
+# Set preprocessed data directory path
+preprocessed.data.directory.path <- "./data/preprocessed-data/"
+
+# Set features directory path
+features.directory.path <- paste(root.data.directory.path, "features/", sep = "")
 
 # Load fss features
-fss.features        <- read.csv(paste(network.directory, "features/fss-features.csv", sep = ""), stringsAsFactors = F)
+fss.features <- read.csv(paste(features.directory.path, "fss-features.csv", sep = ""), stringsAsFactors = F)
 
 for (i in 1:nrow(fss.features)) {
   
@@ -27,14 +35,14 @@ for (i in 1:nrow(fss.features)) {
   last.name       <- properties[, 6]
   first.name      <- properties[, 7]
   date.of.birth   <- properties[, 8]
-  date.directory  <- strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S")
+  date.directory  <- paste(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S"), "/", sep = "")
   
   if(measurement == 1) {
     ecg.data        <- data.frame()
     n               <- 0
     
     # Read data, if needed
-    ecg.data.path <- paste(cleaned.data.directory, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, "/ecg-data.csv", sep="")
+    ecg.data.path <- paste(cleaned.data.directory.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, "ecg-data.csv", sep="")
     if(file.exists(ecg.data.path)) {
       ecg.data      <- read.csv(ecg.data.path)
       
@@ -48,9 +56,9 @@ for (i in 1:nrow(fss.features)) {
       first.timestamp <- ecg.data[1,4]
       
       # Create output directory, if needed
-      output.directory <- paste(processed.data.directory, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, sep="")
-      if(!file.exists(output.directory)) {
-        dir.create(output.directory, recursive = TRUE)
+      output.directory.path <- paste(preprocessed.data.directory.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, sep="")
+      if(!file.exists(output.directory.path)) {
+        dir.create(output.directory.path, recursive = TRUE)
       }
     } else {
       print("No ecg data")
@@ -68,7 +76,11 @@ for (i in 1:nrow(fss.features)) {
     # Interpolate for Kubios HRV
     n.subset <- nrow(ecg.data.subset)
     n.subset / ((ecg.data.subset[n.subset,1] - ecg.data.subset[1,1]) / 1000)
-    fs <- 512 #round(n.subset / ((ecg.data.subset[n.subset,1] - ecg.data.subset[1,1]) / 1000))
+    
+    # Determine fs
+    x   <- round(n.subset / ((ecg.data.subset[n.subset,1] - ecg.data.subset[1,1]) / 1000))
+    fs  <- 2^ceiling(log(x)/log(2))
+    print(paste("Sampling rate   (Hz):", fs))
     
     t.ms      <- seq(ecg.data.subset[1, 1], ecg.data.subset[n.subset, 1], by = 1000/fs)
     lead.1.mv <- interp1(ecg.data.subset[, 1], ecg.data.subset[,3] - ecg.data.subset[,2], t.ms, method = "spline")
@@ -84,7 +96,7 @@ for (i in 1:nrow(fss.features)) {
     plot(t.ms[0:1024] / 1000, lead.3.mv[0:1024], type = "l", xlab = "t [s]", ylab = "Lead III [mV]")
     
     # Write csv file
-    output.file.path <- paste(output.directory, "/ecg-data-", measurement, ".csv", sep = "")
+    output.file.path <- paste(output.directory.path, "ecg-data-", measurement, ".csv", sep = "")
     write.csv(data.frame(t.ms, lead.1.mv, lead.2.mv, lead.3.mv), output.file.path, row.names = FALSE)
     print(paste("Wrote:", output.file.path))
   }
