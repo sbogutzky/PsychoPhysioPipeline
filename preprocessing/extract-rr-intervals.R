@@ -1,9 +1,6 @@
 # Remove all variables
 rm(list = ls(all = T)) 
 
-# Load libraries
-require(signal)
-
 # Set root data directory path
 root.data.directory.path <- ""
 if(file.exists("C:/Users/Simon Bogutzky/Documents/flow/data"))
