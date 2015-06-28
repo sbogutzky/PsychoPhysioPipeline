@@ -53,7 +53,7 @@ for (i in 1:nrow(fss.features)) {
   
     # Load motion time data
     motion.time.data.path <- paste(processed.data.directory.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, body.position, "-motion-time-data-", measurement, ".csv", sep="")
-    motion.time.data      <- read.csv(motion.time.data.path)
+    motion.time.data      <- read.csv(motion.time.data.path, skip = 2)
     
     fs <- n / ((motion.data[n, 1] - motion.data[1, 1]) / 1000) 
     # Compute jerk cost per cycle
@@ -69,10 +69,10 @@ for (i in 1:nrow(fss.features)) {
     linear.acceleration.z <- motion.data[, 4] - gravity.z
   
     if (nrow(motion.time.data) > 1) {
-      jerk.costs    <- c()
+        jerk.costs    <- c()
         for(i in 1:(nrow(motion.time.data) - 1)) {
       
-        in.cycle <- motion.data[,1] >= motion.time.data[,1][i] & motion.data[,1] <= motion.time.data[,1][i+1]
+        in.cycle <- motion.data[,1] / 1000 >= motion.time.data[,1][i] & motion.data[,1] / 1000 <= motion.time.data[,1][i+1]
       
         # Compute jerk cost of each cycle
         t.subset                      <- motion.data[, 1][in.cycle]
