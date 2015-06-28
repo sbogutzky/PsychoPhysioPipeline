@@ -14,11 +14,11 @@ CalculateNormalizedShannonEntropyIndex <- function(t, psi, t.k, t.w = 10, bins =
   t.j <- t.k - t.w / 2 <= t & t < t.k + t.w / 2
   m <- length(psi[t.j])
   if(is.na(bins))
-    bins <- exp(0.626 + 0.4 * log(m - 1))
+    bins <- round(exp(0.626 + 0.4 * log(m - 1)))
   #print(paste("Number of bins:", bins))
   h   <- hist(psi[t.j], breaks = seq(0, 2 * pi, 2 * pi / bins), plot = F)
-  p   <- h$counts / bins
-  h   <- sum(p * log(p) , na.rm = T)
+  p   <- h$counts / m
+  h   <- -sum(p * log(p), na.rm = T)
   h.max <- log(bins)
   return((h.max - h) / h.max)
 }
