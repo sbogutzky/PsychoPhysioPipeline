@@ -64,7 +64,7 @@ for (i in 1:nrow(fss.features)) {
     # Upsampling
     fs            <- 2000
     t             <- seq(motion.data[1, 1], motion.data[n, 1], by = 1000/fs)
-    rotation.rate <- interp1(motion.data[, 1], -motion.data[, axis + 4], t, method = "spline")
+    rotation.rate <- interp1(motion.data[, 1], motion.data[, axis + 4], t, method = "spline")
   
     # Determine filter frequency
     periodogram   <- TSA::periodogram(rotation.rate, plot = F)
