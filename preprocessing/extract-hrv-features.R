@@ -93,6 +93,16 @@ for (i in 1:nrow(fss.features)) {
     # Plot bands
     #PlotPowerBand(hrv.data, indexFreqAnalysis=1, hr=TRUE)
     
+    #We create the data structure to store the nonlinear analysis
+    hrv.data = CreateNonLinearAnalysis(hrv.data)
+    
+    #We calculate the Detrended Fluctuation Analysis alpha1 and alpha 2 parameters
+    
+    hrv.data = CalculateDFA(hrv.data, indexNonLinearAnalysis = 1,
+                            windowSizeRange = c(4, 12), npoints = 25, doPlot = TRUE)
+    hrv.data = EstimateDFA(hrv.data, indexNonLinearAnalysis = 1,
+                           regressionRange = c(20,100), doPlot = TRUE)
+    
     # Calculate HRV features
     ulf.power.a       <- mean(hrv.data$FreqAnalysis[[1]]$ULF)
     vlf.power.a       <- mean(hrv.data$FreqAnalysis[[1]]$VLF)
