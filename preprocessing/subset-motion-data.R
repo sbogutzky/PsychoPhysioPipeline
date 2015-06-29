@@ -41,17 +41,33 @@ for (i in 1:nrow(fss.features)) {
   date.directory  <- paste(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S"), "/", sep = "")
   
   if(measurement == 1) {
-    motion.data        <- data.frame()
+    motion.data     <- data.frame()
     n               <- 0
     
-    # Read data, if needed
-    motion.data.path <- paste(cleaned.data.directory.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, "/", body.position, "-motion-data.csv", sep="")
-    if(file.exists(motion.data.path)) {
-      motion.data      <- read.csv(motion.data.path)
+    if(body.position == "arm") {
+      acceleration.data.path <- paste(cleaned.data.directory.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, "/", body.position, "-accelerometer-data.csv", sep="")
+      gyroscope.data.path    <- paste(cleaned.data.directory.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, "/", body.position, "-gyroscope-data.csv", sep="")
+    
+      if(file.exists(acceleration.data.path) & file.exists(gyroscope.data.path)) {
+        acceleration.data <- read.csv(acceleration.data.path)
+        gyroscope.data    <- read.csv(gyroscope.data.path)
+        gyroscope.data    <- gyroscope.data[,1:4] 
+        
+        motion.data <- merge(acceleration.data, gyroscope.data, by.x = "Timestamp", by.y = "Timestamp")
+        motion.data <- motion.data[, c(1:4, 6:8, 5)]
+        motion.data[,1] <- motion.data[,1] / (10^6)
+      }
+    } else {
+      motion.data.path <- paste(cleaned.data.directory.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, "/", body.position, "-motion-data.csv", sep="")
+      if(file.exists(motion.data.path)) {
+        motion.data      <- read.csv(motion.data.path)
+      }
+    }
       
-      # Number of data rows
-      n <- nrow(motion.data)
-      
+    # Number of data rows
+    n <- nrow(motion.data)
+    
+    if(n > 0) {
       # Set motion data timestamp to zero 
       motion.data[,1] <- motion.data[,1] - motion.data[1,1]
       
