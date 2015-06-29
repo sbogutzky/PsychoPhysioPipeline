@@ -58,7 +58,7 @@ for (i in 1:nrow(fss.features)) {
         motion.data[,1] <- motion.data[,1] / (10^6)
       }
     } else {
-      motion.data.path <- paste(cleaned.data.directory.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, "/", body.position, "-motion-data.csv", sep="")
+      motion.data.path <- paste(cleaned.data.directory.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, body.position, "-motion-data.csv", sep="")
       if(file.exists(motion.data.path)) {
         motion.data      <- read.csv(motion.data.path)
       }

@@ -80,7 +80,7 @@ for (i in 1:nrow(fss.features)) {
         linear.acceleration.y.subset  <- linear.acceleration.y[in.cycle]
         linear.acceleration.z.subset  <- linear.acceleration.z[in.cycle]
       
-        jerk.cost   <- CalculateJerkCost(t.subset, linear.acceleration.x.subset, linear.acceleration.y.subset, linear.acceleration.z.subset, normalized = T, plot = F)
+        jerk.cost   <- CalculateJerkCost(t.subset / 1000, linear.acceleration.x.subset, linear.acceleration.y.subset, linear.acceleration.z.subset, normalized = T, plot = F)
         jerk.costs  <- c(jerk.costs, jerk.cost)
       }
     } else {
