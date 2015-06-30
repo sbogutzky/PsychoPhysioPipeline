@@ -65,11 +65,11 @@ for (i in 1:nrow(fss.features)) {
     #PlotNIHR(hrv.data)
     
     # Filter niHR automatically
-    s                 <- sd(hrv.data$Beat$niHR)
-    m                 <- mean(hrv.data$Beat$niHR)
-    minbpm            <- m - 3 * s
-    maxbpm            <- m + 3 * s
-    hrv.data          <-  FilterNIHR(hrv.data, long=50, last=13, minbpm=minbpm, maxbpm=maxbpm)
+#     s                 <- sd(hrv.data$Beat$niHR)
+#     m                 <- mean(hrv.data$Beat$niHR)
+#     minbpm            <- m - 3 * s
+#     maxbpm            <- m + 3 * s
+    hrv.data          <-  FilterNIHR(hrv.data)
     #PlotNIHR(hrv.data)
     
     # Linear Interpolate the data by 4 Hz (default)
@@ -79,7 +79,6 @@ for (i in 1:nrow(fss.features)) {
     # Create time analysis
     hrv.data          <- CreateTimeAnalysis(hrv.data)
     
-    
     # Plot spectogram with Short-time Fourier transform 30 seconds window with 1 second shift for LF
     #PlotSpectrogram(hrv.data, size=30, shift=1, freqRange=c(0.04, 0.15))
     
@@ -88,7 +87,7 @@ for (i in 1:nrow(fss.features)) {
     
     # Create Frequency analysis (CWT) with least asymmetric Daubechies of width 8 for ULF, VLF, LF and (HF + VHF) as HF 
     hrv.data          <- CreateFreqAnalysis(hrv.data)
-    hrv.data          <- CalculatePowerBand(hrv.data, indexFreqAnalysis=1, type="wavelet", wavelet="la8", bandtolerance=0.005, ULFmin=0, ULFmax=0.0033, VLFmin=0.0033, VLFmax=0.04, LFmin=0.04, LFmax=0.15, HFmin=0.15, HFmax= 1)
+    hrv.data          <- CalculatePowerBand(hrv.data, indexFreqAnalysis=1, type="wavelet", wavelet="la8", bandtolerance=0.005, ULFmin=0, ULFmax=0.0033, VLFmin=0.0033, VLFmax=0.04, LFmin=0.04, LFmax=0.15, HFmin=0.15, HFmax=2)
     
     # Plot bands
     #PlotPowerBand(hrv.data, indexFreqAnalysis=1, hr=TRUE)
@@ -100,8 +99,8 @@ for (i in 1:nrow(fss.features)) {
     
     hrv.data = CalculateDFA(hrv.data, indexNonLinearAnalysis = 1,
                             windowSizeRange = c(4, 12), npoints = 25, doPlot = TRUE)
-    hrv.data = EstimateDFA(hrv.data, indexNonLinearAnalysis = 1,
-                           regressionRange = c(20,100), doPlot = TRUE)
+#     hrv.data = EstimateDFA(hrv.data, indexNonLinearAnalysis = 1,
+#                            regressionRange = c(20,100), doPlot = TRUE)
     
     # Calculate HRV features
     ulf.power.a       <- mean(hrv.data$FreqAnalysis[[1]]$ULF)
@@ -119,10 +118,29 @@ for (i in 1:nrow(fss.features)) {
     mean.hr           <- mean(hrv.data$HR)
     
     # Create parameter vector
-    hrv.parameters      <- data.frame(mean.hr, lf.power.a, hf.power.a, total.power, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf)
+    hrv.parameters    <- data.frame(mean.hr, lf.power.a, hf.power.a, total.power, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf)
     
-    # Clean up
-    rm(ulf.power.a, vlf.power.a, lf.power.a, hf.power.a, total.power, ulf.power.r, vlf.power.r, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf, mean.hr)
+    if(max(beat.times) > 800) {
+    
+      t.s <- seq(min(beat.times), max(beat.times), length.out = length(hrv.data$FreqAnalysis[[1]]$HF))
+      
+      # Create directory, if needed
+      output.directory.path <- paste(processed.data.directory.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, sep="")
+      if(!file.exists(output.directory.path)) {
+        dir.create(paste(output.directory.path, "/", sep = ""), recursive = TRUE)
+      }
+    
+      # Write csv file
+      output.file.path <- paste(output.directory.path, "hrv-spectral-data-", measurement, ".csv", sep = "")
+      op <- options(digits.secs=3)
+      con <- file(output.file.path, 'w') 
+      writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"), con = con)
+      writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%H:%M:%OS"), con = con)
+      write.csv(data.frame(t.s, hf.hz = hrv.data$FreqAnalysis[[1]]$HF, lf.hz = hrv.data$FreqAnalysis[[1]]$HF, lfhf = hrv.data$FreqAnalysis[[1]]$LFHF), file = con, row.names = FALSE)
+      close(con)
+      options(op) #reset options
+      print(paste("Wrote:", output.file.path))
+    }
     
     # Add parameter to feature vector
     hrv.features    <- rbind(hrv.features, data.frame(round(hrv.parameters, 2), activity, activity.start, activity.end, measurement, last.name, first.name, date.of.birth))

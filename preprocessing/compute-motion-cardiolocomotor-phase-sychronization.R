@@ -47,6 +47,11 @@ for (i in 1:nrow(fss.features)) {
     motion.time.data <- read.csv(motion.time.data.path, skip = 2)
     hrv.time.data <- read.csv(hrv.time.data.path, skip = 2)
     
+    
+    #TODO: Kubios 
+    
+    if(max(hrv.time.data) > 800) {
+    
     # Plot
     par("mfcol" = c(4, 1), mar = c(2.5, 2.5, .5, 3.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "i", yaxs = "i")
     
@@ -120,6 +125,8 @@ for (i in 1:nrow(fss.features)) {
     close(con)
     options(op) #reset options
     print(paste("Wrote:", output.file.path))
+    
+    }
     
   } else {
     print("No data")
