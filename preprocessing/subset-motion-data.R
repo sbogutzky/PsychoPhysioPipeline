@@ -92,23 +92,14 @@ for (i in 1:nrow(fss.features)) {
     print(paste("Time difference (ms):", round(time.difference, 3)))
     print(paste("Total time      (ms):", round(motion.data.subset[nrow(motion.data.subset),1] - motion.data.subset[1,1] + time.difference, 3)))
     
-    # Interpolate
-    n.subset <- nrow(motion.data.subset)
-    n.subset / ((motion.data.subset[n.subset,1] - motion.data.subset[1,1]) / 1000)
-    
-    # Determine fs
-    x   <- round(n.subset / ((motion.data.subset[n.subset,1] - motion.data.subset[1,1]) / 1000))
-    fs  <- 2^ceiling(log(x)/log(2))
-    print(paste("Sampling rate   (Hz):", fs))
-    
-    t.ms                     <- seq(motion.data.subset[1, 1], motion.data.subset[n.subset, 1], by = 1000/fs)
-    motion.accel.x.ms.2      <- interp1(motion.data.subset[, 1], motion.data.subset[,2], t.ms, method = "spline")
-    motion.accel.y.ms.2      <- interp1(motion.data.subset[, 1], motion.data.subset[,3], t.ms, method = "spline")
-    motion.accel.z.ms.2      <- interp1(motion.data.subset[, 1], motion.data.subset[,4], t.ms, method = "spline")
-    motion.rot.rate.x.deg.s  <- interp1(motion.data.subset[, 1], motion.data.subset[,5], t.ms, method = "spline") 
-    motion.rot.rate.y.deg.s  <- interp1(motion.data.subset[, 1], motion.data.subset[,6], t.ms, method = "spline")
-    motion.rot.rate.z.deg.s  <- interp1(motion.data.subset[, 1], motion.data.subset[,7], t.ms, method = "spline")
-    t.ms                     <- t.ms - t.ms[1] + time.difference
+    # Extract data
+    t.ms                     <- motion.data.subset[,1] - motion.data.subset[1,1] + time.difference
+    motion.accel.x.ms.2      <- motion.data.subset[,2]
+    motion.accel.y.ms.2      <- motion.data.subset[,3]
+    motion.accel.z.ms.2      <- motion.data.subset[,4]
+    motion.rot.rate.x.deg.s  <- motion.data.subset[,5]
+    motion.rot.rate.y.deg.s  <- motion.data.subset[,6]
+    motion.rot.rate.z.deg.s  <- motion.data.subset[,7]
     
     motion.rot.rate.deg.s <- motion.rot.rate.x.deg.s
     
