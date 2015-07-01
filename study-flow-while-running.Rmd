@@ -26,26 +26,38 @@ documentclass: scrartcl
   library("flow")
   library("xtable")
   library(gplots)
+
+  # Set root data directory path
+  root.data.directory.path <- ""
+  if(file.exists("C:/Users/Simon Bogutzky/Documents/flow/data"))
+    root.data.directory.path <- "C:/Users/Simon Bogutzky/Documents/flow/data/"
+  if(file.exists("/Volumes/flow/Documents/simon-bogutzky/data"))
+    root.data.directory.path <- "/Volumes/flow/Documents/simon-bogutzky/data/"
+  if(file.exists("//gangstore.ddns.net/flow/Documents/simon-bogutzky/data"))
+    root.data.directory.path <- "//gangstore.ddns.net/flow/Documents/simon-bogutzky/data/"
+
+  # Set features directory path
+  features.directory.path <- paste(root.data.directory.path, "features/", sep = "")
   
-  fss.features        <- read.csv("./data/features/fss-features.csv", stringsAsFactors = FALSE)
+  fss.features       <- read.csv(paste(features.directory.path, "/fss-features.csv", sep = ""), stringsAsFactors = FALSE)
   fss.feature.subset <- fss.features
   fss.feature.subset[fss.feature.subset$activity == "Running",]$measurement <- fss.feature.subset[fss.feature.subset$activity == "Running",]$measurement + 1
   fss.feature.subset <- fss.feature.subset[,c(1:5, 7, 10)]
-  fss.feature.subset <- fss.feature.subset[order(as.Date(fss.feature.subset$activity.start, format = "%Y-%m-%d %H:%M:%S")), , drop = FALSE]
+  fss.feature.subset <- fss.feature.subset[order(fss.feature.subset$activity.start), ]
   fss.feature.subset$measurement <- factor(fss.feature.subset$measurement, levels = c(1, 2, 3, 4, 5), labels = c("Ruhe", "15'", "30'", "45'", "60'"))
 
-  hrv.features        <- read.csv("./data/features/hrv-features.csv", stringsAsFactors = FALSE)
+  hrv.features       <- read.csv(paste(features.directory.path, "/hrv-features.csv", sep = ""), stringsAsFactors = FALSE)
   hrv.feature.subset <- hrv.features
   hrv.feature.subset[hrv.feature.subset$activity == "Running",]$measurement <- hrv.feature.subset[hrv.feature.subset$activity == "Running",]$measurement + 1
-  hrv.feature.subset <- hrv.feature.subset[, c(1:9, 11, 15)]
-  hrv.feature.subset <- hrv.feature.subset[order(as.Date(hrv.feature.subset$activity.start,format = "%Y-%m-%d %H:%M:%S")), , drop = FALSE]
+  hrv.feature.subset <- hrv.feature.subset[, c(1:12, 14, 16)]
+  hrv.feature.subset <- hrv.feature.subset[order(hrv.feature.subset$activity.start), ]
   hrv.feature.subset$measurement <- factor(hrv.feature.subset$measurement, levels = c(1, 2, 3, 4, 5), labels = c("Ruhe", "15'", "30'", "45'", "60'"))
 
-  leg.motion.features       <- read.csv("./data/features/leg-motion-features.csv", stringsAsFactors = F)
+  leg.motion.features       <- read.csv(paste(features.directory.path, "leg-motion-features.csv", sep = ""), stringsAsFactors = F)
   leg.motion.feature.subset <- leg.motion.features
   leg.motion.feature.subset[leg.motion.feature.subset$activity == "Running",]$measurement <- leg.motion.feature.subset[leg.motion.feature.subset$activity == "Running",]$measurement + 1
-  leg.motion.feature.subset <- leg.motion.feature.subset[, c(1:2, 4, 8)]
-  leg.motion.feature.subset <- leg.motion.feature.subset[order(as.Date(leg.motion.feature.subset$activity.start,format = "%Y-%m-%d %H:%M:%S")), , drop = FALSE]
+  leg.motion.feature.subset <- leg.motion.feature.subset[, c(1:2, 4, 6)]
+  leg.motion.feature.subset <- leg.motion.feature.subset[order(leg.motion.feature.subset$activity.start), ]
   leg.motion.feature.subset$measurement <- factor(leg.motion.feature.subset$measurement, levels = c(2, 3, 4, 5), labels = c("15'", "30'", "45'", "60'"))
 
 ```
@@ -365,7 +377,7 @@ Die statistische Analyse der einzelnen Merkmale führte ich mit R durch. Der Eff
   plotFeaturesInGroups(fss.feature.subset[, 1:5], fss.feature.subset$measurement)
 
   # Examine hrv features (visual)
-  plotFeaturesInGroups(hrv.feature.subset[, 1:9], hrv.feature.subset$measurement)
+  plotFeaturesInGroups(hrv.feature.subset[, 1:12], hrv.feature.subset$measurement)
 
   # Examine motion features (visual)
   plotFeaturesInGroups(leg.motion.feature.subset[, 1:2], leg.motion.feature.subset$measurement)
@@ -393,7 +405,7 @@ Die statistische Analyse der einzelnen Merkmale führte ich mit R durch. Der Eff
   checkFeaturesNormalityInGroups(fss.feature.subset[, 1:5], fss.feature.subset$measurement, T)
 
   # Check group normality of hrv features 
-  checkFeaturesNormalityInGroups(hrv.feature.subset[, 1:9], hrv.feature.subset$measurement, T)
+  checkFeaturesNormalityInGroups(hrv.feature.subset[, 1:12], hrv.feature.subset$measurement, T)
 
   # Check group normality of motion features 
   checkFeaturesNormalityInGroups(leg.motion.feature.subset[, 1:2], leg.motion.feature.subset$measurement, T)
@@ -454,7 +466,7 @@ Um mögliche Zusammenhänge zwischen den Faktoren der \ac{FKS} und der Merkmale 
 ```{r correlation-analysis, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
 
   fss.feature.subset.running <- fss.feature.subset[fss.feature.subset$measurement != "Ruhe", 1:5]
-  hrv.feature.subset.running <- hrv.feature.subset[hrv.feature.subset$measurement != "Ruhe", 1:9]
+  hrv.feature.subset.running <- hrv.feature.subset[hrv.feature.subset$measurement != "Ruhe", 1:12]
 
   plotFeatures <- function(feature.subset) {
     for(i in 1:length(feature.subset)) { 
