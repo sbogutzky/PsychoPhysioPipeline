@@ -53,7 +53,7 @@ for (i in 1:nrow(fss.features)) {
     
     # Create hrv data
     hrv.data          <- CreateHRVData()
-    hrv.data          <- SetVerbose(hrv.data, T)
+    hrv.data          <- SetVerbose(hrv.data, F)
     hrv.data$Beat     <- data.frame("Time" = beat.times)
     
     # Build not interpolated heart rates
@@ -68,9 +68,9 @@ for (i in 1:nrow(fss.features)) {
     hrv.data <- CreateNonLinearAnalysis(hrv.data)
     
     # We calculate the Detrended Fluctuation Analysis alpha1 and alpha 2 parameters
-    hrv.data <- CalculateDFA(hrv.data, indexNonLinearAnalysis = 1, 
-                             windowSizeRange = c(4, 64), npoints = 64, doPlot = TRUE)
-    hrv.data = EstimateDFA(hrv.data, indexNonLinearAnalysis = 1, doPlot = TRUE)
+    hrv.data <- CalculateDFA(hrv.data, windowSizeRange = c(4, 64), npoints = 60, doPlot = F)
+    hrv.data <- EstimateDFA(hrv.data, regressionRange = c(4, 12), doPlot = F)
+    hrv.data <- EstimateDFA(hrv.data, regressionRange = c(13, 64), doPlot = F)
     
     # Filter niHR automatically
     #TODO: Prüfen, ob nötig
@@ -116,9 +116,11 @@ for (i in 1:nrow(fss.features)) {
     lfhf              <- lf.power.a/hf.power.a
     mean.hr           <- mean(hrv.data$HR)
     rmssd             <- hrv.data$TimeAnalysis[[1]]$rMSSD
+    alpha.1           <- hrv.data$NonLinearAnalysis[[1]]$dfa$statistic[[1]]$estimate
+    alpha.2           <- hrv.data$NonLinearAnalysis[[1]]$dfa$statistic[[2]]$estimate
     
     # Create parameter vector
-    hrv.parameters    <- data.frame(mean.hr, rmssd, lf.power.a, hf.power.a, total.power, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf)
+    hrv.parameters    <- data.frame(mean.hr, lf.power.a, hf.power.a, total.power, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf, rmssd, alpha.1, alpha.2)
     
     if(max(beat.times) > 800) {
     
