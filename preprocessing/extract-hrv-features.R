@@ -136,7 +136,7 @@ for (i in 1:nrow(fss.features)) {
       con <- file(output.file.path, 'w') 
       writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"), con = con)
       writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%H:%M:%OS"), con = con)
-      write.csv(data.frame(t.s, hf.hz = hrv.data$FreqAnalysis[[1]]$HF, lf.hz = hrv.data$FreqAnalysis[[1]]$HF, lfhf = hrv.data$FreqAnalysis[[1]]$LFHF), file = con, row.names = FALSE)
+      write.csv(data.frame(t.s, lf.hz = hrv.data$FreqAnalysis[[1]]$LF, hf.hz = hrv.data$FreqAnalysis[[1]]$HF, lfhf = hrv.data$FreqAnalysis[[1]]$LFHF), file = con, row.names = FALSE)
       close(con)
       options(op) #reset options
       print(paste("Wrote:", output.file.path))
