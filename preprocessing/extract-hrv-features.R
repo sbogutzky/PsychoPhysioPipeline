@@ -64,20 +64,29 @@ for (i in 1:nrow(fss.features)) {
     #hrv.data          <- EditNIHR(hrv.data)
     #PlotNIHR(hrv.data)
     
+    # We create the data structure to store the nonlinear analysis
+    hrv.data <- CreateNonLinearAnalysis(hrv.data)
+    
+    # We calculate the Detrended Fluctuation Analysis alpha1 and alpha 2 parameters
+    hrv.data <- CalculateDFA(hrv.data, indexNonLinearAnalysis = 1, 
+                             windowSizeRange = c(4, 64), npoints = 64, doPlot = TRUE)
+    hrv.data = EstimateDFA(hrv.data, indexNonLinearAnalysis = 1, doPlot = TRUE)
+    
     # Filter niHR automatically
+    #TODO: Prüfen, ob nötig
 #     s                 <- sd(hrv.data$Beat$niHR)
 #     m                 <- mean(hrv.data$Beat$niHR)
 #     minbpm            <- m - 3 * s
 #     maxbpm            <- m + 3 * s
     hrv.data          <-  FilterNIHR(hrv.data)
     #PlotNIHR(hrv.data)
+
+    # Create time analysis
+    hrv.data          <- CreateTimeAnalysis(hrv.data)
     
     # Linear Interpolate the data by 4 Hz (default)
     hrv.data          <- InterpolateNIHR(hrv.data)
     #PlotHR(hrv.data)
-    
-    # Create time analysis
-    hrv.data          <- CreateTimeAnalysis(hrv.data)
     
     # Plot spectogram with Short-time Fourier transform 30 seconds window with 1 second shift for LF
     #PlotSpectrogram(hrv.data, size=30, shift=1, freqRange=c(0.04, 0.15))
@@ -91,17 +100,7 @@ for (i in 1:nrow(fss.features)) {
     
     # Plot bands
     #PlotPowerBand(hrv.data, indexFreqAnalysis=1, hr=TRUE)
-    
-    #We create the data structure to store the nonlinear analysis
-    hrv.data = CreateNonLinearAnalysis(hrv.data)
-    
-    #We calculate the Detrended Fluctuation Analysis alpha1 and alpha 2 parameters
-    
-    hrv.data = CalculateDFA(hrv.data, indexNonLinearAnalysis = 1,
-                            windowSizeRange = c(4, 12), npoints = 25, doPlot = TRUE)
-#     hrv.data = EstimateDFA(hrv.data, indexNonLinearAnalysis = 1,
-#                            regressionRange = c(20,100), doPlot = TRUE)
-    
+
     # Calculate HRV features
     ulf.power.a       <- mean(hrv.data$FreqAnalysis[[1]]$ULF)
     vlf.power.a       <- mean(hrv.data$FreqAnalysis[[1]]$VLF)
@@ -116,9 +115,10 @@ for (i in 1:nrow(fss.features)) {
     hf.power.nu       <- hf.power.a/(lf.power.a + hf.power.a) * 100
     lfhf              <- lf.power.a/hf.power.a
     mean.hr           <- mean(hrv.data$HR)
+    rmssd             <- hrv.data$TimeAnalysis[[1]]$rMSSD
     
     # Create parameter vector
-    hrv.parameters    <- data.frame(mean.hr, lf.power.a, hf.power.a, total.power, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf)
+    hrv.parameters    <- data.frame(mean.hr, rmssd, lf.power.a, hf.power.a, total.power, lf.power.r, hf.power.r, lf.power.nu, hf.power.nu, lfhf)
     
     if(max(beat.times) > 800) {
     
