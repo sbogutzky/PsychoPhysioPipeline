@@ -116,7 +116,7 @@ for (i in 1:nrow(fss.features)) {
     print(paste("Wrote:", output.file.path))
     
     # Write csv file
-    output.file.path <- paste(output.directory.path,  body.position, "-cps-index-", measurement, ".csv", sep = "")
+    output.file.path <- paste(output.directory.path,  body.position, "-cps-relative-phase-", measurement, ".csv", sep = "")
     op <- options(digits.secs=3)
     con <- file(output.file.path, 'w') 
     writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"), con = con)
