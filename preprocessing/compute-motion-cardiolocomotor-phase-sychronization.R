@@ -83,13 +83,13 @@ for (i in 1:nrow(fss.features)) {
     t.w <- 20
     t.s <- seq(t.w/2, x.lim[2] - t.w/2, 1)
     phase.coherence.indexes <- c()
-    phase.normalized.shannon.entropy.indexes <- c()
+    normalized.shannon.entropy.indexes <- c()
     for (t in t.s) {
       phase.coherence.indexes <- c(phase.coherence.indexes, CalculatePhaseCoherenceIndex(t.c, psi, t, t.w))
-      phase.normalized.shannon.entropy.indexes <- c(phase.normalized.shannon.entropy.indexes, CalculateNormalizedShannonEntropyIndex(t.c, psi, t, t.w)) 
+      normalized.shannon.entropy.indexes <- c(normalized.shannon.entropy.indexes, CalculateNormalizedShannonEntropyIndex(t.c, psi, t, t.w)) 
     }
     plot(t.s, phase.coherence.indexes, type = "l",  xlab = "t[ s ]", ylab = "Indexes", xaxt = "n",  yaxt = "n", xlim = x.lim, ylim = y.lim, col = "#3FADCB")
-    lines(t.s, phase.normalized.shannon.entropy.indexes, lty = 2)
+    lines(t.s, normalized.shannon.entropy.indexes, lty = 2)
     abline(v = seq(x.lim[1], x.lim[2], 20), lty = "dashed", col = "lightgrey")
     axis(1, at = seq(x.lim[1], x.lim[2], 20), labels = seq(x.lim[1], x.lim[2], 20), las = 1)
     axis(2, at = seq(y.lim[1], y.lim[2], .2), labels = seq(y.lim[1], y.lim[2], .2))
@@ -110,7 +110,7 @@ for (i in 1:nrow(fss.features)) {
     con <- file(output.file.path, 'w') 
     writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"), con = con)
     writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%H:%M:%OS"), con = con)
-    write.csv(data.frame(t.s, phase.coherence.index = phase.coherence.indexes, phase.normalized.shannon.entropy.index = phase.normalized.shannon.entropy.indexes), file = con, row.names = FALSE)
+    write.csv(data.frame(t.s, phase.coherence.index = phase.coherence.indexes, normalized.shannon.entropy.index = normalized.shannon.entropy.indexes), file = con, row.names = FALSE)
     close(con)
     options(op) #reset options
     print(paste("Wrote:", output.file.path))
