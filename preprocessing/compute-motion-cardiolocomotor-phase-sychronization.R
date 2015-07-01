@@ -31,6 +31,7 @@ for (i in 1:nrow(fss.features)) {
   properties      <- fss.features[i, c(6:12)]
   activity        <- properties[, 1]
   activity.start  <- properties[, 2]
+  activity.end    <- properties[, 3]
   measurement     <- properties[, 5]
   last.name       <- properties[, 6]
   first.name      <- properties[, 7]
@@ -49,8 +50,9 @@ for (i in 1:nrow(fss.features)) {
     
     
     #TODO: Kubios 
-    
-    if(max(hrv.time.data) > 800) {
+    motion.time.data <- motion.time.data[activity.start/1000 + motion.time.data$t.s > activity.end/1000 - 5 * 60,]
+    hrv.time.data$t.s  <- hrv.time.data$t.s + 600
+    #if(max(hrv.time.data) > 800) {
     
     # Plot
     par("mfcol" = c(4, 1), mar = c(2.5, 2.5, .5, 3.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "i", yaxs = "i")
@@ -70,6 +72,9 @@ for (i in 1:nrow(fss.features)) {
     
     # Stroboscopic Technique
     fi  <- CalculateInstantaneousPhases(t.c, t.l)
+    t.c <- t.c[complete.cases(fi)]
+    fi <- fi[complete.cases(fi)]
+    
     m   <- .5
     psi <- fi %% (2 * pi * m)
     y.lim <- c(0, 1)
@@ -81,7 +86,7 @@ for (i in 1:nrow(fss.features)) {
     
     # Indexes
     t.w <- 20
-    t.s <- seq(t.w/2, x.lim[2] - t.w/2, 1)
+    t.s <- seq(min(t.c) + t.w/2, max(t.c) - t.w/2, 1)
     phase.coherence.indexes <- c()
     normalized.shannon.entropy.indexes <- c()
     for (t in t.s) {
@@ -126,7 +131,7 @@ for (i in 1:nrow(fss.features)) {
     options(op) #reset options
     print(paste("Wrote:", output.file.path))
     
-    }
+    #}
     
   } else {
     print("No data")

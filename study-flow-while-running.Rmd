@@ -60,6 +60,13 @@ documentclass: scrartcl
   leg.motion.feature.subset <- leg.motion.feature.subset[order(leg.motion.feature.subset$activity.start), ]
   leg.motion.feature.subset$measurement <- factor(leg.motion.feature.subset$measurement, levels = c(2, 3, 4, 5), labels = c("15'", "30'", "45'", "60'"))
 
+  leg.cps.features       <- read.csv(paste(features.directory.path, "leg-cps-features.csv", sep = ""), stringsAsFactors = F)
+  leg.cps.feature.subset <- leg.cps.features
+  leg.cps.feature.subset[leg.cps.feature.subset$activity == "Running",]$measurement <- leg.cps.feature.subset[leg.cps.feature.subset$activity == "Running",]$measurement + 1
+  leg.cps.feature.subset <- leg.cps.feature.subset[, c(1:2, 4, 6)]
+  leg.cps.feature.subset <- leg.cps.feature.subset[order(leg.cps.feature.subset$activity.start), ]
+  leg.cps.feature.subset$measurement <- factor(leg.cps.feature.subset$measurement, levels = c(2, 3, 4, 5), labels = c("15'", "30'", "45'", "60'"))
+
 ```
 
 # Abkürzungsverzeichnis
