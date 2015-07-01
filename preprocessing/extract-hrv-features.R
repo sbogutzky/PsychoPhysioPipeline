@@ -13,9 +13,6 @@ if(file.exists("/Volumes/flow/Documents/simon-bogutzky/data"))
 if(file.exists("//gangstore.ddns.net/flow/Documents/simon-bogutzky/data"))
   root.data.directory.path <- "//gangstore.ddns.net/flow/Documents/simon-bogutzky/data/"
 
-# Set preprocessed data directory path
-preprocessed.data.directory.path <- "./data/preprocessed-data/"
-
 # Set processed data directory path
 processed.data.directory.path <- paste(root.data.directory.path, "processed-data/", sep = "")
 
