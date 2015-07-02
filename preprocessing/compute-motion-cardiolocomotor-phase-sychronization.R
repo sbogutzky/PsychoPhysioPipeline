@@ -31,6 +31,7 @@ for (i in 1:nrow(fss.features)) {
   properties      <- fss.features[i, c(6:12)]
   activity        <- properties[, 1]
   activity.start  <- properties[, 2]
+  activity.end    <- properties[, 3]
   measurement     <- properties[, 5]
   last.name       <- properties[, 6]
   first.name      <- properties[, 7]
@@ -46,6 +47,12 @@ for (i in 1:nrow(fss.features)) {
     # Load time data
     motion.time.data <- read.csv(motion.time.data.path, skip = 2)
     hrv.time.data <- read.csv(hrv.time.data.path, skip = 2)
+    
+    
+    #TODO: Kubios 
+    motion.time.data <- motion.time.data[activity.start/1000 + motion.time.data$t.s > activity.end/1000 - 5 * 60,]
+    hrv.time.data$t.s  <- hrv.time.data$t.s + 600
+    #if(max(hrv.time.data) > 800) {
     
     # Plot
     par("mfcol" = c(4, 1), mar = c(2.5, 2.5, .5, 3.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "i", yaxs = "i")
@@ -65,6 +72,9 @@ for (i in 1:nrow(fss.features)) {
     
     # Stroboscopic Technique
     fi  <- CalculateInstantaneousPhases(t.c, t.l)
+    t.c <- t.c[complete.cases(fi)]
+    fi <- fi[complete.cases(fi)]
+    
     m   <- .5
     psi <- fi %% (2 * pi * m)
     y.lim <- c(0, 1)
@@ -76,15 +86,15 @@ for (i in 1:nrow(fss.features)) {
     
     # Indexes
     t.w <- 20
-    t.s <- seq(t.w/2, x.lim[2] - t.w/2, 1)
+    t.s <- seq(min(t.c) + t.w/2, max(t.c) - t.w/2, 1)
     phase.coherence.indexes <- c()
-    phase.normalized.shannon.entropy.indexes <- c()
+    normalized.shannon.entropy.indexes <- c()
     for (t in t.s) {
       phase.coherence.indexes <- c(phase.coherence.indexes, CalculatePhaseCoherenceIndex(t.c, psi, t, t.w))
-      phase.normalized.shannon.entropy.indexes <- c(phase.normalized.shannon.entropy.indexes, CalculateNormalizedShannonEntropyIndex(t.c, psi, t, t.w)) 
+      normalized.shannon.entropy.indexes <- c(normalized.shannon.entropy.indexes, CalculateNormalizedShannonEntropyIndex(t.c, psi, t, t.w)) 
     }
     plot(t.s, phase.coherence.indexes, type = "l",  xlab = "t[ s ]", ylab = "Indexes", xaxt = "n",  yaxt = "n", xlim = x.lim, ylim = y.lim, col = "#3FADCB")
-    lines(t.s, phase.normalized.shannon.entropy.indexes, lty = 2)
+    lines(t.s, normalized.shannon.entropy.indexes, lty = 2)
     abline(v = seq(x.lim[1], x.lim[2], 20), lty = "dashed", col = "lightgrey")
     axis(1, at = seq(x.lim[1], x.lim[2], 20), labels = seq(x.lim[1], x.lim[2], 20), las = 1)
     axis(2, at = seq(y.lim[1], y.lim[2], .2), labels = seq(y.lim[1], y.lim[2], .2))
@@ -105,13 +115,13 @@ for (i in 1:nrow(fss.features)) {
     con <- file(output.file.path, 'w') 
     writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"), con = con)
     writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%H:%M:%OS"), con = con)
-    write.csv(data.frame(t.s, phase.coherence.index = phase.coherence.indexes, phase.normalized.shannon.entropy.index = phase.normalized.shannon.entropy.indexes), file = con, row.names = FALSE)
+    write.csv(data.frame(t.s, phase.coherence.index = phase.coherence.indexes, normalized.shannon.entropy.index = normalized.shannon.entropy.indexes), file = con, row.names = FALSE)
     close(con)
     options(op) #reset options
     print(paste("Wrote:", output.file.path))
     
     # Write csv file
-    output.file.path <- paste(output.directory.path,  body.position, "-cps-index-", measurement, ".csv", sep = "")
+    output.file.path <- paste(output.directory.path,  body.position, "-cps-relative-phase-", measurement, ".csv", sep = "")
     op <- options(digits.secs=3)
     con <- file(output.file.path, 'w') 
     writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"), con = con)
@@ -120,6 +130,8 @@ for (i in 1:nrow(fss.features)) {
     close(con)
     options(op) #reset options
     print(paste("Wrote:", output.file.path))
+    
+    #}
     
   } else {
     print("No data")

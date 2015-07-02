@@ -19,8 +19,8 @@ features.directory.path <- paste(root.data.directory.path, "features/", sep = ""
 # Load fss features
 fss.features <- read.csv(paste(features.directory.path, "fss-features.csv", sep = ""), stringsAsFactors = F)
 
-# Create motion feature data frame
-motion.features  <- data.frame()
+# Create cps feature data frame
+cps.features  <- data.frame()
 
 # Set body position
 body.position <- "leg"
@@ -40,21 +40,18 @@ for (i in 1:nrow(fss.features)) {
   
   current.data.path <- paste(processed.data.directory.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, sep="")
   
-  current.file.name.1   <- paste(body.position, "-motion-time-data-", measurement, ".csv", sep = "")
+  current.file.name.1   <- paste(body.position, "-cps-indexes-", measurement, ".csv", sep = "")
   current.file.path.1   <- paste(current.data.path, current.file.name.1, sep = "")
-  current.file.name.2   <- paste(body.position, "-motion-jerk-cost-data-", measurement, ".csv", sep = "")
-  current.file.path.2   <- paste(current.data.path, current.file.name.2, sep = "")
   
-  if(file.exists(current.file.path.1) & file.exists(current.file.path.2)) {
+  if(file.exists(current.file.path.1)) {
     
-    motion.time.data        <- read.csv(current.file.path.1, skip = 2)
-    motion.jerk.cost.data   <- read.csv(current.file.path.2, skip = 2)
+    cps.indexes        <- read.csv(current.file.path.1, skip = 2)
     
-    mean.jc             <- round(mean(motion.jerk.cost.data$jerk.cost.m.2.s..5, na.rm = T), 2)
-    mean.cycle.interval <- round(mean(motion.time.data$cycle.interval.s, na.rm = T), 3)
+    mean.phase.coherence.index             <- round(mean(cps.indexes$phase.coherence.index, na.rm = T), 3)
+    mean.normalized.shannon.entropy.index <- round(mean(cps.indexes$normalized.shannon.entropy.index, na.rm = T), 3)
     
     # Add parameter to feature vector
-    motion.features    <- rbind(motion.features, data.frame(mean.jc, mean.cycle.interval, activity, activity.start, activity.end, measurement, last.name, first.name, date.of.birth))
+    cps.features    <- rbind(cps.features, data.frame(mean.phase.coherence.index, mean.normalized.shannon.entropy.index, activity, activity.start, activity.end, measurement, last.name, first.name, date.of.birth))
   }
 }
 
@@ -65,10 +62,10 @@ if(!file.exists(output.directory.path)) {
 }
 
 # Write to csv file
-output.file.path <- paste(output.directory.path, body.position, "-motion-features.csv", sep = "")
+output.file.path <- paste(output.directory.path, body.position, "-cps-features.csv", sep = "")
 if(file.exists(output.file.path)) {
   features <- read.csv(output.file.path, stringsAsFactors = FALSE)
-  write.csv(unique(rbind(features, motion.features)), output.file.path, row.names = FALSE)
+  write.csv(unique(rbind(features, cps.features)), output.file.path, row.names = FALSE)
 } else {
-  write.csv(motion.features, output.file.path, row.names = FALSE)
+  write.csv(cps.features, output.file.path, row.names = FALSE)
 }
