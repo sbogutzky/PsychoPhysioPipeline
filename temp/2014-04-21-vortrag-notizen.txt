@@ -1,18 +1,0 @@
-Die Flow-Forschung ist bisher auf die Erfassung von Erlebenszuständen gerichtet
-o Sie erfasst das Flow-Erleben im Nachhinein, a posteriori
-o Sie erfasst das Flow-Erleben mittels Fragebögen und das heißt mittels expliziter Feststellungen der Personen
-o Sie unterbricht die Tätigkeit, im Rahmen derer das Flow-Erleben stattfindet
-
-Flow-Maschinen erfordern im Unterschied dazu die Erfassung, Messung, Unterstützung des Prozesses.
-o In der Situation des Erlebens
-o durch Erfassung impliziter Indizes
-o Ohne Unterbrechung der Tätigkeit, im Rahmen derer das Flow-Erleben stattfindet
-
---
-
-Walking is a cyclic activity, within which one step follow the next according to a repeated pattern. Such a gait cycle is defined by phases, events and properties.
-cf Bartlett 1997
-
-—-
-
-o Theoretical & empirical research question: is the flow experience embodied by the walking activity?o Empirical questions:o HRV: Are their features indicating flow while walking?  Which HRV features indicate flowo Gait: Are their gait features indicating flow?   Which gait features indicate flowo HRV & Gait: What kind of relations exist between the phenomenological, the physiological and the biomechanical level of the flow model?
