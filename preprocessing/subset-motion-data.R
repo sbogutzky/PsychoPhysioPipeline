@@ -38,7 +38,7 @@ for (i in 1:nrow(fss.features)) {
   last.name       <- properties[, 6]
   first.name      <- properties[, 7]
   date.of.birth   <- properties[, 8]
-  date.directory  <- paste(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S"), sep = "")
+  date.directory  <- paste(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S"), "/", sep ="")
   
   if(measurement == 1) {
     motion.data     <- data.frame()
@@ -58,7 +58,7 @@ for (i in 1:nrow(fss.features)) {
         motion.data[,1] <- motion.data[,1] / (10^6)
       }
     } else {
-      motion.data.path <- paste(cleaned.data.directory.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, "/", body.position, "-motion-data.csv", sep="")
+      motion.data.path <- paste(cleaned.data.directory.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, body.position, "-motion-data.csv", sep="")
       if(file.exists(motion.data.path)) {
         motion.data      <- read.csv(motion.data.path)
       }
