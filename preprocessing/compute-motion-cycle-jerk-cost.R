@@ -58,15 +58,10 @@ for (i in 1:nrow(fss.features)) {
     fs <- n / ((motion.data[n, 1] - motion.data[1, 1]) / 1000) 
     # Compute jerk cost per cycle
     # Isolate gravity from acceleration 
-    butterworth.filter  <- butter(1, 1/(fs/2) * 0.8, "low")
-    gravity.x           <- filtfilt(butterworth.filter, motion.data[, 2])
-    gravity.y           <- filtfilt(butterworth.filter, motion.data[, 3])
-    gravity.z           <- filtfilt(butterworth.filter, motion.data[, 4])
-  
-    # Compute linear acceleration
-    linear.acceleration.x <- motion.data[, 2] - gravity.x
-    linear.acceleration.y <- motion.data[, 3] - gravity.y
-    linear.acceleration.z <- motion.data[, 4] - gravity.z
+    butterworth.filter              <- butter(3, 1/(fs/2) * 0.3, "high")
+    linear.acceleration.x           <- filtfilt(butterworth.filter, motion.data[, 2])
+    linear.acceleration.y           <- filtfilt(butterworth.filter, motion.data[, 3])
+    linear.acceleration.z           <- filtfilt(butterworth.filter, motion.data[, 4])
   
     if (nrow(motion.time.data) > 1) {
         jerk.costs    <- c()
