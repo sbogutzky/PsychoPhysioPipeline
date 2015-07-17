@@ -91,3 +91,41 @@ box()
 
 ar.peak.2 <- c(1.1055, 1.2617, 1.0781, 1.2422, 1.2227, 1.4531, 1.2148, 1.4531, 1.4492, 1.4297, 1.4297, 1.2305, 1.4453, 1.4648, 1.4883, 1.4609, 1.3672, 1.4570, 1.4688, 1.4805, 1.1055, 1.4492, 1.4453, 1.2930)
 
+#--
+
+# Zusammenhang von Flow und CPS-Indexen
+
+fss.features <- read.csv("//gangstore.ddns.net/flow/Documents/simon-bogutzky/data/features/fss-features.csv")
+leg.cps.features <- read.csv("//gangstore.ddns.net/flow/Documents/simon-bogutzky/data/features/leg-cps-features.csv")
+
+
+
+hist(leg.cps.features$mean.phase.coherence.index)
+hist(leg.cps.features$mean.normalized.shannon.entropy.index)
+shapiro.test(leg.cps.features$mean.phase.coherence.index)
+shapiro.test(leg.cps.features$mean.normalized.shannon.entropy.index)
+
+hist(fss.features$flow)
+hist(fss.features$absorption)
+shapiro.test(fss.features$flow)
+shapiro.test(fss.features$absorption)
+
+plot(fss.features$fit, fss.features$flow)
+
+data.merge <- merge(leg.cps.features[,c(1:2, 4)], fss.features, by = "activity.start")
+
+plot(data.merge$mean.phase.coherence.index, data.merge$flow)
+
+linear.model <- lm(data.merge$flow ~ data.merge$mean.phase.coherence.index)
+summary(linear.model)
+
+plot(data.merge$mean.normalized.shannon.entropy.index, data.merge$flow)
+
+linear.model <- lm(data.merge$flow ~ data.merge$mean.normalized.shannon.entropy.index)
+summary(linear.model)
+
+
+
+
+
+
