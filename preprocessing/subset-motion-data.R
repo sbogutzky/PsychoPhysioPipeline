@@ -39,8 +39,8 @@ for (i in 1:nrow(fss.features)) {
   first.name      <- properties[, 7]
   date.of.birth   <- properties[, 8]
   date.directory  <- paste(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S"), "/", sep ="")
-  
   if(measurement == 1) {
+    print(date.directory)
     motion.data     <- data.frame()
     n               <- 0
     

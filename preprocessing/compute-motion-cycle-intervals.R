@@ -117,8 +117,8 @@ for (i in 1:nrow(fss.features)) {
     plot(t / 1000, filtered.rotation.rate, type="l", xlab="t [s]", ylab=paste("Filtered Rotation Rate [deg/s]", c("X", "Y", "Z")[axis]), xlim = c(300,315))
     abline(v = t[minima] / 1000)
     title(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y/%m/%d %H:%M"))
-    hist(cycle.interval.s, xlab="Motion Cycle Interval [s]", main="", breaks = 100)
-    plot(t.s, cycle.interval.s, type="l", xlab="t [s]", ylab="Motion Cycle Interval [s]")
+    hist(cycle.interval.s, xlab="Motion Cycle Interval [s]", main="", breaks = 100, xlim = c(mean(cycle.interval.s) - 2 * sd(cycle.interval.s), mean(cycle.interval.s) +  2 * sd(cycle.interval.s)))
+    plot(t.s, cycle.interval.s, type="l", xlab="t [s]", ylab="Motion Cycle Interval [s]", ylim = c(mean(cycle.interval.s) - 2 * sd(cycle.interval.s), mean(cycle.interval.s) + 2 * sd(cycle.interval.s)))
 
     # Create directory, if needed
     output.directory.path <- paste(processed.data.directory.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, sep="")
