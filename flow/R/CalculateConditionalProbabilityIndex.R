@@ -2,16 +2,31 @@
 #'
 #' \code{CalculateConditionalProbabilityIndex} returns the conditional probability index.
 #'
-#' @param times. A numeric verctor of ti's for instantanous phase calculation.
-#' @param time.series.1. A numeric verctor of time events of the first oscillator.
-#' @param time.series.2. A numeric verctor ofime events of the second oscillator.
-#' @param n. Phase locking integer for the first oscillator.
-#' @param m. Phase locking integer for the second oscillator.
-#' @param bins. Integer bins for dividing the interval of the first first oscillator.
-#' @param plot. Logical if should plot phase in circles.
+#' @param times A numeric verctor of ti's for instantanous phase calculation.
+#' @param time.series.1 A numeric verctor of time events of the first oscillator.
+#' @param time.series.2 A numeric verctor ofime events of the second oscillator.
+#' @param n Phase locking integer for the first oscillator.
+#' @param m Phase locking integer for the second oscillator.
+#' @param bins Integer bins for dividing the interval of the first first oscillator.
+#' @param plot Logical if should plot phase in circles.
 #' @return conditional probability index
 
 CalculateConditionalProbabilityIndex <- function(times, time.series.1, time.series.2, n, m, bins = 16, plot = F) {
+  
+  plotPhases <- function(fi) {
+    
+    par(mfcol=c(1, 1))
+    plot(-1:1, type = "n", xlim = c(-1,1), ylim = c(-1,1), asp = 1, bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
+    circle(0,0,1)
+    segments(rep(0,bins-1),rep(0,bins-1),sin(bin.breaks[-1]),cos(bin.breaks[-1]), lty = "dashed")
+    mtext(expression(pi), side = 1, line = 0)
+    mtext(expression(pi/2), side = 4, line = 0)
+    mtext(expression(0), side = 3, line = 0)
+    mtext(expression(2*pi/3), side = 2, line = 0)
+    
+    segments(rep(0,length(fi)),rep(0,length(fi)),sin(fi),cos(fi))
+    points(sin(fi), cos(fi), pch = 19)
+  }
   
   fi.1 <- CalculateInstantaneousPhases(times, time.series.1) %% (2*pi*n)
   
@@ -25,21 +40,7 @@ CalculateConditionalProbabilityIndex <- function(times, time.series.1, time.seri
       polygon(xcoords, ycoords, ...)
     }
     
-    plotPhases <- function(fi) {
-    
-      par(mfcol=c(1, 1))
-      plot(-1:1, type = "n", xlim = c(-1,1), ylim = c(-1,1), asp = 1, bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
-      circle(0,0,1)
-      segments(rep(0,bins-1),rep(0,bins-1),sin(bin.breaks[-1]),cos(bin.breaks[-1]), lty = "dashed")
-      mtext(expression(pi), side = 1, line = 0)
-      mtext(expression(pi/2), side = 4, line = 0)
-      mtext(expression(0), side = 3, line = 0)
-      mtext(expression(2*pi/3), side = 2, line = 0)
-    
-      segments(rep(0,length(fi)),rep(0,length(fi)),sin(fi),cos(fi))
-      points(sin(fi), cos(fi), pch = 19)
-    }
-    plotPhases(fi)
+    plotPhases(fi.1)
   }
   
   lambda <- c()

@@ -8,12 +8,12 @@
 CalculateInstantaneousPhases(times, time.series)
 }
 \arguments{
-\item{times.}{A numeric vector of the times.}
+\item{times}{A numeric vector of the times.}
 
-\item{time.series.}{A numeric vector of times of appearance of kth event.}
+\item{time.series}{A numeric vector of times of appearance of kth event.}
 }
 \value{
-fi. A numeric vector of instantaneous phases.
+fi A numeric vector of instantaneous phases.
 }
 \description{
 Calculates the instantaneous phases of the time series.

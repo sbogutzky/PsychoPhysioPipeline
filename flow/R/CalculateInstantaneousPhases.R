@@ -1,9 +1,9 @@
 #' Calculates the instantaneous phases of the time series.
 #' \code{CalculateInstantaneousPhases} returns the instantaneous phases of the time series.
 #'
-#' @param times. A numeric vector of the times.
-#' @param time.series. A numeric vector of times of appearance of kth event.
-#' @return fi. A numeric vector of instantaneous phases.
+#' @param times A numeric vector of the times.
+#' @param time.series A numeric vector of times of appearance of kth event.
+#' @return fi A numeric vector of instantaneous phases.
 
 CalculateInstantaneousPhases <- function(times, time.series) {
   fi <- c()

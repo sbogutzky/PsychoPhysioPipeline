@@ -8,19 +8,19 @@ CalculateConditionalProbabilityIndex(times, time.series.1, time.series.2, n, m,
   bins = 16, plot = F)
 }
 \arguments{
-\item{times.}{A numeric verctor of ti's for instantanous phase calculation.}
+\item{times}{A numeric verctor of ti's for instantanous phase calculation.}
 
-\item{time.series.1.}{A numeric verctor of time events of the first oscillator.}
+\item{time.series.1}{A numeric verctor of time events of the first oscillator.}
 
-\item{time.series.2.}{A numeric verctor ofime events of the second oscillator.}
+\item{time.series.2}{A numeric verctor ofime events of the second oscillator.}
 
-\item{n.}{Phase locking integer for the first oscillator.}
+\item{n}{Phase locking integer for the first oscillator.}
 
-\item{m.}{Phase locking integer for the second oscillator.}
+\item{m}{Phase locking integer for the second oscillator.}
 
-\item{bins.}{Integer bins for dividing the interval of the first first oscillator.}
+\item{bins}{Integer bins for dividing the interval of the first first oscillator.}
 
-\item{plot.}{Logical if should plot phase in circles.}
+\item{plot}{Logical if should plot phase in circles.}
 }
 \value{
 conditional probability index

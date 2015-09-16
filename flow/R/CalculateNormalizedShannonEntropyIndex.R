@@ -2,11 +2,11 @@
 #'
 #' \code{CalculateNormalizedShannonEntropyIndex} returns the index
 #'
-#' @param t. t is a vector with the times of the relative phases.
-#' @param psi. psi is a vector with the realive phase in r (0 to 2pi).
-#' @param t.k. t.k is the point in time for calculting the index.
-#' @param t.w. t.w. is the time window around t.k (default = 10).
-#' @param bins. bins is the number of bins (default = The optimal number of bins will be estimated as N = exp[0.626 + 0.4 ln(M − 1)], where M is the number of samples)
+#' @param t t is a vector with the times of the relative phases.
+#' @param psi psi is a vector with the realive phase in r (0 to 2pi).
+#' @param t.k t.k is the point in time for calculting the index.
+#' @param t.w t.w is the time window around t.k (default = 10).
+#' @param bins bins is the number of bins (default = The optimal number of bins will be estimated as N = exp[0.626 + 0.4 ln(M - 1)], where M is the number of samples)
 #' @return the index.
 
 CalculateNormalizedShannonEntropyIndex <- function(t, psi, t.k, t.w = 10, bins = NA) {

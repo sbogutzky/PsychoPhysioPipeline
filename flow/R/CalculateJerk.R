@@ -2,8 +2,8 @@
 #'
 #' \code{CalculateJerk} returns a vector with the jerk of the acceleration.
 #'
-#' @param t. Vector with intervals
-#' @param x. The other vector with acceleration. t and x must have the same length, greater than one, with no missing values.
+#' @param t Vector with intervals
+#' @param x The other vector with acceleration. t and x must have the same length, greater than one, with no missing values.
 #' @return A vector with the jerk of the acceleration.
 
 CalculateJerk <- function(t, x) {

@@ -7,9 +7,9 @@
 CalculateJerk(t, x)
 }
 \arguments{
-\item{t.}{Vector with intervals}
+\item{t}{Vector with intervals}
 
-\item{x.}{The other vector with acceleration. t and x must have the same length, greater than one, with no missing values.}
+\item{x}{The other vector with acceleration. t and x must have the same length, greater than one, with no missing values.}
 }
 \value{
 A vector with the jerk of the acceleration.

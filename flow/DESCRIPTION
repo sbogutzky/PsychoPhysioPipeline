@@ -7,3 +7,4 @@ Maintainer: Simon Bogutzky <simon.bogutzky@hs-bremen.de>
 Description: A package for non disruptive flow measures.
 Suggests: MASS
 License: GPL-2
+Imports: pracma
