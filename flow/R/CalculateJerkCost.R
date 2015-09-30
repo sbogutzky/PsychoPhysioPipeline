@@ -2,12 +2,12 @@
 #'
 #' \code{CalculateJerkCost} returns a vector with the jerk cost of the acceleration.
 #'
-#' @param t. Vectors with intervals (s)
-#' @param x. The other vector with acceleration. t and x must have the same length, greater than one, with no missing values.
-#' @param y. The other vector with acceleration. t and y must have the same length, greater than one, with no missing values.
-#' @param z. The other vector with acceleration. t and z must have the same length, greater than one, with no missing values.
-#' @param normalized. Boolean. Normalized by cycle length.
-#' @param plot. Boolean. Plot cycle acceleration, cycle jerk and the time differential of jerk-cost
+#' @param t Vectors with intervals (s)
+#' @param x The other vector with acceleration. t and x must have the same length, greater than one, with no missing values.
+#' @param y The other vector with acceleration. t and y must have the same length, greater than one, with no missing values.
+#' @param z The other vector with acceleration. t and z must have the same length, greater than one, with no missing values.
+#' @param normalized Boolean. Normalized by cycle length.
+#' @param plot Boolean. Plot cycle acceleration, cycle jerk and the time differential of jerk-cost
 #' @return A vector with the jerk cost [m^2/s^4] of the acceleration or a vector with normalized jerk cost [m^2/s^5] of the acceleration.
 
 CalculateJerkCost <- function(t, x, y, z, normalized = F, plot = F) {
