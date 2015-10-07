@@ -11,10 +11,10 @@ require(RHRV)
 root.data.directory.path <- ""
 if(file.exists("C:/Users/Simon Bogutzky/Documents/flow/data"))
   root.data.directory.path <- "C:/Users/Simon Bogutzky/Documents/flow/data/"
-if(file.exists("/Volumes/flow/Documents/simon-bogutzky/data"))
-  root.data.directory.path <- "/Volumes/flow/Documents/simon-bogutzky/data/"
-if(file.exists("//gangstore.ddns.net/flow/Documents/simon-bogutzky/data"))
-  root.data.directory.path <- "//gangstore.ddns.net/flow/Documents/simon-bogutzky/data/"
+if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
+  root.data.directory.path <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
+if(file.exists("//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
+  root.data.directory.path <- "//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
 
 # Set preprocessed data directory path
 preprocessed.data.directory.path <- "./data/preprocessed-data/"
