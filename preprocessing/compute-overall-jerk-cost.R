@@ -34,6 +34,7 @@ ranges <- seq(0,900000,300000)
 
 total.jerk.cost         <- c()
 jerk.cost.by.cycle.mean <- c()
+activity.starts         <- c()
 
 detectMidSwings <- function(motion.data) {
   
@@ -103,6 +104,7 @@ for (i in 1:nrow(fss.features)) {
       
       # Detect Midswings
       mid.swings <- detectMidSwings(motion.data.subset)
+      #print(mean(diff(mid.swings)))
       
       jerk.costs <- c()
       for(l in 1:(length(mid.swings) - 1)) {
@@ -121,7 +123,7 @@ for (i in 1:nrow(fss.features)) {
       # Compute total jerk cost
       jerk.cost.by.cycle.mean <- c(jerk.cost.by.cycle.mean, mean(jerk.costs, na.rm = T))
       motion.data.subset.new  <- motion.data.subset[mid.swings[1] <= motion.data.subset$t.ms & motion.data.subset$t.ms <= mid.swings[length(mid.swings)], ]
-      print("----")
+      activity.starts         <- c(activity.starts, activity.start)
       total.jerk.cost         <- c(total.jerk.cost, CalculateJerkCost(motion.data.subset.new$t.ms / 1000, motion.data.subset.new$motion.accel.x.ms.2, motion.data.subset.new$motion.accel.y.ms.2, motion.data.subset.new$motion.accel.z.ms.2, normalized = T, plot = F))
     }
   } else {
@@ -136,5 +138,8 @@ abline(v = c(12,24,36,48,60,72,84))
 
 plot(jerk.cost.by.cycle.mean, col = c(1,2,3))
 abline(v = c(12,24,36,48,60,72,84))
+sample = rep(c(1,2,3), length(total.jerk.cost)/3)
 
-boxplot(total.jerk.cost ~ rep(c(1,2,3), length(total.jerk.cost)/3))
+boxplot(total.jerk.cost ~ sample)
+
+write.csv(data.frame(activity.start = activity.starts, total.jerk.cost, sample), "jerk-cost.csv")
