@@ -24,15 +24,15 @@ preprocessed.data.directory.path  <- "./data/preprocessed-data/"
 activity.directory  <- readline("Type in activity directory and press return to continue (e. g. walking/) > ")
 
 # Read user directory
-user.directory      <- readline("Type in user directory and press return to continue (e. g. john-doe/) > ")
+user.directory      <- readline("Type in user directory and press return to continue (e. g. doe-john/) > ")
 
 # Read in body position
-body.position       <- readline("Type in body position and press return to continue > (e. g. leg) > ")
+body.position       <- readline("Type in body position and press return to continue (e. g. leg) > ")
 
 # Load fss features
-fss.features <- read.csv(paste(features.directory.path, activity.directory, user.directory, "fss-features.csv", sep = ""), stringsAsFactors = F)
+fss.features        <- read.csv(paste(features.directory.path, activity.directory, user.directory, "fss-features.csv", sep = ""), stringsAsFactors = F)
 
-for (i in 1:1) {
+for (i in 1:nrow(fss.features)) {
   
   properties      <- fss.features[i, c(6:13)]
   activity        <- properties[, 1]
@@ -97,54 +97,48 @@ for (i in 1:1) {
     print(paste("Total time      (ms):", round(motion.data.subset[nrow(motion.data.subset),1] - motion.data.subset[1,1] + time.difference, 3)))
     
     # Extract data
-    t.ms                     <- motion.data.subset[,1] - motion.data.subset[1,1] + time.difference
-    motion.accel.x.ms.2      <- motion.data.subset[,2]
-    motion.accel.y.ms.2      <- motion.data.subset[,3]
-    motion.accel.z.ms.2      <- motion.data.subset[,4]
-    motion.rot.rate.x.deg.s  <- motion.data.subset[,5]
-    motion.rot.rate.y.deg.s  <- motion.data.subset[,6]
-    motion.rot.rate.z.deg.s  <- motion.data.subset[,7]
-    
-    motion.rot.rate.deg.s <- motion.rot.rate.x.deg.s
+    t.ms                <- motion.data.subset[,1] - motion.data.subset[1,1] + time.difference
+    acceleration.ms.2   <- t(matrix(c(motion.data.subset[, 2], motion.data.subset[, 3], motion.data.subset[, 4]), nrow(motion.data.subset), 3))
+    rotation.rate.deg.s <- t(matrix(c(motion.data.subset[, 5], motion.data.subset[, 6], motion.data.subset[, 7]), nrow(motion.data.subset), 3))
     
     # Find cyclic movement   
-    rotation.rate.x.spectrum <- TSA::periodogram(motion.rot.rate.x.deg.s, plot = F)
-    rotation.rate.y.spectrum <- TSA::periodogram(motion.rot.rate.y.deg.s, plot = F)
-    rotation.rate.z.spectrum <- TSA::periodogram(motion.rot.rate.z.deg.s, plot = F)
+    rotation.rate.x.spectrum <- TSA::periodogram(rotation.rate.deg.s[1, ], plot = F)
+    rotation.rate.y.spectrum <- TSA::periodogram(rotation.rate.deg.s[2, ], plot = F)
+    rotation.rate.z.spectrum <- TSA::periodogram(rotation.rate.deg.s[3, ], plot = F)
     
     axis <- which.max(c(max(rotation.rate.x.spectrum[[2]]), max(rotation.rate.y.spectrum[[2]]), max(rotation.rate.z.spectrum[[2]])))
     
-    #TODO: Control axis switch
-    if(mean(motion.accel.y.ms.2) < 0 & axis == 1) {
-#       motion.accel.x.ms.2      <- -motion.accel.x.ms.2 
-#       motion.accel.y.ms.2      <- -motion.accel.y.ms.2
-#       motion.rot.rate.x.deg.s  <- -motion.rot.rate.x.deg.s
-#       motion.rot.rate.y.deg.s  <- -motion.rot.rate.y.deg.s
+    if(axis == 3) {
+      print("90 deg around y")
       
-      print("Axis switched cyclic motion around x")
-      
-      # motion.rot.rate.deg.s <- motion.rot.rate.x.deg.s
+      # Rotation
+      rotation.matrix     <- matrix(c(cos(pi/2), 0, sin(pi/2), 0, 1, 0, -sin(pi/2), 0, cos(pi/2)), 3, 3, byrow = T)
+      acceleration.ms.2   <- rotation.matrix %*% acceleration.ms.2
+      rotation.rate.deg.s <- rotation.matrix %*% rotation.rate.deg.s
     }
     
-    if(mean(motion.accel.y.ms.2) < 0 & axis == 3) {
-#       motion.accel.z.ms.2      <- -motion.accel.z.ms.2 
-#       motion.accel.y.ms.2      <- -motion.accel.y.ms.2
-#       motion.rot.rate.z.deg.s  <- -motion.rot.rate.z.deg.s
-#       motion.rot.rate.y.deg.s  <- -motion.rot.rate.y.deg.s
+    if(mean(acceleration.ms.2[, 2]) < 0) {
+      print("180 deg around x")
       
-      print("Axis switched cyclic motion around z")
-      
-      # motion.rot.rate.deg.s <- motion.rot.rate.z.deg.s
+      # Rotation
+      rotation.matrix     <- matrix(c(cos(pi), -sin(pi), 0, sin(pi), cos(pi), 0, 0, 0, 1), 3, 3, byrow = T)
+      acceleration.ms.2   <- rotation.matrix %*% acceleration.ms.2  
+      rotation.rate.deg.s <- rotation.matrix %*% rotation.rate.deg.s
     } 
     
     # Plot data
-    plot(t.ms / 1000, motion.rot.rate.deg.s, type = "l", xlab = "t [s]", ylab = "Rotation Rate [deg/s]", xlim = c(140, 150))
+#     plot(t.ms / 1000, acceleration.ms.2[1,], type = "l", xlab = "t [s]", ylab = "Acceleration X [ms^2]", xlim = c(140, 150))
+#     plot(t.ms / 1000, acceleration.ms.2[2,], type = "l", xlab = "t [s]", ylab = "Acceleration Y [ms^2]", xlim = c(140, 150))
+#     plot(t.ms / 1000, acceleration.ms.2[3,], type = "l", xlab = "t [s]", ylab = "Acceleration Z [ms^2]", xlim = c(140, 150))
+    plot(t.ms / 1000, rotation.rate.deg.s[1,], type = "l", xlab = "t [s]", ylab = "Rotation Rate X [deg/s]", xlim = c(140, 150))
+#     plot(t.ms / 1000, rotation.rate.deg.s[2,], type = "l", xlab = "t [s]", ylab = "Rotation Rate Y [deg/s]", xlim = c(140, 150))
+#     plot(t.ms / 1000, rotation.rate.deg.s[3,], type = "l", xlab = "t [s]", ylab = "Rotation Rate Z [deg/s]", xlim = c(140, 150))
     title(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y/%m/%d %H:%M"))
     
     # Write csv file
     output.file.path <- paste(output.directory.path, body.position, "-motion-data-", measurement, ".csv", sep = "")
-    write.csv(data.frame(t.ms, motion.accel.x.ms.2, motion.accel.y.ms.2, motion.accel.z.ms.2, motion.rot.rate.x.deg.s, motion.rot.rate.y.deg.s, motion.rot.rate.z.deg.s), output.file.path, row.names = FALSE)
+    write.csv(data.frame(t.ms, motion.accel.x.ms.2 = acceleration.ms.2[1, ], motion.accel.y.ms.2 = acceleration.ms.2[2, ], motion.accel.z.ms.2  = acceleration.ms.2[3, ], motion.rot.rate.x.deg.s = rotation.rate.deg.s[1, ], motion.rot.rate.y.deg.s  = rotation.rate.deg.s[2, ], motion.rot.rate.z.deg.s = rotation.rate.deg.s[3, ]), output.file.path, row.names = FALSE)
     print(paste("Wrote:", output.file.path))
-    readline("Press return to continue") 
+    readline("Press return to continue > ")
   }
 }
