@@ -7,27 +7,28 @@ require(signal)
 
 # Set root data directory path
 root.data.directory.path <- ""
-if(file.exists("C:/Users/Simon Bogutzky/Documents/flow/data"))
-  root.data.directory.path <- "C:/Users/Simon Bogutzky/Documents/flow/data/"
 if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
-  root.data.directory.path <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
+  root.data.directory.path        <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
 if(file.exists("//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
-  root.data.directory.path <- "//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
-
-# Set preprocessed data directory path
-preprocessed.data.directory.path <- "./data/preprocessed-data/"
-
-# Set processed data directory path
-processed.data.directory.path <- paste(root.data.directory.path, "processed-data/", sep = "")
+  root.data.directory.path        <- "//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
 
 # Set features directory path
-features.directory.path <- paste(root.data.directory.path, "features/", sep = "")
+features.directory.path           <- paste(root.data.directory.path, "features/", sep = "")
+
+# Set preprocessed data directory path
+preprocessed.data.directory.path  <- "./data/preprocessed-data/"
+
+# Read activity directory
+activity.directory  <- readline("Type in activity directory and press return to continue (e. g. walking/) > ")
+
+# Read user directory
+user.directory      <- readline("Type in user directory and press return to continue (e. g. doe-john/) > ")
+
+# Read in body position
+body.position       <- readline("Type in body position and press return to continue (e. g. leg) > ")
 
 # Load fss features
-fss.features <- read.csv(paste(features.directory.path, "fss-features-grueter.csv", sep = ""), stringsAsFactors = F)
-
-# Set body position
-body.position       <- "leg"
+fss.features        <- read.csv(paste(features.directory.path, activity.directory, user.directory, "fss-features.csv", sep = ""), stringsAsFactors = F)
 
 # Set measures in ms
 ranges <- seq(0,900000,300000)
@@ -134,12 +135,15 @@ for (i in 1:nrow(fss.features)) {
 par(mfrow = c(3,1), mgp = c(2, 1, 0)) 
 
 plot(total.jerk.cost, col = c(1,2,3))
-abline(v = c(12,24,36,48,60,72,84))
+abline(v = c(12, 24, 36, 48, 60, 72, 84))
+
+# Annika
+#abline(v = c(6,15,27,39,51,63))
 
 plot(jerk.cost.by.cycle.mean, col = c(1,2,3))
-abline(v = c(12,24,36,48,60,72,84))
+abline(v = c(12, 24, 36, 48, 60, 72, 84))
 sample = rep(c(1,2,3), length(total.jerk.cost)/3)
 
 boxplot(total.jerk.cost ~ sample)
 
-write.csv(data.frame(activity.start = activity.starts, total.jerk.cost, sample), "jerk-cost.csv")
+#write.csv(data.frame(activity.start = activity.starts, total.jerk.cost, sample), "jerk-cost.csv")
