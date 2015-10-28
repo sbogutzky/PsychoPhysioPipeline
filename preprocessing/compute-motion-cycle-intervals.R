@@ -23,23 +23,21 @@ processed.data.directory.path <- paste(root.data.directory.path, "processed-data
 features.directory.path <- paste(root.data.directory.path, "features/", sep = "")
 
 # Read activity directory
-activity.directory  <- "walking/" # readline("Type in activity directory and press return to continue (e. g. walking/) > ")
+activity.directory  <- readline("Type in activity directory and press return to continue (e. g. walking/) > ")
 
 # Read user directory
-user.directory      <- "grueter-barbara/" # readline("Type in user directory and press return to continue (e. g. doe-john/) > ")
+user.directory      <- readline("Type in user directory and press return to continue (e. g. doe-john/) > ")
 
 # Read in body position
-body.position       <- "leg" # readline("Type in body position and press return to continue (e. g. leg) > ")
+body.position       <- readline("Type in body position and press return to continue (e. g. leg) > ")
 
 # Read in subset size in seconds
-subset.size         <- 30 # readline("Type in subset size in seconds for visual control and press return to continue (e. g. 30) > ")
-
+subset.size         <- as.numeric(readline("Type in subset size in seconds for visual control and press return to continue (e. g. 30) > "))
 
 # Load fss features
 fss.features        <- read.csv(paste(features.directory.path, activity.directory, user.directory, "fss-features.csv", sep = ""), stringsAsFactors = F)
 
-i <- 1
-# for (i in 1:nrow(fss.features)) {
+for (i in 1:nrow(fss.features)) {
   
   properties      <- fss.features[i, c(6:12)]
   activity.start  <- properties[, 2]
@@ -171,30 +169,56 @@ i <- 1
     plot(motion.data[, 1] / 1000, motion.data[, 5], type = "l", xlab = "t [s]", ylab = "Rotation Rate X [deg/s]")
     points(mid.swings[, 1] / 1000, mid.swings[, 2], col = 5)
     
+    # Isolate gravity from acceleration 
+    butterworth.filter              <- butter(1, .2, "high")
+    motion.data$motion.accel.x.ms.2 <- filtfilt(butterworth.filter, motion.data$motion.accel.x.ms.2)
+    motion.data$motion.accel.y.ms.2 <- filtfilt(butterworth.filter, motion.data$motion.accel.y.ms.2)
+    motion.data$motion.accel.z.ms.2 <- filtfilt(butterworth.filter, motion.data$motion.accel.z.ms.2)
+        
+    jerk.costs <- c()
+    for(l in 1:(nrow(mid.swings) - 1)) {
+          
+        # Compute jerk cost of each cycle
+        in.cycle                    <- mid.swings[l, 1] <= motion.data$t.ms & motion.data$t.ms < mid.swings[l + 1, 1]
+        t.ms.subset                 <- motion.data$t.ms[in.cycle]
+        motion.accel.x.ms.2.subset  <- motion.data$motion.accel.x.ms.2[in.cycle]
+        motion.accel.y.ms.2.subset  <- motion.data$motion.accel.y.ms.2[in.cycle]
+        motion.accel.z.ms.2.subset  <- motion.data$motion.accel.z.ms.2[in.cycle]
+          
+        jerk.cost   <- CalculateJerkCost(t.ms.subset / 1000, motion.accel.x.ms.2.subset, motion.accel.y.ms.2.subset, motion.accel.z.ms.2.subset, normalized = T, plot = F)
+        jerk.costs  <- c(jerk.costs, jerk.cost)
+    }
     
     cycle.intervals <- diff(mid.swings[, 1] / 1000)
-    hist(cycle.intervals[cycle.intervals < 1.5])
     
-    plot(cycle.intervals[cycle.intervals < 1.5], type = "b")
+    result.data <- data.frame(t.s = mid.swings[(2:nrow(mid.swings)), 1] / 1000, cycle.interval.s = cycle.intervals, jerk.cost.m2s5 = jerk.costs)
+    result.data <- result.data[result.data[,2] < 1.5, ]
     
-#     # Create directory, if needed
-#     output.directory.path <- paste(processed.data.directory.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, sep="")
-#     if(!file.exists(output.directory.path)) {
-#       dir.create(output.directory.path, recursive = TRUE)
-#     }
-# 
-#     # Write csv file
-#     output.file.path <- paste(output.directory.path, body.position, "-motion-time-data-", measurement, ".csv", sep = "")
-#     op <- options(digits.secs=3)
-#     con <- file(output.file.path, 'w') 
-#     writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"), con = con)
-#     writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%H:%M:%OS"), con = con)
-#     write.csv(data.frame(t.s, cycle.interval.s), file = con, row.names = FALSE)
-#     close(con)
-#     options(op) #reset options
-#     print(paste("Wrote:", output.file.path))
-#     
+    # Compute mean to compare
+    jerk.cost.by.all.accelerations  <- CalculateJerkCost(motion.data$t.ms / 1000, motion.data$motion.accel.x.ms.2, motion.data$motion.accel.y.ms.2, motion.data$motion.accel.z.ms.2, normalized = T, plot = F)
+    jerk.cost.by.cycle.mean         <- mean(result.data[, 3], na.rm = T)
+    print(paste("Jerk Cost by Cycle:           :", jerk.cost.by.cycle.mean))
+    print(paste("Jerk Cost by all Accelerations:", jerk.cost.by.all.accelerations))
+    
+    # Create directory, if needed
+    output.directory.path <- paste(features.directory.path, activity.directory, user.directory, "jerk-cost/", date.directory, sep="")
+    if(!file.exists(output.directory.path)) {
+      dir.create(output.directory.path, recursive = TRUE)
+    }
+
+    # Write csv file
+    output.file.path <- paste(output.directory.path, body.position, "-jerk-cost-data-", measurement, ".csv", sep = "")
+    op <- options(digits.secs=3)
+    con <- file(output.file.path, 'w') 
+    writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"), con = con)
+    writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%H:%M:%OS"), con = con)
+    write.csv(result.data, file = con, row.names = FALSE)
+    close(con)
+    options(op) #reset options
+    print(paste("Wrote:", output.file.path))
+    readline("Press return to continue > ")
+    
   } else {
     print("No Motion data")
   }
-#}
+}
