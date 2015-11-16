@@ -1,0 +1,147 @@
+---
+title: "Flow beim Gehen"
+author: "Simon Bogutzky"
+date: "16. November 2015"
+output: html_document
+---
+
+```{r set-directories, echo = FALSE}
+
+# Set root data directory path
+root.data.directory.path  <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
+
+# Set activity directory
+activity.directory        <- "walking/" 
+
+# Set user directory
+user.directory            <- "grueter-barbara/"
+
+```
+
+```{r load-data, echo=FALSE}
+
+# Load FSS features
+fss.features              <- read.csv(paste(root.data.directory.path, "features/", activity.directory, user.directory, "fss-features.csv", sep = ""))
+
+# Create data frame for HRV features
+hrv.features              <- data.frame()
+hrv.feature.names        <- c("activity","activity.start","activity.end","inquiry.end","measurement","last.name","first.name","date.of.birth","sample","meanrr","sdnn","meanhr","sdhr","rmssd","nn50","pnn50","sdann","sdnni","hrvtri","tinn","vlfpeakfft","lfpeakfft","hfpeakfft","vlfpowfft","lfpowfft","hfpowfft","vlfpowprfft","lfpowprfft","hfpowprfft","lfpownufft","hfpownufft","totpowfft","lfhffft","vlfpeakar","lfpeakar","hfpeakar","vlfpowar","lfpowar","hfpowar","vlfpowprar","lfpowprar","hfpowprar","lfpownuar","hfpownuar","totpowar","lfhfar","edr","sd1","sd2","apen","sampen","d2","dfa1","dfa2")
+
+# Create data frame for JC features
+jerk.cost.features        <- data.frame()
+jerk.cost.feature.names   <- c("cycle.interval", "mean.jerk.cost")  
+
+# Load data per session
+for (i in 1:nrow(fss.features)) {
+  
+  # Set session properties
+  properties      <- fss.features[i, c(6:13)]
+  activity        <- properties[, 1]
+  activity.start  <- properties[, 2]
+  measurement     <- properties[, 5]
+  last.name       <- properties[, 6]
+  first.name      <- properties[, 7]
+  
+  if(measurement == 1) {
+    date.directory <- paste(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S"), "/", sep ="")
+  }
+  
+  # Load and store HRV features
+  kubios.hrv.features.path      <- paste(root.data.directory.path, "features/", activity.directory, user.directory, "kubios-hrv-features/", date.directory, sep="")
+  kubios.hrv.features.file.name <- paste("ecg-data-", measurement, "_hrv.txt", sep = "")
+  if(file.exists(paste(kubios.hrv.features.path, kubios.hrv.features.file.name, sep = ""))) {
+    
+    kubios.hrv.features       <- read.csv(paste(kubios.hrv.features.path, kubios.hrv.features.file.name, sep = ""))
+    for (j in 1:nrow(kubios.hrv.features)) {
+      new.hrv.features        <- cbind(properties, kubios.hrv.features[j, 1:46])
+      names(new.hrv.features) <- hrv.feature.names
+      hrv.features            <- rbind(hrv.features, new.hrv.features)
+    }
+  } else {
+    j = 1
+    while(j <= 3) {
+      new.hrv.features        <- cbind(properties, t(rep(NA, 46)))
+      names(new.hrv.features) <- hrv.feature.names
+      hrv.features            <- rbind(hrv.features, new.hrv.features)
+      j                       <- j + 1
+    }
+  }
+  
+  # Load jerk cost, estimate and store JC features
+  jerk.cost.path       <- paste(root.data.directory.path, "features/", activity.directory, user.directory, "jerk-cost/", date.directory, sep="")
+  jerk.cost.file.name       <- paste("leg-jerk-cost-data-", measurement, ".csv", sep = "")
+  jerk.cost                 <- read.csv(paste(jerk.cost.path, jerk.cost.file.name, sep = ""), skip = 2)
+  
+  range.intervals           <- seq(0, 900, 300)
+  for (j in 1:(length(range.intervals)-1)) {
+    jerk.cost.features <- rbind(jerk.cost.features, c(mean(jerk.cost$cycle.interval[jerk.cost$t.s >= range.intervals[j] & jerk.cost$t.s < range.intervals[j + 1] & jerk.cost$cycle.interval < 1.15], na.rm = T), mean(jerk.cost$jerk.cost[jerk.cost$t.s >= range.intervals[j] & jerk.cost$t.s < range.intervals[j + 1] & jerk.cost$cycle.interval < 1.15], na.rm = T)))
+  }
+  names(jerk.cost.features) <- jerk.cost.feature.names
+}
+
+# Remove unused stuff
+rm(hrv.feature.names, properties, activity, activity.start, measurement, last.name, first.name, date.directory, kubios.hrv.features, kubios.hrv.features.path, kubios.hrv.features.file.name, new.hrv.features, i, j, jerk.cost, jerk.cost.feature.names, jerk.cost.file.name, jerk.cost.path, range.intervals)
+
+jerk.cost.features$mean.jerk.cost <- jerk.cost.features$mean.jerk.cost/10^5
+```
+
+```{r time-series, echo=FALSE}
+breaks  <- rep(1:3, nrow(fss.features)) 
+starts  <- seq(1, 28, by = 4)
+dates   <- format(as.POSIXct(fss.features$activity.end/1000, origin = "1970-01-01", tz = "CET"), "%D", tz = "CET")
+
+absorption.expression <- expression("FSS FII: Absorption")
+meanhr.expression     <- expression("Mean HR ("~BPM~")")
+rmssd.expression      <- expression("RMSSD ("~s~")")
+jerk.cost.expression  <- expression("Mean JC (x"~10^5~m^2*s^{-5}~")")
+
+par(mfcol = c(4, 1), mar = c(3.5, 4, 0, 4) + 0.1, mgp = c(2.5, 1, 0))
+
+plot(fss.features$absorption, xaxt = "n", pch = 21, bg = c("green", "white", "white", "white"), cex = 1.2, ylab = absorption.expression, xlab = "")
+axis(1, at = starts, labels = rep("", 7))
+box()
+
+plot(hrv.features$meanhr[breaks == 3], xaxt = "n", pch = 21, bg = c("green", "white", "white", "white"), cex = 1.2, ylab = meanhr.expression, xlab = "")
+axis(1, at = starts, labels = rep("", 7))
+box()
+
+plot(hrv.features$rmssd[breaks == 3], xaxt = "n", pch = 21, bg = c("green", "white", "white", "white"), cex = 1.2, ylab = rmssd.expression, xlab = "")
+axis(1, at = starts, labels = rep("", 7))
+box()
+
+plot(jerk.cost.features$mean.jerk.cost[breaks == 3], xaxt = "n", pch = 21, bg = c("green", "white", "white", "white"), cex = 1.2, ylab = jerk.cost.expression, xlab = "Measurement")
+axis(1, at = starts, labels = dates[starts])
+box()
+```
+
+```{r linear-models, echo=FALSE}
+par(mfrow = c(2, 2), mar = c(3.5, 4, 1, 4) + 0.1, mgp = c(2.5, 1, 0))
+
+linear.model <- lm(fss.features$flow ~ hrv.features$meanhr[breaks == 3])
+summary(linear.model)
+plot(hrv.features$meanhr[breaks == 3], fss.features$absorption, pch = 21, cex = 1.2, ylab = absorption.expression, xlab = meanhr.expression)
+abline(linear.model)
+box()
+
+linear.model <- lm(fss.features$flow ~ hrv.features$rmssd[breaks == 3])
+summary(linear.model)
+plot(hrv.features$rmssd[breaks == 3], fss.features$absorption, pch = 21, cex = 1.2, ylab = absorption.expression, xlab = rmssd.expression)
+abline(linear.model)
+box()
+
+linear.model <- lm(fss.features$flow ~ (jerk.cost.features$mean.jerk.cost[breaks == 3]))
+summary(linear.model)
+plot(jerk.cost.features$mean.jerk.cost[breaks == 3], fss.features$absorption, pch = 21, cex = 1.2, ylab = absorption.expression, xlab = jerk.cost.expression)
+abline(linear.model)
+box()
+
+linear.model <- lm(hrv.features$meanhr[breaks == 3] ~ (jerk.cost.features$mean.jerk.cost[breaks == 3]))
+summary(linear.model)
+plot(jerk.cost.features$mean.jerk.cost[breaks == 3], hrv.features$meanhr[breaks == 3], pch = 21, cex = 1.2, ylab = meanhr.expression, xlab = jerk.cost.expression)
+abline(linear.model)
+box()
+
+rm(linear.model)
+```
+
+
