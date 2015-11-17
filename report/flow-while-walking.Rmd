@@ -29,7 +29,8 @@ hrv.feature.names        <- c("activity","activity.start","activity.end","inquir
 
 # Create data frame for JC features
 jerk.cost.features        <- data.frame()
-jerk.cost.feature.names   <- c("cycle.interval", "mean.jerk.cost")  
+jerk.cost.feature.names   <- c("cycle.interval", "mean.jerk.cost") 
+epsilon                   <- 0
 
 # Load data per session
 for (i in 1:nrow(fss.features)) {
@@ -72,6 +73,27 @@ for (i in 1:nrow(fss.features)) {
   jerk.cost.file.name       <- paste("leg-jerk-cost-data-", measurement, ".csv", sep = "")
   jerk.cost                 <- read.csv(paste(jerk.cost.path, jerk.cost.file.name, sep = ""), skip = 2)
   
+  jerk.cost$jerk.cost.m2s5 <- jerk.cost$jerk.cost.m2s5/10^5
+
+  # Annomaly detection
+  X <- matrix(data = c(jerk.cost$cycle.interval.s, jerk.cost$jerk.cost.m2s5), nrow = nrow(jerk.cost), ncol = 2)
+  plot(X[,1], X[,2], ylab = expression("Cycle Intervale ("~s~")"), xlab = expression("JC (x"~10^5~m^2*s^{-5}~")"), pch = 21)
+  
+  gl <- EstimateGaussian(X)
+  p  <- MultivariateGaussian(X, gl$mu, gl$sigma2)
+  
+  if(i == 1) {
+    y               <- zeros(nrow(X), 1)
+    y[identify(X)]  <- 1
+    bt              <- SelectThreshold(y, p)
+    epsilon         <- bt$epsilon
+  }
+  
+  outliers <- which(p < bt$epsilon)
+  points(X[outliers, 1], X[outliers, 2], ylab = expression("Cycle Intervale ("~s~")"), xlab = expression("JC (x"~10^5~m^2*s^{-5}~")"), pch = 21, bg = 2)
+  
+  jerk.cost <- jerk.cost[-outliers, ]
+  
   range.intervals           <- seq(0, 900, 300)
   for (j in 1:(length(range.intervals)-1)) {
     jerk.cost.features <- rbind(jerk.cost.features, c(mean(jerk.cost$cycle.interval[jerk.cost$t.s >= range.intervals[j] & jerk.cost$t.s < range.intervals[j + 1] & jerk.cost$cycle.interval < 1.15], na.rm = T), mean(jerk.cost$jerk.cost[jerk.cost$t.s >= range.intervals[j] & jerk.cost$t.s < range.intervals[j + 1] & jerk.cost$cycle.interval < 1.15], na.rm = T)))
@@ -81,8 +103,6 @@ for (i in 1:nrow(fss.features)) {
 
 # Remove unused stuff
 rm(hrv.feature.names, properties, activity, activity.start, measurement, last.name, first.name, date.directory, kubios.hrv.features, kubios.hrv.features.path, kubios.hrv.features.file.name, new.hrv.features, i, j, jerk.cost, jerk.cost.feature.names, jerk.cost.file.name, jerk.cost.path, range.intervals)
-
-jerk.cost.features$mean.jerk.cost <- jerk.cost.features$mean.jerk.cost/10^5
 ```
 
 ```{r time-series, echo=FALSE}
