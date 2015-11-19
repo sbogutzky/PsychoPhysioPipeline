@@ -15,6 +15,75 @@ activity.directory        <- "walking/"
 
 # Set user directory
 user.directory            <- "grueter-barbara/"
+
+require(flow)
+
+  CreateFeatureDataFrame <- function(directory.path, filename, cols, rows, col.names, additional.features, skip = skip) {
+    feature.data.frame <- data.frame()
+    if(file.exists(paste(directory.path, file.name, sep = ""))) {
+      loaded.features <- read.csv(paste(directory.path, file.name, sep = ""), skip = skip)
+      for (i in rows) {
+          feature.vector        <- c(loaded.features[i, cols], additional.features)
+          names(feature.vector) <- col.names
+          feature.data.frame    <- rbind(feature.data.frame, feature.vector)
+      }
+    } else {
+      for (i in rows) {
+        feature.vector        <- c(rep(NA, length(cols)), additional.features)
+        names(feature.vector) <- col.names
+        feature.data.frame    <- rbind(feature.data.frame, feature.vector)
+      }
+    }
+    return(feature.data.frame)
+  }
+  
+
+    CreateJerkCostFeatureDataFrame <- function(directory.path, filename, interval.ranges, col.names, additional.features) {
+    feature.data.frame <- data.frame()
+    
+    if(file.exists(paste(directory.path, file.name, sep = ""))) {
+      data        <- read.csv(paste(directory.path, file.name, sep = ""), skip = 2)
+      
+      data[, 3]   <- data[, 3] / 10^5
+      annomalies  <- DetectAnnomalies(data[, 2], data[, 3], expression("Cycle Interval ("~s~")"), expression("JC (x"~10^5~m^2*s^{-5}~")"), c(.8, 1.3), epsilon = epsilon) 
+      data        <- data[-annomalies$outliers, ]
+      epsilon     <- annomalies$epsilon
+      
+      for (i in 1:(length(range.intervals) - 1)) {
+        estimated.features <- c(mean(data[, 2][data[, 1] >= range.intervals[j] & data[, 1] < range.intervals[j + 1] & data[, 2] < 1.15], na.rm = T), mean(data[, 2][data[, 1] >= range.intervals[j] & data[, 1] < range.intervals[j + 1] & data[, 2] < 1.15], na.rm = T))
+        feature.vector        <- c(estimated.features, additional.features)
+        names(feature.vector) <- col.names
+        feature.data.frame    <- rbind(feature.data.frame, feature.vector)
+      }
+    } else {
+      for (i in 1:(length(range.intervals) - 1)) {
+        feature.vector        <- c(rep(NA, 2), additional.features)
+        names(feature.vector) <- col.names
+        feature.data.frame    <- rbind(feature.data.frame, feature.vector)
+      }
+    }
+    return(feature.data.frame)
+  }
+
+  DetectAnnomalies <- function(x, y, x.lab, y.lab, x.lim, epsilon = 0) {
+    X <- matrix(data = c(x, y), nrow = length(y), ncol = 2)
+    plot(X[,1], X[,2], xlab = x.lab, ylab = y.lab, pch = 21, xlim = x.lim)
+  
+    gl <- EstimateGaussian(X)
+    p  <- MultivariateGaussian(X, gl$mu, gl$sigma2)
+  
+    if(epsilon == 0) {
+      y <- zeros(nrow(X), 1)
+      y[identify(X)]  <- 1
+      bt              <- SelectThreshold(y, p)
+    }
+  
+    outliers <- which(p < bt$epsilon)
+    points(X[outliers, 1], X[outliers, 2], xlab = x.lab, ylab = y.lab, pch = 21, bg = 2)
+  
+    return(list("epsilon" = bt$epsilon, "outliers" = outliers))  
+  }
+
 ```
 
 ```{r load-data, echo=FALSE}
@@ -24,16 +93,20 @@ fss.features              <- read.csv(paste(root.data.directory.path, "features/
 
 # Create data frame for HRV features
 hrv.features              <- data.frame()
-hrv.feature.names        <- c("activity","activity.start","activity.end","inquiry.end","measurement","last.name","first.name","date.of.birth","sample","meanrr","sdnn","meanhr","sdhr","rmssd","nn50","pnn50","sdann","sdnni","hrvtri","tinn","vlfpeakfft","lfpeakfft","hfpeakfft","vlfpowfft","lfpowfft","hfpowfft","vlfpowprfft","lfpowprfft","hfpowprfft","lfpownufft","hfpownufft","totpowfft","lfhffft","vlfpeakar","lfpeakar","hfpeakar","vlfpowar","lfpowar","hfpowar","vlfpowprar","lfpowprar","hfpowprar","lfpownuar","hfpownuar","totpowar","lfhfar","edr","sd1","sd2","apen","sampen","d2","dfa1","dfa2")
+hrv.feature.names        <- c("sample","meanrr","sdnn","meanhr","sdhr","rmssd","nn50","pnn50","sdann","sdnni","hrvtri","tinn","vlfpeakfft","lfpeakfft","hfpeakfft","vlfpowfft","lfpowfft","hfpowfft","vlfpowprfft","lfpowprfft","hfpowprfft","lfpownufft","hfpownufft","totpowfft","lfhffft","vlfpeakar","lfpeakar","hfpeakar","vlfpowar","lfpowar","hfpowar","vlfpowprar","lfpowprar","hfpowprar","lfpownuar","hfpownuar","totpowar","lfhfar","edr","sd1","sd2","apen","sampen","d2","dfa1","dfa2","activity","activity.start","activity.end","inquiry.end","measurement","last.name","first.name","date.of.birth")
 
 # Create data frame for JC features
 jerk.cost.features        <- data.frame()
-jerk.cost.feature.names   <- c("cycle.interval", "mean.jerk.cost") 
+jerk.cost.feature.names   <- c("mean.cycle.interval", "mean.jerk.cost", "activity","activity.start","activity.end","inquiry.end","measurement","last.name","first.name","date.of.birth") 
 epsilon                   <- 0
+
+# Create data frame for CLS features
+cls.features        <- data.frame()
+cls.feature.names   <- c("activity","activity.start","activity.end","inquiry.end","measurement","last.name","first.name","date.of.birth", "mean.pcoi", "mean.nsei") 
 
 # Load data per session
 for (i in 1:nrow(fss.features)) {
-  
+
   # Set session properties
   properties      <- fss.features[i, c(6:13)]
   activity        <- properties[, 1]
@@ -46,64 +119,46 @@ for (i in 1:nrow(fss.features)) {
     date.directory <- paste(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S"), "/", sep ="")
   }
   
-  # Load and store HRV features
-  kubios.hrv.features.path      <- paste(root.data.directory.path, "features/", activity.directory, user.directory, "kubios-hrv-features/", date.directory, sep="")
-  kubios.hrv.features.file.name <- paste("ecg-data-", measurement, "_hrv.txt", sep = "")
-  if(file.exists(paste(kubios.hrv.features.path, kubios.hrv.features.file.name, sep = ""))) {
+  
+  # Create HRV feature data frame
+  directory.path  <- paste(root.data.directory.path, "features/", activity.directory, user.directory, "kubios-hrv-features/", date.directory, sep="")
+  file.name       <- paste("ecg-data-", measurement, "_hrv.txt", sep = "")
+  CreateFeatureDataFrame(directory.path, file.name, 1:46, 1:3, hrv.feature.names, properties, skip = 0)
+  
+  # Load jerk cost, estimate and store JC features
+  directory.path        <- paste(root.data.directory.path, "processed-data/", activity.directory, user.directory, date.directory, sep = "")
+  file.name             <- paste("leg-jerk-cost-data-", measurement, ".csv", sep = "")
+  range.intervals       <- seq(0, 900, 300)
+
+  
+  # Load CLS indexes, estimate and store CLS features
+  cls.indexes.file.name     <- paste("leg-cls-indexes-", measurement, ".csv", sep = "")
+  if(file.exists(paste(processed.data.path, cls.indexes.file.name, sep = ""))) {
     
-    kubios.hrv.features       <- read.csv(paste(kubios.hrv.features.path, kubios.hrv.features.file.name, sep = ""))
-    for (j in 1:nrow(kubios.hrv.features)) {
-      new.hrv.features        <- cbind(properties, kubios.hrv.features[j, 1:46])
-      names(new.hrv.features) <- hrv.feature.names
-      hrv.features            <- rbind(hrv.features, new.hrv.features)
-    }
+      cls.indexes.data          <- read.csv(paste(processed.data.path, cls.indexes.file.name, sep = ""), skip = 2)
+      plot(cls.indexes.data$pcoi, cls.indexes.data$nsei, xlab ="PCoI", ylab = "NSEI")
+  
+      for (j in 1:(length(range.intervals)-1)) {
+        new.cls.features <- rbind(cls.features, c(properties, mean(cls.indexes.data$pcoi[cls.indexes.data$t.s >= range.intervals[j] & cls.indexes.data$t.s < range.intervals[j + 1]], na.rm = T), mean(cls.indexes.data$nsei[cls.indexes.data$t.s >= range.intervals[j] & cls.indexes.data$t.s < range.intervals[j + 1]], na.rm = T)))
+        names(new.cls.features) <- cls.feature.names
+        cls.features <- rbind(cls.features, new.cls.features)
+      }
   } else {
     j = 1
     while(j <= 3) {
-      new.hrv.features        <- cbind(properties, t(rep(NA, 46)))
-      names(new.hrv.features) <- hrv.feature.names
-      hrv.features            <- rbind(hrv.features, new.hrv.features)
+      new.cls.features        <- cbind(properties, t(rep(NA, 2)))
+      names(new.cls.features) <- cls.feature.names
+      cls.features <- rbind(cls.features, new.cls.features)
       j                       <- j + 1
     }
   }
-  
-  # Load jerk cost, estimate and store JC features
-  jerk.cost.path            <- paste(root.data.directory.path, "processed-data/", activity.directory, user.directory, date.directory, sep = "")
-  jerk.cost.file.name       <- paste("leg-jerk-cost-data-", measurement, ".csv", sep = "")
-  jerk.cost                 <- read.csv(paste(jerk.cost.path, jerk.cost.file.name, sep = ""), skip = 2)
-  
-  jerk.cost$jerk.cost.m2s5  <- jerk.cost$jerk.cost.m2s5/10^5
-
-  # Annomaly detection
-  X <- matrix(data = c(jerk.cost$cycle.interval.s, jerk.cost$jerk.cost.m2s5), nrow = nrow(jerk.cost), ncol = 2)
-  plot(X[,1], X[,2], ylab = expression("Cycle Intervale ("~s~")"), xlab = expression("JC (x"~10^5~m^2*s^{-5}~")"), pch = 21, xlim = c(.8, 1.3))
-  
-  gl <- EstimateGaussian(X)
-  p  <- MultivariateGaussian(X, gl$mu, gl$sigma2)
-  
-  if(i == 1) {
-    y               <- zeros(nrow(X), 1)
-    y[identify(X)]  <- 1
-    bt              <- SelectThreshold(y, p)
-    epsilon         <- bt$epsilon
-  }
-  
-  outliers <- which(p < bt$epsilon)
-  points(X[outliers, 1], X[outliers, 2], xlab = expression("Cycle Intervale ("~s~")"), ylab = expression("JC (x"~10^5~m^2*s^{-5}~")"), pch = 21, bg = 2)
-  
-  jerk.cost <- jerk.cost[-outliers, ]
-  
-  range.intervals           <- seq(0, 900, 300)
-  for (j in 1:(length(range.intervals)-1)) {
-    jerk.cost.features <- rbind(jerk.cost.features, c(mean(jerk.cost$cycle.interval[jerk.cost$t.s >= range.intervals[j] & jerk.cost$t.s < range.intervals[j + 1] & jerk.cost$cycle.interval < 1.15], na.rm = T), mean(jerk.cost$jerk.cost[jerk.cost$t.s >= range.intervals[j] & jerk.cost$t.s < range.intervals[j + 1] & jerk.cost$cycle.interval < 1.15], na.rm = T)))
-  }
-  names(jerk.cost.features) <- jerk.cost.feature.names
 }
 
 # Remove unused stuff
-rm(hrv.feature.names, properties, activity, activity.start, measurement, last.name, first.name, date.directory, kubios.hrv.features, kubios.hrv.features.path, kubios.hrv.features.file.name, new.hrv.features, i, j, jerk.cost, jerk.cost.feature.names, jerk.cost.file.name, jerk.cost.path, range.intervals, X, y, bt, epsilon, gl, outliers, p)
+rm(hrv.feature.names, properties, activity, activity.start, measurement, last.name, first.name, date.directory, kubios.hrv.features, kubios.hrv.features.path, kubios.hrv.features.file.name, new.hrv.features, i, j, jerk.cost, jerk.cost.feature.names, jerk.cost.file.name, processed.data.path, range.intervals, X, y, bt, epsilon, gl, outliers, p)
 ```
 
+# Ebenenspezifisch
 ```{r time-series, echo=FALSE}
 breaks  <- rep(1:3, nrow(fss.features)) 
 starts  <- seq(1, nrow(fss.features), by = 4)
@@ -135,6 +190,7 @@ box()
 rm(starts, dates)
 ```
 
+# Korrelation
 ```{r linear-models, echo=FALSE}
 par(mfrow = c(2, 2), mar = c(3.5, 4, 1, 4) + 0.1, mgp = c(2.5, 1, 0))
 
@@ -164,3 +220,7 @@ box()
 
 rm(linear.model)
 ```
+
+
+
+
