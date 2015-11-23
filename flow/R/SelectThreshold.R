@@ -14,7 +14,7 @@ SelectThreshold <- function(yval, pval) {
     fp = sum((predictions == 1) & (yval == 0))
     fn = sum((predictions == 0) & (yval == 1))
     
-    if ((tp + fp) > 0 & (tp + fn) > 0) {
+    if (tp > 0 & (tp + fp) > 0 & (tp + fn) > 0) {
       prec = tp / (tp + fp)
       rec = tp / (tp + fn)
       F1 = 2 * prec * rec / (prec + rec)
