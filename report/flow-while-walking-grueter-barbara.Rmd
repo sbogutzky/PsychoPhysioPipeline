@@ -7,8 +7,15 @@ output: html_document
 
 ```{r set-directories, echo = FALSE}
 
+# Remove all variables
+rm(list = ls(all = T)) 
+
 # Set root data directory path
-root.data.directory.path  <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
+root.data.directory.path <- ""
+if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
+  root.data.directory.path        <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
+if(file.exists("//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
+  root.data.directory.path        <- "//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
 
 # Set activity directory
 activity.directory        <- "walking/" 
