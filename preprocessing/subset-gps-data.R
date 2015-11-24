@@ -60,24 +60,28 @@ for (i in 1:nrow(fss.features)) {
     
     # Subset gps data
     gps.data.subset   <- gps.data[activity.start <= gps.data[,1] & gps.data[,1] < activity.end,]
-    time.difference   <- gps.data.subset[1,1] - activity.start
-    print(paste("Time difference (ms):", round(time.difference, 3)))
-    print(paste("Total time      (ms):", round(gps.data.subset[nrow(gps.data.subset),1] - gps.data.subset[1,1] + time.difference, 3)))
-    
-    
-    date.time <- as.POSIXct(gps.data.subset[,1] / 1000, origin = "1970-01-01", tz = "CET")
-    date.time <- format(date.time, "%Y-%m-%d %H:%M:%OS3")
-    latitude  <- gps.data.subset[,2]
-    longitude <- gps.data.subset[,3]
-    altitude  <- gps.data.subset[,4]
-    
-    # Write kml file
-    header <- "<?xml version=\"1.0\" encoding=\"UTF-8\"?><kml xmlns=\"http://earth.google.com/kml/2.2\"><!-- TimeStamp is recommended for Point. Each Point represents a sample from a GPS. --><Document><name>Points with TimeStamps</name><Style id=\"paddle-a\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/kml/paddle/A.png</href></Icon><hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/></IconStyle></Style><Style id=\"paddle-b\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/kml/paddle/B.png</href></Icon><hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/></IconStyle></Style><Style id=\"hiker-icon\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/hiker.png</href></Icon><hotSpot x=\"0\" y=\".5\" xunits=\"fraction\" yunits=\"fraction\"/></IconStyle></Style><Style id=\"check-hide-children\"><ListStyle><listItemType>checkHideChildren</listItemType></ListStyle></Style>"
-    footer <- "</Document></kml>"
-    output.file.path <- paste(output.directory.path, "kml-path-", measurement, ".kml", sep = "")
-    write(header, output.file.path)
-    write(paste("<Placemark><TimeStamp><when>", strftime(date.time, format = "%F", tz = "CET"), "T", strftime(date.time, format = "%T"), "Z</when></TimeStamp><styleUrl>#hiker-icon</styleUrl><Point><coordinates>", longitude, ",", latitude, ",", altitude, "</coordinates></Point></Placemark>", sep = ""), output.file.path, append = T)
-    write(footer, output.file.path, append = T)
-    print(paste("Wrote:", output.file.path))
+    if(nrow(gps.data.subset) > 0) {
+      time.difference   <- gps.data.subset[1,1] - activity.start
+      print(paste("Time difference (ms):", round(time.difference, 3)))
+      print(paste("Total time      (ms):", round(gps.data.subset[nrow(gps.data.subset),1] - gps.data.subset[1,1] + time.difference, 3)))
+      
+      
+      date.time <- as.POSIXct(gps.data.subset[,1] / 1000, origin = "1970-01-01", tz = "CET")
+      date.time <- format(date.time, "%Y-%m-%d %H:%M:%OS3")
+      latitude  <- gps.data.subset[,2]
+      longitude <- gps.data.subset[,3]
+      altitude  <- gps.data.subset[,4]
+      
+      # Write kml file
+      header <- "<?xml version=\"1.0\" encoding=\"UTF-8\"?><kml xmlns=\"http://earth.google.com/kml/2.2\"><!-- TimeStamp is recommended for Point. Each Point represents a sample from a GPS. --><Document><name>Points with TimeStamps</name><Style id=\"paddle-a\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/kml/paddle/A.png</href></Icon><hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/></IconStyle></Style><Style id=\"paddle-b\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/kml/paddle/B.png</href></Icon><hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/></IconStyle></Style><Style id=\"hiker-icon\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/hiker.png</href></Icon><hotSpot x=\"0\" y=\".5\" xunits=\"fraction\" yunits=\"fraction\"/></IconStyle></Style><Style id=\"check-hide-children\"><ListStyle><listItemType>checkHideChildren</listItemType></ListStyle></Style>"
+      footer <- "</Document></kml>"
+      output.file.path <- paste(output.directory.path, "kml-path-", measurement, ".kml", sep = "")
+      write(header, output.file.path)
+      write(paste("<Placemark><TimeStamp><when>", strftime(date.time, format = "%F", tz = "CET"), "T", strftime(date.time, format = "%T"), "Z</when></TimeStamp><styleUrl>#hiker-icon</styleUrl><Point><coordinates>", longitude, ",", latitude, ",", altitude, "</coordinates></Point></Placemark>", sep = ""), output.file.path, append = T)
+      write(footer, output.file.path, append = T)
+      print(paste("Wrote:", output.file.path))
+    } else {
+      print("No gps data in sequence")
+    }
   }
 }
