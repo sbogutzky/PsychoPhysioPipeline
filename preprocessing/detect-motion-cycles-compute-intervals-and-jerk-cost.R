@@ -77,7 +77,7 @@ for (i in 1:nrow(fss.features)) {
     # Upsampling
     fs <- 2000
     x <- seq(motion.data[1, 1], motion.data[n, 1], by = 1000/fs)
-    y <- interp1(motion.data[, 1], motion.data[, 5], x, method = "spline")
+    y <- signal::interp1(motion.data[, 1], motion.data[, 5], x, method = "spline")
     
     # Add minima original data
     minima    <- SearchExtrema(y, which = "minima")
@@ -230,7 +230,7 @@ for (i in 1:nrow(fss.features)) {
     print(paste("Jerk Cost by all Accelerations:", jerk.cost.by.all.accelerations))
     
     # Create directory, if needed
-    output.directory.path <- paste(features.directory.path, activity.directory, user.directory, "jerk-cost/", date.directory, sep="")
+    output.directory.path <- paste(processed.data.directory.path, activity.directory, user.directory, date.directory, sep="")
     if(!file.exists(output.directory.path)) {
       dir.create(output.directory.path, recursive = TRUE)
     }
