@@ -68,7 +68,7 @@ DetectAnnomalies <- function(x, y, x.lab, y.lab, x.lim, y.lim, epsilon = 0) {
 
 ```{r load-data, echo=FALSE}
 
-par(mgp = c(2.5, 1, 0))
+par(mfcol = c(1, 1), mgp = c(2.5, 1, 0))
 
 # Load FSS features
 fss.features <- read.csv(paste(root.data.directory.path, "features/", activity.directory, user.directory, "fss-features.csv", sep = ""))
