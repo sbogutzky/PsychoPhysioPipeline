@@ -117,7 +117,7 @@ for (i in 1:nrow(fss.features)) {
       rotation.rate.deg.s <- rotation.matrix %*% rotation.rate.deg.s
     }
     
-    if(mean(acceleration.ms.2[, 2]) < 0) {
+    if(mean(acceleration.ms.2[2, ]) < 0) {
       print("180 deg around x")
       
       # Rotation
