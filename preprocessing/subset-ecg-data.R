@@ -1,40 +1,41 @@
 # Remove all variables
-rm(list = ls(all = T)) 
+rm(list = ls(all = T))
 
 # Load libraries
 require(signal)
 
 # Set root data directory path
 root.data.directory.path <- ""
-if(file.exists("C:/Users/Simon Bogutzky/Documents/flow/data"))
-  root.data.directory.path <- "C:/Users/Simon Bogutzky/Documents/flow/data/"
-if(file.exists("/Volumes/flow/Documents/simon-bogutzky/data"))
-  root.data.directory.path <- "/Volumes/flow/Documents/simon-bogutzky/data/"
-if(file.exists("//gangstore.ddns.net/flow/Documents/simon-bogutzky/data"))
-  root.data.directory.path <- "//gangstore.ddns.net/flow/Documents/simon-bogutzky/data/"
+if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
+  root.data.directory.path        <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
+if(file.exists("//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
+  root.data.directory.path        <- "//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
 
 # Set cleaned data directory path
-cleaned.data.directory.path <- paste(root.data.directory.path, "cleaned-data/", sep = "")
-
-# Set preprocessed data directory path
-preprocessed.data.directory.path <- "./data/preprocessed-data/"
+cleaned.data.directory.path       <- paste(root.data.directory.path, "cleaned-data/", sep = "")
 
 # Set features directory path
-features.directory.path <- paste(root.data.directory.path, "features/", sep = "")
+features.directory.path           <- paste(root.data.directory.path, "features/", sep = "")
+
+# Set preprocessed data directory path
+preprocessed.data.directory.path  <- "./data/preprocessed-data/"
+
+# Read activity directory
+activity.directory  <- readline("Type in activity directory and press return to continue (e. g. walking/) > ")
+
+# Read user directory
+user.directory      <- readline("Type in user directory and press return to continue (e. g. doe-john/) > ")
 
 # Load fss features
-fss.features <- read.csv(paste(features.directory.path, "fss-features.csv", sep = ""), stringsAsFactors = F)
+fss.features        <- read.csv(paste(features.directory.path, activity.directory, user.directory, "fss-features.csv", sep = ""), stringsAsFactors = F)
+
 
 for (i in 1:nrow(fss.features)) {
   
   properties      <- fss.features[i, c(6:13)]
-  activity        <- properties[, 1]
   activity.start  <- properties[, 2]
   activity.end    <- properties[, 3]
   measurement     <- properties[, 5]
-  last.name       <- properties[, 6]
-  first.name      <- properties[, 7]
-  date.of.birth   <- properties[, 8]
   date.directory  <- paste(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S"), "/", sep = "")
   
   if(measurement == 1) {
@@ -42,7 +43,7 @@ for (i in 1:nrow(fss.features)) {
     n               <- 0
     
     # Read data, if needed
-    ecg.data.path <- paste(cleaned.data.directory.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, "ecg-data.csv", sep="")
+    ecg.data.path <- paste(cleaned.data.directory.path, activity.directory, user.directory, date.directory, "ecg-data.csv", sep="")
     if(file.exists(ecg.data.path)) {
       ecg.data      <- read.csv(ecg.data.path)
       
@@ -56,7 +57,7 @@ for (i in 1:nrow(fss.features)) {
       first.timestamp <- ecg.data[1,4]
       
       # Create output directory, if needed
-      output.directory.path <- paste(preprocessed.data.directory.path, tolower(activity), "/", tolower(last.name), "-", tolower(first.name), "/", date.directory, sep="")
+      output.directory.path <- paste(preprocessed.data.directory.path, activity.directory, user.directory, date.directory, sep="")
       if(!file.exists(output.directory.path)) {
         dir.create(output.directory.path, recursive = TRUE)
       }
@@ -83,9 +84,9 @@ for (i in 1:nrow(fss.features)) {
     print(paste("Sampling rate   (Hz):", fs))
     
     t.ms      <- seq(ecg.data.subset[1, 1], ecg.data.subset[n.subset, 1], by = 1000/fs)
-    lead.1.mv <- interp1(ecg.data.subset[, 1], ecg.data.subset[,3] - ecg.data.subset[,2], t.ms, method = "spline")
-    lead.2.mv <- interp1(ecg.data.subset[, 1], ecg.data.subset[,2], t.ms, method = "spline")
-    lead.3.mv <- interp1(ecg.data.subset[, 1], ecg.data.subset[,3], t.ms, method = "spline")
+    lead.1.mv <- signal::interp1(ecg.data.subset[, 1], ecg.data.subset[,3] - ecg.data.subset[,2], t.ms, method = "spline")
+    lead.2.mv <- signal::interp1(ecg.data.subset[, 1], ecg.data.subset[,2], t.ms, method = "spline")
+    lead.3.mv <- signal::interp1(ecg.data.subset[, 1], ecg.data.subset[,3], t.ms, method = "spline")
     t.ms      <- t.ms - t.ms[1] + time.difference
     
     # Plot data
