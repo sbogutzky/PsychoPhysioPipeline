@@ -57,19 +57,12 @@ DetectAnnomalies <- function(x, y, x.lab, y.lab, x.lim, y.lim, epsilon = 0) {
   return(list("epsilon" = epsilon, "outliers" = outliers))  
 }
 
-
-for (i in 1:nrow(fss.features)) {
-  properties      <- fss.features[i, c(6:12)]
-  activity.start  <- properties[, 2]
-  measurement     <- properties[, 5]
-  if(measurement == 1) {
-    date.directory  <- paste(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S"), "/", sep ="")
-  }
+compute <- function(preprocessed.data.directory.path, activity.directory, user.directory, date.directory, body.position, activity.start, measurement) {
   
   # Read motion data
   motion.data.path <- paste(preprocessed.data.directory.path, activity.directory, user.directory, date.directory, body.position, "-motion-data-", measurement,  ".csv", sep="")
   if(file.exists(motion.data.path)) {
-  
+    
     # Load motion data
     motion.data <- read.csv(motion.data.path)
     n           <- nrow(motion.data)
@@ -96,7 +89,7 @@ for (i in 1:nrow(fss.features)) {
     rm(periodogram, freqs, specs, index)
     
     # Low pass signal
-    lp  <- butter(3, 1/(fs/2) * filt.freq * 6, "low")
+    lp  <- butter(3, 1/(fs/2) * filt.freq * 5, "low")
     y.1 <- filter(lp, y)
     
     lines(x[r]/1000, y.1[r], col = 2)
@@ -108,7 +101,7 @@ for (i in 1:nrow(fss.features)) {
     rm(minima.1)
     
     # Low pass signal
-    lp  <- butter(3, 1/(fs/2) * (filt.freq / 2), "low")
+    lp  <- butter(2, 1/(fs/2) * filt.freq / 2, "low")
     y.2 <- filter(lp, y)
     
     lines(x[r]/1000, y.2[r], col = 3)
@@ -210,19 +203,19 @@ for (i in 1:nrow(fss.features)) {
     motion.data$motion.accel.x.ms.2 <- filtfilt(butterworth.filter, motion.data$motion.accel.x.ms.2)
     motion.data$motion.accel.y.ms.2 <- filtfilt(butterworth.filter, motion.data$motion.accel.y.ms.2)
     motion.data$motion.accel.z.ms.2 <- filtfilt(butterworth.filter, motion.data$motion.accel.z.ms.2)
-        
+    
     jerk.costs <- c()
     for(l in 1:(nrow(mid.swings) - 1)) {
-          
-        # Compute jerk cost of each cycle
-        in.cycle                    <- mid.swings[l, 1] <= motion.data$t.ms & motion.data$t.ms < mid.swings[l + 1, 1]
-        t.ms.subset                 <- motion.data$t.ms[in.cycle]
-        motion.accel.x.ms.2.subset  <- motion.data$motion.accel.x.ms.2[in.cycle]
-        motion.accel.y.ms.2.subset  <- motion.data$motion.accel.y.ms.2[in.cycle]
-        motion.accel.z.ms.2.subset  <- motion.data$motion.accel.z.ms.2[in.cycle]
-          
-        jerk.cost   <- CalculateJerkCost(t.ms.subset / 1000, motion.accel.x.ms.2.subset, motion.accel.y.ms.2.subset, motion.accel.z.ms.2.subset, normalized = T, plot = F)
-        jerk.costs  <- c(jerk.costs, jerk.cost)
+      
+      # Compute jerk cost of each cycle
+      in.cycle                    <- mid.swings[l, 1] <= motion.data$t.ms & motion.data$t.ms < mid.swings[l + 1, 1]
+      t.ms.subset                 <- motion.data$t.ms[in.cycle]
+      motion.accel.x.ms.2.subset  <- motion.data$motion.accel.x.ms.2[in.cycle]
+      motion.accel.y.ms.2.subset  <- motion.data$motion.accel.y.ms.2[in.cycle]
+      motion.accel.z.ms.2.subset  <- motion.data$motion.accel.z.ms.2[in.cycle]
+      
+      jerk.cost   <- CalculateJerkCost(t.ms.subset / 1000, motion.accel.x.ms.2.subset, motion.accel.y.ms.2.subset, motion.accel.z.ms.2.subset, normalized = T, plot = F)
+      jerk.costs  <- c(jerk.costs, jerk.cost)
     }
     
     cycle.intervals <- diff(mid.swings[, 1] / 1000)
@@ -241,7 +234,7 @@ for (i in 1:nrow(fss.features)) {
     if(!file.exists(output.directory.path)) {
       dir.create(output.directory.path, recursive = TRUE)
     }
-
+    
     # Write csv file
     output.file.path <- paste(output.directory.path, body.position, "-jerk-cost-data-", measurement, ".csv", sep = "")
     op <- options(digits.secs=3)
@@ -253,8 +246,29 @@ for (i in 1:nrow(fss.features)) {
     options(op) #reset options
     print(paste("Wrote:", output.file.path))
     readline("Press return to continue > ")
-    
   } else {
     print("No Motion data")
   }
 }
+
+for (i in 1:nrow(fss.features)) {
+  properties      <- fss.features[i, c(6:12)]
+  activity.start  <- properties[, 2]
+  measurement     <- properties[, 5]
+  if(measurement == 1) {
+    date.directory  <- paste(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S"), "/", sep ="")
+  }
+  
+  compute(preprocessed.data.directory.path, activity.directory, user.directory, date.directory, body.position, activity.start, measurement)
+}
+
+# i <- 16
+# date.directory  <- "2013-10-24--17-32-15/"
+# properties      <- fss.features[i, c(6:12)]
+# activity.start  <- properties[, 2]
+# measurement     <- properties[, 5]
+# compute(preprocessed.data.directory.path, activity.directory, user.directory, date.directory, body.position, activity.start, measurement)
+
+
+
+
