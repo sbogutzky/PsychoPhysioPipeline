@@ -108,7 +108,7 @@ for (i in 1:nrow(fss.features)) {
     rm(minima.1)
     
     # Low pass signal
-    lp  <- butter(1, 1/(fs/2) * (filt.freq / 10), "low")
+    lp  <- butter(3, 1/(fs/2) * (filt.freq / 2), "low")
     y.2 <- filter(lp, y)
     
     lines(x[r]/1000, y.2[r], col = 3)
