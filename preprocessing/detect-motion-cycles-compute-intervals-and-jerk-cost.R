@@ -78,6 +78,9 @@ for (i in 1:nrow(fss.features)) {
     fs <- 2000
     x <- seq(motion.data[1, 1], motion.data[n, 1], by = 1000/fs)
     y <- signal::interp1(motion.data[, 1], motion.data[, 5], x, method = "spline")
+    r <- 140000:145000
+    
+    plot(x[r]/1000, y[r], type = "l", xlab = "t [s]", ylab = "Rotation Rate X [deg/s]")
     
     # Add minima original data
     minima    <- SearchExtrema(y, which = "minima")
@@ -93,8 +96,10 @@ for (i in 1:nrow(fss.features)) {
     rm(periodogram, freqs, specs, index)
     
     # Low pass signal
-    lp  <- butter(1, 1/(fs/2) * filt.freq, "low")
+    lp  <- butter(3, 1/(fs/2) * filt.freq * 6, "low")
     y.1 <- filter(lp, y)
+    
+    lines(x[r]/1000, y.1[r], col = 2)
     
     # Add minima from the filtered signal (1st level)
     minima.1  <- SearchExtrema(y.1, which = "minima")
@@ -105,6 +110,8 @@ for (i in 1:nrow(fss.features)) {
     # Low pass signal
     lp  <- butter(1, 1/(fs/2) * (filt.freq / 10), "low")
     y.2 <- filter(lp, y)
+    
+    lines(x[r]/1000, y.2[r], col = 3)
     
     # Add minima from the filtered signal (2nd level)
     minima.2  <- SearchExtrema(y.2, which = "minima")
