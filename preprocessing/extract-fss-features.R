@@ -10,6 +10,8 @@ if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"
   root.data.directory.path        <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
 if(file.exists("//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
   root.data.directory.path        <- "//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
+if(file.exists("C:/Users/Simon Bogutzky/Documents/Archiv/flow/data"))
+  root.data.directory.path        <- "C:/Users/Simon Bogutzky/Documents/Archiv/flow/data/"
 
 # Set cleaned data directory path
 cleaned.data.directory.path <- paste(root.data.directory.path, "cleaned-data/", sep = "")
@@ -62,7 +64,7 @@ for (fss.data.file.name in fss.data.file.names) {
 
 # Create output directory, if needed
 output.directory.path <- paste(features.directory.path, activity.directory, user.directory, sep = "")
-if(!file.exists(output.directory.path)) {
+if(!file.exists(substr(output.directory.path, 1, nchar(output.directory.path) - 1))) {
   dir.create(output.directory.path, recursive = TRUE)
 }
 
