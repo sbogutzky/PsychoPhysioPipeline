@@ -146,6 +146,11 @@ for (i in 1:nrow(fss.features)) {
         rotation.rate.deg.s <- rotation.matrix %*% rotation.rate.deg.s
       } 
       
+#       if(i > 4) {
+#         acceleration.ms.2[3,]   <- -acceleration.ms.2[3,]
+#         rotation.rate.deg.s[1,] <- -rotation.rate.deg.s[1,]
+#       }
+      
       # Plot data
       #     plot(t.ms / 1000, acceleration.ms.2[1,], type = "l", xlab = "t [s]", ylab = "Acceleration X [ms^2]", xlim = c(140, 150))
       #     plot(t.ms / 1000, acceleration.ms.2[2,], type = "l", xlab = "t [s]", ylab = "Acceleration Y [ms^2]", xlim = c(140, 150))
