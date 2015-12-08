@@ -296,15 +296,22 @@ for (i in 13:13) { # nrow(fss.features)) {
     
     # Smooth acceleration data
     A <- M[, 1:4]
+    fn <- fs/2
+    n <- 2
     current.cycle <- A[, 1] > mid.swings[50, 1] & A[, 1] < mid.swings[51, 1]
     # plot(A[, 1][current.cycle] / 1000, A[, 2][current.cycle], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Acceleration ("~m/s^2~")"), ylim = c(-40, 30))
     plot(A[, 1][current.cycle] / 1000, A[, 3][current.cycle], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Acceleration vertical ("~m/s^2~")"), ylim = c(-40, 30))
     plot(A[, 1][current.cycle] / 1000, A[, 4][current.cycle], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Acceleration horizontal ("~m/s^2~")"), ylim = c(-40, 30))
-    butterworth.filter <- butter(2, 1/(fs/2) * 6.5, "low")
-    # A[, 2] <- filtfilt(butterworth.filter, A[, 2])
-    A[, 3] <- filtfilt(butterworth.filter, A[, 3])
-    butterworth.filter <- butter(2, 1/(fs/2) * 7, "low")
-    A[, 4] <- filtfilt(butterworth.filter, A[, 4])
+    fc <- 6.5
+    W <- fc/fn
+    lowpass.filter.vertical <- butter(n, W)
+    # A[, 2] <- filtfilt(lowpass.filter, A[, 2])
+    A[, 3] <- filtfilt(lowpass.filter.vertical, A[, 3])
+    
+    fc <- 7.5
+    W <- fc/fn
+    lowpass.filter.horizontal <- butter(n, W)
+    A[, 4] <- filtfilt(lowpass.filter.horizontal, A[, 4])
     # plot(A[, 1][current.cycle] / 1000, A[, 2][current.cycle], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Acceleration ("~m/s^2~")"), ylim = c(-40, 30))
     plot(A[, 1][current.cycle] / 1000, A[, 3][current.cycle], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Acceleration vertical ("~m/s^2~")"), ylim = c(-40, 30))
     plot(A[, 1][current.cycle] / 1000, A[, 4][current.cycle], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Acceleration horizontal ("~m/s^2~")"), ylim = c(-40, 30))
