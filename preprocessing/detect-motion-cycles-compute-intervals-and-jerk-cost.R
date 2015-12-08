@@ -12,6 +12,8 @@ if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"
   root.data.directory.path        <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
 if(file.exists("//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
   root.data.directory.path        <- "//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
+if(file.exists("C:/Users/Simon Bogutzky/Documents/Archiv/flow/data"))
+  root.data.directory.path        <- "C:/Users/Simon Bogutzky/Documents/Archiv/flow/data/"
 
 # Set preprocessed data directory path
 preprocessed.data.directory.path <- "./data/preprocessed-data/"
@@ -31,11 +33,95 @@ user.directory      <- readline("Type in user directory and press return to cont
 # Read in body position
 body.position       <- readline("Type in body position and press return to continue (e. g. leg) > ")
 
-# Read in subset size in seconds
-subset.size         <- as.numeric(readline("Type in subset size in seconds for visual control and press return to continue (e. g. 30) > "))
+# Read in subset length in seconds
+length.s         <- as.numeric(readline("Type in subset size in seconds for visual control and press return to continue (e. g. 30) > "))
 
 # Load fss features
-fss.features        <- read.csv(paste(features.directory.path, activity.directory, user.directory, "fss-features.csv", sep = ""), stringsAsFactors = F)
+fss.features        <- read.csv(paste(features.directory.path, activity.directory, user.directory, "fss-features.csv", sep = ""))
+
+ComputeSamplingRate <- function(t.ms) {
+  n <- length(t.ms)
+  fs <- round(n / ((t.ms[n] - t.ms[1]) / 1000))
+  new.fs <- 2^ceiling(log(fs)/log(2))
+  return(new.fs)
+}
+
+ResampleData <- function(data, fs, t.ms) {
+  
+  x <- t.ms
+  xi <- seq(x[1], x[length(x)], by = 1000/fs)
+  n.col <- ncol(data)
+  n.row <- length(xi)
+  
+  yi.all <- c()
+  for(i in 1:n.col) {
+    y <- data[, i]
+    yi <- signal::interp1(x, y, xi, method = "spline")
+    yi.all <- c(yi.all, yi)
+  }
+  
+  m <- matrix(c(xi, yi.all), n.row, n.col + 1)
+  
+  return(m)
+}
+
+ComputeMainFrequency <- function(y, fs) {
+  
+  periodogram <- TSA::periodogram(y, plot = F)
+  freqs <- periodogram[[1]] * fs
+  specs <- periodogram[[2]]
+  index <- which.max(specs)
+  main.freq <- freqs[index]
+  new.main.freq <- ceiling(main.freq)
+  
+  return(new.main.freq)
+}
+
+DetectMidSwings <- function(y, y.1, y.2) {
+  
+  # Add minima original data
+  minima    <- SearchExtrema(y, which = "minima")
+  minima.f  <- rep(0, length(minima))
+  
+  # Add minima from the filtered signal (1st level)
+  minima.1  <- SearchExtrema(y.1, which = "minima")
+  minima    <- c(minima, minima.1)
+  minima.f  <- c(minima.f, rep(1, length(minima.1)))
+  rm(minima.1)
+  
+  # Add minima from the filtered signal (2nd level)
+  minima.2  <- SearchExtrema(y.2, which = "minima")
+  minima    <- c(minima, minima.2)
+  minima.f  <- c(minima.f, rep(2, length(minima.2)))
+  rm(minima.2)
+  
+  # Create minima data frame (sorted)
+  minima <- data.frame(minima, minima.f)[order(-minima),]
+  rm(minima.f)
+  
+  # Identify and sort mid swings
+  mid.swing.index <- c()
+  found.level.2   <- F
+  found.level.1   <- F
+  for(j in 1:nrow(minima)) {
+    if(!found.level.2)
+      found.level.2 <- as.numeric(minima$minima.f[j]) == 2
+    else {
+      if(!found.level.1)
+        found.level.1 <- as.numeric(minima$minima.f[j]) == 1
+      else {
+        if(as.numeric(minima$minima.f[j]) == 0) {
+          mid.swing.index <- c(mid.swing.index, minima$minima[j])
+          found.level.2   <- F
+          found.level.1   <- F
+        }
+      }
+    }
+  }
+  mid.swing.index <- sort(mid.swing.index)
+  
+  return(mid.swing.index)
+}
 
 DetectAnnomalies <- function(x, y, x.lab, y.lab, x.lim, y.lim, epsilon = 0) {
   X <- matrix(data = c(x, y), nrow = length(y), ncol = 2)
@@ -57,214 +143,190 @@ DetectAnnomalies <- function(x, y, x.lab, y.lab, x.lim, y.lim, epsilon = 0) {
   return(list("epsilon" = epsilon, "outliers" = outliers))  
 }
 
-Compute <- function(preprocessed.data.directory.path, activity.directory, user.directory, date.directory, body.position, activity.start, measurement) {
+CheckMidSwingDetection <- function(t.ms, angular.velocity.deg.s, length.s, mid.swing.ms, mid.swing.deg.s) {
   
-  # Read motion data
-  motion.data.path <- paste(preprocessed.data.directory.path, activity.directory, user.directory, date.directory, body.position, "-motion-data-", measurement,  ".csv", sep="")
-  if(file.exists(motion.data.path)) {
+  current.t.ms <- 0
+  while(current.t.ms < max(t.ms)) {
     
-    # Load motion data
-    motion.data <- read.csv(motion.data.path)
-    n           <- nrow(motion.data)
+    plot(t.ms[t.ms >= current.t.ms & t.ms < current.t.ms + length.s * 1000] / 1000, angular.velocity.deg.s[t.ms >= current.t.ms & t.ms < current.t.ms + length.s * 1000], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Angular Velocity ("~deg/s~")"))
+    points(mid.swing.ms[mid.swing.ms >= current.t.ms & mid.swing.ms < current.t.ms + length.s * 1000] / 1000, mid.swing.deg.s[mid.swing.ms >= current.t.ms & mid.swing.ms < current.t.ms + length.s * 1000], pch = 21, bg = "red")
+    abline(h = mean(mid.swing.deg.s) + 4 * sd(mid.swing.deg.s), lty = "dashed", col = "darkgrey")
+    title("Select to remove")
     
-    # Upsampling
-    fs <- 2000
-    x <- seq(motion.data[1, 1], motion.data[n, 1], by = 1000/fs)
-    y <- signal::interp1(motion.data[, 1], motion.data[, 5], x, method = "spline")
-    r <- 140000:145000
+    remove  <- identify(mid.swing.ms / 1000, mid.swing.deg.s)
     
-    plot(x[r]/1000, y[r], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Angular Velocity ("~deg/s~")"))
-    
-    # Add minima original data
-    minima    <- SearchExtrema(y, which = "minima")
-    minima.f  <- rep(0, length(minima))
-    
-    # Determine filter frequency
-    periodogram <- TSA::periodogram(y, plot = F)
-    freqs       <- periodogram[[1]] * fs
-    specs       <- periodogram[[2]]
-    index       <- which.max(specs)
-    main.freq   <- freqs[index]
-    filt.freq   <- ceiling(main.freq)
-    rm(periodogram, freqs, specs, index)
-    
-    # Low pass signal
-    lp  <- butter(3, 1/(fs/2) * filt.freq * 5, "low")
-    y.1 <- filter(lp, y)
-    
-    lines(x[r]/1000, y.1[r], col = 2)
-    
-    # Add minima from the filtered signal (1st level)
-    minima.1  <- SearchExtrema(y.1, which = "minima")
-    minima    <- c(minima, minima.1)
-    minima.f  <- c(minima.f, rep(1, length(minima.1)))
-    rm(minima.1)
-    
-    # Low pass signal
-    lp  <- butter(2, 1/(fs/2) * filt.freq / 2, "low")
-    y.2 <- filter(lp, y)
-    
-    lines(x[r]/1000, y.2[r], col = 3)
-    
-    # Add minima from the filtered signal (2nd level)
-    minima.2  <- SearchExtrema(y.2, which = "minima")
-    minima    <- c(minima, minima.2)
-    minima.f  <- c(minima.f, rep(2, length(minima.2)))
-    rm(minima.2)
-    
-    # Create minima data frame (sorted)
-    minima <- data.frame(minima, minima.f)[order(-minima),]
-    rm(minima.f)
-    
-    # Identify and sort mid swings
-    mid.swing.index <- c()
-    found.level.2   <- F
-    found.level.1   <- F
-    for(j in 1:nrow(minima)) {
-      if(!found.level.2)
-        found.level.2 <- as.numeric(minima$minima.f[j]) == 2
-      else {
-        if(!found.level.1)
-          found.level.1 <- as.numeric(minima$minima.f[j]) == 1
-        else {
-          if(as.numeric(minima$minima.f[j]) == 0) {
-            mid.swing.index <- c(mid.swing.index, minima$minima[j])
-            found.level.2   <- F
-            found.level.1   <- F
-          }
-        }
-      }
-    }
-    mid.swing.index <- sort(mid.swing.index)
-    
-    # Get time and value for mid swing
-    mid.swing.x <- x[mid.swing.index]
-    mid.swing.y <- y[mid.swing.index]
-    
-    # Remove changes below 10 deg per second
-    mid.swing.x <- mid.swing.x[mid.swing.y > 10 | mid.swing.y < -10]
-    mid.swing.y <- mid.swing.y[mid.swing.y > 10 | mid.swing.y < -10]
-    
-    diff.x <- c(0, diff(mid.swing.x / 1000))
-    
-    da <- DetectAnnomalies(diff.x, mid.swing.y/100, expression("Cycle Interval ("~s~")"), expression("Angular Velocity (x"~10^2~deg/s~")"), c(min(diff.x), max(diff.x)), c(min(mid.swing.y/100), max(mid.swing.y/100)), epsilon = 0)
     # Remove selected mid swings
-    if(length(da$outliers) > 0) {
-      mid.swing.x <- mid.swing.x[-da$outliers]
-      mid.swing.y <- mid.swing.y[-da$outliers]
+    if(length(remove) > 0) {
+      mid.swing.ms <- mid.swing.ms[-remove]
+      mid.swing.deg.s <- mid.swing.deg.s[-remove]
     }
     
-    # Visual control
-    k       <- 0
-    while(k < max(motion.data[, 1])) {
-      plot(motion.data[, 1][motion.data[, 1] >= k & motion.data[, 1] < k + subset.size * 1000] / 1000, motion.data[, 5][motion.data[, 1] >= k & motion.data[, 1] < k + subset.size * 1000], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Angular Velocity ("~deg/s~")"))
-      points(mid.swing.x[mid.swing.x >= k & mid.swing.x < k + subset.size * 1000] / 1000, mid.swing.y[mid.swing.x >= k &  mid.swing.x < k + subset.size * 1000], pch = 21, bg = "red")
-      abline(h = mean(mid.swing.y) + 4 * sd(mid.swing.y), lty = "dashed", col = "darkgrey")
-      title("Select to remove")
+    plot(t.ms[t.ms >= current.t.ms & t.ms < current.t.ms + length.s * 1000] / 1000, angular.velocity.deg.s[t.ms >= current.t.ms & t.ms < current.t.ms + length.s * 1000], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Angular Velocity ("~deg/s~")"))
+    points(mid.swing.ms[mid.swing.ms >= current.t.ms & mid.swing.ms < current.t.ms + length.s * 1000] / 1000, mid.swing.deg.s[mid.swing.ms >= current.t.ms &  mid.swing.ms < current.t.ms + length.s * 1000], pch = 21, bg = "red")
+    abline(h = mean(mid.swing.deg.s) + 4 * sd(mid.swing.deg.s), lty = "dashed", col = "darkgrey")
+    title("Select to add")
+    
+    # Add mid swings and control
+    add  <- identify(t.ms / 1000, angular.velocity.deg.s)
+    if(length(add) > 0) {
+      mid.swing.ms <- c(mid.swing.ms, t.ms[add])
+      mid.swing.deg.s <- c(mid.swing.deg.s, angular.velocity.deg.s[add])
       
-      remove  <- identify(mid.swing.x / 1000, mid.swing.y)
+      mid.swings <- data.frame(t.ms = mid.swing.ms, angular.velocity.deg.s = mid.swing.deg.s)[order(mid.swing.ms),]
       
-      # Remove selected mid swings
-      if(length(remove) > 0) {
-        mid.swing.x <- mid.swing.x[-remove]
-        mid.swing.y <- mid.swing.y[-remove]
-      }
+      plot(t.ms[t.ms >= current.t.ms & t.ms < current.t.ms + length.s * 1000] / 1000, angular.velocity.deg.s[t.ms >= current.t.ms & t.ms < current.t.ms + length.s * 1000], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Angular Velocity ("~deg/s~")"))
+      points(mid.swings[, 1][mid.swings[, 1] >= current.t.ms & mid.swings[, 1] < current.t.ms + length.s * 1000] / 1000, mid.swings[, 2][mid.swings[, 1] >= current.t.ms & mid.swings[, 1] < current.t.ms + length.s * 1000], pch = 21, bg = "red")
+      abline(h = mean(mid.swing.deg.s) + 4 * sd(mid.swing.deg.s), lty = "dashed", col = "darkgrey")
       
-      plot(motion.data[, 1][motion.data[, 1] >= k & motion.data[, 1] < k + subset.size * 1000] / 1000, motion.data[, 5][motion.data[, 1] >= k & motion.data[, 1] < k + subset.size * 1000], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Angular Velocity ("~deg/s~")"))
-      points(mid.swing.x[mid.swing.x >= k & mid.swing.x < k + subset.size * 1000] / 1000, mid.swing.y[mid.swing.x >= k &  mid.swing.x < k + subset.size * 1000], pch = 21, bg = "red")
-      abline(h = mean(mid.swing.y) + 4 * sd(mid.swing.y), lty = "dashed", col = "darkgrey")
-      title("Select to add")
-      
-      # Add mid swings and control
-      add  <- identify(motion.data[, 1] / 1000, motion.data[, 5])
-      if(length(add) > 0) {
-        mid.swing.x <- c(mid.swing.x, motion.data[add, 1])
-        mid.swing.y <- c(mid.swing.y, motion.data[add, 5])
-        
-        mid.swings <- data.frame(t.ms = mid.swing.x, rotation.rate.x.deg.s = mid.swing.y)[order(mid.swing.x),]
-        
-        plot(motion.data[, 1][motion.data[, 1] >= k & motion.data[, 1] < k + subset.size * 1000] / 1000, motion.data[, 5][motion.data[, 1] >= k & motion.data[, 1] < k + subset.size * 1000], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Angular Velocity ("~deg/s~")"))
-        points(mid.swings[, 1][mid.swings[, 1] >= k & mid.swings[, 1] < k + subset.size * 1000] / 1000, mid.swings[, 2][mid.swings[, 1] >= k & mid.swings[, 1] < k + subset.size * 1000], pch = 21, bg = "red")
-        abline(h = mean(mid.swing.y) + 4 * sd(mid.swing.y), lty = "dashed", col = "darkgrey")
-        
-        readline("Press return to continue > ")
-      }
-      
-      k       <- k + subset.size * 1000
+      readline("Press return to continue > ")
     }
     
-    mid.swings <- data.frame(t.ms = mid.swing.x, rotation.rate.x.deg.s = mid.swing.y)[order(mid.swing.x),]
-    
-    plot(motion.data[, 1] / 1000, motion.data[, 5], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Angular Velocity ("~deg/s~")"))
-    points(mid.swings[, 1] / 1000, mid.swings[, 2], pch = 21, bg = "red")
-    
-    # Isolate gravity from acceleration 
-    butterworth.filter              <- butter(1, .2, "high")
-    motion.data$motion.accel.x.ms.2 <- filtfilt(butterworth.filter, motion.data$motion.accel.x.ms.2)
-    motion.data$motion.accel.y.ms.2 <- filtfilt(butterworth.filter, motion.data$motion.accel.y.ms.2)
-    motion.data$motion.accel.z.ms.2 <- filtfilt(butterworth.filter, motion.data$motion.accel.z.ms.2)
-    
-    jerk.costs <- c()
-    for(l in 1:(nrow(mid.swings) - 1)) {
-      
-      # Compute jerk cost of each cycle
-      in.cycle                    <- mid.swings[l, 1] <= motion.data$t.ms & motion.data$t.ms < mid.swings[l + 1, 1]
-      t.ms.subset                 <- motion.data$t.ms[in.cycle]
-      motion.accel.x.ms.2.subset  <- motion.data$motion.accel.x.ms.2[in.cycle]
-      motion.accel.y.ms.2.subset  <- motion.data$motion.accel.y.ms.2[in.cycle]
-      motion.accel.z.ms.2.subset  <- motion.data$motion.accel.z.ms.2[in.cycle]
-      
-      jerk.cost   <- CalculateJerkCost(t.ms.subset / 1000, motion.accel.x.ms.2.subset, motion.accel.y.ms.2.subset, motion.accel.z.ms.2.subset, normalized = T, plot = F)
-      jerk.costs  <- c(jerk.costs, jerk.cost)
-    }
-    
-    cycle.intervals <- diff(mid.swings[, 1] / 1000)
-    
-    result.data <- data.frame(t.s = mid.swings[(2:nrow(mid.swings)), 1] / 1000, cycle.interval.s = cycle.intervals, jerk.cost.m2s5 = jerk.costs)
-    result.data <- result.data[result.data[,2] < 1.5, ]
-    
-    # Compute mean to compare
-    jerk.cost.by.all.accelerations  <- CalculateJerkCost(motion.data$t.ms / 1000, motion.data$motion.accel.x.ms.2, motion.data$motion.accel.y.ms.2, motion.data$motion.accel.z.ms.2, normalized = T, plot = F)
-    jerk.cost.by.cycle.mean         <- mean(result.data[, 3], na.rm = T)
-    print(paste("Jerk Cost by Cycle:           :", jerk.cost.by.cycle.mean))
-    print(paste("Jerk Cost by all Accelerations:", jerk.cost.by.all.accelerations))
-    
-    # Create directory, if needed
-    output.directory.path <- paste(processed.data.directory.path, activity.directory, user.directory, date.directory, sep="")
-    if(!file.exists(output.directory.path)) {
-      dir.create(output.directory.path, recursive = TRUE)
-    }
-    
-    # Write csv file
-    output.file.path <- paste(output.directory.path, body.position, "-jerk-cost-data-", measurement, ".csv", sep = "")
-    op <- options(digits.secs=3)
-    con <- file(output.file.path, 'w') 
-    writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"), con = con)
-    writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%H:%M:%OS"), con = con)
-    write.csv(result.data, file = con, row.names = FALSE)
-    close(con)
-    options(op) #reset options
-    print(paste("Wrote:", output.file.path))
-    readline("Press return to continue > ")
-  } else {
-    print("No Motion data")
+    current.t.ms       <- current.t.ms + length.s * 1000
   }
+  
+  mid.swings <- data.frame(t.ms = mid.swing.ms, angular.velocity.deg.s = mid.swing.deg.s)[order(mid.swing.ms),]
+  return(mid.swings)
 }
 
-for (i in 1:nrow(fss.features)) {
+ComputeCycleJerkCosts <- function(A, mid.swings) {
+  jerk.costs <- c()
+  for(l in 1:(nrow(mid.swings) - 1)) {
+    
+    # Compute jerk cost of each cycle
+    in.cycle            <- mid.swings[l, 1] <= A[, 1] & A[, 1] < mid.swings[l + 1, 1]
+    t.ms                <- A[, 1][in.cycle]
+    # acceleration.x.ms.2 <- A[, 2][in.cycle]
+    acceleration.y.ms.2 <- A[, 3][in.cycle]
+    acceleration.z.ms.2 <- A[, 4][in.cycle]
+    
+    jerk.cost   <- CalculateJerkCost(t.ms / 1000, data.frame(acceleration.y.ms.2, acceleration.z.ms.2), normalized = T)
+    jerk.costs  <- c(jerk.costs, jerk.cost)
+  }
+  
+  return(jerk.costs)
+}
+
+saveData <- function(output.data, preprocessed.data.directory.path, activity.directory, user.directory, date.directory, body.position, activity.start, measurement) {
+  
+  # Create directory, if needed
+  output.directory.path <- paste(processed.data.directory.path, activity.directory, user.directory, date.directory, sep="")
+  if(!file.exists(substr(output.directory.path, 1, nchar(output.directory.path) - 1))) {
+    dir.create(output.directory.path, recursive = TRUE)
+  }
+  
+  # Write csv file
+  output.file.path <- paste(output.directory.path, body.position, "-jerk-cost-data-", measurement, ".csv", sep = "")
+  op <- options(digits.secs=3)
+  con <- file(output.file.path, 'w') 
+  writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"), con = con)
+  writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%H:%M:%OS"), con = con)
+  write.csv(output.data, file = con, row.names = FALSE)
+  close(con)
+  options(op) #reset options
+  print(paste("Wrote:", output.file.path))
+}
+
+for (i in 13:13) { # nrow(fss.features)) {
+  
   properties      <- fss.features[i, c(6:12)]
   activity.start  <- properties[, 2]
   measurement     <- properties[, 5]
   if(measurement == 1) {
     date.directory  <- paste(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S"), "/", sep ="")
   }
+  motion.data.path <- paste(preprocessed.data.directory.path, activity.directory, user.directory, date.directory, body.position, "-motion-data-", measurement,  ".csv", sep="")
   
-  Compute(preprocessed.data.directory.path, activity.directory, user.directory, date.directory, body.position, activity.start, measurement)
+  if(file.exists(motion.data.path)) {
+    
+    # Load motion data
+    motion.data <- read.csv(motion.data.path)
+    x <- motion.data[, 1]
+    y <- motion.data[, 5]
+    
+    # Compute fS
+    fs <- ComputeSamplingRate(x)
+    
+    # Resample data
+    M <- ResampleData(motion.data[2:7], fs, x)
+    
+    # Plot resampled data
+    value.range <- (200 * 128):(210 * 128)
+    plot(M[, 1][value.range]/1000, M[, 5][value.range], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Angular Velocity ("~deg/s~")"))
+    
+    # Compute main freq
+    main.freq <- ComputeMainFrequency(M[, 5], fs)
+    
+    # Filter (1nd level)
+    lp.1 <- butter(3, 1/(fs/2) * main.freq * 2, "low")
+    f.1 <- filter(lp.1, M[, 5])
+    lines(M[, 1][value.range]/1000, f.1[value.range], col = 2)
+    
+    # Filter (2nd level)
+    lp.2 <- butter(3, 1/(fs/2) * main.freq * .5, "low")
+    f.2 <- filter(lp.2, M[, 5])
+    lines(M[, 1][value.range]/1000, f.2[value.range], col = 3)
+    
+    # Detect Midswings
+    ms <- DetectMidSwings(M[, 5], f.1, f.2)
+    mid.swing.ms <- M[, 1][ms]
+    mid.swing.deg.s <- M[, 5][ms]
+    points(mid.swing.ms/1000, mid.swing.deg.s, col = 4)
+    
+    # Remove changes below 10 deg per second
+    mid.swing.ms <- mid.swing.ms[mid.swing.deg.s > 10 | mid.swing.deg.s < -10]
+    mid.swing.deg.s <- mid.swing.deg.s[mid.swing.deg.s > 10 | mid.swing.deg.s < -10]
+    
+    # Detect Annomalies
+    diff.x <- c(0, diff(mid.swing.ms / 1000))
+    annomalies <- DetectAnnomalies(diff.x, mid.swing.deg.s/100, expression("Cycle Interval ("~s~")"), expression("Angular Velocity (x"~10^2~deg/s~")"), c(min(diff.x), max(diff.x)), c(min(mid.swing.deg.s/100), max(mid.swing.deg.s/100)), epsilon = 0)
+    
+    if(length(annomalies$outliers) > 0) {
+      mid.swing.ms <- mid.swing.ms[-annomalies$outliers]
+      mid.swing.deg.s <- mid.swing.deg.s[-annomalies$outliers]
+    }
+    
+    # Check data
+    mid.swings <- CheckMidSwingDetection(M[, 1], M[, 5], length.s, mid.swing.ms, mid.swing.deg.s)
+    
+    #TODO: save mid.swings
+    
+    # Plot all data
+    plot(M[, 1] / 1000, M[, 5], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Angular Velocity ("~deg/s~")"))
+    points(mid.swings[, 1] / 1000, mid.swings[, 2], pch = 21, bg = "red")
+    
+    # Smooth acceleration data
+    A <- M[, 1:4]
+    current.cycle <- A[, 1] > mid.swings[50, 1] & A[, 1] < mid.swings[51, 1]
+    # plot(A[, 1][current.cycle] / 1000, A[, 2][current.cycle], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Acceleration ("~m/s^2~")"), ylim = c(-40, 30))
+    plot(A[, 1][current.cycle] / 1000, A[, 3][current.cycle], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Acceleration vertical ("~m/s^2~")"), ylim = c(-40, 30))
+    plot(A[, 1][current.cycle] / 1000, A[, 4][current.cycle], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Acceleration horizontal ("~m/s^2~")"), ylim = c(-40, 30))
+    butterworth.filter <- butter(2, 1/(fs/2) * 6.5, "low")
+    # A[, 2] <- filtfilt(butterworth.filter, A[, 2])
+    A[, 3] <- filtfilt(butterworth.filter, A[, 3])
+    butterworth.filter <- butter(2, 1/(fs/2) * 7, "low")
+    A[, 4] <- filtfilt(butterworth.filter, A[, 4])
+    # plot(A[, 1][current.cycle] / 1000, A[, 2][current.cycle], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Acceleration ("~m/s^2~")"), ylim = c(-40, 30))
+    plot(A[, 1][current.cycle] / 1000, A[, 3][current.cycle], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Acceleration vertical ("~m/s^2~")"), ylim = c(-40, 30))
+    plot(A[, 1][current.cycle] / 1000, A[, 4][current.cycle], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Acceleration horizontal ("~m/s^2~")"), ylim = c(-40, 30))
+    
+    # Compute output data
+    cycle.jerk.costs <- ComputeCycleJerkCosts(A, mid.swings)
+    cycle.intervals <- diff(mid.swings[, 1] / 1000)
+    output.data <- data.frame(t.s = mid.swings[(2:nrow(mid.swings)), 1] / 1000, cycle.interval.s = cycle.intervals, jerk.cost.m2s5 = cycle.jerk.costs)
+    output.data <- output.data[output.data[, 2] < 1.5, ]
+    
+    # Compute mean to compare
+    jerk.cost.by.all.accelerations  <- CalculateJerkCost(A[, 1] / 1000, A[, 3:4], normalized = T) 
+    jerk.cost.by.cycle.mean         <- mean(output.data[, 3], na.rm = T)
+    print(paste("Jerk Cost by Cycle:           :", jerk.cost.by.cycle.mean / 10^4))
+    print(paste("Jerk Cost by all Accelerations:", jerk.cost.by.all.accelerations / 10^4))
+    
+    # Save data
+    saveData(output.data, preprocessed.data.directory.path, activity.directory, user.directory, date.directory, body.position, activity.start, measurement)
+    
+    readline("Press return to continue > ")
+    
+  } else {
+    print(paste("File not exits:", motion.data.path))
+  }
 }
-
-# i <- n
-# date.directory  <- "YYYY-mm-dd--HH-MM-SS/"
-# properties      <- fss.features[i, c(6:12)]
-# activity.start  <- properties[, 2]
-# measurement     <- properties[, 5]
-# Compute(preprocessed.data.directory.path, activity.directory, user.directory, date.directory, body.position, activity.start, measurement)
