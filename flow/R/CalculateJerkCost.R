@@ -10,38 +10,30 @@
 #' @param plot Boolean. Plot cycle acceleration, cycle jerk and the time differential of jerk-cost
 #' @return A vector with the jerk cost [m^2/s^4] of the acceleration or a vector with normalized jerk cost [m^2/s^5] of the acceleration.
 
-CalculateJerkCost <- function(t, x, y, z, normalized = F, plot = F) {
+CalculateJerkCost <- function(t.s, data, normalized = F) {
   
-  jerk.x <- CalculateJerk(t, x)
-  jerk.y <- CalculateJerk(t, y)
-  jerk.z <- CalculateJerk(t, z)
+  x <- t.s
+  n.col <- ncol(data)
+  n.row <- length(x) - 1
   
-  cycle.interval <- t[length(t)] - t[1]
+  cycle.interval <- x[length(x)] - x[1]
   
-  if (plot) {
-    par(mfrow = c(3,1), mgp = c(2, 1, 0)) 
-    
-    y.lim <- c(min(x, y, z), max(x, y, z))
-    plot(t, x, type = "l", xlab = "Time", ylab = expression("Acceleration [" ~ m/s^2 ~ "]"), xaxs = "i", ylim=y.lim)
-    lines(t, y, lty = "dashed")
-    lines(t, z, lty = "dotted")
-    y.lim <- c(min(jerk.x, jerk.y, jerk.z), max(jerk.x, jerk.y, jerk.z))
-    plot(t, c(NA, jerk.x), type = "l", xlab = "Time", ylab = expression("Jerk [" ~ m/s^3 ~ "]"), xaxs = "i", ylim=y.lim)
-    lines(t, c(NA, jerk.y), lty = "dashed")
-    lines(t, c(NA, jerk.z), lty = "dotted")
-    plot(t, c(NA, jerk.x^2 + jerk.y^2 + jerk.z^2), type = "l", xlab = "Time", ylab = expression(Jerk[x]^2 ~ (t)+Jerk[y]^2 ~ (t)+Jerk[z]^2 ~ (t)), xaxs = "i")
-    title(sub = "Time differential of jerk-cost")
+  yi.all <- c()
+  for(i in 1:n.col) {
+    y <- data[, i]
+    yi <- CalculateJerk(x, y)
+    yi <- yi^2
+    yi.all <- c(yi.all, yi)
   }
   
+  m <- matrix(yi.all, n.row, n.col)
+  
   # Intergal of the time differential
-  jerk.cost <- pracma::trapz(t[-1], jerk.x^2 + jerk.y^2 + jerk.z^2)
+  jerk.cost <- pracma::trapz(x[-1], rowSums(m))
   
   if (normalized) {
     jerk.cost <- jerk.cost / cycle.interval
   }
-  
-#   print(paste("normalized trapz:", jerk.cost))
-#   print(paste("mean            :", mean(jerk.x^2 + jerk.y^2 + jerk.z^2)))
   
   return(jerk.cost)
 }
