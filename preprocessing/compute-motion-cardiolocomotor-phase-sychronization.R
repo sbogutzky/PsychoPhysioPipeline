@@ -33,7 +33,7 @@ time.range  <- c(as.numeric(readline("Type in start for visualisation in seconds
 t.w         <- as.numeric(readline("Type in time window in seconds and press return to continue (e. g. 30) > "))
 
 # Predicted relation
-m           <- 1 #as.numeric(readline("Type in predicted relation and press return to continue (e. g. 0.5) > "))
+m           <- .5 #as.numeric(readline("Type in predicted relation and press return to continue (e. g. 0.5) > "))
 
 # Load fss features
 fss.features        <- read.csv(paste(features.directory.path, activity.directory, user.directory, "fss-features.csv", sep = ""), stringsAsFactors = F)
