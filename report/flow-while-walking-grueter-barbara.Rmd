@@ -112,8 +112,8 @@ for (i in 1:nrow(fss.features)) {
   if(file.exists(paste(directory.path, file.name, sep = ""))) {
     data        <- read.csv(paste(directory.path, file.name, sep = ""), skip = 2)
     
-    data[, 3]   <- data[, 3] / 10^5
-    annomalies  <- DetectAnnomalies(data[, 2], data[, 3], expression("Cycle Interval ("~s~")"), expression("JC (x"~10^5~m^2*s^{-5}~")"), c(.8, 1.3), c(0, 8), epsilon = epsilon) 
+    data[, 3]   <- data[, 3] / 10^4
+    annomalies  <- DetectAnnomalies(data[, 2], data[, 3], expression("Cycle Interval ("~s~")"), expression("JC (x"~10^4~m^2*s^{-5}~")"), c(.8, 1.3), c(0, 8), epsilon = epsilon) 
     data        <- data[-annomalies$outliers, ]
     epsilon     <- annomalies$epsilon
     
@@ -172,7 +172,7 @@ dates   <- format(as.POSIXct(fss.features$activity.end/1000, origin = "1970-01-0
 absorption.expression <- expression("FSS FII: Absorption")
 meanhr.expression     <- expression("Mean HR ("~BPM~")")
 rmssd.expression      <- expression("RMSSD ("~s~")")
-jerk.cost.expression  <- expression("Mean JC (x"~10^5~m^2*s^{-5}~")")
+jerk.cost.expression  <- expression("Mean JC (x"~10^4~m^2*s^{-5}~")")
 
 par(mfcol = c(4, 1), mar = c(3.5, 4, 0, 4) + 0.1, mgp = c(2.5, 1, 0))
 
@@ -388,7 +388,7 @@ for (i in sessions) {
   axis(1, at = ticks, labels = F)
   abline(v = ticks, lty = "dashed", col = "darkgrey")
   box()
-  plot(data$t.s, runmean(data$jerk.cost.m2s5/10^5, 10, endrule = "NA"), xlab = "", ylab = expression("JC (x"~10^5~m^2*s^{-5}~")"), xlim = time.range, pch = 21, xaxt = "n")
+  plot(data$t.s, runmean(data$jerk.cost.m2s5/10^4, 10, endrule = "NA"), xlab = "", ylab = expression("JC (x"~10^4~m^2*s^{-5}~")"), xlim = time.range, pch = 21, xaxt = "n")
   axis(1, at = ticks)
   abline(v = ticks, lty = "dashed", col = "darkgrey")
   box()
