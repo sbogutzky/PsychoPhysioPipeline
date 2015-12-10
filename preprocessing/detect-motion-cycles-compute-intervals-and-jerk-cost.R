@@ -285,7 +285,7 @@ for (i in 1:nrow(fss.features)) {
       main.freq <- ComputeMainFrequency(M[, 5], fs)
       
       # Filter (1nd level)
-      fc <- main.freq * 2
+      fc <- main.freq * 4
       W <- fc/fn
       n <- 2
       lp.1 <- butter(n, W)
@@ -340,11 +340,15 @@ for (i in 1:nrow(fss.features)) {
     fc <- 6.5
     W <- fc/fn
     lp.vertical <- butter(n, W)
+    lp.vertical.freg <- freqz(lp.vertical, Fs = fs)
+    plot(lp.vertical.freg$f, abs(lp.vertical.freg$h), type = "l", xlim = c(0, 30), xlab = "Frequency ( Hz )", ylab = "Magnitude Response")
     A[, 3] <- filtfilt(lp.vertical, A[, 3])
     
     fc <- 7.5
     W <- fc/fn
     lp.horizontal <- butter(n, W)
+    lp.horizontal.freg <- freqz(lp.horizontal, Fs = fs)
+    plot(lp.horizontal.freg$f, abs(lp.horizontal.freg$h), type = "l", xlim = c(0, 30), xlab = "Frequency ( Hz )", ylab = "Magnitude Response")
     A[, 4] <- filtfilt(lp.horizontal, A[, 4])
     
     par(mfcol = c(2, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
