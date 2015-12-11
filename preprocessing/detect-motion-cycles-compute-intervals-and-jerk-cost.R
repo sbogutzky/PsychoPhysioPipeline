@@ -145,8 +145,18 @@ DetectAnomaly <- function(x, y, x.lab, y.lab, x.lim, y.lim, epsilon = 0) {
 
 CheckMidSwingDetection <- function(t.ms, angular.velocity.deg.s, length.s, mid.swing.indexes) {
   
-  current.t.ms <- 0
-  answer <- "N"
+  par(mfcol = c(2, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
+  plot(t.ms / 1000, angular.velocity.deg.s, type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Angular Velocity ("~deg/s~")"))
+  points(t.ms[mid.swing.indexes] / 1000, angular.velocity.deg.s[mid.swing.indexes], pch = 21, bg = "red")
+  cycle.interval.t.ms <- diff(t.ms[mid.swing.indexes])
+  plot(t.ms[mid.swing.indexes] / 1000, c(mean(cycle.interval.t.ms), cycle.interval.t.ms) / 1000, xlab = expression("Time ("~s~")"), ylab = expression("Cycle Interval ("~s~")"))
+  
+  answer <- readline("Are you finish? Type Y and press return > ")
+  if(answer != "Y") {
+    answer <- "N"
+    current.t.ms <- 0
+  }
+  
   while(answer == "N") {
     while(current.t.ms < max(t.ms)) {
       
@@ -355,8 +365,8 @@ for (i in 1:nrow(fss.features)) {
     par(mfcol = c(2, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
     x.p <- 1:length(mean.A.vertical[, 1]) / length(mean.A.vertical[, 1]) * 100
     plot(x.p,  mean.A.vertical[, 1], type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Acceleration vertical ("~m/s^2~")"))
-    for (i in 2:length(mean.A.vertical[1, ])) {
-      lines(x.p, mean.A.vertical[,i], type = "l")
+    for (j in 2:length(mean.A.vertical[1, ])) {
+      lines(x.p, mean.A.vertical[,j], type = "l")
     }
     mean.a.vertical <- rowMeans(mean.A.vertical)
     plot(x.p, mean.a.vertical, type = "l",xlab = expression("Time ( % Stride )"), ylab = expression("Acceleration vertical ("~m/s^2~")"))
@@ -367,8 +377,8 @@ for (i in 1:nrow(fss.features)) {
     par(mfcol = c(2, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
     x.p <- 1:length(mean.A.horizontal[, 1]) / length(mean.A.horizontal[, 1]) * 100
     plot(x.p,  mean.A.horizontal[, 1], type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Acceleration horizontal ("~m/s^2~")"))
-    for (i in 2:length(mean.A.horizontal[1, ])) {
-      lines(x.p, mean.A.horizontal[,i], type = "l")
+    for (j in 2:length(mean.A.horizontal[1, ])) {
+      lines(x.p, mean.A.horizontal[,j], type = "l")
     }
     mean.a.horizontal <- rowMeans(mean.A.horizontal)
     plot(x.p, mean.a.horizontal, type = "l",xlab = expression("Time ( % Stride )"), ylab = expression("Acceleration horizontal ("~m/s^2~")"))
@@ -396,8 +406,8 @@ for (i in 1:nrow(fss.features)) {
     par(mfcol = c(3, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
     x.p <- 1:length(mean.A.vertical[, 1]) / length(mean.A.vertical[, 1]) * 100
     plot(x.p,  mean.A.vertical[, 1], type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Acceleration vertical ("~m/s^2~")"))
-    for (i in 2:length(mean.A.vertical[1, ])) {
-      lines(x.p, mean.A.vertical[,i], type = "l")
+    for (j in 2:length(mean.A.vertical[1, ])) {
+      lines(x.p, mean.A.vertical[,j], type = "l")
     }
     mean.a.vertical <- rowMeans(mean.A.vertical)
     plot(x.p, mean.a.vertical, type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Acceleration vertical ("~m/s^2~")"))
@@ -410,8 +420,8 @@ for (i in 1:nrow(fss.features)) {
     par(mfcol = c(3, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
     x.p <- 1:length(mean.A.horizontal[, 1]) / length(mean.A.horizontal[, 1]) * 100
     plot(x.p,  mean.A.horizontal[, 1], type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Acceleration horizontal ("~m/s^2~")"))
-    for (i in 2:length(mean.A.horizontal[1, ])) {
-      lines(x.p, mean.A.horizontal[,i], type = "l")
+    for (j in 2:length(mean.A.horizontal[1, ])) {
+      lines(x.p, mean.A.horizontal[,j], type = "l")
     }
     mean.a.horizontal <- rowMeans(mean.A.horizontal)
     plot(x.p, mean.a.horizontal, type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Acceleration horizontal ("~m/s^2~")"))

@@ -1,7 +1,7 @@
 ---
 title: "Flow beim Gehen"
 author: "Simon Bogutzky"
-date: "16. November 2015"
+date: "11. Dezember 2015"
 output: html_document
 ---
 
@@ -16,6 +16,8 @@ if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"
   root.data.directory.path        <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
 if(file.exists("//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
   root.data.directory.path        <- "//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
+if(file.exists("C:/Users/Simon Bogutzky/Documents/Archiv/flow/data"))
+  root.data.directory.path        <- "C:/Users/Simon Bogutzky/Documents/Archiv/flow/data/"
 
 # Set activity directory
 activity.directory        <- "walking/" 
@@ -44,7 +46,7 @@ CreateFeatureDataFrame <- function(directory.path, filename, cols, rows, col.nam
   return(feature.data.frame)
 }
 
-DetectAnnomalies <- function(x, y, x.lab, y.lab, x.lim, y.lim, epsilon = 0) {
+DetectAnomaly <- function(x, y, x.lab, y.lab, x.lim, y.lim, epsilon = 0) {
   X <- matrix(data = c(x, y), nrow = length(y), ncol = 2)
   plot(X[,1], X[,2], xlab = x.lab, ylab = y.lab, pch = 21, xlim = x.lim, ylim = y.lim)
   
@@ -113,9 +115,9 @@ for (i in 1:nrow(fss.features)) {
     data        <- read.csv(paste(directory.path, file.name, sep = ""), skip = 2)
     
     data[, 3]   <- data[, 3] / 10^4
-    annomalies  <- DetectAnnomalies(data[, 2], data[, 3], expression("Cycle Interval ("~s~")"), expression("JC (x"~10^4~m^2*s^{-5}~")"), c(.8, 1.3), c(0, 8), epsilon = epsilon) 
-    data        <- data[-annomalies$outliers, ]
-    epsilon     <- annomalies$epsilon
+    anomaly  <- DetectAnomaly(data[, 2], data[, 3], expression("Cycle Interval ("~s~")"), expression("JC (x"~10^4~m^2*s^{-5}~")"), c(.8, 1.3), c(0, 8), epsilon = epsilon) 
+    data        <- data[-anomaly$outliers, ]
+    epsilon     <- anomaly$epsilon
     
     for (j in 1:(length(range.intervals) - 1)) {
       estimated.features <- c(mean(data[, 2][data[, 1] >= range.intervals[j] & data[, 1] < range.intervals[j + 1] & data[, 2] < 1.15], na.rm = T), mean(data[, 3][data[, 1] >= range.intervals[j] & data[, 1] < range.intervals[j + 1] & data[, 2] < 1.15], na.rm = T))
@@ -160,7 +162,7 @@ for (i in 1:nrow(fss.features)) {
 }
 
 # Remove unused stuff
-rm(additional.features, data, feature.data.frame, activity.start, annomalies, col.names, date.directory, directory.path, epsilon, estimated.features, feature.vector, file.name, measurement,i, j, range.intervals)
+rm(additional.features, data, feature.data.frame, activity.start, anomaly, col.names, date.directory, directory.path, epsilon, estimated.features, feature.vector, file.name, measurement,i, j, range.intervals)
 ```
 
 # Ebenenspezifisch
@@ -295,7 +297,7 @@ rm(linear.model, breaks)
 require(RHRV)
 require(caTools)
 
-sessions   <- c(2, 20, 24)
+sessions   <- c(14:16, 22:24)
 time.range <- c(600, 900)
 ticks      <- seq(time.range[1], time.range[2], 30)
 
