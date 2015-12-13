@@ -105,7 +105,7 @@ for (i in 1:nrow(fss.features)) {
       duplicates <- which(duplicated(motion.data.subset))
       if(length(duplicates) > 0) {
         
-        t <- (motion.data.subsett$Timestamp - motion.data.subset$Timestamp[1]) / 1000
+        t <- (motion.data.subset$Timestamp - motion.data.subset$Timestamp[1]) / 1000
         plot(t, t, xlab = "t [s]", ylab = "t [s]")
         points(t[duplicates], t[duplicates], col = "red")
         
