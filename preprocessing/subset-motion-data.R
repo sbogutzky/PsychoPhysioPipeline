@@ -94,6 +94,7 @@ for (i in 1:nrow(fss.features)) {
     
     # Subset motion data
     motion.data.subset  <- motion.data[activity.start <= first.timestamp + motion.data[,1] & first.timestamp + motion.data[,1] < activity.end,]
+    motion.data.subset <- motion.data.subset[complete.cases(motion.data.subset), ]
     n.subset <- nrow(motion.data.subset)
     if(n.subset > 0) {
       time.difference     <- first.timestamp + motion.data.subset[1,1] - activity.start

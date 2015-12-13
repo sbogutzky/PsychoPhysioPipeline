@@ -1,7 +1,7 @@
 ---
-title: "Flow beim Gehen"
+title: "Flow beim Gehen (intraindividell)"
 author: "Simon Bogutzky"
-date: "16. November 2015"
+date: "13. Dezember 2015"
 output: html_document
 ---
 
@@ -16,6 +16,8 @@ if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"
   root.data.directory.path        <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
 if(file.exists("//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
   root.data.directory.path        <- "//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
+if(file.exists("C:/Users/Simon Bogutzky/Documents/Archiv/flow/data"))
+  root.data.directory.path        <- "C:/Users/Simon Bogutzky/Documents/Archiv/flow/data/"
 
 # Set activity directory
 activity.directory        <- "walking/" 
@@ -24,46 +26,6 @@ activity.directory        <- "walking/"
 user.directory            <- "lochwitz-andreas/"
 
 require(flow)
-
-CreateFeatureDataFrame <- function(directory.path, filename, cols, rows, col.names, additional.features, skip = skip) {
-  feature.data.frame <- data.frame()
-  if(file.exists(paste(directory.path, file.name, sep = ""))) {
-    loaded.features <- read.csv(paste(directory.path, file.name, sep = ""), skip = skip)
-    for (i in rows) {
-      feature.vector        <- c(loaded.features[i, cols], additional.features)
-      names(feature.vector) <- col.names
-      feature.data.frame    <- rbind(feature.data.frame, feature.vector)
-    }
-  } else {
-    for (i in rows) {
-      feature.vector        <- c(rep(NA, length(cols)), additional.features)
-      names(feature.vector) <- col.names
-      feature.data.frame    <- rbind(feature.data.frame, feature.vector)
-    }
-  }
-  return(feature.data.frame)
-}
-
-DetectAnnomalies <- function(x, y, x.lab, y.lab, x.lim, y.lim, epsilon = 0) {
-  X <- matrix(data = c(x, y), nrow = length(y), ncol = 2)
-  plot(X[,1], X[,2], xlab = x.lab, ylab = y.lab, pch = 21, xlim = x.lim, ylim = y.lim)
-  
-  gl <- EstimateGaussian(X)
-  p  <- MultivariateGaussian(X, gl$mu, gl$sigma2)
-  
-  if(epsilon == 0) {
-    y <- zeros(nrow(X), 1)
-    y[identify(X)]  <- 1
-    bt              <- SelectThreshold(y, p)
-    epsilon         <- bt$epsilon
-  }
-  
-  outliers <- which(p < epsilon)
-  points(X[outliers, 1], X[outliers, 2], xlab = x.lab, ylab = y.lab, pch = 21, bg = 2)
-  
-  return(list("epsilon" = epsilon, "outliers" = outliers))  
-}
-
 ```
 
 ```{r load-data, echo=FALSE}
@@ -101,7 +63,6 @@ for (i in 1:nrow(fss.features)) {
   col.names       <- c("sample","meanrr","sdnn","meanhr","sdhr","rmssd","nn50","pnn50","sdann","sdnni","hrvtri","tinn","vlfpeakfft","lfpeakfft","hfpeakfft","vlfpowfft","lfpowfft","hfpowfft","vlfpowprfft","lfpowprfft","hfpowprfft","lfpownufft","hfpownufft","totpowfft","lfhffft","vlfpeakar","lfpeakar","hfpeakar","vlfpowar","lfpowar","hfpowar","vlfpowprar","lfpowprar","hfpowprar","lfpownuar","hfpownuar","totpowar","lfhfar","edr","sd1","sd2","apen","sampen","d2","dfa1","dfa2","activity","activity.start","activity.end","inquiry.end","measurement","last.name","first.name","date.of.birth")
   feature.data.frame  <- CreateFeatureDataFrame(directory.path, file.name, 1:46, 1:3, col.names, additional.features, skip = 0)
   hrv.features        <- rbind(hrv.features, feature.data.frame)
-  hrv.features$rmssd[hrv.features$rmssd > 39] = NA
   
   # Load jerk cost, estimate and create JC feature data frame
   directory.path        <- paste(root.data.directory.path, "processed-data/", activity.directory, user.directory, date.directory, sep = "")
@@ -113,10 +74,12 @@ for (i in 1:nrow(fss.features)) {
   if(file.exists(paste(directory.path, file.name, sep = ""))) {
     data        <- read.csv(paste(directory.path, file.name, sep = ""), skip = 2)
     
-    data[, 3]   <- data[, 3] / 10^5
-    annomalies  <- DetectAnnomalies(data[, 2], data[, 3], expression("Cycle Interval ("~s~")"), expression("JC (x"~10^5~m^2*s^{-5}~")"), c(.8, 1.3), c(0, 8), epsilon = epsilon) 
-    data        <- data[-annomalies$outliers, ]
-    epsilon     <- annomalies$epsilon
+    data[, 3]   <- data[, 3] / 10^4
+    anomaly  <- DetectAnomaly(data[, 2], data[, 3], expression("Cycle Interval ("~s~")"), expression("JC (x"~10^4~m^2*s^{-5}~")"), c(.4, 1.3), c(0, 6), epsilon = epsilon)
+    if(anomaly$epsilon != 0 & length(anomaly$outliers) > 0) {
+      data        <- data[-anomaly$outliers, ]
+      epsilon     <- anomaly$epsilon
+    }
     
     for (j in 1:(length(range.intervals) - 1)) {
       estimated.features <- c(mean(data[, 2][data[, 1] >= range.intervals[j] & data[, 1] < range.intervals[j + 1] & data[, 2] < 1.15], na.rm = T), mean(data[, 3][data[, 1] >= range.intervals[j] & data[, 1] < range.intervals[j + 1] & data[, 2] < 1.15], na.rm = T))
@@ -161,12 +124,11 @@ for (i in 1:nrow(fss.features)) {
 }
 
 # Remove unused stuff
-rm(additional.features, data, feature.data.frame, activity.start, annomalies, col.names, date.directory, directory.path, epsilon, estimated.features, feature.vector, file.name, measurement,i, j, range.intervals)
+rm(additional.features, data, feature.data.frame, activity.start, anomaly, col.names, date.directory, directory.path, epsilon, estimated.features, feature.vector, file.name, measurement,i, j, range.intervals)
 ```
 
 # Ebenenspezifisch
 ```{r time-series, echo=FALSE}
-
 breaks  <- rep(1:3, nrow(fss.features)) 
 starts  <- seq(1, nrow(fss.features), by = 4)
 dates   <- format(as.POSIXct(fss.features$activity.end/1000, origin = "1970-01-01", tz = "CET"), "%D", tz = "CET")
@@ -174,7 +136,7 @@ dates   <- format(as.POSIXct(fss.features$activity.end/1000, origin = "1970-01-0
 absorption.expression <- expression("FSS FII: Absorption")
 meanhr.expression     <- expression("Mean HR ("~BPM~")")
 rmssd.expression      <- expression("RMSSD ("~s~")")
-jerk.cost.expression  <- expression("Mean JC (x"~10^5~m^2*s^{-5}~")")
+jerk.cost.expression  <- expression("Mean JC (x"~10^4~m^2*s^{-5}~")")
 
 par(mfcol = c(4, 1), mar = c(3.5, 4, 0, 4) + 0.1, mgp = c(2.5, 1, 0))
 
@@ -182,11 +144,11 @@ plot(fss.features$absorption, xaxt = "n", pch = 21, bg = c("green", "white", "wh
 axis(1, at = starts, labels = F)
 box()
 
-plot(hrv.features$meanhr[breaks == 3], xaxt = "n", pch = 21, bg = c("green", "white", "white", "white"), cex = 1.2, ylab = meanhr.expression, xlab = "")
+plot(hrv.features$meanhr[breaks == 3] , xaxt = "n", pch = 21, bg = c("green", "white", "white", "white"), cex = 1.2, ylab = meanhr.expression, xlab = "")
 axis(1, at = starts, labels = F)
 box()
 
-plot(hrv.features$rmssd[breaks == 3], xaxt = "n", pch = 21, bg = c("green", "white", "white", "white"), cex = 1.2, ylab = rmssd.expression, xlab = "")
+plot(hrv.features$rmssd[breaks == 3] , xaxt = "n", pch = 21, bg = c("green", "white", "white", "white"), cex = 1.2, ylab = rmssd.expression, xlab = "")
 axis(1, at = starts, labels = F)
 box()
 
@@ -213,11 +175,11 @@ points(cls.features$mean.nsei[breaks == 3], pch = 22, bg = c("green", "white", "
 axis(1, at = starts, labels = F)
 box()
 
-plot(hrv.features$meanhr[breaks == 3], xaxt = "n", pch = 21, bg = c("green", "white", "white", "white"), cex = 1.2, ylab = meanhr.expression, xlab = "")
+plot(hrv.features$meanhr[breaks == 3] , xaxt = "n", pch = 21, bg = c("green", "white", "white", "white"), cex = 1.2, ylab = meanhr.expression, xlab = "")
 axis(1, at = starts, labels = F)
 box()
 
-plot(hrv.features$rmssd[breaks == 3], xaxt = "n", pch = 21, bg = c("green", "white", "white", "white"), cex = 1.2, ylab = rmssd.expression, xlab = "")
+plot(hrv.features$rmssd[breaks == 3] , xaxt = "n", pch = 21, bg = c("green", "white", "white", "white"), cex = 1.2, ylab = rmssd.expression, xlab = "")
 axis(1, at = starts, labels = F)
 box()
 
@@ -231,65 +193,62 @@ rm(breaks, starts, dates)
 
 # Korrelation
 ```{r linear-models, echo=FALSE}
-breaks  <- rep(1:3, nrow(fss.features)) 
+
 par(mfrow = c(2, 2), mar = c(3.5, 4, 1, 4) + 0.1, mgp = c(2.5, 1, 0))
 
-linear.model <- lm(fss.features$absorption ~ hrv.features$meanhr[breaks == 3])
-summary(linear.model)
-plot(hrv.features$meanhr[breaks == 3], fss.features$absorption, pch = 21, cex = 1.2, ylab = absorption.expression, xlab = meanhr.expression)
-abline(linear.model)
-box()
+breaks  <- rep(1:3, nrow(fss.features))
 
-linear.model <- lm(fss.features$absorption ~ hrv.features$rmssd[breaks == 3])
-summary(linear.model)
-plot(hrv.features$rmssd[breaks == 3], fss.features$absorption, pch = 21, cex = 1.2, ylab = absorption.expression, xlab = rmssd.expression)
-abline(linear.model)
-box()
+absorption.expression <- expression("FSS FII: Absorption")
+meanhr.expression     <- expression("Mean HR ("~BPM~")")
+rmssd.expression      <- expression("RMSSD ("~s~")")
+jerk.cost.expression  <- expression("Mean JC (x"~10^4~m^2*s^{-5}~")")
 
-linear.model <- lm(fss.features$absorption ~ (jc.features$mean.jerk.cost[breaks == 3]))
-summary(linear.model)
-plot(jc.features$mean.jerk.cost[breaks == 3], fss.features$absorption, pch = 21, cex = 1.2, ylab = absorption.expression, xlab = jerk.cost.expression)
-abline(linear.model)
-box()
+x <- hrv.features$meanhr[breaks == 3] 
+y <- fss.features$absorption
+PlotLinearRegression(x, y, xlab = meanhr.expression, ylab = absorption.expression)
 
-linear.model <- lm(hrv.features$meanhr[breaks == 3] ~ (jc.features$mean.jerk.cost[breaks == 3]))
-summary(linear.model)
-plot(jc.features$mean.jerk.cost[breaks == 3], hrv.features$meanhr[breaks == 3], pch = 21, cex = 1.2, ylab = meanhr.expression, xlab = jerk.cost.expression)
-abline(linear.model)
-box()
+x <- hrv.features$rmssd[breaks == 3] 
+y <- fss.features$absorption
+PlotLinearRegression(x, y, ylab = absorption.expression, xlab = rmssd.expression)
 
-rm(linear.model, breaks)
+x <- jc.features$mean.jerk.cost[breaks == 3]
+y <- fss.features$absorption
+PlotLinearRegression(x, y, ylab = absorption.expression, xlab = jerk.cost.expression)
+
+x <- jc.features$mean.jerk.cost[breaks == 3]
+y <- hrv.features$meanhr[breaks == 3] 
+PlotLinearRegression(x, y, ylab = meanhr.expression, xlab = jerk.cost.expression)
+
 ```
 
 ```{r linear-models-2, echo=FALSE}
-breaks  <- rep(1:3, nrow(fss.features)) 
+
 par(mfrow = c(2, 2), mar = c(3.5, 4, 1, 4) + 0.1, mgp = c(2.5, 1, 0))
 
-linear.model <- lm(fss.features$absorption ~ cls.features$mean.pcoi[breaks == 3])
-summary(linear.model)
-plot(cls.features$mean.nsei[breaks == 3], fss.features$absorption, pch = 21, cex = 1.2, ylab = absorption.expression, xlab = nsei.expression)
-abline(linear.model)
-box()
+breaks  <- rep(1:3, nrow(fss.features))
 
-linear.model <- lm(hrv.features$rmssd[breaks == 3] ~ cls.features$mean.nsei[breaks == 3])
-summary(linear.model)
-plot(cls.features$mean.nsei[breaks == 3], hrv.features$rmssd[breaks == 3], pch = 21, cex = 1.2, ylab = rmssd.expression, xlab = nsei.expression)
-abline(linear.model)
-box()
+absorption.expression <- expression("FSS FII: Absorption")
+meanhr.expression     <- expression("Mean HR ("~BPM~")")
+rmssd.expression      <- expression("RMSSD ("~s~")")
+jerk.cost.expression  <- expression("Mean JC (x"~10^4~m^2*s^{-5}~")")
+pcoi.expression  <- expression("Mean PCoI")
+nsei.expression  <- expression("Mean NSEI")
 
-linear.model <- lm(jc.features$mean.jerk.cost[breaks == 3] ~ cls.features$mean.nsei[breaks == 3])
-summary(linear.model)
-plot(cls.features$mean.nsei[breaks == 3], jc.features$mean.jerk.cost[breaks == 3], pch = 21, cex = 1.2, ylab = jerk.cost.expression, xlab = nsei.expression)
-abline(linear.model)
-box()
+x <- cls.features$mean.nsei[breaks == 3]
+y <- fss.features$absorption
+PlotLinearRegression(x, y, ylab = absorption.expression, xlab = nsei.expression)
 
-linear.model <- lm(cls.features$mean.pcoi[breaks == 3] ~ cls.features$mean.nsei[breaks == 3])
-summary(linear.model)
-plot(cls.features$mean.nsei[breaks == 3], cls.features$mean.pcoi[breaks == 3], pch = 21, cex = 1.2, ylab = pcoi.expression, xlab = nsei.expression)
-abline(linear.model)
-box()
+x <- hrv.features$rmssd[breaks == 3] 
+y <- cls.features$mean.nsei[breaks == 3]
+PlotLinearRegression(x, y, ylab = rmssd.expression, xlab = nsei.expression)
 
-rm(linear.model, breaks)
+x <- cls.features$mean.nsei[breaks == 3]
+y <- jc.features$mean.jerk.cost[breaks == 3] 
+PlotLinearRegression(x, y, ylab = jerk.cost.expression, xlab = nsei.expression)
+
+x <- cls.features$mean.nsei[breaks == 3]
+y <- cls.features$mean.pcoi[breaks == 3]
+PlotLinearRegression(x, y, ylab = pcoi.expression, xlab = nsei.expression)
 ```
 
 ```{r process-data, echo=FALSE}
@@ -297,7 +256,7 @@ rm(linear.model, breaks)
 require(RHRV)
 require(caTools)
 
-sessions   <- c(12, 23)
+sessions   <- c(5, 6, 7)
 time.range <- c(600, 900)
 ticks      <- seq(time.range[1], time.range[2], 30)
 
@@ -390,7 +349,7 @@ for (i in sessions) {
   axis(1, at = ticks, labels = F)
   abline(v = ticks, lty = "dashed", col = "darkgrey")
   box()
-  plot(data$t.s, runmean(data$jerk.cost.m2s5/10^5, 10, endrule = "NA"), xlab = "", ylab = expression("JC (x"~10^5~m^2*s^{-5}~")"), xlim = time.range, pch = 21, xaxt = "n")
+  plot(data$t.s, runmean(data$jerk.cost.m2s5/10^4, 10, endrule = "NA"), xlab = "", ylab = expression("JC (x"~10^4~m^2*s^{-5}~")"), xlim = time.range, pch = 21, xaxt = "n")
   axis(1, at = ticks)
   abline(v = ticks, lty = "dashed", col = "darkgrey")
   box()
