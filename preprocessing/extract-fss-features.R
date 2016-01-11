@@ -5,13 +5,8 @@ rm(list = ls(all = T))
 library(flow)
 
 # Set root data directory path
-root.data.directory.path <- ""
-if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
-  root.data.directory.path        <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
-if(file.exists("//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
-  root.data.directory.path        <- "//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
-if(file.exists("C:/Users/Simon Bogutzky/Documents/Archiv/flow/data"))
-  root.data.directory.path        <- "C:/Users/Simon Bogutzky/Documents/Archiv/flow/data/"
+if(file.exists("/Volumes/OSX/flow/data"))
+  root.data.directory.path        <- "/Volumes/OSX/flow/data/"
 
 # Set cleaned data directory path
 cleaned.data.directory.path <- paste(root.data.directory.path, "cleaned-data/", sep = "")
@@ -23,7 +18,7 @@ features.directory.path <- paste(root.data.directory.path, "features/", sep = ""
 first.name        <- "Patrick"
 last.name         <- "Buse"
 date.of.birth     <- "1984-05-05"
-activity          <- "Baseline"
+activity          <- "Running"
 
 activity.directory <- paste(tolower(activity), "/",  sep = "")
 user.directory <- paste(tolower(last.name), "-", tolower(first.name), "/",  sep = "")
@@ -34,6 +29,7 @@ fss.data.file.names <- list.files(path = input.data.directory.path, pattern = "f
 
 # Create fss feature data frame
 fss.features  <- data.frame()
+fss.measurements  <- data.frame()
 
 # Fill fss features data frame
 for (fss.data.file.name in fss.data.file.names) {
@@ -58,9 +54,15 @@ for (fss.data.file.name in fss.data.file.names) {
     fss.factors     <- CalculateFlowShortScaleFactors(as.numeric(fss.data[i, 3:18]))
     
     # Add fss fss features
-    fss.features    <- rbind(fss.features, data.frame(round(fss.factors[c(1, 3, 5, 7, 9)], 2), activity, activity.start, activity.end, inquiry.end, measurement = i, last.name, first.name, date.of.birth))
+    fss.features    <- rbind(fss.features, data.frame(round(fss.factors[c(1, 3, 5, 7, 9, 11)], 2), activity, activity.start, activity.end, inquiry.end, measurement = i, last.name, first.name, date.of.birth))
+    fss.measurements    <- rbind(fss.measurements, data.frame(fss.data[i, 3:18]))
   }
 }
+
+print(paste("Cronbach's Alpha Flow", multilevel::cronbach(fss.measurements[, 1:10])$Alpha))
+print(paste("Cronbach's Alpha Fluency", multilevel::cronbach(fss.measurements[, c(8,7,9,4,5,2)])$Alpha))
+print(paste("Cronbach's Alpha Absorption", multilevel::cronbach(fss.measurements[, c(6,1,10,3)])$Alpha))
+print(paste("Cronbach's Alpha Anxienty", multilevel::cronbach(fss.measurements[, 11:13])$Alpha))
 
 # Create output directory, if needed
 output.directory.path <- paste(features.directory.path, activity.directory, user.directory, sep = "")

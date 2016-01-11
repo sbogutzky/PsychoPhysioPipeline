@@ -1,0 +1,272 @@
+---
+title: "Flow beim Laufen (intraindividell)"
+author: "Simon Bogutzky"
+date: "12. Dezember 2015"
+output: html_document
+---
+
+```{r set-directories, echo = FALSE}
+
+# Remove all variables
+rm(list = ls(all = T)) 
+
+# Set root data directory path
+if(file.exists("/Volumes/OSX/flow/data"))
+  root.data.directory.path        <- "/Volumes/OSX/flow/data/"
+
+# Set activity directory
+activity.directory        <- "running/" 
+
+# Set user directory
+user.directory            <- "buse-patrick/"
+
+require(flow)
+```
+
+```{r load-data, echo=FALSE}
+
+# Load FSS features
+fss.features <- read.csv(paste(root.data.directory.path, "features/", activity.directory, user.directory, "fss-features.csv", sep = ""))
+
+# Load data HRV features per session
+hrv.features <- data.frame()
+for (i in 1:nrow(fss.features)) {
+  
+  # Set additional features
+  additional.features <- fss.features[i, c(7:14)]
+  activity.start      <- additional.features[, 2]
+  measurement         <- additional.features[, 5]
+  
+  if(measurement == 1) {
+    date.directory <- paste(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S"), "/", sep ="")
+  }
+  
+  # Create HRV feature data frame
+  directory.path  <- paste(root.data.directory.path, "features/", activity.directory, user.directory, "kubios-hrv-features/", date.directory, sep="")
+  file.name       <- paste("ecg-data-", measurement, "_hrv.txt", sep = "")
+  col.names       <- c("sample","meanrr","sdnn","meanhr","sdhr","rmssd","nn50","pnn50","sdann","sdnni","hrvtri","tinn","vlfpeakfft","lfpeakfft","hfpeakfft","vlfpowfft","lfpowfft","hfpowfft","vlfpowprfft","lfpowprfft","hfpowprfft","lfpownufft","hfpownufft","totpowfft","lfhffft","vlfpeakar","lfpeakar","hfpeakar","vlfpowar","lfpowar","hfpowar","vlfpowprar","lfpowprar","hfpowprar","lfpownuar","hfpownuar","totpowar","lfhfar","edr","sd1","sd2","apen","sampen","d2","dfa1","dfa2","activity","activity.start","activity.end","inquiry.end","measurement","last.name","first.name","date.of.birth")
+  feature.data.frame  <- CreateFeatureDataFrame(directory.path, file.name, 1:46, 1:3, col.names, additional.features, skip = 0)
+  hrv.features        <- rbind(hrv.features, feature.data.frame)
+}
+
+jc.features  <- data.frame()
+
+# Load jerk cost, estimate and create JC feature frame per session
+for (i in 1:nrow(fss.features)) {
+  # Set additional features
+  additional.features <- fss.features[i, c(7:14)]
+  activity.start      <- additional.features[, 2]
+  measurement         <- additional.features[, 5]
+  
+  if(measurement == 1) {
+    date.directory <- paste(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S"), "/", sep ="")
+  }
+  
+  directory.path        <- paste(root.data.directory.path, "processed-data/", activity.directory, user.directory, date.directory, sep = "")
+  file.name             <- paste("leg-jerk-cost-data-", measurement, ".csv", sep = "")
+  col.names             <- jerk.cost.feature.names   <- c("mean.cycle.interval", "mean.jerk.cost", "activity","activity.start","activity.end","inquiry.end","measurement","last.name","first.name","date.of.birth")
+  range.intervals       <- seq(0, 900, 300)
+  
+  feature.data.frame <- data.frame()
+  if(file.exists(paste(directory.path, file.name, sep = ""))) {
+    data        <- read.csv(paste(directory.path, file.name, sep = ""), skip = 2)
+    data[, 3]   <- data[, 3] / 10^4
+    
+    for (j in 1:(length(range.intervals) - 1)) {
+      estimated.features <- c(mean(data[, 2][data[, 1] >= range.intervals[j] & data[, 1] < range.intervals[j + 1] & data[, 2] < 1.15], na.rm = T), mean(data[, 3][data[, 1] >= range.intervals[j] & data[, 1] < range.intervals[j + 1] & data[, 2] < 1.15], na.rm = T))
+      feature.vector        <- c(estimated.features, additional.features)
+      names(feature.vector) <- col.names
+      feature.data.frame    <- rbind(feature.data.frame, feature.vector)
+    }
+  } else {
+    for (j in 1:(length(range.intervals) - 1)) {
+      feature.vector        <- c(rep(NA, 2), additional.features)
+      names(feature.vector) <- col.names
+      feature.data.frame    <- rbind(feature.data.frame, feature.vector)
+    }
+  }
+  jc.features        <- rbind(jc.features, feature.data.frame)
+}
+
+cls.features <- data.frame()
+
+# Load CLS, estimate and create CLS feature data frame
+for (i in 1:nrow(fss.features)) {
+  
+  # Set additional features
+  additional.features <- fss.features[i, c(7:14)]
+  activity.start      <- additional.features[, 2]
+  measurement         <- additional.features[, 5]
+  
+  if(measurement == 1) {
+    date.directory <- paste(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S"), "/", sep ="")
+  }
+  
+  
+  directory.path        <- paste(root.data.directory.path, "processed-data/", activity.directory, user.directory, date.directory, sep = "")
+  file.name             <- paste("leg-cls-indexes-", measurement, ".csv", sep = "")
+  col.names             <- c("mean.pcoi", "mean.nsei", "activity","activity.start","activity.end","inquiry.end","measurement","last.name","first.name","date.of.birth")
+  range.intervals       <- seq(0, 900, 300)
+  
+  feature.data.frame <- data.frame()
+  if(file.exists(paste(directory.path, file.name, sep = ""))) {
+    data        <- read.csv(paste(directory.path, file.name, sep = ""), skip = 2)
+    #plot(data[, 2], data[, 3], xlab ="PCoI", ylab = "NSEI", xlim = c(0, 1), ylim = c(0, 1))  
+    for (j in 1:(length(range.intervals) - 1)) {
+      
+      estimated.features <- c(mean(data[, 2][data[, 1] >= range.intervals[j] & data[, 1] < range.intervals[j + 1]], na.rm = T), mean(data[, 3][data[, 1] >= range.intervals[j] & data[, 1] < range.intervals[j + 1]], na.rm = T))
+      feature.vector        <- c(estimated.features, additional.features)
+      names(feature.vector) <- col.names
+      feature.data.frame    <- rbind(feature.data.frame, feature.vector)
+    }
+  } else {
+    for (j in 1:(length(range.intervals) - 1)) {
+      feature.vector        <- c(rep(NA, 2), additional.features)
+      names(feature.vector) <- col.names
+      feature.data.frame    <- rbind(feature.data.frame, feature.vector)
+    }
+  }
+  cls.features        <- rbind(cls.features, feature.data.frame)
+}
+
+data.1 <- data.frame(flow = fss.features$flow, absorption = fss.features$absorption, mean.hr = hrv.features$meanhr[seq(3, 72, 3)], rmssd = hrv.features$rmssd[seq(3, 72, 3)], mean.cycle.interval = jc.features$mean.cycle.interval[seq(3, 72, 3)], mean.jerk.cost = jc.features$mean.jerk.cost[seq(3, 72, 3)], coh = cls.features$mean.nsei[seq(3, 72, 3)], daf = fss.features$daf)
+data.1$day <- factor(sort(rep(1:6, 4)))
+data.1$minute <-factor(fss.features$measurement, levels = c(1, 2, 3, 4), labels = c("15'", "30'", "45'", "60'"))
+
+rm(activity.start, col.names, data, date.directory, feature.vector, file.name, i, j, measurement, additional.features, feature.data.frame, directory.path, range.intervals)
+```
+
+```{r}
+plotFeaturesInGroups <- function(features, factor) {
+  for(i in 1:length(features)) {
+    feature       <- features[, i]
+    feature.name  <- names(features)[i]
+    
+    par(mfrow = c(3, 1), xaxs = "r", yaxs = "r")
+    plot(feature, pch = as.numeric(factor), main = feature.name, ylab = feature.name)
+    
+    factor        <- factor[complete.cases(feature)]
+    feature       <- feature[complete.cases(feature)]
+    
+    boxplot(feature ~ factor, data = features, ylab = feature.name)
+    
+    hist(feature, xlab = feature.name, breaks = 10)
+    lines(density(feature))
+    rug(jitter(feature))
+  } 
+}
+
+checkFeaturesNormalityInGroups <- function(features, factor, plot = F) {
+  for(i in 1:length(features)) {
+    feature.name <- names(features)[i]
+    for(j in levels(factor)) { 
+      feature <- features[factor == j, i]
+      if(length(feature) > 0) {
+        print(paste(feature.name, j))
+        print(shapiro.test(feature))
+        
+        if(plot) {
+          par(mfrow = c(2, 1), xaxs="r", yaxs="r")
+          qqnorm(feature, ylab = paste(feature.name, j))
+          qqline(feature)
+          plot(feature, ylab = paste(feature.name, j))
+        }
+      }
+    }
+  }
+}
+
+calculateRepeatedAnova <- function(subject, treatment, feature) {
+  options(contrasts = c("contr.sum", "contr.poly"))
+  
+  #     subject   <- subject[complete.cases(feature)]
+  #     treatment <- treatment[complete.cases(feature)]
+  #     feature   <- feature[complete.cases(feature)]
+  
+  df        <- data.frame(subject, treatment, feature)
+  
+  #     print(with(df, tapply(feature, treatment, mean)))
+  #     
+  #     aov.out       <- aov(feature ~ treatment + Error(subject/treatment), data = df)
+  #     print(summary(aov.out))
+  
+  library(car)
+  matrix        <- c()
+  treatments    <- levels(df$treatment)
+  for(i in 1:length(treatments)) {
+    matrix <- cbind(matrix, feature[treatment==treatments[i]])
+  }
+  model         <- lm(matrix ~ 1)
+  design        <- factor(treatments)
+  
+  aov.out.3     <- Anova(model, idata = data.frame(design), idesign = ~design, type = "III")
+  print(summary(aov.out.3, multivariate = F))
+  
+  print(with(df, pairwise.t.test(feature, treatment, p.adjust.method = "none", paired = T)))
+}
+
+calculateFeaturesRepeatedAnova <- function(features, treatment, subject) {
+  for(i in 1:length(features)) {
+    feature      <- features[, i]
+    feature.name <- names(features)[i]
+    print(feature.name)
+    calculateRepeatedAnova(subject, treatment, feature) 
+  }
+}
+
+# Teste auf Zeitpunkteffekt 
+
+# Examine features (visual)
+plotFeaturesInGroups(data.1[, 1:7], data.1[, 10])
+
+data.2 <- data.1
+data.2$coh[c(4,8)] <- NA
+data.2$mean.hr[2] <- NA
+
+# Check group normality of features
+checkFeaturesNormalityInGroups(data.2[, 1:7], data.2[, 10], T)
+
+# Calculate repeated anova of features 
+calculateFeaturesRepeatedAnova(data.2[, c(1, 3:7)], data.2[, 10], data.2[, 9])
+
+data.3 <- data.2[as.numeric(data.2$minute) != 1, ]
+
+# Test auf AFP (daf)
+daf <- data.2[data.2$daf >= 4, ]
+no.daf <- data.2[data.2$daf < 4, ]
+shapiro.test(no.daf$flow)
+shapiro.test(daf$flow)
+t.test(no.daf$flow, daf$flow, "less")
+
+# Flow als Kreterium
+no.flow <- data.3[data.3$flow < 4.8, ]
+flw <- data.3[data.3$flow >= 4.8, ]
+
+shapiro.test(no.flow$rmssd)
+shapiro.test(flw$rmssd)
+t.test(no.flow$rmssd, flw$rmssd)
+
+shapiro.test(no.flow$mean.jerk.cost)
+shapiro.test(flw$mean.jerk.cost)
+t.test(no.flow$mean.jerk.cost, flw$mean.jerk.cost)
+
+shapiro.test(no.flow$coh)
+shapiro.test(flw$coh)
+t.test(no.flow$coh, flw$coh)
+
+plot(data.3$flow, data.3$rmssd)
+summary(lm(data.3$rmssd ~ data.3$flow))
+abline(lm(data.3$rmssd ~ data.3$flow))
+
+plot(data.3$flow, data.3$mean.jerk.cost)
+summary(lm(data.3$mean.jerk.cost ~ data.3$flow))
+abline(lm(data.3$mean.jerk.cost ~ data.3$flow))
+
+plot(data.3$flow, data.3$coh)
+summary(lm(data.3$coh ~ data.3$flow))
+abline(lm(data.3$coh ~ data.3$flow))
+
+```
+
+
+
