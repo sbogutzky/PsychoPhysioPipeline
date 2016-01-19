@@ -4,8 +4,6 @@
 rm(list = ls(all = T))  
 
 # Load libraries
-library(flow)
-library(multilevel)
 library(zoom)
 
 source("./code-snippets/read-set-load.R")
