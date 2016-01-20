@@ -9,6 +9,8 @@
 
 CalculateFlowShortScaleFactors <- function(items) {
   
+  daf = 0
+  
   if(items[16] == 1 | items[16] == 9)
     daf = 1
   
