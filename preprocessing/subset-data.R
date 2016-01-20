@@ -43,7 +43,7 @@ for (self.report.file.name in self.report.file.names) {
       fs <- nrow(data.subset) / duration.s
       print(paste("Sampling rate:", round(fs, 2), "Hz"))
       print(paste("Duration:", round(duration.s, 2), "s"))
-      plot(data.subset$timestamp.ms[-1] / 1000, diff(data.subset$timestamp.ms / 1000), xlab = "Timestamp (s)", ylab = "Interval (s)")
+      plot(diff(data.subset$timestamp.ms / 1000), xlab = "#", ylab = "Interval (s)") # data.subset$timestamp.ms[-1] / 1000, -- Timestamp (s)
       title(paste(strftime(session.start, format="%Y/%m/%d %H:%M"), " #", i, sep = ""))
       session.zoom()
   
