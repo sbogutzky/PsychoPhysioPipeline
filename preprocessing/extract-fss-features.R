@@ -42,7 +42,7 @@ print(paste("Cronbach's Alpha Fluency: ", round(multilevel::cronbach(fss.measure
 print(paste("Cronbach's Alpha Absorption: ", round(multilevel::cronbach(fss.measurements[, c(6,1,10,3)])$Alpha, 2)))
 
 # Write to csv file
-output.directory <- paste(feature.directory, activity.directory, user.directory, date.directory, sep = "")
+output.directory <- paste(feature.directory, activity.directory, user.directory, sep = "")
 if(!file.exists(substr(output.directory, 1, nchar(output.directory) - 1))) {
   dir.create(output.directory, recursive = T)
 }
