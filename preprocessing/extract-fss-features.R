@@ -28,7 +28,7 @@ for (self.report.file.name in self.report.file.names) {
     source("./code-snippets/extract-self-report-times.R")
     
     # Calculate fss factors
-    fss.measurement <- c(as.numeric(self.report.data[i, 7:15]), 0, 0, 0, as.numeric(self.report.data[i, 16:18]))
+    fss.measurement <- c(as.numeric(self.report.data[i, 7:16]), 0, 0, 0, as.numeric(self.report.data[i, 17:19]))
     fss.factors <- CalculateFlowShortScaleFactors(fss.measurement)
     
     # Add fss features
