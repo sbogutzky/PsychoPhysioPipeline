@@ -18,7 +18,7 @@ for (self.report.file.name in self.report.file.names) {
   self.report.data <- read.csv(paste(input.data.directory, self.report.file.name, sep = ""), comment.char = "#")
   
   # Load data
-  data <- read.csv(paste(input.data.directory, date.directory, data.file.name, sep = ""), comment.char = "#")
+  data <- read.csv(paste(input.data.directory, date.directory, data.file.name, ".csv", sep = ""), comment.char = "#")
   
   # Loop measurements
   for(i in 1:nrow(self.report.data)) {
@@ -32,11 +32,11 @@ for (self.report.file.name in self.report.file.names) {
     duplicates <- which(duplicated(data.subset))
     if(length(duplicates) > 0) {
       data.subset <- data.subset[-duplicates, ]
-      print(paste(length(duplicates), "removed duplicates in ", paste(input.data.directory, date.directory, data.file.name, sep = ""), i))
+      print(paste(length(duplicates), "removed duplicates in ", paste(input.data.directory, date.directory, data.file.name, ".csv", sep = ""), i))
       readline("Press return to continue > ")
     }
     
-    if(data.file.name != "gps-position.csv") {
+    if(data.file.name != "gps-position") {
     
       # Check sampling rate
       duration.s <- ((data.subset$timestamp.ms[nrow(data.subset)] - data.subset$timestamp.ms[1]) / 1000)
@@ -49,6 +49,7 @@ for (self.report.file.name in self.report.file.names) {
   
       # Check data
       for(j in 2:ncol(data.subset)) {
+        par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
         plot(data.subset$timestamp.ms / 1000, data.subset[, j], type = "l", xlab = "Timestamp (s)", ylab = GetDataLabel(colnames(data.subset)[j]))
         title(paste(strftime(session.start, format="%Y/%m/%d %H:%M"), " #", i, sep = ""))
         session.zoom()
@@ -59,7 +60,7 @@ for (self.report.file.name in self.report.file.names) {
       if(!file.exists(substr(output.directory, 1, nchar(output.directory) - 1))) {
         dir.create(output.directory, recursive = T)
       }
-      output.file.name <- gsub(pattern = ".csv", replacement = paste("-", i, ".csv", sep = ""), x = data.file.name, ignore.case = T)
+      output.file.name <- paste(data.file.name, "-", i, ".csv", sep = "")
       output.directory <- paste(output.directory, output.file.name, sep = "")
       write.csv(data.subset, output.directory, row.names = F)
       print(paste("Worte:", output.directory))
