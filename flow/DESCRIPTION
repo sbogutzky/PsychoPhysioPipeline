@@ -5,6 +5,9 @@ Date: 2013-04-02
 Author: Simon Bogutzky
 Maintainer: Simon Bogutzky <simon.bogutzky@hs-bremen.de>
 Description: A package for non disruptive flow measures.
-Suggests: MASS
+Suggests:
+    MASS
 License: GPL-2
-Imports: pracma
+Imports:
+    pracma
+RoxygenNote: 5.0.1

@@ -4,3 +4,4 @@
 data/cleaned-data
 data/preprocessed-data
 .DS_Store
+flow.Rcheck

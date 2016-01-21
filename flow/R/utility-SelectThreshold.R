@@ -1,7 +1,9 @@
-SelectThreshold <- function(yval, pval) {
-  #' \code{MultivariateGaussian} finds the best threshold (epsilon) to use for selecting outliers
-  #' Finds the best threshold to use for selecting outliers based on the results from a validation set (pval) and the ground truth (yval).
+#' SelectTreshold
+#' 
+#' \code{SelectTreshold} is ...
 
+SelectThreshold <- function(yval, pval) {
+  
   bestEpsilon = 0
   bestF1 = 0
   F1 = 0

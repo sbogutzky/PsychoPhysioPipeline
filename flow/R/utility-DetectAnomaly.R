@@ -1,3 +1,7 @@
+#' DetectAnomaly 
+#' 
+#' \code{DetectAnomaly} is ...
+
 DetectAnomaly <- function(x, y, x.lab, y.lab, x.lim, y.lim, epsilon = 0) {
   X <- matrix(data = c(x, y), nrow = length(y), ncol = 2)
   par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
