@@ -1,6 +1,6 @@
 Package: flow
 Title: flow
-Version: 1.0
+Version: 2.0
 Date: 2013-04-02
 Author: Simon Bogutzky
 Maintainer: Simon Bogutzky <simon.bogutzky@hs-bremen.de>
@@ -9,5 +9,5 @@ Suggests:
     MASS
 License: GPL-2
 Imports:
-    pracma
+    pracma, signal
 RoxygenNote: 5.0.1
