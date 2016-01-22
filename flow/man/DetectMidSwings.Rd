@@ -2,11 +2,26 @@
 % Please edit documentation in R/biomechanics-DetectMidSwings.R
 \name{DetectMidSwings}
 \alias{DetectMidSwings}
-\title{DetectMidSwings}
+\title{Detects mid swings form angular velocity.}
 \usage{
-DetectMidSwings(t.s, angular.velocity, fs = 102.4, ff.1 = 4, ff.2 = 0.5)
+DetectMidSwings(t.s, angular.velocity.deg.s, fs = 102.4, ff.1 = 4,
+  ff.2 = 0.5)
+}
+\arguments{
+\item{t.s.}{A numerical vector of seconds}
+
+\item{angular.velocity.deg.s.}{A numerical vector of angular velocity in deg/s}
+
+\item{fs.}{A numerical that specifies the sampling rate}
+
+\item{ff.1.}{A numerical that specifies the first filter factor to compute the cut off frequency}
+
+\item{ff.2.}{A numerical that specifies the second filter factor to compute the cut off frequency}
+}
+\value{
+A numerical vector of mid swing indexes
 }
 \description{
-\code{DetectMidSwings} is ...
+\code{DetectMidSwings} returns mid swings. Uses the angular velocity and filtering like in "Quasi real-time gait event detection using shank-attached gyroscopes" of Lee & Park (2011).
 }
 

@@ -2,11 +2,23 @@
 % Please edit documentation in R/biomechanics-CheckMidSwings.R
 \name{CheckMidSwings}
 \alias{CheckMidSwings}
-\title{CheckMidSwings}
+\title{Checks mid swing visually.}
 \usage{
 CheckMidSwings(t.ms, angular.velocity.deg.s, length.s, mid.swing.indexes)
 }
+\arguments{
+\item{t.ms.}{t.s. A numerical vector of seconds}
+
+\item{angular.velocity.deg.s.}{A numerical vector of angular velocity in deg/s}
+
+\item{length.s.}{A numerical that specifies the length in seconds for the visual control}
+
+\item{mid.swing.indexes.}{A numerical vector of mid swing indexes}
+}
+\value{
+A numerical vector of checked mid swing indexes
+}
 \description{
-\code{CheckMidSwings} is ...
+\code{CheckMidSwings} return checked mid swing indexes.
 }
 

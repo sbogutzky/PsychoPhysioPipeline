@@ -2,11 +2,17 @@
 % Please edit documentation in R/utility-ComputeSamplingRate.R
 \name{ComputeSamplingRate}
 \alias{ComputeSamplingRate}
-\title{ComputeSamplingRate}
+\title{Computes the sampling rate of a time series in milliseconds.}
 \usage{
 ComputeSamplingRate(t.ms)
 }
+\arguments{
+\item{t.ms.}{A numerical vector of milliseconds}
+}
+\value{
+A numerical with the sampling rate in Hz
+}
 \description{
-\code{ComputeSamplingRate} is ...
+\code{ComputeSamplingRate} returns the sampling in Hz.
 }
 

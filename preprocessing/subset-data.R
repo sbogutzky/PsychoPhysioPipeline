@@ -4,6 +4,7 @@
 rm(list = ls(all = T))  
 
 # Load libraries
+library(flow)
 library(zoom)
 
 source("./code-snippets/read-set-load.R")
@@ -40,7 +41,7 @@ for (self.report.file.name in self.report.file.names) {
     
       # Check sampling rate
       duration.s <- ((data.subset$timestamp.ms[nrow(data.subset)] - data.subset$timestamp.ms[1]) / 1000)
-      fs <- nrow(data.subset) / duration.s
+      fs <- ComputeSamplingRate(data.subset$timestamp.ms)
       print(paste("Sampling rate:", round(fs, 2), "Hz"))
       print(paste("Duration:", round(duration.s, 2), "s"))
       plot(diff(data.subset$timestamp.ms / 1000), xlab = "#", ylab = "Interval (s)") # data.subset$timestamp.ms[-1] / 1000, -- Timestamp (s)
@@ -50,7 +51,7 @@ for (self.report.file.name in self.report.file.names) {
       # Check data
       for(j in 2:ncol(data.subset)) {
         par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
-        plot(data.subset$timestamp.ms / 1000, data.subset[, j], type = "l", xlab = "Timestamp (s)", ylab = GetDataLabel(colnames(data.subset)[j]))
+        plot(data.subset$timestamp.ms / 1000, data.subset[, j], type = "l", xlab = "Timestamp (s)", ylab = ReturnFieldLabels(colnames(data.subset)[j]))
         title(paste(strftime(session.start, format="%Y/%m/%d %H:%M"), " #", i, sep = ""))
         session.zoom()
       }

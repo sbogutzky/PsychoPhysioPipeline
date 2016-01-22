@@ -1,8 +1,16 @@
-#' DetectMidSwings
+#' Detects mid swings form angular velocity.
 #' 
-#' \code{DetectMidSwings} is ...
+#' \code{DetectMidSwings} returns mid swings. Uses the angular velocity and filtering like in "Quasi real-time gait event detection using shank-attached gyroscopes" of Lee & Park (2011).
+#' @param t.s. A numerical vector of seconds
+#' @param angular.velocity.deg.s. A numerical vector of angular velocity in deg/s
+#' @param fs. A numerical that specifies the sampling rate
+#' @param ff.1. A numerical that specifies the first filter factor to compute the cut off frequency
+#' @param ff.2. A numerical that specifies the second filter factor to compute the cut off frequency
+#' @return A numerical vector of mid swing indexes
 
-DetectMidSwings <- function(t.s, angular.velocity, fs = 102.4, ff.1 = 4, ff.2 = .5) {
+DetectMidSwings <- function(t.s, angular.velocity.deg.s, fs = 102.4, ff.1 = 4, ff.2 = .5) {
+  
+  require(signal)
   
   fn <- fs/2
   
@@ -11,18 +19,19 @@ DetectMidSwings <- function(t.s, angular.velocity, fs = 102.4, ff.1 = 4, ff.2 = 
   canPlot = !is.na(t.s[range[1]])
   if(canPlot) {
     par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
-    plot(t.s[range], angular.velocity[range], type = "l", xlab = "Timestamp (s)", ylab = expression("Angular Velocity (" ~ deg/s ~ ")"))
+    plot(t.s[range], angular.velocity.deg.s[range], type = "l", xlab = "Timestamp (s)", ylab = expression("Angular Velocity (" ~ deg/s ~ ")"))
   }
   
   # Compute main frequncy
-  main.freq <- ComputeMainFrequency(angular.velocity, fs)
+  main.freq <- ComputeMainFrequency(angular.velocity.deg.s, fs)
+  main.freq <- ceiling(main.freq)
   
   # Filter (1nd level)
   fc <- main.freq * ff.1
   W <- fc/fn
   n <- 2
   lp.1 <- butter(n, W)
-  f.1 <- filter(lp.1, angular.velocity)
+  f.1 <- filter(lp.1, angular.velocity.deg.s)
   if(canPlot) {
     lines(t.s[range], f.1[range], col = 2)
   }
@@ -31,14 +40,14 @@ DetectMidSwings <- function(t.s, angular.velocity, fs = 102.4, ff.1 = 4, ff.2 = 
   fc <- main.freq * ff.2
   W <- fc/fn
   lp.2 <- butter(n, W)
-  f.2 <- filter(lp.2, angular.velocity)
+  f.2 <- filter(lp.2, angular.velocity.deg.s)
   if(canPlot) {
     lines(t.s[range], f.2[range], col = 3)
   }
   
   readline("Press return to continue > ")
   
-  y <- angular.velocity
+  y <- angular.velocity.deg.s
   y.1 <- f.1
   y.2 <- f.2
   

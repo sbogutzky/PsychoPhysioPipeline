@@ -27,12 +27,12 @@ for (self.report.file.name in self.report.file.names) {
     
     source("./code-snippets/extract-self-report-times.R")
     
-    # Calculate fss factors
+    # Calculate fss dimensions
     fss.measurement <- c(as.numeric(self.report.data[i, 7:16]), 0, 0, 0, as.numeric(self.report.data[i, 17:19]))
-    fss.factors <- CalculateFlowShortScaleFactors(fss.measurement)
+    fss.dimensions <- ComputeFlowShortScaleDimensions(fss.measurement)
     
     # Add fss features
-    fss.features <- rbind(fss.features, data.frame(round(fss.factors[c(1, 3, 5, 7, 9, 11)], 2), session.start, activity, activity.start.ms, activity.end.ms, self.report.end.ms, measurement = i, last.name, first.name, date.of.birth))
+    fss.features <- rbind(fss.features, data.frame(round(fss.dimensions[c(1, 3, 5, 7, 9, 11)], 2), session.start, activity, activity.start.ms, activity.end.ms, self.report.end.ms, measurement = i, last.name, first.name, date.of.birth))
     fss.measurements <- rbind(fss.measurements, fss.measurement)
   }
 }

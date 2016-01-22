@@ -2,17 +2,17 @@
 % Please edit documentation in R/utility-EstimateGaussian.R
 \name{EstimateGaussian}
 \alias{EstimateGaussian}
-\title{EstimateGaussian estimates the parameters of a Gaussian distribution using the data in X}
+\title{Estimates the parameters of a Gaussian distribution using the data in X.}
 \usage{
 EstimateGaussian(X)
 }
 \arguments{
-\item{The}{input X is the dataset with each n-dimensional data point in one row}
+\item{X.}{A dataset with each n-dimensional data point in one row}
 }
 \value{
-The output is an n-dimensional vector mu, the mean of the data set and the variances sigma^2, an n x 1 vector
+The mean "mu" of the data set and the variances "sigma2", an n x 1 vector
 }
 \description{
-\code{EstimateGaussian} estimates the parameters of a Gaussian distribution using the data in X
+\code{EstimateGaussian} estimates the parameters of a Gaussian distribution using the data in X.
 }
 

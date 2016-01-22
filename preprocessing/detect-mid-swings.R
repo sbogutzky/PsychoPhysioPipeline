@@ -20,9 +20,6 @@ for (self.report.file.name in self.report.file.names) {
   # Load self report data
   self.report.data <- read.csv(paste(input.data.directory, self.report.file.name, sep = ""), comment.char = "#")
   
-  # Load data
-  data <- read.csv(paste(input.data.directory, date.directory, data.file.name, ".csv", sep = ""), comment.char = "#")
-  
   # Loop measurements
   for(i in 1:nrow(self.report.data)) {
     
@@ -44,7 +41,7 @@ for (self.report.file.name in self.report.file.names) {
 #       data <- data.1
       
       # Detect Midswings
-      mid.swing.indexes <- DetectMidSwings(data$timestamp.ms/1000, data$angular.velocity.x.deg.s, fs)
+      mid.swing.indexes <- DetectMidSwings(data$timestamp.ms/1000, data$angular.velocity.x.deg.s)
       
       # Remove changes below 50 deg per second
       mid.swing.indexes <- mid.swing.indexes[data$angular.velocity.x.deg.s[mid.swing.indexes] > 50 | data$angular.velocity.x.deg.s[mid.swing.indexes] < -50]
@@ -54,9 +51,9 @@ for (self.report.file.name in self.report.file.names) {
         # Detect outliers
         interval.t.s <- diff(data$timestamp.ms[mid.swing.indexes] / 1000)
         interval.t.s <- c(mean(interval.t.s), interval.t.s)
-        annomaly <- DetectAnomaly(interval.t.s, data$angular.velocity.x.deg.s[mid.swing.indexes] / 100 , "Cycle Interval (s)", expression("Angular Velocity (x"~10^2~deg/s~")"), c(min(interval.t.s), max(interval.t.s)), c(min(data$angular.velocity.x.deg.s[mid.swing.indexes] / 100), max(data$angular.velocity.x.deg.s[mid.swing.indexes] / 100)), epsilon = 0)
-        if(length(annomaly$outliers) > 0) {
-          mid.swing.indexes <- mid.swing.indexes[-annomaly$outliers]
+        anomaly <- DetectAnomaly(interval.t.s, data$angular.velocity.x.deg.s[mid.swing.indexes] / 100 , "Cycle Interval (s)", expression("Angular Velocity (x"~10^2~deg/s~")"), c(min(interval.t.s), max(interval.t.s)), c(min(data$angular.velocity.x.deg.s[mid.swing.indexes] / 100), max(data$angular.velocity.x.deg.s[mid.swing.indexes] / 100)), epsilon = 0)
+        if(length(anomaly$outliers) > 0) {
+          mid.swing.indexes <- mid.swing.indexes[-anomaly$outliers]
         }
       
         # Visual check
@@ -67,7 +64,7 @@ for (self.report.file.name in self.report.file.names) {
         if(!file.exists(substr(output.directory, 1, nchar(output.directory) - 1))) {
           dir.create(output.directory, recursive = T)
         }
-        output.file.name <- paste("mid-swing-indexes-", i, ".csv", sep = "")
+        output.file.name <- paste(data.file.name, "-mid-swing-indexes-", i, ".csv", sep = "")
         output.directory <- paste(output.directory, output.file.name, sep = "")
         write.csv(mid.swing.indexes, output.directory, row.names = F)
         print(paste("Worte:", output.directory))

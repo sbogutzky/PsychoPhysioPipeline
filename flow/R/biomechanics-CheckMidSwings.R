@@ -1,6 +1,12 @@
-#' CheckMidSwings
+#' Checks mid swing visually.
 #' 
-#' \code{CheckMidSwings} is ...
+#' \code{CheckMidSwings} return checked mid swing indexes.
+#' 
+#' @param t.ms. t.s. A numerical vector of seconds
+#' @param angular.velocity.deg.s. A numerical vector of angular velocity in deg/s
+#' @param length.s. A numerical that specifies the length in seconds for the visual control
+#' @param mid.swing.indexes. A numerical vector of mid swing indexes
+#' @return A numerical vector of checked mid swing indexes
 
 CheckMidSwings <- function(t.ms, angular.velocity.deg.s, length.s, mid.swing.indexes) {
   
@@ -68,7 +74,7 @@ CheckMidSwings <- function(t.ms, angular.velocity.deg.s, length.s, mid.swing.ind
     answer <- readline("Are you finish? Type Y and press return > ")
     if(answer != "Y") {
       answer <- "N"
-      current.t.ms <- 0
+      current.t.ms <- t.ms[1]
     }
   }
   

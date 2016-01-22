@@ -1,6 +1,11 @@
-#' ResampleData
+#' Resamples time-domain data by spline interpolation.
 #' 
-#' \code{ResampleData} is ...
+#' \code{ResampleData} resamples time-domain data by spline interpolation.
+#'
+#' @param data. A data frame with time domain data
+#' @param fs. A numeric that specify the the new sampling rate
+#' @param tm.s. A numerical vector of milliseconds with the same row size of data
+#' @return A matrix with the time-domain data
 
 ResampleData <- function(data, fs, t.ms) {
   

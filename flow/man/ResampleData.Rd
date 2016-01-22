@@ -2,11 +2,21 @@
 % Please edit documentation in R/utility-ResampleData.R
 \name{ResampleData}
 \alias{ResampleData}
-\title{ResampleData}
+\title{Resamples time-domain data by spline interpolation.}
 \usage{
 ResampleData(data, fs, t.ms)
 }
+\arguments{
+\item{data.}{A data frame with time domain data}
+
+\item{fs.}{A numeric that specify the the new sampling rate}
+
+\item{tm.s.}{A numerical vector of milliseconds with the same row size of data}
+}
+\value{
+A matrix with the time-domain data
+}
 \description{
-\code{ResampleData} is ...
+\code{ResampleData} resamples time-domain data by spline interpolation.
 }
 

@@ -1,13 +1,13 @@
-#' Calculate the flow short scale factors.
+#'Computes the flow short scale dimensions.
 #'
-#' \code{CalculateFlowShortScaleFactors} returns a data frame with flow factors and standard deviation.
+#' \code{ComputeFlowShortScaleDimensions} returns a data frame with flow dimensions and standard deviations.
 #'
-#' @param items Questionaire items. A numerical vector of the length 16 of items
-#' @return Data frame with flow-factor and sd.
+#' @param items. A numerical vector of the length 16 of questionaire items
+#' @return A data frame with flow dimensions and their standard deviations
 #' @examples
-#' CalculateFlowShortScaleFactors(c(3,4,3,4,2,3,5,6,4,5,6,4,8,9,1,3))
+#' ComputeFlowShortScaleDimensions(c(3,4,3,4,2,3,5,6,4,5,6,4,8,9,1,3))
 
-CalculateFlowShortScaleFactors <- function(items) {
+ComputeFlowShortScaleDimensions <- function(items) {
   
   daf = 0
   
