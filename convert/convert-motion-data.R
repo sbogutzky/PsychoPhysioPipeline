@@ -5,7 +5,7 @@ rm(list = ls(all = T))
 
 source("./code-snippets/read-and-set.R")
 
-file.names <- list.files(path = input.data.directory, pattern = "[0-9]{4}-[0-9]{2}-[0-9]{2}--[0-9]{2}-[0-9]{2}-[0-9]{2}-motion.csv", recursive = T)
+file.names <- list.files(path = input.data.directory, pattern = "([0-9]{4}-[0-9]{2}-[0-9]{2}--[0-9]{2}-[0-9]{2}-[0-9]{2}-)?motion.csv", recursive = T)
 
 for (file.name in file.names) {
   
@@ -25,6 +25,9 @@ for (file.name in file.names) {
     dir.create(output.directory, recursive = T)
   }
   
+  # Delete file
+  file.remove(paste(input.data.directory, file.name, sep = ""))
+  
   output.directory <- paste(output.directory, "motion.csv", sep = "")
   con <- file(output.directory, 'w') 
   writeLines(paste("# StartTime:", strftime(session.start, format="%Y/%m/%d %H:%M:%S")), con = con)
@@ -33,6 +36,4 @@ for (file.name in file.names) {
   close(con)
   print(paste("Worte:", output.directory))
   
-  # Delete file
-  file.remove(paste(input.data.directory, file.name, sep = ""))
 }

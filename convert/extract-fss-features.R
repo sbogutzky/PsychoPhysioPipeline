@@ -5,7 +5,7 @@ rm(list = ls(all = T))
 
 source("./code-snippets/read-and-set.R")
 
-file.names <- list.files(path = input.data.directory, pattern = "[0-9]{4}-[0-9]{2}-[0-9]{2}--[0-9]{2}-[0-9]{2}-[0-9]{2}-questionaire.csv", recursive = T)
+file.names <- list.files(path = input.data.directory, pattern = "([0-9]{4}-[0-9]{2}-[0-9]{2}--[0-9]{2}-[0-9]{2}-[0-9]{2}-)?questionaire.csv", recursive = T)
 
 # Create fss feature and measurement data frame
 fss.features <- data.frame()
