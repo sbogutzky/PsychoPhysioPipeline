@@ -1,0 +1,182 @@
+---
+title: "Flow beim Laufen (intraindividell)"
+author: "Simon Bogutzky"
+date: "12. Dezember 2015"
+output: html_document
+---
+
+```{r set-directories, echo = FALSE}
+
+# Remove all variables
+rm(list = ls(all = T)) 
+
+# Set root data directory path
+if(file.exists("/Volumes/OSX/flow/data"))
+  root.data.directory.path        <- "/Volumes/OSX/flow/data/"
+
+# Set activity directory
+activity.directory        <- "walking/" 
+
+# Set user directory
+user.directory            <- "grueter-barbara/"
+
+source("code-snippets/functions.R")
+```
+
+```{r load-data, echo=FALSE}
+
+# Load FSS features
+fss.features <- read.csv(paste(root.data.directory.path, "features/", activity.directory, user.directory, "fss-features.csv", sep = ""))
+
+# Load HRV features
+source("code-snippets/load-hrv-features.R")
+
+# Load JC features
+source("code-snippets/load-jc-features.R")
+
+# Load CLS features
+source("code-snippets/load-cls-features.R") 
+
+n.row <- nrow(fss.features)
+e.seq <- seq(3, n.row, 3)
+
+data.1 <- data.frame(flow = fss.features$flow, absorption = fss.features$absorption, mean.hr = hrv.features$meanhr[e.seq], rmssd = hrv.features$rmssd[e.seq], mean.cycle.interval = jc.features$mean.cycle.interval[e.seq], mean.jerk.cost = jc.features$mean.jerk.cost[e.seq], coh = cls.features$mean.nsei[e.seq])
+data.1$day <- factor(sort(rep(1:6, 4)))
+data.1$minute <-factor(fss.features$measurement, levels = c(1, 2, 3, 4), labels = c("15'", "30'", "45'", "60'"))
+
+```
+
+```{r}
+plotFeaturesInGroups <- function(features, factor) {
+  for(i in 1:length(features)) {
+    feature       <- features[, i]
+    feature.name  <- names(features)[i]
+    
+    par(mfrow = c(3, 1), xaxs = "r", yaxs = "r")
+    plot(feature, pch = as.numeric(factor), main = feature.name, ylab = feature.name)
+    
+    factor        <- factor[complete.cases(feature)]
+    feature       <- feature[complete.cases(feature)]
+    
+    boxplot(feature ~ factor, data = features, ylab = feature.name)
+    
+    hist(feature, xlab = feature.name, breaks = 10)
+    lines(density(feature))
+    rug(jitter(feature))
+  } 
+}
+
+checkFeaturesNormalityInGroups <- function(features, factor, plot = F) {
+  for(i in 1:length(features)) {
+    feature.name <- names(features)[i]
+    for(j in levels(factor)) { 
+      feature <- features[factor == j, i]
+      if(length(feature) > 0) {
+        print(paste(feature.name, j))
+        print(shapiro.test(feature))
+        
+        if(plot) {
+          par(mfrow = c(2, 1), xaxs="r", yaxs="r")
+          qqnorm(feature, ylab = paste(feature.name, j))
+          qqline(feature)
+          plot(feature, ylab = paste(feature.name, j))
+        }
+      }
+    }
+  }
+}
+
+calculateRepeatedAnova <- function(subject, treatment, feature) {
+  options(contrasts = c("contr.sum", "contr.poly"))
+  
+  #     subject   <- subject[complete.cases(feature)]
+  #     treatment <- treatment[complete.cases(feature)]
+  #     feature   <- feature[complete.cases(feature)]
+  
+  df        <- data.frame(subject, treatment, feature)
+  
+  #     print(with(df, tapply(feature, treatment, mean)))
+  #     
+  #     aov.out       <- aov(feature ~ treatment + Error(subject/treatment), data = df)
+  #     print(summary(aov.out))
+  
+  library(car)
+  matrix        <- c()
+  treatments    <- levels(df$treatment)
+  for(i in 1:length(treatments)) {
+    matrix <- cbind(matrix, feature[treatment==treatments[i]])
+  }
+  model         <- lm(matrix ~ 1)
+  design        <- factor(treatments)
+  
+  aov.out.3     <- Anova(model, idata = data.frame(design), idesign = ~design, type = "III")
+  print(summary(aov.out.3, multivariate = F))
+  
+  print(with(df, pairwise.t.test(feature, treatment, p.adjust.method = "none", paired = T)))
+}
+
+calculateFeaturesRepeatedAnova <- function(features, treatment, subject) {
+  for(i in 1:length(features)) {
+    feature      <- features[, i]
+    feature.name <- names(features)[i]
+    print(feature.name)
+    calculateRepeatedAnova(subject, treatment, feature) 
+  }
+}
+
+# Teste auf Zeitpunkteffekt 
+
+# Examine features (visual)
+plotFeaturesInGroups(data.1[, 1:7], data.1[, 10])
+
+data.2 <- data.1
+data.2$coh[c(4,8)] <- NA
+data.2$mean.hr[2] <- NA
+
+# Check group normality of features
+checkFeaturesNormalityInGroups(data.2[, 1:7], data.2[, 10], T)
+
+# Calculate repeated anova of features 
+calculateFeaturesRepeatedAnova(data.2[, c(1, 3:7)], data.2[, 10], data.2[, 9])
+
+data.3 <- data.2[as.numeric(data.2$minute) != 1, ]
+
+# Test auf AFP (daf)
+daf <- data.2[data.2$daf >= 4, ]
+no.daf <- data.2[data.2$daf < 4, ]
+shapiro.test(no.daf$flow)
+shapiro.test(daf$flow)
+t.test(no.daf$flow, daf$flow, "less")
+
+# Flow als Kreterium
+no.flow <- data.3[data.3$flow < 4.8, ]
+flw <- data.3[data.3$flow >= 4.8, ]
+
+shapiro.test(no.flow$rmssd)
+shapiro.test(flw$rmssd)
+t.test(no.flow$rmssd, flw$rmssd)
+
+shapiro.test(no.flow$mean.jerk.cost)
+shapiro.test(flw$mean.jerk.cost)
+t.test(no.flow$mean.jerk.cost, flw$mean.jerk.cost)
+
+shapiro.test(no.flow$coh)
+shapiro.test(flw$coh)
+t.test(no.flow$coh, flw$coh)
+
+plot(data.3$flow, data.3$rmssd)
+summary(lm(data.3$rmssd ~ data.3$flow))
+abline(lm(data.3$rmssd ~ data.3$flow))
+
+plot(data.3$flow, data.3$mean.jerk.cost)
+summary(lm(data.3$mean.jerk.cost ~ data.3$flow))
+abline(lm(data.3$mean.jerk.cost ~ data.3$flow))
+
+plot(data.3$flow, data.3$coh)
+summary(lm(data.3$coh ~ data.3$flow))
+abline(lm(data.3$coh ~ data.3$flow))
+
+```
+
+
+
