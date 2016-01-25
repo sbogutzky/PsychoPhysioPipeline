@@ -1,5 +1,7 @@
 # Version 2.0
 
+# TODO: Mehrere FKS müssen unterstützt werden
+
 # Remove all variables
 rm(list = ls(all = T))
 
