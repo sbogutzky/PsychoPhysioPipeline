@@ -9,7 +9,7 @@
 ComputeMostCommonCycleMatrix <- function(y, separator.indexes) {
   require(pracma)
   
-  center <- Mode(diff(separator.indexes))
+  center <- Mode(diff(separator.indexes)) + 1
   cycles <- c()
   j = 0
   for(i in 1:(length(separator.indexes) - 1)) {
