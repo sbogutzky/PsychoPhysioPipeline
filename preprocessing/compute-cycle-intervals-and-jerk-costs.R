@@ -83,7 +83,7 @@ for (self.report.file.name in self.report.file.names) {
       }
       
       output.data <- data.frame(t.s, cycle.interval.s, jerk.cost.m2s5)
-      output.data <- data.frame(t.s, cycle.interval.s, jerk.cost.m2s5)
+      output.data <- output.data[cycle.interval.s < 1.25,]
       
       # Detect outliers
       anomaly <- DetectAnomaly(cycle.interval.s, jerk.cost.m2s5 / 10^4, "Cycle Interval (s)", expression("JC (x"~10^4~m^2*s^{-5}~")"), c(min(cycle.interval.s), max(cycle.interval.s)), c(min(jerk.cost.m2s5 / 10^4), max(jerk.cost.m2s5 / 10^4)))
