@@ -35,4 +35,4 @@ for (i in 1:nrow(fss.features)) {
   jc.features        <- rbind(jc.features, feature.data.frame)
 }
 
-rm(additional.features, data.1, data.subset, feature.data.frame, activity.start, col.names, date.directory, estimated.features, feature.vector, file.name, i, j, jerk.cost.feature.names, measurement, n, range.intervals)
+rm(additional.features, data.1, data.subset, feature.data.frame, activity.start, col.names, date.directory, estimated.features, feature.vector, file.name, i, j, jerk.cost.feature.names, measurement, range.intervals)

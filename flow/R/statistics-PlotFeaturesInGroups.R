@@ -13,10 +13,10 @@ PlotFeaturesInGroups <- function(features, factor) {
     par(mfrow = c(3, 1), xaxs = "r", yaxs = "r")
     plot(feature, pch = as.numeric(factor), main = feature.name, ylab = feature.name)
     
-    factor        <- factor[complete.cases(feature)]
-    feature       <- feature[complete.cases(feature)]
+    f        <- factor[complete.cases(feature)]
+    feature  <- feature[complete.cases(feature)]
     
-    boxplot(feature ~ factor, data = features, ylab = feature.name)
+    boxplot(feature ~ f, ylab = feature.name)
     
     hist(feature, xlab = feature.name, breaks = 10)
     lines(density(feature))
