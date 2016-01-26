@@ -16,9 +16,9 @@ for (i in 1:nrow(fss.features)) {
     for (j in 1:(length(range.intervals) - 1)) {
       
       data.subset <- data.1[data.1[, 1] >= range.intervals[j] & data.1[, 1] < range.intervals[j + 1], ]
-      n <- nrow(data.subset)
+      # n <- nrow(data.subset)
       data.subset <- data.subset[data.subset[, 2] < 1.25, ]
-      print(n - nrow(data.subset))
+      # print(n - nrow(data.subset))
       
       estimated.features <- colMeans(data.subset[, 2:3], na.rm = T)
       feature.vector <- c(estimated.features, additional.features)
