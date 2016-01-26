@@ -9,5 +9,5 @@ Suggests:
     MASS
 License: GPL-2
 Imports:
-    pracma, signal
+    pracma, signal, car
 RoxygenNote: 5.0.1
