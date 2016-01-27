@@ -13,6 +13,9 @@ CheckFeaturesNormalityInGroups(features, factor, plot = F)
 
 \item{plot.}{Boolean}
 }
+\value{
+A vector of indexes of normally distributed features
+}
 \description{
 \code{CheckFeaturesNormalityInGroups} checks normality visually and by the Shapiro.
 }

@@ -5,8 +5,9 @@
 #' @param subject. A vector of subjects
 #' @param treatment. A factor to group by treatment
 #' @param feature. A vector of feature values
+#' @param paired. A logical indicating whether you want paired t-tests
 
-CalculateRepeatedAnova <- function(subject, treatment, feature) {
+CalculateRepeatedAnova <- function(subject, treatment, feature, paired = T) {
   options(contrasts = c("contr.sum", "contr.poly"))
   
 #   subject <- subject[complete.cases(feature)]
@@ -27,6 +28,5 @@ CalculateRepeatedAnova <- function(subject, treatment, feature) {
   design <- factor(t.levels)
   aov.out <- Anova(model, idata = data.frame(design), idesign = ~design, type = "III")
   print(summary(aov.out, multivariate = F))
-  
-  print(with(data.1, pairwise.t.test(feature, treatment, p.adjust.method = "none", paired = T)))
+  print(with(data.1, pairwise.t.test(feature, treatment, p.adjust.method = "none", paired = paired)))
 }

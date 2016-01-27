@@ -1,0 +1,109 @@
+---
+  title: "Flow beim Laufen (intraindividell)"
+author: "Simon Bogutzky"
+date: "27. Januar 2016"
+output: html_document
+---
+  
+```{r load-data, echo=FALSE}
+data.barbara.1 <- data.barbara
+data.annika.1 <- data.annika
+data.andreas.1 <- data.andreas
+
+data.barbara.1$subject <- "Barbara"
+data.annika.1$subject <- "Annika"
+data.andreas.1$subject <- "Andreas"
+
+data.1 <- rbind(data.barbara.1, data.annika.1, data.andreas.1)
+data.1$subject <- factor(data.1$subject)
+summary(data.1)
+```
+
+```{r test-subject-effect, echo=FALSE}
+
+# Test subject effect
+subject <- data.1$subject
+data.2 <- data.1[, c(1, 4, 9)]
+
+# Examine features (visually)
+PlotFeaturesInGroups(data.2, subject)
+
+# Check group normality of features
+normally.distributed <- CheckFeaturesNormalityInGroups(data.2, subject, T)
+data.3 <- data.2
+
+# Calculate repeated anova of features 
+for(i in 1:length(data.3)) {
+  feature.name <- names(data.3)[i]
+  print(feature.name)
+  CalculateRepeatedAnova(date, subject, data.3[, i], F) 
+}
+
+rm(normally.distributed, data.3, data.2, i, feature.name)
+```
+
+```{r}
+data.barbara.1 <- data.frame(scale(data.barbara))
+data.annika.1 <- data.frame(scale(data.annika))
+data.andreas.1 <- data.frame(scale(data.andreas))
+
+data.barbara.1$subject <- "Barbara"
+data.annika.1$subject <- "Annika"
+data.andreas.1$subject <- "Andreas"
+
+data.1 <- rbind(data.barbara.1, data.annika.1, data.andreas.1)
+data.1$subject <- factor(data.1$subject)
+summary(data.1)
+```
+
+
+
+```{r correlation-analysis, echo=FALSE}
+data.2 <- data.1
+
+PlotFeatureOverview(data.2$flow, main = "Flow")
+shapiro.test(data.2$flow)
+
+PlotFeatureOverview(data.2$fluency, main = "Fluency")
+shapiro.test(data.2$fluency)
+
+PlotFeatureOverview(data.2$absorption, main = "Absorption")
+shapiro.test(data.2$absorption)
+
+PlotFeatureOverview(data.2$mean.hr, main = "Mean HR")
+shapiro.test(data.2$mean.hr)
+
+PlotFeatureOverview(data.2$rmssd, main = "RMSSD")
+shapiro.test(data.2$rmssd)
+
+PlotFeatureOverview(data.2$lf, main = "LF")
+shapiro.test(data.2$lf) # *
+
+PlotFeatureOverview(data.2$hf, main = "HF")
+shapiro.test(data.2$hf)
+
+PlotFeatureOverview(data.2$coh, main = "Coherence")
+shapiro.test(data.2$coh)
+
+PlotFeatureOverview(data.2$mean.cycle.interval, main = "Mean Cycle Interval")
+shapiro.test(data.2$mean.cycle.interval) 
+
+PlotFeatureOverview(data.2$mean.jerk.cost, main = "Mean Jerk Cost")
+shapiro.test(data.2$mean.jerk.cost)
+
+data.3 <- data.2
+
+par(mfrow = c(2, 2), xaxs = "r", yaxs = "r")
+PlotLinearRegression(data.3$flow, data.3$mean.jerk.cost, xlab = "Flow", ylab = "Mean Jerk Cost", col = data.3$subject)
+PlotLinearRegression(data.3$flow, data.3$mean.hr, xlab = "Flow", ylab = "Mean HR", col = data.3$subject)
+PlotLinearRegression(data.3$flow, data.3$rmssd, xlab = "Flow", ylab = "RMSSD", col = data.3$subject)
+PlotLinearRegression(data.3$flow, data.3$coh, xlab = "Flow", ylab = "Coherence", col = data.3$subject)
+
+PlotLinearRegression(data.3$mean.hr, data.3$mean.jerk.cost, xlab = "Mean HR", ylab = "Mean Jerk Cost", col = data.3$subject)
+PlotLinearRegression(data.3$mean.hr, data.3$mean.cycle.interval, xlab = "Mean HR", ylab = "Mean Cycle Interval", col = data.3$subject)
+PlotLinearRegression(data.3$mean.hr, data.3$rmssd, xlab = "Mean HR", ylab = "RMSSD", col = data.3$subject)
+PlotLinearRegression(data.3$mean.cycle.interval, data.3$mean.jerk.cost, xlab = "Mean Cycle Interval", ylab = "Mean Jerk Cost", col = data.3$subject)
+
+rm(data.1, data.2, data.3)
+```
+

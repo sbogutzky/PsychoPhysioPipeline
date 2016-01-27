@@ -1,14 +1,14 @@
 ---
 title: "Flow beim Laufen (intraindividell)"
 author: "Simon Bogutzky"
-date: "12. Dezember 2015"
+date: "27. Januar 2016"
 output: html_document
 ---
 
 ```{r set-directories, echo = FALSE}
 
 # Remove all variables
-rm(list = ls(all = T)) 
+# rm(list = ls(all = T)) 
 
 # Set root data directory path
 if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
@@ -44,15 +44,17 @@ n.row <- nrow(fss.features)
 e.seq <- seq(3, n.row * 3, 3)
 data.1 <- data.frame(flow = fss.features$flow, fluency = fss.features$fluency, absorption = fss.features$absorption, mean.hr = hrv.features$meanhr[e.seq], rmssd = hrv.features$rmssd[e.seq], lf = hrv.features$lfpowfft[e.seq], hf = hrv.features$hfpowfft[e.seq], coh = cls.features$mean.nsei[e.seq], mean.cycle.interval = jc.features$mean.cycle.interval[e.seq], mean.jerk.cost = jc.features$mean.jerk.cost[e.seq])
 date <- factor(format(as.POSIXct(fss.features$activity.start / 1000, origin = "1970-01-01"), "%Y-%m-%d"))
+
+# Measurement as subject
 measurement <- factor(fss.features$measurement, levels = c(1, 2, 3, 4), labels = c("15'", "30'", "45'", "60'"))
 
-rm(e.seq, n.row)
+rm(e.seq, n.row, cls.features, fss.features, hrv.features, jc.features, user.directory)
 ```
 
 ```{r test-time-effect, echo=FALSE}
 
-# Test time effect
-data.2 <- data.1
+# Test time effect of flow, mean.hr and mean.cycle.interval
+data.2 <- data.1[c(1, 4, 9)]
 
 # Examine features (visually)
 PlotFeaturesInGroups(data.2, measurement)
@@ -61,17 +63,11 @@ PlotFeaturesInGroups(data.2, measurement)
 normally.distributed <- CheckFeaturesNormalityInGroups(data.2, measurement, T)
 
 # Remove outlier of the fss (2014-05-27)
-data.2[29:32, 1:3] <- NA
+data.2[29:32, 1] <- NA
 
-# Remove outlier of the heart activity (2014-06-04)
-data.2[c(23:24, 45:48), 4:8] <- NA
-
-# Check group normality of features
+# Check group normality of features again
 normally.distributed <- CheckFeaturesNormalityInGroups(data.2, measurement, F)
 data.3 <- data.2[, normally.distributed]
-
-# Examine features (visually)
-PlotFeaturesInGroups(data.3, measurement)
 
 # Calculate repeated anova of features 
 for(i in 1:length(data.3)) {
@@ -84,16 +80,18 @@ rm(normally.distributed, data.3, data.2, i, feature.name)
 ```
 
 ```{r correlation-analysis, echo=FALSE}
+
+# Use only data after the 30' mark
 data.2 <- data.1[as.numeric(measurement) == 2, ]
 
 PlotFeatureOverview(data.2$flow, main = "Flow")
-shapiro.test(data.2$flow)
+shapiro.test(data.2$flow) # *
 
 PlotFeatureOverview(data.2$fluency, main = "Fluency")
 shapiro.test(data.2$fluency)
 
 PlotFeatureOverview(data.2$absorption, main = "Absorption")
-shapiro.test(data.2$absorption)
+shapiro.test(data.2$absorption) # *
 
 PlotFeatureOverview(data.2$mean.hr, main = "Mean HR")
 shapiro.test(data.2$mean.hr)
@@ -105,7 +103,7 @@ PlotFeatureOverview(data.2$lf, main = "LF")
 shapiro.test(data.2$lf)
 
 PlotFeatureOverview(data.2$hf, main = "HF")
-shapiro.test(data.2$hf)
+shapiro.test(data.2$hf) # *
 
 PlotFeatureOverview(data.2$coh, main = "Coherence")
 shapiro.test(data.2$coh)
@@ -116,28 +114,30 @@ shapiro.test(data.2$mean.cycle.interval)
 PlotFeatureOverview(data.2$mean.jerk.cost, main = "Mean Jerk Cost")
 shapiro.test(data.2$mean.jerk.cost)
 
+# Remove outlier
 data.3 <- data.2
 data.3[8, 1:3] <- NA
 shapiro.test(data.3$flow)
+shapiro.test(data.3$fluency)
+shapiro.test(data.3$absorption)
 
-par(mfcol = c(3, 3), xaxs = "r", yaxs = "r")
-PlotLinearRegression(data.3$mean.hr, data.3$mean.jerk.cost, xlab = "Mean HR", ylab = "Mean Jerk Cost")
-PlotLinearRegression(data.3$mean.hr, data.3$mean.cycle.interval, xlab = "Mean HR", ylab = "Mean Cycle Interval")
-PlotLinearRegression(data.3$mean.hr, data.3$rmssd, xlab = "Mean HR", ylab = "RMSSD")
-
+par(mfrow = c(2, 2), xaxs = "r", yaxs = "r")
 PlotLinearRegression(data.3$flow, data.3$mean.jerk.cost, xlab = "Flow", ylab = "Mean Jerk Cost")
 PlotLinearRegression(data.3$flow, data.3$mean.hr, xlab = "Flow", ylab = "Mean HR")
 PlotLinearRegression(data.3$flow, data.3$rmssd, xlab = "Flow", ylab = "RMSSD")
+PlotLinearRegression(data.3$flow, data.3$coh, xlab = "Flow", ylab = "Coherence")
 
-# PlotLinearRegression(data.3$absorption, data.3$mean.jerk.cost, xlab = "Absorption", ylab = "Mean Jerk Cost")
-# PlotLinearRegression(data.3$absorption, data.3$mean.hr, xlab = "Absorption", ylab = "Mean HR")
-# PlotLinearRegression(data.3$absorption, data.3$rmssd, xlab = "Absorption", ylab = "RMSSD")
+PlotLinearRegression(data.3$mean.hr, data.3$mean.jerk.cost, xlab = "Mean HR", ylab = "Mean Jerk Cost")
+PlotLinearRegression(data.3$mean.hr, data.3$mean.cycle.interval, xlab = "Mean HR", ylab = "Mean Cycle Interval")
+PlotLinearRegression(data.3$mean.hr, data.3$rmssd, xlab = "Mean HR", ylab = "RMSSD")
+PlotLinearRegression(data.3$mean.cycle.interval, data.3$mean.jerk.cost, xlab = "Mean Cycle Interval", ylab = "Mean Jerk Cost")
 
-PlotLinearRegression(data.3$coh, data.3$mean.hr, xlab = "Coherence", ylab = "Mean HR")
-PlotLinearRegression(data.3$coh, data.3$mean.cycle.interval, xlab = "Coherence", ylab = "Mean Cycle Interval")
-PlotLinearRegression(data.3$coh, data.2$flow, xlab = "Coherence", ylab = "Flow")
+set.seed(2)
+data.4 <- data.2
+samples <- sample(1:nrow(data.4), 12, replace=F)
+data.barbara <- data.4[samples, ]
 
-rm(data.2, data.3)
+rm(data.2, data.3, data.4, samples)
 ```
 
 

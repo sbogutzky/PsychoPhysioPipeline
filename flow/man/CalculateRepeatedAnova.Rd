@@ -4,7 +4,7 @@
 \alias{CalculateRepeatedAnova}
 \title{Calculates the repeteated anova of a feature and execute an pairwise t test.}
 \usage{
-CalculateRepeatedAnova(subject, treatment, feature)
+CalculateRepeatedAnova(subject, treatment, feature, paired = T)
 }
 \arguments{
 \item{subject.}{A vector of subjects}
@@ -12,6 +12,8 @@ CalculateRepeatedAnova(subject, treatment, feature)
 \item{treatment.}{A factor to group by treatment}
 
 \item{feature.}{A vector of feature values}
+
+\item{paired.}{A logical indicating whether you want paired t-tests}
 }
 \description{
 \code{CalculateRepeatedAnova} calculates the repeteated anova of a feature and execute an pairwise t test.

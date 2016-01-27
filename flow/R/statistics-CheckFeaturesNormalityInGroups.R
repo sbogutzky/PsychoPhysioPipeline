@@ -14,8 +14,7 @@ CheckFeaturesNormalityInGroups <- function(features, factor, plot = F) {
     is.normally.distributed <- T
     for(j in levels(factor)) { 
       feature <- features[factor == j, i]
-      if(length(feature) > 0) {
-        
+      if(length(feature[!is.na(feature)]) > 2) {
         test <- shapiro.test(feature)
         if(test$p.value < 0.05) {
           
@@ -30,6 +29,8 @@ CheckFeaturesNormalityInGroups <- function(features, factor, plot = F) {
             plot(feature, ylab = paste(feature.name, j))
           }
         }
+      } else {
+        is.normally.distributed <- F
       }
     }
     if(is.normally.distributed) {
