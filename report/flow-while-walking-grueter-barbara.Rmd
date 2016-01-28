@@ -48,7 +48,7 @@ date <- factor(format(as.POSIXct(fss.features$activity.start / 1000, origin = "1
 # Measurement as subject
 measurement <- factor(fss.features$measurement, levels = c(1, 2, 3, 4), labels = c("15'", "30'", "45'", "60'"))
 
-rm(e.seq, n.row, cls.features, fss.features, hrv.features, jc.features, user.directory)
+rm(e.seq, n.row, fss.features, cls.features, hrv.features, jc.features)
 ```
 
 ```{r test-time-effect, echo=FALSE}
@@ -139,6 +139,28 @@ data.barbara <- data.4[samples, ]
 
 rm(data.2, data.3, data.4, samples)
 ```
+
+```{r process-orientation}
+
+# Use only data after the 30' mark
+m <- 2
+data.2 <- cbind(data.1, date)
+data.2 <- data.2[as.numeric(measurement) == m, ]
+
+max.coh <- which.max(data.2$coh)
+min.flow <- which.min(data.2$flow)
+dates <- c(as.character(data.2[min.flow,]$date), as.character(data.2[max.coh,]$date))
+time.range <- c(600, 900)
+ticks <- seq(time.range[1], time.range[2], 30)
+
+for(i in 1:length(dates)) {
+  source("code-snippets/load-and-plot-processes.R")
+}
+
+rm(m, data.2, max.coh, min.flow, dates, time.range, ticks, i)
+
+```
+
 
 
 
