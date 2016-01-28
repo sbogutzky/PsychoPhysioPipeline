@@ -1,4 +1,4 @@
-comment.lines <- readLines(paste(input.data.directory, file.name, sep = ""), n = 3)
+comment.lines <- readLines(file.path, n = 3)
 comment.lines <- gsub(pattern = "[A-Za-z]+: ", replacement = "", x = comment.lines, ignore.case = T)
 comment.lines <- gsub(pattern = " ", replacement = "", x = comment.lines, ignore.case = T)
 

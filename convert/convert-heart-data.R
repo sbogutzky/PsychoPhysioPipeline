@@ -12,19 +12,19 @@ for(first.name in first.names) {
 
 source("./code-snippets/read-and-set.R")
 
-file.names <- list.files(path = input.data.directory, pattern = "([0-9]{4}-[0-9]{2}-[0-9]{2}--[0-9]{2}-[0-9]{2}-[0-9]{2}-)?motion.csv", recursive = T)
+file.paths <- list.files(path = input.data.directory, pattern = "([0-9]{4}-[0-9]{2}-[0-9]{2}--[0-9]{2}-[0-9]{2}-[0-9]{2}-)?heart.csv", full.names = T, recursive = T)
 
 for (file.path in file.paths) {
   
   # Load motion data
-  motion.data <- read.csv(file.path, comment.char = "#", skip = 10)
+  heart.data  <- read.csv(file.path, comment.char = "#", skip = 10)
   
   source("./code-snippets/extract-session-start.R")
   
   date.directory <- paste(strftime(session.start, format="%Y-%m-%d--%H-%M-%S"), "/", sep ="")
   
-  new.motion.data <- data.frame(motion.data[, 1] * 1000, (motion.data[, 2] + motion.data[, 5]) * 9.81, (motion.data[, 3] + motion.data[, 6]) * 9.81, (motion.data[, 4] + motion.data[, 7]) * 9.81, motion.data[, 8] * 180/pi, motion.data[, 9] * 180/pi, motion.data[, 10] * 180/pi)
-  colnames(new.motion.data) <- c("timestamp.ms","acceleration.x.ms.2","acceleration.y.ms.2","acceleration.z.ms.2","angular.velocity.x.deg.s","angular.velocity.y.deg.s","angular.velocity.z.deg.s")
+  new.heart.data  <- data.frame(heart.data [, 1], heart.data [, 2])
+  colnames(new.heart.data ) <- c("timestamp.ms","rr.interval.s")
 
   # Write to csv file
   output.directory <- paste(raw.data.directory, activity.directory, user.directory, date.directory, sep = "")
@@ -35,11 +35,11 @@ for (file.path in file.paths) {
   # Delete file
   # file.remove(file.path)
   
-  output.directory <- paste(output.directory, "motion.csv", sep = "")
+  output.directory <- paste(output.directory, "heart.csv", sep = "")
   con <- file(output.directory, 'w') 
   writeLines(paste("# StartTime:", strftime(session.start, format="%Y/%m/%d %H:%M:%S")), con = con)
-  write.csv(new.motion.data, file = con, row.names = FALSE)
-  writeLines(paste("# StopTime:", strftime(session.start + motion.data[, 1], format="%Y/%m/%d %H:%M:%S")), con = con)
+  write.csv(new.heart.data , file = con, row.names = FALSE)
+  writeLines(paste("# StopTime:", strftime(session.start + heart.data [, 1], format="%Y/%m/%d %H:%M:%S")), con = con)
   close(con)
   print(paste("Worte:", output.directory))
   

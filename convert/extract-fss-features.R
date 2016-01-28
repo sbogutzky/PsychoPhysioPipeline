@@ -5,17 +5,23 @@
 # Remove all variables
 rm(list = ls(all = T))
 
+root.directory <- readline("Type in root directory and press return to continue (with: /) > ")
+first.names <- c("birthe", "danilo", "hilke", "kiana", "linde", "maike", "max", "susanna", "timo", "tobias", "vreni")
+activity <- "walking"
+
+for(first.name in first.names) {
+
 source("./code-snippets/read-and-set.R")
 
-file.names <- list.files(path = input.data.directory, pattern = "([0-9]{4}-[0-9]{2}-[0-9]{2}--[0-9]{2}-[0-9]{2}-[0-9]{2}-)?questionaire.csv", recursive = T)
+file.paths <- list.files(path = input.data.directory, pattern = "([0-9]{4}-[0-9]{2}-[0-9]{2}--[0-9]{2}-[0-9]{2}-[0-9]{2}-)?self-report.csv", full.names = T, recursive = T)
 
 # Create fss feature and measurement data frame
 fss.features <- data.frame()
 
-for (file.name in file.names) {
+for (file.path in file.paths) {
   
   # Load self report results
-  self.report.results <- read.csv(paste(input.data.directory, file.name, sep = ""), comment.char = "#", skip = 10)
+  self.report.results <- read.csv(file.path, comment.char = "#", skip = 10)
   
   source("./code-snippets/extract-session-start.R")
   
@@ -44,7 +50,7 @@ for (file.name in file.names) {
   print(paste("Worte:", output.directory))
   
   # Delete file
-  file.remove(paste(input.data.directory, file.name, sep = ""))
+  # file.remove(file.path)
 }
 
 # Write to csv file
@@ -55,3 +61,5 @@ if(!file.exists(substr(output.directory, 1, nchar(output.directory) - 1))) {
 output.directory <- paste(output.directory, "fss-features.csv", sep = "")
 write.csv(fss.features, output.directory, row.names = F)
 print(paste("Worte:", output.directory))
+
+}
