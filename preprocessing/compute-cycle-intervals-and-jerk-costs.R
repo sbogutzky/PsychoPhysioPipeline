@@ -67,10 +67,10 @@ for (self.report.file.name in self.report.file.names) {
       t.s <- t.s[-1]
       
       jerk.cost.m2s5 <- c()
-      for(i in 1:(length(mid.swing.indexes) - 1)) {
+      for(j in 1:(length(mid.swing.indexes) - 1)) {
         
-        m <- mid.swing.indexes[i]
-        n <- mid.swing.indexes[(i+1)]
+        m <- mid.swing.indexes[j]
+        n <- mid.swing.indexes[(j+1)]
         
         # Compute jerk cost of each cycle
         t.ms                <- A[, 1][m:n]
@@ -106,7 +106,7 @@ for (self.report.file.name in self.report.file.names) {
       # Write csv file
       output.file.name <- paste(data.file.name, "-cycle-intervals-jerk-costs-", i, ".csv", sep = "")
       output.directory <- paste(output.directory, output.file.name, sep = "")
-      write.csv(mid.swing.indexes, output.directory, row.names = F)
+      write.csv(output.data, output.directory, row.names = F)
       print(paste("Wrote:", output.directory))
   
     } else {
