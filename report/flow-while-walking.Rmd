@@ -21,6 +21,76 @@ summary(data.1)
 
 ```{r test-subject-effect, echo=FALSE}
 
+plot(data.1, main = "walking (black=male, red=female-1, green=female-2)", pch = 19, col = as.numeric(data.1$subject))
+levels(data.1$subject)
+
+par(mfrow = c(2, 2))
+
+for (i in 1:10)
+  boxplot(data.1[,i] ~ subject, data = data.1, main = names(data.1)[i])
+
+par(mfrow = c(1, 1))
+hist(data.andreas$absorption[!is.na(data.andreas$absorption)])
+lines(density(data.andreas$absorption[!is.na(data.andreas$absorption)]))
+rug(jitter(data.andreas$absorption[!is.na(data.andreas$absorption)]))
+
+shapiro.test(data.andreas$absorption[!is.na(data.andreas$absorption)])
+qqnorm(data.andreas$absorption[!is.na(data.andreas$absorption)])
+qqline(data.andreas$absorption[!is.na(data.andreas$absorption)])
+
+hist(data.andreas$mean.jerk.cost[!is.na(data.andreas$mean.jerk.cost)])
+lines(density(data.andreas$mean.jerk.cost[!is.na(data.andreas$mean.jerk.cost)]))
+rug(jitter(data.andreas$mean.jerk.cost[!is.na(data.andreas$mean.jerk.cost)]))
+
+shapiro.test(data.andreas$mean.jerk.cost[!is.na(data.andreas$mean.jerk.cost)])
+qqnorm(data.andreas$mean.jerk.cost[!is.na(data.andreas$mean.jerk.cost)])
+qqline(data.andreas$mean.jerk.cost[!is.na(data.andreas$mean.jerk.cost)])
+
+library(car)
+scatterplot(data.andreas$mean.jerk.cost ~ data.andreas$absorption)
+
+cor.test(data.andreas$absorption, data.andreas$mean.jerk.cost, alternative = "two.sided", method = "pearson")
+
+
+par(mfrow = c(1, 2))
+plot.design(data.1$absorption ~ data.1$subject)
+boxplot(data.1$absorption ~ data.1$subject)
+
+par(mfrow = c(1, 1))
+cdplot(subject~absorption, data = data.1)
+
+aov1 <- aov(data.1$absorption ~ data.1$subject)
+summary(aov1)
+
+summary.lm(aov1)
+TukeyHSD(aov1)
+
+fligner.test(data.1$absorption ~ data.1$subject)
+
+
+
+
+
+
+
+
+
+
+
+
+flow <- jitter(data.barbara.1$flow, amount = 0.6)
+mean.jerk.cost <- jitter(data.barbara.1$mean.jerk.cost, amount = 0.6)
+plot(mean.jerk.cost ~ flow, xlab = expression("Jerk cost in"~10^4~"*"~m^2*s^{-5}), ylab = "Flow", main = "Scatterplot of Jerk cost vs. Flow", pch = 20, col = "cornflowerblue")
+# die linke wird durch die rechte erklärt
+mod <- lm(gewicht~größe)
+
+
+
+
+plot(data.1$flow, data.1$fluency)
+
+
+
 # Test subject effect
 subject <- data.1$subject
 data.2 <- data.1[, c(1, 4, 9)]
