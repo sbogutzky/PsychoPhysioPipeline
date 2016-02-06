@@ -1,24 +1,28 @@
-#' Calculates the instantaneous phases of the time series.
-#' \code{CalculateInstantaneousPhases} returns the instantaneous phases of the time series.
+#' Calculates the instantaneous phase.
+#' \code{CalculateInstantaneousPhases} returns the instantaneous phase.
 #'
-#' @param times A numeric vector of the times.
-#' @param time.series A numeric vector of times of appearance of kth event.
-#' @return fi A numeric vector of instantaneous phases.
+#' @param ts1. A numeric vector of time events.
+#' @param ts2. A numeric vector of time events (onset of the cycle).
+#' @return fi A numeric vector of instantaneous phase.
 
-CalculateInstantaneousPhases <- function(times, time.series) {
-  fi <- c()
+CalculateInstantaneousPhases <- function(ts1, ts2) {
+  fis <- c()
+  ts <- c()
   
-  for (t in times) {
-    for (k in 1:(length(time.series) - 1)) {
-      tk    <- time.series[k]
-      tk.1  <- time.series[k + 1]
-      if (tk <= t && t < tk.1) { 
-        fi <- c(fi, 2 * pi * k + 2 * pi * (t - tk) / (tk.1 - tk))
+  for (i in 1:(length(ts2) - 1)) {
+    cycle <- c(ts2[i], ts2[i + 1])
+    fi <- NA
+    for (t in ts1) {
+      if (cycle[1] <= t && t < cycle[2]) { 
+        fi <- 2 * pi * i + 2 * pi * (t - cycle[1]) / diff(cycle)
+        fis <- c(fis, fi)
+        ts <- c(ts, cycle[1])
       }
     }
-    if (t > max(time.series) || t < min(time.series)) {
-      fi <- c(fi, NA)
+    if(is.na(fi)) {
+      fis <- c(fis, fi)
+      ts <- c(ts, cycle[1])
     }
   }
-  return(fi)
+  return(data.frame(ts = ts, fi = fis))
 }
