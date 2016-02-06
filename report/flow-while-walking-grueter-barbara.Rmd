@@ -73,7 +73,7 @@ data.3 <- data.2[, normally.distributed]
 for(i in 1:length(data.3)) {
   feature.name <- names(data.3)[i]
   print(feature.name)
-  CalculateRepeatedAnova(date, measurement, data.3[, i]) 
+  ComputeRepeatedAnova(date, measurement, data.3[, i]) 
 }
 
 rm(normally.distributed, data.3, data.2, i, feature.name)
