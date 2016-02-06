@@ -1,11 +1,11 @@
-#' Calculates the instantaneous phase.
-#' \code{CalculateInstantaneousPhases} returns the instantaneous phase.
-#'
+#' Computes the instantaneous phase.
+#' 
+#' \code{ComputeInstantaneousPhases} returns the instantaneous phase.
 #' @param ts1. A numeric vector of time events.
 #' @param ts2. A numeric vector of time events (onset of the cycle).
 #' @return fi A numeric vector of instantaneous phase.
 
-CalculateInstantaneousPhases <- function(ts1, ts2) {
+ComputeInstantaneousPhases <- function(ts1, ts2) {
   fis <- c()
   ts <- c()
   

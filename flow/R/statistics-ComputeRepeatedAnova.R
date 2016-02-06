@@ -1,13 +1,12 @@
-#' Calculates the repeteated anova of a feature and execute an pairwise t test.
+#' Computes the repeteated anova of a feature and execute an pairwise t test.
 #' 
-#' \code{CalculateRepeatedAnova} calculates the repeteated anova of a feature and execute an pairwise t test.
-#' 
+#' \code{ComputeRepeatedAnova} computes the repeteated anova of a feature and execute an pairwise t test.
 #' @param subject. A vector of subjects
 #' @param treatment. A factor to group by treatment
 #' @param feature. A vector of feature values
 #' @param paired. A logical indicating whether you want paired t-tests
 
-CalculateRepeatedAnova <- function(subject, treatment, feature, paired = T) {
+ComputeRepeatedAnova <- function(subject, treatment, feature, paired = T) {
   options(contrasts = c("contr.sum", "contr.poly"))
   
 #   subject <- subject[complete.cases(feature)]
