@@ -1,32 +1,23 @@
-cls.features <- data.frame()
+cls.features  <- data.frame()
 for (i in 1:nrow(fss.features)) {
-  
   source("code-snippets/set-additional-features.R")
-  
-  directory.path        <- paste(root.data.directory.path, "processed-data/", activity.directory, user.directory, date.directory, sep = "")
-  file.name             <- paste("leg-cls-indexes-", measurement, ".csv", sep = "")
-  col.names             <- c("mean.pcoi", "mean.nsei", "activity","activity.start","activity.end","inquiry.end","measurement","last.name","first.name","date.of.birth")
-  range.intervals       <- seq(0, 900, 300)
-  
-  feature.data.frame <- data.frame()
-  if(file.exists(paste(directory.path, file.name, sep = ""))) {
-    data        <- read.csv(paste(directory.path, file.name, sep = ""), skip = 2)
-    #plot(data[, 2], data[, 3], xlab ="PCoI", ylab = "NSEI", xlim = c(0, 1), ylim = c(0, 1))  
+  cls.data.path <- paste(root.path, "processed-data", "/", activity, "/", user, "/", strftime(date, format="%Y-%m-%d--%H-%M-%S"), "/", "leg-cls-indexes-", measurement, ".csv", sep = "")
+  range.intervals <- seq(0, 900, 300)
+  if(file.exists(cls.data.path)) {
+    cls.data <- read.csv(cls.data.path, skip = 2)
     for (j in 1:(length(range.intervals) - 1)) {
-      
-      estimated.features <- c(mean(data[, 2][data[, 1] >= range.intervals[j] & data[, 1] < range.intervals[j + 1]], na.rm = T), mean(data[, 3][data[, 1] >= range.intervals[j] & data[, 1] < range.intervals[j + 1]], na.rm = T))
-      feature.vector        <- c(estimated.features, additional.features)
-      names(feature.vector) <- col.names
-      feature.data.frame    <- rbind(feature.data.frame, feature.vector)
+      cls.data.subset <- cls.data[cls.data[, 1] >= range.intervals[j] & cls.data[, 1] < range.intervals[j + 1], ]
+      cls.feature.row <- colMeans(cls.data.subset[, 2:3], na.rm = T)
+      cls.features <- rbind(cls.features, cls.feature.row)
     }
+    rm(cls.data, cls.data.subset, cls.feature.row, j)
   } else {
     for (j in 1:(length(range.intervals) - 1)) {
-      feature.vector        <- c(rep(NA, 2), additional.features)
-      names(feature.vector) <- col.names
-      feature.data.frame    <- rbind(feature.data.frame, feature.vector)
+      cls.feature.row <- rep(NA, 2)
+      cls.features <- rbind(cls.features, cls.feature.row)
     }
+    rm(cls.feature.row, j)
   }
-  cls.features        <- rbind(cls.features, feature.data.frame)
 }
-
-rm(additional.features, data, feature.data.frame, activity.start, col.names, date.directory, estimated.features, feature.vector, file.name, i, j, measurement, range.intervals)
+names(cls.features) <- c("mean.pcoi", "mean.nsei")
+rm(cls.data.path, range.intervals, i, additional.features, activity.start, date, measurement)

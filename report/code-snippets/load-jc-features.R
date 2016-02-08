@@ -1,38 +1,25 @@
 jc.features  <- data.frame()
 for (i in 1:nrow(fss.features)) {
-  
   source("code-snippets/set-additional-features.R")
-  
-  directory.path        <- paste(root.data.directory.path, "processed-data/", activity.directory, user.directory, date.directory, sep = "")
-  file.name             <- paste("leg-jerk-cost-data-", measurement, ".csv", sep = "")
-  col.names             <- jerk.cost.feature.names   <- c("mean.cycle.interval", "mean.jerk.cost", "activity","activity.start","activity.end","inquiry.end","measurement","last.name","first.name","date.of.birth")
-  range.intervals       <- seq(0, 900, 300)
-  
-  feature.data.frame <- data.frame()
-  if(file.exists(paste(directory.path, file.name, sep = ""))) {
-    data.1        <- read.csv(paste(directory.path, file.name, sep = ""), skip = 2)
-    data.1[, 3]   <- data.1[, 3] / 10^4
-    
+  jc.data.path <- paste(root.path, "processed-data", "/", activity, "/", user, "/", strftime(date, format="%Y-%m-%d--%H-%M-%S"), "/", "leg-jerk-cost-data-", measurement, ".csv", sep = "")
+  range.intervals <- seq(0, 900, 300)
+  if(file.exists(jc.data.path)) {
+    jc.data <- read.csv(jc.data.path, skip = 2)
+    jc.data[, 3] <- jc.data[, 3] / 10^4
     for (j in 1:(length(range.intervals) - 1)) {
-      
-      data.subset <- data.1[data.1[, 1] >= range.intervals[j] & data.1[, 1] < range.intervals[j + 1], ]
-      # n <- nrow(data.subset)
-      data.subset <- data.subset[data.subset[, 2] < 1.25, ]
-      # print(n - nrow(data.subset))
-      
-      estimated.features <- colMeans(data.subset[, 2:3], na.rm = T)
-      feature.vector <- c(estimated.features, additional.features)
-      names(feature.vector) <- col.names
-      feature.data.frame <- rbind(feature.data.frame, feature.vector)
+      jc.data.subset <- jc.data[jc.data[, 1] >= range.intervals[j] & jc.data[, 1] < range.intervals[j + 1], ]
+      jc.data.subset <- jc.data.subset[jc.data.subset[, 2] < 1.25, ]
+      jc.feature.row <- colMeans(jc.data.subset[, 2:3], na.rm = T)
+      jc.features <- rbind(jc.features, jc.feature.row)
     }
+    rm(jc.data, jc.data.subset, jc.feature.row, j)
   } else {
     for (j in 1:(length(range.intervals) - 1)) {
-      feature.vector        <- c(rep(NA, 2), additional.features)
-      names(feature.vector) <- col.names
-      feature.data.frame    <- rbind(feature.data.frame, feature.vector)
+      jc.feature.row <- rep(NA, 2)
+      jc.features <- rbind(jc.features, jc.feature.row)
     }
+    rm(jc.feature.row, j)
   }
-  jc.features        <- rbind(jc.features, feature.data.frame)
 }
-
-rm(additional.features, data.1, data.subset, feature.data.frame, activity.start, col.names, date.directory, estimated.features, feature.vector, file.name, i, j, jerk.cost.feature.names, measurement, range.intervals)
+names(jc.features) <- c("mean.cycle.interval", "mean.jerk.cost")
+rm(jc.data.path, range.intervals, i, additional.features, activity.start, date, measurement)

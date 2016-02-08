@@ -6,174 +6,52 @@ output: html_document
 ---
   
 ```{r load-data, echo=FALSE}
-data.barbara.1 <- data.barbara
-data.annika.1 <- data.annika
-data.andreas.1 <- data.andreas
 
-data.barbara.1$subject <- "Barbara"
-data.annika.1$subject <- "Annika"
-data.andreas.1$subject <- "Andreas"
+# Remove all variables
+rm(list = ls(all = T)) 
 
-data.1 <- rbind(data.barbara.1, data.annika.1, data.andreas.1)
-data.1$subject <- factor(data.1$subject)
-summary(data.1)
-```
+# Set root path
+if(file.exists("/Volumes/OSX/flow/data"))
+  root.path <- "/Volumes/OSX/flow/data/"
 
-```{r test-subject-effect, echo=FALSE}
+# Load functions
+require(flow)
 
-plot(data.1, main = "walking (black=male, red=female-1, green=female-2)", pch = 19, col = as.numeric(data.1$subject))
-levels(data.1$subject)
+# Set test users
+users <- c("grueter-barbara", "lochwitz-andreas", "worpenberg-annika")
+activities <- c("walking")
 
-par(mfrow = c(2, 2))
+# Collect data
+data.1 <- data.frame()
+for (activity in activities) {
+  for (user in users) {
+    
+    # Load FSS features
+    fss.feature.path <- paste(root.path, "features", "/", activity, "/", user, "/", "fss-features.csv", sep = "")
+    fss.features <- read.csv(fss.feature.path)
+    rm(fss.feature.path)
+    
+    # Load HRV features
+    source("code-snippets/load-hrv-features.R")
+    
+    # Load JC features
+    source("code-snippets/load-jc-features.R")
+    
+    # Load CLS features
+    source("code-snippets/load-cls-features.R") 
 
-for (i in 1:10)
-  boxplot(data.1[,i] ~ subject, data = data.1, main = names(data.1)[i])
-
-par(mfrow = c(1, 1))
-hist(data.andreas$absorption[!is.na(data.andreas$absorption)])
-lines(density(data.andreas$absorption[!is.na(data.andreas$absorption)]))
-rug(jitter(data.andreas$absorption[!is.na(data.andreas$absorption)]))
-
-shapiro.test(data.andreas$absorption[!is.na(data.andreas$absorption)])
-qqnorm(data.andreas$absorption[!is.na(data.andreas$absorption)])
-qqline(data.andreas$absorption[!is.na(data.andreas$absorption)])
-
-hist(data.andreas$mean.jerk.cost[!is.na(data.andreas$mean.jerk.cost)])
-lines(density(data.andreas$mean.jerk.cost[!is.na(data.andreas$mean.jerk.cost)]))
-rug(jitter(data.andreas$mean.jerk.cost[!is.na(data.andreas$mean.jerk.cost)]))
-
-shapiro.test(data.andreas$mean.jerk.cost[!is.na(data.andreas$mean.jerk.cost)])
-qqnorm(data.andreas$mean.jerk.cost[!is.na(data.andreas$mean.jerk.cost)])
-qqline(data.andreas$mean.jerk.cost[!is.na(data.andreas$mean.jerk.cost)])
-
-library(car)
-scatterplot(data.andreas$mean.jerk.cost ~ data.andreas$absorption)
-
-cor.test(data.andreas$absorption, data.andreas$mean.jerk.cost, alternative = "two.sided", method = "pearson")
-
-
-par(mfrow = c(1, 2))
-plot.design(data.1$absorption ~ data.1$subject)
-boxplot(data.1$absorption ~ data.1$subject)
-
-par(mfrow = c(1, 1))
-cdplot(subject~absorption, data = data.1)
-
-aov1 <- aov(data.1$absorption ~ data.1$subject)
-summary(aov1)
-
-summary.lm(aov1)
-TukeyHSD(aov1)
-
-fligner.test(data.1$absorption ~ data.1$subject)
-
-
-
-
-
-
-
-
-
-
-
-
-flow <- jitter(data.barbara.1$flow, amount = 0.6)
-mean.jerk.cost <- jitter(data.barbara.1$mean.jerk.cost, amount = 0.6)
-plot(mean.jerk.cost ~ flow, xlab = expression("Jerk cost in"~10^4~"*"~m^2*s^{-5}), ylab = "Flow", main = "Scatterplot of Jerk cost vs. Flow", pch = 20, col = "cornflowerblue")
-# die linke wird durch die rechte erklärt
-mod <- lm(gewicht~größe)
-
-
-
-
-plot(data.1$flow, data.1$fluency)
-
-
-
-# Test subject effect
-subject <- data.1$subject
-data.2 <- data.1[, c(1, 4, 9)]
-
-# Examine features (visually)
-PlotFeaturesInGroups(data.2, subject)
-
-# Check group normality of features
-normally.distributed <- CheckFeaturesNormalityInGroups(data.2, subject, T)
-data.3 <- data.2
-
-# Calculate repeated anova of features 
-for(i in 1:length(data.3)) {
-  feature.name <- names(data.3)[i]
-  print(feature.name)
-  CalculateRepeatedAnova(date, subject, data.3[, i], F) 
+    # Set factors
+    subjects <- factor(fss.features$first.name)
+    dates <- factor(strftime(as.POSIXct(fss.features$activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"))
+    measurements <- factor(fss.features$measurement, levels = c(1, 2, 3, 4), labels = c("15'", "30'", "45'", "60'"))
+  
+    # Create data frame
+    n.row <- nrow(fss.features)
+    e.seq <- seq(3, n.row * 3, 3)
+    data.1 <- rbind(data.1, data.frame(subject = subjects, date = dates, measurement = measurements, fss.features[, 1:5], hrv.features[e.seq, c(3:6, 11:12, 17:18, 24:25, 45:46)], jc.features[e.seq, 1:2], cls.features[e.seq, 1:2]))
+    
+  }
+  rm(user, fss.features, hrv.features, jc.features, cls.features, n.row, e.seq, subjects, dates, measurements)
 }
-
-rm(normally.distributed, data.3, data.2, i, feature.name)
+rm(activity)
 ```
-
-```{r}
-data.barbara.1 <- data.frame(scale(data.barbara))
-data.annika.1 <- data.frame(scale(data.annika))
-data.andreas.1 <- data.frame(scale(data.andreas))
-
-data.barbara.1$subject <- "Barbara"
-data.annika.1$subject <- "Annika"
-data.andreas.1$subject <- "Andreas"
-
-data.1 <- rbind(data.barbara.1, data.annika.1, data.andreas.1)
-data.1$subject <- factor(data.1$subject)
-summary(data.1)
-```
-
-
-
-```{r correlation-analysis, echo=FALSE}
-data.2 <- data.1
-
-PlotFeatureOverview(data.2$flow, main = "Flow")
-shapiro.test(data.2$flow)
-
-PlotFeatureOverview(data.2$fluency, main = "Fluency")
-shapiro.test(data.2$fluency)
-
-PlotFeatureOverview(data.2$absorption, main = "Absorption")
-shapiro.test(data.2$absorption)
-
-PlotFeatureOverview(data.2$mean.hr, main = "Mean HR")
-shapiro.test(data.2$mean.hr)
-
-PlotFeatureOverview(data.2$rmssd, main = "RMSSD")
-shapiro.test(data.2$rmssd)
-
-PlotFeatureOverview(data.2$lf, main = "LF")
-shapiro.test(data.2$lf) # *
-
-PlotFeatureOverview(data.2$hf, main = "HF")
-shapiro.test(data.2$hf)
-
-PlotFeatureOverview(data.2$coh, main = "Coherence")
-shapiro.test(data.2$coh)
-
-PlotFeatureOverview(data.2$mean.cycle.interval, main = "Mean Cycle Interval")
-shapiro.test(data.2$mean.cycle.interval) 
-
-PlotFeatureOverview(data.2$mean.jerk.cost, main = "Mean Jerk Cost")
-shapiro.test(data.2$mean.jerk.cost)
-
-data.3 <- data.2
-
-par(mfrow = c(2, 2), xaxs = "r", yaxs = "r")
-PlotLinearRegression(data.3$flow, data.3$mean.jerk.cost, xlab = "Flow", ylab = "Mean Jerk Cost", col = data.3$subject)
-PlotLinearRegression(data.3$flow, data.3$mean.hr, xlab = "Flow", ylab = "Mean HR", col = data.3$subject)
-PlotLinearRegression(data.3$flow, data.3$rmssd, xlab = "Flow", ylab = "RMSSD", col = data.3$subject)
-PlotLinearRegression(data.3$flow, data.3$coh, xlab = "Flow", ylab = "Coherence", col = data.3$subject)
-
-PlotLinearRegression(data.3$mean.hr, data.3$mean.jerk.cost, xlab = "Mean HR", ylab = "Mean Jerk Cost", col = data.3$subject)
-PlotLinearRegression(data.3$mean.hr, data.3$mean.cycle.interval, xlab = "Mean HR", ylab = "Mean Cycle Interval", col = data.3$subject)
-PlotLinearRegression(data.3$mean.hr, data.3$rmssd, xlab = "Mean HR", ylab = "RMSSD", col = data.3$subject)
-PlotLinearRegression(data.3$mean.cycle.interval, data.3$mean.jerk.cost, xlab = "Mean Cycle Interval", ylab = "Mean Jerk Cost", col = data.3$subject)
-
-rm(data.1, data.2, data.3)
-```
-

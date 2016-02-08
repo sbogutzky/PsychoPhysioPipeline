@@ -1,14 +1,18 @@
-hrv.features <- data.frame()
+hrv.features  <- data.frame()
 for (i in 1:nrow(fss.features)) {
-  
   source("code-snippets/set-additional-features.R")
-  
-  # Create HRV feature data frame
-  directory.path  <- paste(root.data.directory.path, "features/", activity.directory, user.directory, "kubios-hrv-features/", date.directory, sep="")
-  file.name <- paste("ecg-data-", measurement, "_hrv.txt", sep = "")
-  col.names <- c("sample","meanrr","sdnn","meanhr","sdhr","rmssd","nn50","pnn50","sdann","sdnni","hrvtri","tinn","vlfpeakfft","lfpeakfft","hfpeakfft","vlfpowfft","lfpowfft","hfpowfft","vlfpowprfft","lfpowprfft","hfpowprfft","lfpownufft","hfpownufft","totpowfft","lfhffft","vlfpeakar","lfpeakar","hfpeakar","vlfpowar","lfpowar","hfpowar","vlfpowprar","lfpowprar","hfpowprar","lfpownuar","hfpownuar","totpowar","lfhfar","edr","sd1","sd2","apen","sampen","d2","dfa1","dfa2","activity","activity.start","activity.end","inquiry.end","measurement","last.name","first.name","date.of.birth")
-  feature.data.frame <- CreateFeatureDataFrame(directory.path, file.name, 1:46, 1:3, col.names, additional.features, skip = 0)
-  hrv.features <- rbind(hrv.features, feature.data.frame)
+  hrv.feature.path <- paste(root.path, "features", "/", activity, "/", user, "/", "kubios-hrv-features", "/", strftime(date, format="%Y-%m-%d--%H-%M-%S"), "/", "ecg-data-", measurement, "_hrv.txt", sep = "")
+  if(file.exists(hrv.feature.path)) {
+    hrv.feature.rows <- read.csv(hrv.feature.path, skip = 0)
+    hrv.features <- rbind(hrv.features, hrv.feature.rows[, 1:46])
+    rm(hrv.feature.rows)
+  } else {
+    for (j in 1:3) {
+      hrv.feature.row <- rep(NA, 46)
+      hrv.features <- rbind(hrv.features, hrv.feature.row)
+    }
+    rm(hrv.feature.row, j)
+  }
 }
-
-rm(additional.features, directory.path, feature.data.frame, file.name, activity.start, col.names, i, measurement)
+names(hrv.features) <- c("sample","meanrr","sdnn","meanhr","sdhr","rmssd","nn50","pnn50","sdann","sdnni","hrvtri","tinn","vlfpeakfft","lfpeakfft","hfpeakfft","vlfpowfft","lfpowfft","hfpowfft","vlfpowprfft","lfpowprfft","hfpowprfft","lfpownufft","hfpownufft","totpowfft","lfhffft","vlfpeakar","lfpeakar","hfpeakar","vlfpowar","lfpowar","hfpowar","vlfpowprar","lfpowprar","hfpowprar","lfpownuar","hfpownuar","totpowar","lfhfar","edr","sd1","sd2","apen","sampen","d2","dfa1","dfa2")
+rm(hrv.feature.path, i, additional.features, activity.start, date, measurement)
