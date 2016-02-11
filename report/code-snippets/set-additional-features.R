@@ -1,5 +1,5 @@
 # Set additional features
-additional.features <- fss.features[i, c(6:13)]
+additional.features <- fss.features[i, c(7:14)]
 activity.start      <- additional.features[, 2]
 measurement         <- additional.features[, 5]
 

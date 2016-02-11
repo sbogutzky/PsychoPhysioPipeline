@@ -1,18 +1,21 @@
 ---
-  title: "Flow beim Laufen (intraindividell)"
+title: "Flow beim Laufen (intraindividell)"
 author: "Simon Bogutzky"
 date: "27. Januar 2016"
 output: html_document
 ---
-  
-```{r load-data, echo=FALSE}
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+  
+```{r load-data, include=FALSE}
 # Remove all variables
-rm(list = ls(all = T)) 
+#rm(list = ls(all = T)) 
 
 # Set root path
-if(file.exists("/Volumes/OSX/flow/data"))
-  root.path <- "/Volumes/OSX/flow/data/"
+if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
+  root.path <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
 
 # Load functions
 require(flow)
@@ -53,5 +56,68 @@ for (activity in activities) {
   }
   rm(user, fss.features, hrv.features, jc.features, cls.features, n.row, e.seq, subjects, dates, measurements)
 }
+rownames(data.1) <- seq(length = nrow(data.1)) 
 rm(activity)
+```
+
+```{r select-data, include=FALSE}
+data.2 <- data.1[data.1$date == "2014-03-06" | data.1$date == "2014-05-27" | data.1$date == "2014-06-03" | data.1$date == "2014-06-04" |  data.1$date == "2014-06-16" | data.1$date == "2014-06-17" | data.1$date == "2014-06-18" | data.1$date == "2014-06-19" | data.1$date == "2014-07-23" | data.1$date == "2014-07-28" | data.1$date == "2014-07-29" | data.1$date == "2014-08-04", ]
+```
+
+```{r distribution, echo=FALSE}
+par("mfcol" = c(2, 3), mar = c(2.5, 2.5, 2.5, 3.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+
+for(i in unique(as.numeric(data.2$subject))) {
+  data.2.1 <- data.2[as.numeric(data.2$subject) == i, ]
+  hist(data.2.1$absorption, main = data.2.1$subject[1], xlab = "Absorption")
+  print(shapiro.test(data.2.1$absorption))
+  plot(data.2.1$absorption ~ data.2.1$measurement, xlab = "Measurement", ylab = "Absorption", pch = 21, bg = "#3FADCB")
+}
+rm(data.2.1, i)
+```
+
+```{r scale}
+jerk.cost <- matrix(data = data.2$mean.jerk.cost, nrow = 3, byrow = T)
+jerk.cost <- apply(jerk.cost, 1, scale)
+data.2$mean.jerk.cost <- c(jerk.cost)
+rm(jerk.cost)
+
+# absorption <- matrix(data = data.2$absorption, nrow = 12, byrow = T)
+# absorption <- apply(absorption, 1, scale)
+# data.2$absorption <- c(absorption)
+# rm(absorption)
+```
+
+```{r linear-regression}
+for(i in unique(as.numeric(data.2$subject))) {
+  data.2.1 <- data.2[as.numeric(data.2$subject) == i, ]
+  par("mfcol" = c(1, 1), mar = c(3, 3, 2.5, 3.5) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+  plot(data.2.1$mean.jerk.cost ~ data.2.1$absorption, main = data.2.1$subject[1], xlab = "Absorption", ylab = "Jerk Cost", pch = 21, bg = "#3FADCB")
+  mod <- lm(data.2.1$mean.jerk.cost ~ data.2.1$absorption)
+  print(summary(mod))
+  abline(mod)
+  par("mfcol" = c(2, 2), mar = c(3, 3, 2.5, 3.5) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+  plot(mod)
+}
+
+fss.features$activity.start <- factor(strftime(as.POSIXct(fss.features$activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"))
+
+
+data.4 <- data.1[1:28, c(2,3,6)]
+absorption.run <- matrix(data = data.44$absorption, nrow = 7, byrow = T)
+
+summary(lm(fss.features.barbara$absorption[-3] ~ absorption.run[-3, 1] + absorption.run[-3, 2] + absorption.run[-3, 3] + absorption.run[-3, 4]))
+
+plot(fss.features.barbara$absorption ~ absorption.run[, 1])
+
+```
+
+
+```
+
+```{r page-trend-test}
+runs <- matrix(data.2$absorption, nrow = 24, byrow = T)
+library(crank)
+p.res <- page.trend.test(runs, F)
+rm(runs, p.res)
 ```
