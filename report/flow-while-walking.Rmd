@@ -4,21 +4,20 @@ author: "Simon Bogutzky"
 date: "27. Januar 2016"
 output: html_document
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
   
 ```{r load-data, include=FALSE}
 # Remove all variables
-#rm(list = ls(all = T)) 
+rm(list = ls(all = T)) 
 
 # Set root path
-if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
-  root.path <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
+if(file.exists("Z:/2015/flow-gehen-und-laufen"))
+  root.path <- "Z:/2015/flow-gehen-und-laufen/"
 
 # Load functions
 require(flow)
+
+# Define Colors
+colors <- c("#3FADCB", "#33D100", "white")
 
 # Set test users
 users <- c("grueter-barbara", "lochwitz-andreas", "worpenberg-annika")
@@ -56,79 +55,266 @@ for (activity in activities) {
   }
   rm(user, fss.features, hrv.features, jc.features, cls.features, n.row, e.seq, subjects, dates, measurements)
 }
-rownames(data.1) <- seq(length = nrow(data.1)) 
-rm(activity)
+
+data.1b <- rbind(read.csv(paste(root.path, "features/baseline/grueter-barbara/fss-features.csv", sep = "")), read.csv(paste(root.path, "features/baseline/lochwitz-andreas/fss-features.csv", sep = "")), read.csv(paste(root.path, "features/baseline/worpenberg-annika/fss-features.csv", sep = "")))
+subjects <- factor(data.1b$first.name)
+dates <- factor(strftime(as.POSIXct(data.1b$activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"))
+data.1b <- data.frame(subject = subjects, date = dates, data.1b[, 1:5])
+
+rownames(data.1) <- seq(length = nrow(data.1))
+rownames(data.1b) <- seq(length = nrow(data.1b))
+data.1$absorption[data.1$absorption == 0] <- NA
+data.1b$absorption[data.1b$absorption == 0] <- NA
+rm(activity, dates, subjects)
 ```
 
-```{r select-data, include=FALSE}
+```{r distribution-all-data, echo=FALSE, message=FALSE, warning=FALSE}
+par("mfcol" = c(2, 3), mar = c(2.5, 2.5, 2.5, 3.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+
+for(i in unique(as.numeric(data.1$subject))) {
+  data.1.1 <- data.1[as.numeric(data.1$subject) == i, ]
+  hist(data.1.1$absorption, main = data.1.1$subject[1], xlab = "Absorption")
+  print(shapiro.test(data.1.1$absorption))
+  plot(data.1.1$absorption ~ data.1.1$measurement, xlab = "Measurement", ylab = "Absorption", pch = 21, bg = colors[1])
+}
+rm(data.1.1, i)
+```
+
+```{r linear-regression-all-data, echo=FALSE, message=FALSE, warning=FALSE}
+for(i in unique(as.numeric(data.1$subject))) {
+  data.1.1 <- data.1[as.numeric(data.1$subject) == i, ]
+  
+  par("mfcol" = c(2, 3), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+  
+  plot(data.1.1$meanhr ~ data.1.1$absorption, main = data.1.1$subject[1], xlab = "Absorption", ylab = "Mean HR", pch = 21, bg = colors[1])
+  mod <- lm(data.1.1$meanhr ~ data.1.1$absorption)
+  abline(mod)
+  
+  print("-----------------Mean HR-----------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.1.1$rmssd ~ data.1.1$absorption, main = data.1.1$subject[1], xlab = "Absorption", ylab = "RMSSD", pch = 21, bg = colors[1])
+  mod <- lm(data.1.1$rmssd ~ data.1.1$absorption)
+  abline(mod)
+  
+  print("-----------------RMSSD-------------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.1.1$mean.jerk.cost ~ data.1.1$absorption, main = data.1.1$subject[1], xlab = "Absorption", ylab = "Jerk Cost", pch = 21, bg = colors[1])
+  mod <- lm(data.1.1$mean.jerk.cost ~ data.1.1$absorption)
+  abline(mod)
+  
+  print("-----------------Jerk Cost---------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.1.1$mean.cycle.interval ~ data.1.1$absorption, main = data.1.1$subject[1], xlab = "Absorption", ylab = "Cycle Interval", pch = 21, bg = colors[1])
+  mod <- lm(data.1.1$mean.cycle.interval ~ data.1.1$absorption)
+  abline(mod)
+  
+  print("-----------------Cycle Interval----------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.1.1$mean.pcoi ~ data.1.1$absorption, main = data.1.1$subject[1], xlab = "Absorption", ylab = "PCoI", pch = 21, bg = colors[1])
+  mod <- lm(data.1.1$mean.pcoi ~ data.1.1$absorption)
+  abline(mod)
+  
+  print("-----------------PCoI--------------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.1.1$mean.nsei ~ data.1.1$absorption, main = data.1.1$subject[1], xlab = "Absorption", ylab = "NSEI", pch = 21, bg = colors[1])
+  mod <- lm(data.1.1$mean.nsei ~ data.1.1$absorption)
+  abline(mod)
+  
+  print("----------------NSEI--------------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+}
+
+rm(data.1.1, mod, i)
+```
+
+```{r select-data, message=FALSE, warning=FALSE, include=FALSE}
 data.2 <- data.1[data.1$date == "2014-03-06" | data.1$date == "2014-05-27" | data.1$date == "2014-06-03" | data.1$date == "2014-06-04" |  data.1$date == "2014-06-16" | data.1$date == "2014-06-17" | data.1$date == "2014-06-18" | data.1$date == "2014-06-19" | data.1$date == "2014-07-23" | data.1$date == "2014-07-28" | data.1$date == "2014-07-29" | data.1$date == "2014-08-04", ]
+
+data.2b <- data.1b[data.1b$date == "2014-03-06" | data.1b$date == "2014-05-27" | data.1b$date == "2014-06-03" | data.1b$date == "2014-06-04" |  data.1b$date == "2014-06-16" | data.1b$date == "2014-06-17" | data.1b$date == "2014-06-18" | data.1b$date == "2014-06-19" | data.1b$date == "2014-07-23" | data.1b$date == "2014-07-28" | data.1b$date == "2014-07-29" | data.1b$date == "2014-08-04", ]
+
+rownames(data.2) <- seq(length = nrow(data.2))
+rownames(data.2b) <- seq(length = nrow(data.2b))
 ```
 
-```{r model-to-predict-baseline-absorption, include=FALSE}
-data.3 <- data.1[c(1:28, 57:104), c(2, 3, 6)]
-data.3$absorption[data.3$absorption == 0] <- NA
-absorption.walking <- matrix(data = data.3$absorption, nrow = 19, byrow = T)
-baseline.fss.features.barbara <- read.csv("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/features/baseline/grueter-barbara/fss-features.csv")
-baseline.fss.features.andreas <- read.csv("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/features/baseline/lochwitz-andreas/fss-features.csv")
-baseline.fss.features.annika <- read.csv("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/features/baseline/worpenberg-annika/fss-features.csv")
-absorption.baseline <- c(baseline.fss.features.barbara$absorption, baseline.fss.features.andreas$absorption, baseline.fss.features.annika$absorption)
-absorption.baseline[absorption.baseline == 0] <- NA
-
-subject <- c(rep(1, 7), rep(2, 6), rep(3, 6))
-plot(absorption.baseline ~ absorption.walking[, 1], col = subject)
-mod.1 <- lm(absorption.baseline ~ absorption.walking[, 1])
-summary(mod.1)
-abline(mod.1)
-
-mod.2 <- lm(absorption.baseline ~ absorption.walking[, 1] + absorption.walking[, 2] + absorption.walking[, 3] + absorption.walking[, 4])
-summary(mod.2)
-```
-
-```{r distribution, echo=FALSE}
+```{r distribution-selected-data, echo=FALSE, message=FALSE, warning=FALSE}
 par("mfcol" = c(2, 3), mar = c(2.5, 2.5, 2.5, 3.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
 
 for(i in unique(as.numeric(data.2$subject))) {
   data.2.1 <- data.2[as.numeric(data.2$subject) == i, ]
   hist(data.2.1$absorption, main = data.2.1$subject[1], xlab = "Absorption")
   print(shapiro.test(data.2.1$absorption))
-  plot(data.2.1$absorption ~ data.2.1$measurement, xlab = "Measurement", ylab = "Absorption", pch = 21, bg = "#3FADCB")
+  plot(data.2.1$absorption ~ data.2.1$measurement, xlab = "Measurement", ylab = "Absorption", pch = 21, bg = colors[1])
 }
 rm(data.2.1, i)
 ```
 
-```{r scale}
-jerk.cost <- matrix(data = data.2$mean.jerk.cost, nrow = 3, byrow = T)
-jerk.cost <- apply(jerk.cost, 1, scale)
-data.2$mean.jerk.cost <- c(jerk.cost)
-rm(jerk.cost)
-
-# absorption <- matrix(data = data.2$absorption, nrow = 12, byrow = T)
-# absorption <- apply(absorption, 1, scale)
-# data.2$absorption <- c(absorption)
-# rm(absorption)
-```
-
-```{r linear-regression}
+```{r linear-regression-selected-data, echo=FALSE, message=FALSE, warning=FALSE}
 for(i in unique(as.numeric(data.2$subject))) {
   data.2.1 <- data.2[as.numeric(data.2$subject) == i, ]
-  par("mfcol" = c(1, 1), mar = c(3, 3, 2.5, 3.5) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
-  plot(data.2.1$mean.jerk.cost ~ data.2.1$absorption, main = data.2.1$subject[1], xlab = "Absorption", ylab = "Jerk Cost", pch = 21, bg = "#3FADCB")
-  mod <- lm(data.2.1$mean.jerk.cost ~ data.2.1$absorption)
-  print(summary(mod))
+  
+  par("mfcol" = c(2, 3), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+  
+  plot(data.2.1$meanhr ~ data.2.1$absorption, main = data.2.1$subject[1], xlab = "Absorption", ylab = "Mean HR", pch = 21, bg = colors[1])
+  mod <- lm(data.2.1$meanhr ~ data.2.1$absorption)
   abline(mod)
-  par("mfcol" = c(2, 2), mar = c(3, 3, 2.5, 3.5) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
-  plot(mod)
+  
+  print("-----------------Mean HR-----------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.2.1$rmssd ~ data.2.1$absorption, main = data.2.1$subject[1], xlab = "Absorption", ylab = "RMSSD", pch = 21, bg = colors[1])
+  mod <- lm(data.2.1$rmssd ~ data.2.1$absorption)
+  abline(mod)
+  
+  print("-----------------RMSSD-------------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.2.1$mean.jerk.cost ~ data.2.1$absorption, main = data.2.1$subject[1], xlab = "Absorption", ylab = "Jerk Cost", pch = 21, bg = colors[1])
+  mod <- lm(data.2.1$mean.jerk.cost ~ data.2.1$absorption)
+  abline(mod)
+  
+  print("-----------------Jerk Cost---------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.2.1$mean.cycle.interval ~ data.2.1$absorption, main = data.2.1$subject[1], xlab = "Absorption", ylab = "Cycle Interval", pch = 21, bg = colors[1])
+  mod <- lm(data.2.1$mean.cycle.interval ~ data.2.1$absorption)
+  abline(mod)
+  
+  print("-----------------Cycle Interval----------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.2.1$mean.pcoi ~ data.2.1$absorption, main = data.2.1$subject[1], xlab = "Absorption", ylab = "PCoI", pch = 21, bg = colors[1])
+  mod <- lm(data.2.1$mean.pcoi ~ data.2.1$absorption)
+  abline(mod)
+  
+  print("-----------------PCoI--------------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.2.1$mean.nsei ~ data.2.1$absorption, main = data.2.1$subject[1], xlab = "Absorption", ylab = "NSEI", pch = 21, bg = colors[1])
+  mod <- lm(data.2.1$mean.nsei ~ data.2.1$absorption)
+  abline(mod)
+  
+  print("----------------NSEI--------------------")
+  print(summary(mod))
+  print("-----------------------------------------")
 }
 
-fss.features$activity.start <- factor(strftime(as.POSIXct(fss.features$activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"))
+rm(data.2.1, mod, i)
 ```
 
+```{r model-to-predict-baseline-absorption, message=FALSE, warning=FALSE, include=FALSE}
+data.3 <- data.1[c(1:28, 57:104), ]
+absorption.matrix <- matrix(data = data.3$absorption, nrow = length(data.3$absorption)/4, byrow = T)
 
+par("mfrow" = c(1, 1), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+plot(data.1b$absorption ~ absorption.matrix[, 1], xlab = "Absorption 15'", ylab = "Absorption Baseline", pch = 21, bg = colors[as.numeric(data.1b$subject)])
+
+mod.1 <- lm(data.1b$absorption ~ absorption.matrix[, 1])
+summary(mod.1)
+abline(mod.1)
+
+mod.2 <- lm(data.1b$absorption ~ absorption.matrix[, 1] + absorption.matrix[, 2] + absorption.matrix[, 3] + absorption.matrix[, 4])
+summary(mod.2)
+
+predictFeature <- function(data.1, coefficients) {
+  return(as.numeric(coefficients[1]) + as.numeric(coefficients[2]) * data.1[1] + as.numeric(coefficients[3]) * data.1[2] + as.numeric(coefficients[4]) * data.1[3] + as.numeric(coefficients[5]) * data.1[4])
+}
+
+baseline.absorption <- c(data.2b$absorption[1], predictFeature(data.2$absorption[5:8], mod.2$coefficients), predictFeature(data.2$absorption[9:12], mod.2$coefficients), predictFeature(data.2$absorption[13:16], mod.2$coefficients))
+
+rm(mod.1, mod.2, data.3, predictFeature, absorption.matrix)
 ```
 
-```{r page-trend-test}
-runs <- matrix(data.2$absorption, nrow = 24, byrow = T)
-library(crank)
-p.res <- page.trend.test(runs, F)
-rm(runs, p.res)
+```{r substract-baseline-absorption, message=FALSE, warning=FALSE, include=FALSE}
+data.3 <- data.2
+absorption.matrix <- matrix(data = data.2$absorption, nrow = length(data.2$absorption)/4, byrow = T)
+baseline.absorption <- c(baseline.absorption, data.2b$absorption[-1])
+absorption.matrix <- sweep(absorption.matrix, 1, (baseline.absorption - 1), "-")
+data.3$absorption <- c(t(absorption.matrix))
+rm(baseline.absorption, absorption.matrix)
+```
+
+```{r distribution-selected-data-1, echo=FALSE, message=FALSE, warning=FALSE}
+par("mfcol" = c(2, 3), mar = c(2.5, 2.5, 2.5, 3.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+
+for(i in unique(as.numeric(data.3$subject))) {
+  data.3.1 <- data.3[as.numeric(data.3$subject) == i, ]
+  hist(data.3.1$absorption, main = data.3.1$subject[1], xlab = "Absorption")
+  print(shapiro.test(data.3.1$absorption))
+  plot(data.3.1$absorption ~ data.3.1$measurement, xlab = "Measurement", ylab = "Absorption", pch = 21, bg = colors[1])
+}
+rm(data.3.1, i)
+```
+
+```{r linear-regression-selected-data-1, echo=FALSE, message=FALSE, warning=FALSE}
+for(i in unique(as.numeric(data.3$subject))) {
+  data.3.1 <- data.3[as.numeric(data.3$subject) == i, ]
+  
+  par("mfcol" = c(2, 3), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+  
+  plot(data.3.1$meanhr ~ data.3.1$absorption, main = data.3.1$subject[1], xlab = "Absorption", ylab = "Mean HR", pch = 21, bg = colors[1])
+  mod <- lm(data.3.1$meanhr ~ data.3.1$absorption)
+  abline(mod)
+  
+  print("-----------------Mean HR-----------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.3.1$rmssd ~ data.3.1$absorption, main = data.3.1$subject[1], xlab = "Absorption", ylab = "RMSSD", pch = 21, bg = colors[1])
+  mod <- lm(data.3.1$rmssd ~ data.3.1$absorption)
+  abline(mod)
+  
+  print("-----------------RMSSD-------------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.3.1$mean.jerk.cost ~ data.3.1$absorption, main = data.3.1$subject[1], xlab = "Absorption", ylab = "Jerk Cost", pch = 21, bg = colors[1])
+  mod <- lm(data.3.1$mean.jerk.cost ~ data.3.1$absorption)
+  abline(mod)
+  
+  print("-----------------Jerk Cost---------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.3.1$mean.cycle.interval ~ data.3.1$absorption, main = data.3.1$subject[1], xlab = "Absorption", ylab = "Cycle Interval", pch = 21, bg = colors[1])
+  mod <- lm(data.3.1$mean.cycle.interval ~ data.3.1$absorption)
+  abline(mod)
+  
+  print("-----------------Cycle Interval----------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.3.1$mean.pcoi ~ data.3.1$absorption, main = data.3.1$subject[1], xlab = "Absorption", ylab = "PCoI", pch = 21, bg = colors[1])
+  mod <- lm(data.3.1$mean.pcoi ~ data.3.1$absorption)
+  abline(mod)
+  
+  print("-----------------PCoI--------------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.3.1$mean.nsei ~ data.3.1$absorption, main = data.3.1$subject[1], xlab = "Absorption", ylab = "NSEI", pch = 21, bg = colors[1])
+  mod <- lm(data.3.1$mean.nsei ~ data.3.1$absorption)
+  abline(mod)
+  
+  print("----------------NSEI--------------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+}
+
+rm(data.3.1, mod, i)
 ```
