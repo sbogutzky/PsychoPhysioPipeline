@@ -139,9 +139,9 @@ rm(data.1.1, mod, i)
 ```
 
 ```{r select-data, message=FALSE, warning=FALSE, include=FALSE}
-data.2 <- data.1[data.1$date == "2014-03-06" | data.1$date == "2014-05-27" | data.1$date == "2014-06-03" | data.1$date == "2014-06-04" |  data.1$date == "2014-06-16" | data.1$date == "2014-06-17" | data.1$date == "2014-06-18" | data.1$date == "2014-06-19" | data.1$date == "2014-07-23" | data.1$date == "2014-07-28" | data.1$date == "2014-07-29" | data.1$date == "2014-08-04", ]
+data.2 <- data.1[data.1$date == "2014-03-06" | data.1$date == "2014-05-28" | data.1$date == "2014-06-03" | data.1$date == "2014-06-04" |  data.1$date == "2014-06-16" | data.1$date == "2014-06-17" | data.1$date == "2014-06-18" | data.1$date == "2014-06-19" | data.1$date == "2014-07-23" | data.1$date == "2014-07-28" | data.1$date == "2014-07-29" | data.1$date == "2014-08-04", ]
 
-data.2b <- data.1b[data.1b$date == "2014-03-06" | data.1b$date == "2014-05-27" | data.1b$date == "2014-06-03" | data.1b$date == "2014-06-04" |  data.1b$date == "2014-06-16" | data.1b$date == "2014-06-17" | data.1b$date == "2014-06-18" | data.1b$date == "2014-06-19" | data.1b$date == "2014-07-23" | data.1b$date == "2014-07-28" | data.1b$date == "2014-07-29" | data.1b$date == "2014-08-04", ]
+data.2b <- data.1b[data.1b$date == "2014-03-06" | data.1b$date == "2014-05-28" | data.1b$date == "2014-06-03" | data.1b$date == "2014-06-04" |  data.1b$date == "2014-06-16" | data.1b$date == "2014-06-17" | data.1b$date == "2014-06-18" | data.1b$date == "2014-06-19" | data.1b$date == "2014-07-23" | data.1b$date == "2014-07-28" | data.1b$date == "2014-07-29" | data.1b$date == "2014-08-04", ]
 
 rownames(data.2) <- seq(length = nrow(data.2))
 rownames(data.2b) <- seq(length = nrow(data.2b))
@@ -246,6 +246,7 @@ absorption.matrix <- matrix(data = data.2$absorption, nrow = length(data.2$absor
 baseline.absorption <- c(baseline.absorption, data.2b$absorption[-1])
 absorption.matrix <- sweep(absorption.matrix, 1, (baseline.absorption - 1), "-")
 data.3$absorption <- c(t(absorption.matrix))
+data.3$absorption[data.3$absorption < 1] <- 1
 rm(baseline.absorption, absorption.matrix)
 ```
 
@@ -318,3 +319,102 @@ for(i in unique(as.numeric(data.3$subject))) {
 
 rm(data.3.1, mod, i)
 ```
+
+```{r scale, message=FALSE, warning=FALSE, include=FALSE}
+data.4 <- data.3
+
+normalize <- function(x) {
+  return(t(scale(x)[, 1]))
+}
+
+meanhr.matrix <- matrix(data = data.3$meanhr, nrow = length(data.3$meanhr)/4, byrow = T)
+meanhr.matrix <- apply(meanhr.matrix, 1, normalize)
+
+data.4$meanhr <- c(meanhr.matrix)
+
+rmssd.matrix <- matrix(data = data.3$rmssd, nrow = length(data.3$rmssd)/4, byrow = T)
+rmssd.matrix <- apply(rmssd.matrix, 1, normalize)
+
+data.4$rmssd <- c(rmssd.matrix)
+
+mean.jerk.cost.matrix <- matrix(data = data.3$mean.jerk.cost, nrow = length(data.3$mean.jerk.cost)/4, byrow = T)
+mean.jerk.cost.matrix <- apply(mean.jerk.cost.matrix, 1, normalize)
+
+data.4$mean.jerk.cost <- c(mean.jerk.cost.matrix)
+
+mean.cycle.interval.matrix <- matrix(data = data.3$mean.cycle.interval, nrow = length(data.3$mean.cycle.interval)/4, byrow = T)
+mean.cycle.interval.matrix <- apply(mean.cycle.interval.matrix, 1, normalize)
+
+data.4$mean.cycle.interval <- c(mean.cycle.interval.matrix)
+
+mean.pcoi.matrix <- matrix(data = data.3$mean.pcoi, nrow = length(data.3$mean.pcoi)/4, byrow = T)
+mean.pcoi.matrix <- apply(mean.pcoi.matrix, 1, normalize)
+
+data.4$mean.pcoi <- c(mean.pcoi.matrix)
+
+mean.nsei.matrix <- matrix(data = data.3$mean.nsei, nrow = length(data.3$mean.nsei)/4, byrow = T)
+mean.nsei.matrix <- apply(mean.nsei.matrix, 1, normalize)
+
+data.4$mean.nsei <- c(mean.nsei.matrix)
+
+rm(meanhr.matrix, rmssd.matrix, mean.jerk.cost.matrix, mean.cycle.interval.matrix, mean.pcoi.matrix, mean.nsei.matrix, normalize)
+```
+
+```{r linear-regression-selected-data-2, echo=FALSE, message=FALSE, warning=FALSE}
+for(i in unique(as.numeric(data.4$subject))) {
+  data.4.1 <- data.4[as.numeric(data.4$subject) == i, ]
+  
+  par("mfcol" = c(2, 3), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+  
+  plot(data.4.1$meanhr ~ data.4.1$absorption, main = data.4.1$subject[1], xlab = "Absorption", ylab = "Mean HR", pch = 21, bg = colors[1])
+  mod <- lm(data.4.1$meanhr ~ data.4.1$absorption)
+  abline(mod)
+  
+  print("-----------------Mean HR-----------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.4.1$rmssd ~ data.4.1$absorption, main = data.4.1$subject[1], xlab = "Absorption", ylab = "RMSSD", pch = 21, bg = colors[1])
+  mod <- lm(data.4.1$rmssd ~ data.4.1$absorption)
+  abline(mod)
+  
+  print("-----------------RMSSD-------------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.4.1$mean.jerk.cost ~ data.4.1$absorption, main = data.4.1$subject[1], xlab = "Absorption", ylab = "Jerk Cost", pch = 21, bg = colors[1])
+  mod <- lm(data.4.1$mean.jerk.cost ~ data.4.1$absorption)
+  abline(mod)
+  
+  print("-----------------Jerk Cost---------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.4.1$mean.cycle.interval ~ data.4.1$absorption, main = data.4.1$subject[1], xlab = "Absorption", ylab = "Cycle Interval", pch = 21, bg = colors[1])
+  mod <- lm(data.4.1$mean.cycle.interval ~ data.4.1$absorption)
+  abline(mod)
+  
+  print("-----------------Cycle Interval----------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.4.1$mean.pcoi ~ data.4.1$absorption, main = data.4.1$subject[1], xlab = "Absorption", ylab = "PCoI", pch = 21, bg = colors[1])
+  mod <- lm(data.4.1$mean.pcoi ~ data.4.1$absorption)
+  abline(mod)
+  
+  print("-----------------PCoI--------------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+  
+  plot(data.4.1$mean.nsei ~ data.4.1$absorption, main = data.4.1$subject[1], xlab = "Absorption", ylab = "NSEI", pch = 21, bg = colors[1])
+  mod <- lm(data.4.1$mean.nsei ~ data.4.1$absorption)
+  abline(mod)
+  
+  print("----------------NSEI--------------------")
+  print(summary(mod))
+  print("-----------------------------------------")
+}
+
+rm(data.4.1, mod, i)
+```
+
