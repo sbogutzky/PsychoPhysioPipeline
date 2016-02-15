@@ -43,7 +43,7 @@ for (activity in activities) {
     source("code-snippets/load-cls-features.R") 
 
     # Set factors
-    subjects <- factor(fss.features$first.name)
+    subjects <- factor(fss.features$first.name, levels = c("Barbara", "Andreas", "Annika"), labels = c("Female 1", "Male", "Female 2"))
     dates <- factor(strftime(as.POSIXct(fss.features$activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"))
     measurements <- factor(fss.features$measurement, levels = c(1, 2, 3, 4), labels = c("15'", "30'", "45'", "60'"))
   
@@ -118,7 +118,7 @@ for(i in unique(as.numeric(data.1$subject))) {
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.1.1$absorption ~ data.1.1$mean.pcoi, main = data.1.1$subject[1], ylab = "PCoI", xlab = "Absorption", pch = 21, bg = colors[1])
+  plot(data.1.1$absorption ~ data.1.1$mean.pcoi, main = data.1.1$subject[1], xlab = "PCoI", ylab = "Absorption", pch = 21, bg = colors[1])
   mod <- lm(data.1.1$absorption ~ data.1.1$mean.pcoi)
   abline(mod)
   
@@ -197,7 +197,7 @@ for(i in unique(as.numeric(data.2$subject))) {
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.2.1$absorption ~ data.2.1$mean.pcoi, main = data.2.1$subject[1], ylab = "PCoI", xlab = "Absorption", pch = 21, bg = colors[1])
+  plot(data.2.1$absorption ~ data.2.1$mean.pcoi, main = data.2.1$subject[1], xlab = "PCoI", ylab = "Absorption", pch = 21, bg = colors[1])
   mod <- lm(data.2.1$absorption ~ data.2.1$mean.pcoi)
   abline(mod)
   
@@ -300,7 +300,7 @@ for(i in unique(as.numeric(data.3$subject))) {
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.3.1$absorption ~ data.3.1$mean.pcoi, main = data.3.1$subject[1], ylab = "PCoI", xlab = "Absorption", pch = 21, bg = colors[1])
+  plot(data.3.1$absorption ~ data.3.1$mean.pcoi, main = data.3.1$subject[1], xlab = "PCoI", ylab = "Absorption", pch = 21, bg = colors[1])
   mod <- lm(data.3.1$absorption ~ data.3.1$mean.pcoi)
   abline(mod)
   
@@ -398,7 +398,7 @@ for(i in unique(as.numeric(data.4$subject))) {
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.4.1$absorption ~ data.4.1$mean.pcoi, main = data.4.1$subject[1], ylab = "PCoI", xlab = "Absorption", pch = 21, bg = colors[1])
+  plot(data.4.1$absorption ~ data.4.1$mean.pcoi, main = data.4.1$subject[1], xlab = "PCoI", ylab = "Absorption", pch = 21, bg = colors[1])
   mod <- lm(data.4.1$absorption ~ data.4.1$mean.pcoi)
   abline(mod)
   
