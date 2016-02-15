@@ -86,48 +86,48 @@ for(i in unique(as.numeric(data.1$subject))) {
   
   par("mfcol" = c(2, 3), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
   
-  plot(data.1.1$meanhr ~ data.1.1$absorption, main = data.1.1$subject[1], xlab = "Absorption", ylab = "Mean HR", pch = 21, bg = colors[1])
-  mod <- lm(data.1.1$meanhr ~ data.1.1$absorption)
+  plot(data.1.1$absorption ~ data.1.1$meanhr, main = data.1.1$subject[1], xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.1.1$absorption ~ data.1.1$meanhr)
   abline(mod)
   
   print("-----------------Mean HR-----------------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.1.1$rmssd ~ data.1.1$absorption, main = data.1.1$subject[1], xlab = "Absorption", ylab = "RMSSD", pch = 21, bg = colors[1])
-  mod <- lm(data.1.1$rmssd ~ data.1.1$absorption)
+  plot(data.1.1$absorption ~ data.1.1$rmssd, main = data.1.1$subject[1], xlab = "RMSSD", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.1.1$absorption ~ data.1.1$rmssd)
   abline(mod)
   
   print("-----------------RMSSD-------------------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.1.1$mean.jerk.cost ~ data.1.1$absorption, main = data.1.1$subject[1], xlab = "Absorption", ylab = "Jerk Cost", pch = 21, bg = colors[1])
-  mod <- lm(data.1.1$mean.jerk.cost ~ data.1.1$absorption)
+  plot(data.1.1$absorption ~ data.1.1$mean.jerk.cost, main = data.1.1$subject[1], xlab = "Jerk Cost", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.1.1$absorption ~ data.1.1$mean.jerk.cost)
   abline(mod)
   
   print("-----------------Jerk Cost---------------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.1.1$mean.cycle.interval ~ data.1.1$absorption, main = data.1.1$subject[1], xlab = "Absorption", ylab = "Cycle Interval", pch = 21, bg = colors[1])
-  mod <- lm(data.1.1$mean.cycle.interval ~ data.1.1$absorption)
+  plot(data.1.1$absorption ~ data.1.1$mean.cycle.interval, main = data.1.1$subject[1], xlab = "Cycle Interval", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.1.1$absorption ~ data.1.1$mean.cycle.interval)
   abline(mod)
   
   print("-----------------Cycle Interval----------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.1.1$mean.pcoi ~ data.1.1$absorption, main = data.1.1$subject[1], xlab = "Absorption", ylab = "PCoI", pch = 21, bg = colors[1])
-  mod <- lm(data.1.1$mean.pcoi ~ data.1.1$absorption)
+  plot(data.1.1$absorption ~ data.1.1$mean.pcoi, main = data.1.1$subject[1], ylab = "PCoI", xlab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.1.1$absorption ~ data.1.1$mean.pcoi)
   abline(mod)
   
   print("-----------------PCoI--------------------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.1.1$mean.nsei ~ data.1.1$absorption, main = data.1.1$subject[1], xlab = "Absorption", ylab = "NSEI", pch = 21, bg = colors[1])
-  mod <- lm(data.1.1$mean.nsei ~ data.1.1$absorption)
+  plot(data.1.1$absorption ~ data.1.1$mean.nsei, main = data.1.1$subject[1], xlab = "NSEI", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.1.1$absorption ~ data.1.1$mean.nsei)
   abline(mod)
   
   print("----------------NSEI--------------------")
@@ -165,48 +165,48 @@ for(i in unique(as.numeric(data.2$subject))) {
   
   par("mfcol" = c(2, 3), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
   
-  plot(data.2.1$meanhr ~ data.2.1$absorption, main = data.2.1$subject[1], xlab = "Absorption", ylab = "Mean HR", pch = 21, bg = colors[1])
-  mod <- lm(data.2.1$meanhr ~ data.2.1$absorption)
+  plot(data.2.1$absorption ~ data.2.1$meanhr, main = data.2.1$subject[1], xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.2.1$absorption ~ data.2.1$meanhr)
   abline(mod)
   
   print("-----------------Mean HR-----------------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.2.1$rmssd ~ data.2.1$absorption, main = data.2.1$subject[1], xlab = "Absorption", ylab = "RMSSD", pch = 21, bg = colors[1])
-  mod <- lm(data.2.1$rmssd ~ data.2.1$absorption)
+  plot(data.2.1$absorption ~ data.2.1$rmssd, main = data.2.1$subject[1], xlab = "RMSSD", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.2.1$absorption ~ data.2.1$rmssd)
   abline(mod)
   
   print("-----------------RMSSD-------------------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.2.1$mean.jerk.cost ~ data.2.1$absorption, main = data.2.1$subject[1], xlab = "Absorption", ylab = "Jerk Cost", pch = 21, bg = colors[1])
-  mod <- lm(data.2.1$mean.jerk.cost ~ data.2.1$absorption)
+  plot(data.2.1$absorption ~ data.2.1$mean.jerk.cost, main = data.2.1$subject[1], xlab = "Jerk Cost", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.2.1$absorption ~ data.2.1$mean.jerk.cost)
   abline(mod)
   
   print("-----------------Jerk Cost---------------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.2.1$mean.cycle.interval ~ data.2.1$absorption, main = data.2.1$subject[1], xlab = "Absorption", ylab = "Cycle Interval", pch = 21, bg = colors[1])
-  mod <- lm(data.2.1$mean.cycle.interval ~ data.2.1$absorption)
+  plot(data.2.1$absorption ~ data.2.1$mean.cycle.interval, main = data.2.1$subject[1], xlab = "Cycle Interval", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.2.1$absorption ~ data.2.1$mean.cycle.interval)
   abline(mod)
   
   print("-----------------Cycle Interval----------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.2.1$mean.pcoi ~ data.2.1$absorption, main = data.2.1$subject[1], xlab = "Absorption", ylab = "PCoI", pch = 21, bg = colors[1])
-  mod <- lm(data.2.1$mean.pcoi ~ data.2.1$absorption)
+  plot(data.2.1$absorption ~ data.2.1$mean.pcoi, main = data.2.1$subject[1], ylab = "PCoI", xlab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.2.1$absorption ~ data.2.1$mean.pcoi)
   abline(mod)
   
   print("-----------------PCoI--------------------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.2.1$mean.nsei ~ data.2.1$absorption, main = data.2.1$subject[1], xlab = "Absorption", ylab = "NSEI", pch = 21, bg = colors[1])
-  mod <- lm(data.2.1$mean.nsei ~ data.2.1$absorption)
+  plot(data.2.1$absorption ~ data.2.1$mean.nsei, main = data.2.1$subject[1], xlab = "NSEI", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.2.1$absorption ~ data.2.1$mean.nsei)
   abline(mod)
   
   print("----------------NSEI--------------------")
@@ -268,48 +268,48 @@ for(i in unique(as.numeric(data.3$subject))) {
   
   par("mfcol" = c(2, 3), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
   
-  plot(data.3.1$meanhr ~ data.3.1$absorption, main = data.3.1$subject[1], xlab = "Absorption", ylab = "Mean HR", pch = 21, bg = colors[1])
-  mod <- lm(data.3.1$meanhr ~ data.3.1$absorption)
+  plot(data.3.1$absorption ~ data.3.1$meanhr, main = data.3.1$subject[1], xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.3.1$absorption ~ data.3.1$meanhr)
   abline(mod)
   
   print("-----------------Mean HR-----------------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.3.1$rmssd ~ data.3.1$absorption, main = data.3.1$subject[1], xlab = "Absorption", ylab = "RMSSD", pch = 21, bg = colors[1])
-  mod <- lm(data.3.1$rmssd ~ data.3.1$absorption)
+  plot(data.3.1$absorption ~ data.3.1$rmssd, main = data.3.1$subject[1], xlab = "RMSSD", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.3.1$absorption ~ data.3.1$rmssd)
   abline(mod)
   
   print("-----------------RMSSD-------------------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.3.1$mean.jerk.cost ~ data.3.1$absorption, main = data.3.1$subject[1], xlab = "Absorption", ylab = "Jerk Cost", pch = 21, bg = colors[1])
-  mod <- lm(data.3.1$mean.jerk.cost ~ data.3.1$absorption)
+  plot(data.3.1$absorption ~ data.3.1$mean.jerk.cost, main = data.3.1$subject[1], xlab = "Jerk Cost", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.3.1$absorption ~ data.3.1$mean.jerk.cost)
   abline(mod)
   
   print("-----------------Jerk Cost---------------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.3.1$mean.cycle.interval ~ data.3.1$absorption, main = data.3.1$subject[1], xlab = "Absorption", ylab = "Cycle Interval", pch = 21, bg = colors[1])
-  mod <- lm(data.3.1$mean.cycle.interval ~ data.3.1$absorption)
+  plot(data.3.1$absorption ~ data.3.1$mean.cycle.interval, main = data.3.1$subject[1], xlab = "Cycle Interval", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.3.1$absorption ~ data.3.1$mean.cycle.interval)
   abline(mod)
   
   print("-----------------Cycle Interval----------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.3.1$mean.pcoi ~ data.3.1$absorption, main = data.3.1$subject[1], xlab = "Absorption", ylab = "PCoI", pch = 21, bg = colors[1])
-  mod <- lm(data.3.1$mean.pcoi ~ data.3.1$absorption)
+  plot(data.3.1$absorption ~ data.3.1$mean.pcoi, main = data.3.1$subject[1], ylab = "PCoI", xlab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.3.1$absorption ~ data.3.1$mean.pcoi)
   abline(mod)
   
   print("-----------------PCoI--------------------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.3.1$mean.nsei ~ data.3.1$absorption, main = data.3.1$subject[1], xlab = "Absorption", ylab = "NSEI", pch = 21, bg = colors[1])
-  mod <- lm(data.3.1$mean.nsei ~ data.3.1$absorption)
+  plot(data.3.1$absorption ~ data.3.1$mean.nsei, main = data.3.1$subject[1], xlab = "NSEI", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.3.1$absorption ~ data.3.1$mean.nsei)
   abline(mod)
   
   print("----------------NSEI--------------------")
@@ -366,55 +366,206 @@ for(i in unique(as.numeric(data.4$subject))) {
   
   par("mfcol" = c(2, 3), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
   
-  plot(data.4.1$meanhr ~ data.4.1$absorption, main = data.4.1$subject[1], xlab = "Absorption", ylab = "Mean HR", pch = 21, bg = colors[1])
-  mod <- lm(data.4.1$meanhr ~ data.4.1$absorption)
+  plot(data.4.1$absorption ~ data.4.1$meanhr, main = data.4.1$subject[1], xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.4.1$absorption ~ data.4.1$meanhr)
   abline(mod)
   
   print("-----------------Mean HR-----------------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.4.1$rmssd ~ data.4.1$absorption, main = data.4.1$subject[1], xlab = "Absorption", ylab = "RMSSD", pch = 21, bg = colors[1])
-  mod <- lm(data.4.1$rmssd ~ data.4.1$absorption)
+  plot(data.4.1$absorption ~ data.4.1$rmssd, main = data.4.1$subject[1], xlab = "RMSSD", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.4.1$absorption ~ data.4.1$rmssd)
   abline(mod)
   
   print("-----------------RMSSD-------------------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.4.1$mean.jerk.cost ~ data.4.1$absorption, main = data.4.1$subject[1], xlab = "Absorption", ylab = "Jerk Cost", pch = 21, bg = colors[1])
-  mod <- lm(data.4.1$mean.jerk.cost ~ data.4.1$absorption)
+  plot(data.4.1$absorption ~ data.4.1$mean.jerk.cost, main = data.4.1$subject[1], xlab = "Jerk Cost", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.4.1$absorption ~ data.4.1$mean.jerk.cost)
   abline(mod)
   
   print("-----------------Jerk Cost---------------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.4.1$mean.cycle.interval ~ data.4.1$absorption, main = data.4.1$subject[1], xlab = "Absorption", ylab = "Cycle Interval", pch = 21, bg = colors[1])
-  mod <- lm(data.4.1$mean.cycle.interval ~ data.4.1$absorption)
+  plot(data.4.1$absorption ~ data.4.1$mean.cycle.interval, main = data.4.1$subject[1], xlab = "Cycle Interval", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.4.1$absorption ~ data.4.1$mean.cycle.interval)
   abline(mod)
   
   print("-----------------Cycle Interval----------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.4.1$mean.pcoi ~ data.4.1$absorption, main = data.4.1$subject[1], xlab = "Absorption", ylab = "PCoI", pch = 21, bg = colors[1])
-  mod <- lm(data.4.1$mean.pcoi ~ data.4.1$absorption)
+  plot(data.4.1$absorption ~ data.4.1$mean.pcoi, main = data.4.1$subject[1], ylab = "PCoI", xlab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.4.1$absorption ~ data.4.1$mean.pcoi)
   abline(mod)
   
   print("-----------------PCoI--------------------")
   print(summary(mod))
   print("-----------------------------------------")
   
-  plot(data.4.1$mean.nsei ~ data.4.1$absorption, main = data.4.1$subject[1], xlab = "Absorption", ylab = "NSEI", pch = 21, bg = colors[1])
-  mod <- lm(data.4.1$mean.nsei ~ data.4.1$absorption)
+  plot(data.4.1$absorption ~ data.4.1$mean.nsei, main = data.4.1$subject[1], xlab = "NSEI", ylab = "Absorption", pch = 21, bg = colors[1])
+  mod <- lm(data.4.1$absorption ~ data.4.1$mean.nsei)
   abline(mod)
   
   print("----------------NSEI--------------------")
   print(summary(mod))
   print("-----------------------------------------")
-}
+  }
 
 rm(data.4.1, mod, i)
 ```
+
+```{r multi-model-subject-effect, echo=FALSE, message=FALSE, warning=FALSE}
+library(lmerTest)
+
+linear.model <- lm(absorption ~ 1, data.4)
+print(summary(linear.model))
+
+null.model <- lmer(absorption ~ (1 | subject), data = data.4, REML = F)
+print(summary(null.model))
+
+between.variance <- as.data.frame(VarCorr(null.model))[1, 4]
+within.variance <- as.data.frame(VarCorr(null.model))[2, 4]
+total.variance <- between.variance + within.variance
+
+variance.partition.coefficient <- between.variance / total.variance
+
+print(paste("VPC:", variance.partition.coefficient))
+
+lr <- 2 * (as.data.frame(logLik(null.model))[1, 1] - as.data.frame(logLik(linear.model))[1, 1])
+
+print(paste("LR:", lr, "chi-squared distribution on 1 d.f.:", qchisq(.95, df = 1)))
+
+print("---------------Jerk Cost-----------------")
+
+fit.model <- lmer(absorption ~ mean.jerk.cost + measurement + (1 | subject), data = data.4, REML = F)
+print(summary(fit.model))
+
+between.variance <- as.data.frame(VarCorr(fit.model))[1, 4]
+within.variance <- as.data.frame(VarCorr(fit.model))[2, 4]
+total.variance <- between.variance + within.variance
+
+variance.partition.coefficient <- between.variance / total.variance
+
+print(paste("VPC:", variance.partition.coefficient))
+
+anova(null.model, fit.model)
+
+print("-----------------------------------------")
+
+print("-----------------Cycle Interval----------")
+
+fit.model <- lmer(absorption ~ mean.cycle.interval + measurement + (1 | subject), data = data.4, REML = F)
+print(summary(fit.model))
+
+between.variance <- as.data.frame(VarCorr(fit.model))[1, 4]
+within.variance <- as.data.frame(VarCorr(fit.model))[2, 4]
+total.variance <- between.variance + within.variance
+
+variance.partition.coefficient <- between.variance / total.variance
+
+print(paste("VPC:", variance.partition.coefficient))
+
+anova(null.model, fit.model)
+
+print("-----------------------------------------")
+
+
+data.5 <- data.4[complete.cases(data.4), ]
+
+linear.model <- lm(absorption ~ 1, data.5)
+print(summary(linear.model))
+
+null.model <- lmer(absorption ~ (1 | subject), data = data.5, REML = F)
+print(summary(null.model))
+
+between.variance <- as.data.frame(VarCorr(null.model))[1, 4]
+within.variance <- as.data.frame(VarCorr(null.model))[2, 4]
+total.variance <- between.variance + within.variance
+
+variance.partition.coefficient <- between.variance / total.variance
+
+print(paste("VPC:", variance.partition.coefficient))
+
+lr <- 2 * (as.data.frame(logLik(null.model))[1, 1] - as.data.frame(logLik(linear.model))[1, 1])
+
+print(paste("LR:", lr, "chi-squared distribution on 1 d.f.:", qchisq(.95, df = 1)))
+
+print("-----------------Mean HR-----------------")
+
+fit.model <- lmer(absorption ~ meanhr + measurement + (1 | subject), data = data.5, REML = F)
+print(summary(fit.model))
+
+between.variance <- as.data.frame(VarCorr(fit.model))[1, 4]
+within.variance <- as.data.frame(VarCorr(fit.model))[2, 4]
+total.variance <- between.variance + within.variance
+
+variance.partition.coefficient <- between.variance / total.variance
+
+print(paste("VPC:", variance.partition.coefficient))
+
+anova(null.model, fit.model)
+
+print("-----------------------------------------")
+
+print("-----------------RMSSD-------------------")
+
+fit.model <- lmer(absorption ~ rmssd + measurement + (1 | subject), data = data.5, REML = F)
+print(summary(fit.model))
+
+between.variance <- as.data.frame(VarCorr(fit.model))[1, 4]
+within.variance <- as.data.frame(VarCorr(fit.model))[2, 4]
+total.variance <- between.variance + within.variance
+
+variance.partition.coefficient <- between.variance / total.variance
+
+print(paste("VPC:", variance.partition.coefficient))
+
+anova(null.model, fit.model)
+
+print("-----------------------------------------")
+
+print("-----------------PCoI--------------------")
+
+fit.model <- lmer(absorption ~ mean.pcoi + measurement + (1 | subject), data = data.5, REML = F)
+print(summary(fit.model))
+
+between.variance <- as.data.frame(VarCorr(fit.model))[1, 4]
+within.variance <- as.data.frame(VarCorr(fit.model))[2, 4]
+total.variance <- between.variance + within.variance
+
+variance.partition.coefficient <- between.variance / total.variance
+
+print(paste("VPC:", variance.partition.coefficient))
+
+anova(null.model, fit.model)
+
+print("-----------------------------------------")
+
+print("-----------------NSEI--------------------")
+
+fit.model <- lmer(absorption ~ mean.nsei + measurement + (1 | subject), data = data.5, REML = F)
+print(summary(fit.model))
+
+between.variance <- as.data.frame(VarCorr(fit.model))[1, 4]
+within.variance <- as.data.frame(VarCorr(fit.model))[2, 4]
+total.variance <- between.variance + within.variance
+
+variance.partition.coefficient <- between.variance / total.variance
+
+print(paste("VPC:", variance.partition.coefficient))
+
+anova(null.model, fit.model)
+
+print("-----------------------------------------")
+
+rm(null.model, linear.model, lr, fit.model, variance.partition.coefficient, between.variance, within.variance, total.variance, l.lmerTest.private.contrast, reml.lmerTest.private, devFunOnly.lmerTest.private)
+```
+
+Before testing the hypotheses, we assessed the variance components on the within-subject level (level 1) and on the between-subject level (level 2) for the flow-subscale absorption. For absorption 84.1 % of the variance was located on the between-subject level and 15.9 % of the variance on the within-subject level, respectively.
+
+
 
