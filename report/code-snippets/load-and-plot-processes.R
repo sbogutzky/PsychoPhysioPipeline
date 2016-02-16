@@ -47,15 +47,15 @@ box()
 
 # Plot CLS
 plot(process.data.3$t.s, process.data.3$psi, xlab = "", ylab = expression(Psi(t)), xaxt = "n", xlim = time.range, ylim = c(0, 1), pch = 21, bg = "#3FADCB")
-axis(1, at = ticks, labels = F)
+axis(1, at = ticks, labels = ticks, las = 1)
 abline(v = ticks, lty = "dashed", col = "darkgrey")
 box()
 
 frame()
 
-plot(process.data.4$t.s, process.data.4$pcoi, type = "l", xlab = "Time (s)", ylab = "Indexes", xlim = time.range, ylim = c(0, 1), lty = 2)
+plot(process.data.4$t.s, process.data.4$pcoi, type = "l", xlab = "Time (s)", ylab = "Indexes", xaxt = "n", xlim = time.range, ylim = c(0, 1), lty = 2)
 lines(process.data.4$t.s, process.data.4$nsei, col = "#3FADCB")
-axis(1, at = ticks, labels = F)
+axis(1, at = ticks, labels = ticks, las = 1)
 abline(v = ticks, lty = "dashed", col = "darkgrey")
 legend("topleft", c("Coherence Index", "Shannon Entropy Index"), lty = c("solid", "dashed"), col = c("#3FADCB", "#000000"), cex = .8, bg = "white")
 box()
@@ -71,8 +71,8 @@ box()
 
 # Plot JC
 require(caTools)
-plot(process.data.5$t.s, runmean(process.data.5$jerk.cost.m2s5/10^4, 10, endrule = "NA"), type = "l", xlab = "", ylab = expression("JC (x"~10^4~m^2*s^{-5}~")"), xlim = time.range, ylim = c(1, 2.5), pch = 21, col = "#3FADCB")
-axis(1, at = ticks)
+plot(process.data.5$t.s, runmean(process.data.5$jerk.cost.m2s5/10^4, 10, endrule = "NA"), type = "l", xlab = "", ylab = expression("JC (x"~10^4~m^2*s^{-5}~")"), xlim = time.range, ylim = c(1, 2.5), pch = 21, xaxt = "n", col = "#3FADCB")
+axis(1, at = ticks, labels = ticks, las = 1)
 abline(v = ticks, lty = "dashed", col = "darkgrey")
 box()
 
