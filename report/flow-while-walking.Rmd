@@ -10,8 +10,8 @@ output: html_document
 rm(list = ls(all = T)) 
 
 # Set root path
-if(file.exists("Z:/2015/flow-gehen-und-laufen"))
-  root.path <- "Z:/2015/flow-gehen-und-laufen/"
+if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
+  root.path <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
 
 # Load functions
 require(flow)
@@ -567,5 +567,19 @@ rm(null.model, linear.model, lr, fit.model, variance.partition.coefficient, betw
 
 Before testing the hypotheses, we assessed the variance components on the within-subject level (level 1) and on the between-subject level (level 2) for the flow-subscale absorption. For absorption 84.1 % of the variance was located on the between-subject level and 15.9 % of the variance on the within-subject level, respectively.
 
+```{r process-orientation, echo=FALSE, message=FALSE, warning=FALSE}
+max.nsei <- which.max(data.3$mean.nsei)
+min.nsei <- which.min(data.3$mean.nsei)
+activities.1 <- rep("walking", 2)
+dates <- c(as.character(data.3[min.nsei,]$date), as.character(data.3[max.nsei,]$date))
+measurements <- c(data.3[min.nsei,]$measurement, data.3[max.nsei,]$measurement)
+subjects <- c(users[as.numeric(data.3[min.nsei,]$subject)], users[as.numeric(data.3[max.nsei,]$subject)])
+time.range <- c(0, 900)
+ticks <- seq(time.range[1], time.range[2], 30)
 
+for(i in 1:length(dates)) {
+  source("code-snippets/load-and-plot-processes.R")
+} 
 
+rm(max.nsei, min.nsei, dates, measurements, subjects, activities.1, time.range, ticks, i)
+```
