@@ -35,14 +35,14 @@ process.data.5 <- read.csv(paste(directory.path, "/", file.name, sep = ""), skip
 spm       <- 60 / (process.data.5$cycle.interval.s / 2)
 bpm       <- 60 / process.data.1$rr.interval.s
 
-par("mfcol" = c(4, 1), mar = c(2.5, 2.5, .5, 3.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "i", yaxs = "i")
+par("mfcol" = c(4, 1), mar = c(2.5, 2.5, .5, 1.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "i", yaxs = "i")
 
 # Plot cadance and hr
-plot(process.data.5$t.s, spm, xlab = "", ylab = "Cadence & HR", xaxt = "n", xlim = time.range, ylim = c(90, 130), pch = 21, bg = "#3FADCB")
+plot(process.data.5$t.s, spm, xlab = "", ylab = "Cadence & Heart rate", xaxt = "n", xlim = time.range, ylim = c(90, 130), pch = 21, bg = "#3FADCB")
 points(process.data.1$t.s, bpm, pch = 22, bg = "#33D100")
 axis(1, at = ticks, labels = F)
 abline(v = ticks, lty = "dashed", col = "darkgrey")
-legend("bottomright", c("SPM", "BPM"), pch = c(21, 22), pt.bg = c("#3FADCB", "#33D100"), cex = .8, bg = "white")
+legend("topleft", c("SPM", "BPM"), pch = c(21, 22), pt.bg = c("#3FADCB", "#33D100"), bty = "n", cex = .8)
 box()
 
 # Plot CLS
@@ -57,10 +57,10 @@ plot(process.data.4$t.s, process.data.4$pcoi, type = "l", xlab = "Time (s)", yla
 lines(process.data.4$t.s, process.data.4$nsei, col = "#3FADCB")
 axis(1, at = ticks, labels = ticks, las = 1)
 abline(v = ticks, lty = "dashed", col = "darkgrey")
-legend("topleft", c("Coherence Index", "Shannon Entropy Index"), lty = c("solid", "dashed"), col = c("#3FADCB", "#000000"), cex = .8, bg = "white")
+legend("topleft", c("Phase Coherence Index", "Normalized Shannon Entropy Index"), lty = c("solid", "dashed"), col = c("#3FADCB", "#000000"), bty = "n", cex = .8)
 box()
 
-par("mfcol" = c(2, 1), mar = c(2.5, 2.5, .5, 3.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "i", yaxs = "i")
+par("mfcol" = c(2, 1), mar = c(2.5, 2.5, .5, 1.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "i", yaxs = "i")
 
 # Plot HF
 t.s <- seq(min(process.data.1$t.s), max(process.data.1$t.s), length.out = length(process.data.2$HR))
