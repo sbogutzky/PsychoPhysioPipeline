@@ -2,8 +2,6 @@ jc.features  <- data.frame()
 for (i in 1:nrow(fss.features)) {
   source("code-snippets/set-additional-features.R")
   jc.data.path <- paste(root.path, "processed-data", "/", activity, "/", user, "/", strftime(date, format="%Y-%m-%d--%H-%M-%S"), "/", jc.file.name.prefix, measurement, ".csv", sep = "")
-  
-  print(jc.data.path)
   if(file.exists(jc.data.path)) {
     jc.data <- read.csv(jc.data.path)
     jc.data[, 3] <- jc.data[, 3] / 10^4

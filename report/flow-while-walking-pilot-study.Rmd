@@ -1,5 +1,5 @@
 ---
-title: "Flow beim Laufen (intraindividell)"
+title: "Flow beim Gehen (intraindividell)"
 author: "Simon Bogutzky"
 date: "27. Januar 2016"
 output: html_document
