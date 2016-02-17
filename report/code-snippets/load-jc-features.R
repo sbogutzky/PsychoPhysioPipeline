@@ -9,7 +9,7 @@ for (i in 1:nrow(fss.features)) {
     for (j in 1:(length(range.intervals) - 1)) {
       jc.data.subset <- jc.data[jc.data[, 1] >= range.intervals[j] & jc.data[, 1] < range.intervals[j + 1], ]
       jc.data.subset <- jc.data.subset[jc.data.subset[, 2] < 1.25, ]
-      jc.feature.row <- colMeans(jc.data.subset[, 2:3], na.rm = T)
+      jc.feature.row <- data.frame(t(colMeans(jc.data.subset[, 2:3], na.rm = T)))
       names(jc.feature.row) <- c("mean.cycle.interval", "mean.jerk.cost")
       jc.features <- rbind(jc.features, jc.feature.row)
     }

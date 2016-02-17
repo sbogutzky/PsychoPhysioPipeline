@@ -20,4 +20,4 @@ for (i in 1:nrow(fss.features)) {
   }
 }
 names(cls.features) <- c("mean.pcoi", "mean.nsei")
-rm(cls.data.path, range.intervals, i, additional.features, activity.start, date, measurement)
+rm(cls.data.path, range.intervals, i, additional.features, activity.start, date, measurement, m, hrv.file.name.prefix, jc.file.name.prefix)
