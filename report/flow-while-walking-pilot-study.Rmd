@@ -256,6 +256,27 @@ for(i in unique(as.numeric(data.3$subject))) {
   print(shapiro.test(data.3.1$absorption))
   plot(data.3.1$absorption ~ data.3.1$measurement, xlab = "Measurement", ylab = "Absorption", pch = 21, bg = colors[1])
 }
+
+for(i in unique(as.numeric(data.3$subject))) {
+  data.3.1 <- data.3[as.numeric(data.3$subject) == i, ]
+  hist(data.3.1$meanhr, main = data.3.1$subject[1], xlab = "Mean HR")
+  print(shapiro.test(data.3.1$meanhr))
+  plot(data.3.1$meanhr ~ data.3.1$measurement, xlab = "Measurement", ylab = "Mean HR", pch = 21, bg = colors[1])
+}
+
+for(i in unique(as.numeric(data.3$subject))) {
+  data.3.1 <- data.3[as.numeric(data.3$subject) == i, ]
+  hist(data.3.1$mean.cycle.interval, main = data.3.1$subject[1], xlab = "Cycle Interval")
+  print(shapiro.test(data.3.1$mean.cycle.interval))
+  plot(data.3.1$mean.cycle.interval ~ data.3.1$measurement, xlab = "Measurement", ylab = "Cycle Interval", pch = 21, bg = colors[1])
+}
+
+for(i in unique(as.numeric(data.3$subject))) {
+  data.3.1 <- data.3[as.numeric(data.3$subject) == i, ]
+  hist(data.3.1$mean.jerk.cost, main = data.3.1$subject[1], xlab = "Jerk Cost")
+  print(shapiro.test(data.3.1$mean.jerk.cost))
+  plot(data.3.1$mean.jerk.cost ~ data.3.1$measurement, xlab = "Measurement", ylab = "Jerk Cost", pch = 21, bg = colors[1])
+}
 rm(data.3.1, i)
 ```
 
