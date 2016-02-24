@@ -428,3 +428,25 @@ for(i in 1:length(dates)) {
 } 
 
 rm(max.nsei, min.nsei, dates, measurements, subjects, activities.1, time.range, ticks, i, beat.plot.range, detail.plot.range)
+```
+
+```{r relations, echo=FALSE, message=FALSE, warning=FALSE}
+source("./code-snippets/functions.r")
+data.5 <- data.1
+data.5 <- data.5[-c(5, 18), ]
+
+par("mfcol" = c(3, 1), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+
+for(i in unique(as.numeric(data.5$subject))) {
+  data.5.1 <- data.5[as.numeric(data.5$subject) == i, ]
+  plot(data.5.1$meanhr, data.5.1$mean.nsei, xlab = "Mean HR", ylab = "Cardio-locomotor phase synchronisation", pch = 21, bg = colors[1])
+  PlotModels(data.5.1$meanhr, data.5.1$mean.nsei, x.lim = c(100, 200), sub.line = 1.25, interval = 1)
+  
+  plot(data.5.1$meanhr, data.5.1$absorption, xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
+  PlotModels(data.5.1$meanhr, data.5.1$absorption, x.lim = c(100, 200), sub.line = 1.25, interval = 1)
+  
+  plot(data.5.1$mean.nsei, data.5.1$absorption, xlab = "Cardio-locomotor phase synchronisation", ylab = "Absorption", pch = 21, bg = colors[1])
+  PlotModels(data.5.1$mean.nsei, data.5.1$absorption, x.lim = c(0, 1), sub.line = 1.25, interval = .01)
+}
+rm(data.5.1)
+```
