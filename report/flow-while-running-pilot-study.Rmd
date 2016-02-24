@@ -422,10 +422,9 @@ measurements <- c(data.3[min.nsei,]$measurement, data.3[max.nsei,]$measurement)
 subjects <- c(users[as.numeric(data.3[min.nsei,]$subject)], users[as.numeric(data.3[max.nsei,]$subject)])
 time.range <- c(0, 900)
 ticks <- seq(time.range[1], time.range[2], 30)
-
+beat.plot.range <- c(150, 200)
 for(i in 1:length(dates)) {
   source("code-snippets/load-and-plot-processes.R")
 } 
 
-rm(max.nsei, min.nsei, dates, measurements, subjects, activities.1, time.range, ticks, i)
-```
+rm(max.nsei, min.nsei, dates, measurements, subjects, activities.1, time.range, ticks, i, beat.plot.range, detail.plot.range)

@@ -38,7 +38,10 @@ bpm       <- 60 / process.data.1$rr.interval.s
 par("mfcol" = c(4, 1), mar = c(2.5, 2.5, .5, 1.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "i", yaxs = "i")
 
 # Plot cadance and hr
-plot(process.data.5$t.s, spm, xlab = "", ylab = "Cadence & Heart rate", xaxt = "n", xlim = time.range, ylim = c(90, 130), pch = 21, bg = "#3FADCB")
+if(!exists("beat.plot.range")) {
+  beat.plot.range <- c(90, 130)
+}
+plot(process.data.5$t.s, spm, xlab = "", ylab = "Cadence & Heart rate", xaxt = "n", xlim = time.range, ylim = beat.plot.range, pch = 21, bg = "#3FADCB")
 points(process.data.1$t.s, bpm, pch = 22, bg = "#33D100")
 axis(1, at = ticks, labels = F)
 abline(v = ticks, lty = "dashed", col = "darkgrey")
@@ -51,7 +54,14 @@ axis(1, at = ticks, labels = ticks, las = 1)
 abline(v = ticks, lty = "dashed", col = "darkgrey")
 box()
 
-frame()
+# Plot a period in detail
+if(!exists("detail.plot.range")) {
+  detail.plot.range <- c(780, 810)
+}
+plot(process.data.3$t.s, process.data.3$psi, xlab = "", ylab = expression(Psi(t)), xaxt = "n", xlim = detail.plot.range, ylim = c(0, 1), pch = 21, bg = "black")
+axis(1, at = ticks, labels = ticks, las = 1)
+abline(v = process.data.3$t.s)
+box()
 
 plot(process.data.4$t.s, process.data.4$pcoi, type = "l", xlab = "Time (s)", ylab = "Indexes", xaxt = "n", xlim = time.range, ylim = c(0, 1), lty = 2)
 lines(process.data.4$t.s, process.data.4$nsei, col = "#3FADCB")
