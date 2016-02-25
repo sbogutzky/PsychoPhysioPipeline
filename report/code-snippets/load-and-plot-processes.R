@@ -81,7 +81,7 @@ box()
 
 # Plot JC
 require(caTools)
-plot(process.data.5$t.s, runmean(process.data.5$jerk.cost.m2s5/10^4, 10, endrule = "NA"), type = "l", xlab = "", ylab = expression("JC (x"~10^4~m^2*s^{-5}~")"), xlim = time.range, ylim = c(1, 2.5), pch = 21, xaxt = "n", col = "#3FADCB")
+plot(process.data.5$t.s, runmean(process.data.5$jerk.cost.m2s5/10^4, 10, endrule = "NA"), type = "l", xlab = "", ylab = expression("JC (x"~10^4~m^2*s^{-5}~")"), xlim = time.range, pch = 21, xaxt = "n", col = "#3FADCB")
 axis(1, at = ticks, labels = ticks, las = 1)
 abline(v = ticks, lty = "dashed", col = "darkgrey")
 box()

@@ -1,7 +1,7 @@
 ---
 title: "Flow beim Laufen (intraindividell)"
 author: "Simon Bogutzky"
-date: "27. Januar 2016"
+date: "25. Februar 2016"
 output: html_document
 ---
   
@@ -25,6 +25,7 @@ activities <- c("running")
 
 # Collect data
 data.1 <- data.frame()
+data.1b <- data.frame()
 for (activity in activities) {
   for (user in users) {
     
@@ -33,7 +34,7 @@ for (activity in activities) {
     fss.features <- read.csv(fss.feature.path)
     subjects <- factor(fss.features$first.name, levels = c("Patrick"), labels = c("Male"))
     dates <- factor(strftime(as.POSIXct(fss.features$activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"))
-    data.1b <- data.frame(subject = subjects, date = dates, fss.features[, 1:5])
+    data.1b <- rbind(data.1b, data.frame(subject = subjects, date = dates, fss.features[, 1:5]))
     rm(fss.feature.path)
     
     # Load FSS features
@@ -69,7 +70,7 @@ rownames(data.1b) <- seq(length = nrow(data.1b))
 rm(activity)
 ```
 
-```{r distribution-all-data, echo=FALSE, message=FALSE, warning=FALSE}
+```{r distribution, echo=FALSE, message=FALSE, warning=FALSE}
 par("mfcol" = c(2, 1), mar = c(2.5, 2.5, 2.5, 3.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
 
 for(i in unique(as.numeric(data.1$subject))) {
@@ -81,15 +82,15 @@ for(i in unique(as.numeric(data.1$subject))) {
 rm(data.1.1, i)
 ```
 
-```{r linear-regression-all-data, echo=FALSE, message=FALSE, warning=FALSE}
+```{r linear-models, echo=FALSE, message=FALSE, warning=FALSE}
 for(i in unique(as.numeric(data.1$subject))) {
-  data.1.1 <- data.1[as.numeric(data.1$subject) == 1, ]
+  data.1.1 <- data.1[as.numeric(data.1$subject) == i, ]
   
   par("mfcol" = c(2, 3), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
   
   print("-----------------Mean HR-----------------")
   plot(data.1.1$absorption ~ data.1.1$meanhr, main = data.1.1$subject[1], xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.1.1$meanhr, data.1.1$absorption, x.lim = c(150, 200), sub.line = 1.3, interval = 1)
+  PlotModels(data.1.1$meanhr, data.1.1$absorption, x.lim = c(30, 200), sub.line = 1.3, interval = 1)
   print("-----------------------------------------")
   
   print("-----------------RMSSD-------------------")
@@ -99,12 +100,12 @@ for(i in unique(as.numeric(data.1$subject))) {
   
   print("-----------------Jerk Cost---------------")
   plot(data.1.1$absorption ~ data.1.1$mean.jerk.cost, main = data.1.1$subject[1], xlab = "Jerk Cost", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.1.1$mean.jerk.cost, data.1.1$absorption, x.lim = c(1, 5), sub.line = 1.3, interval = .1)
+  PlotModels(data.1.1$mean.jerk.cost, data.1.1$absorption, x.lim = c(1, 10), sub.line = 1.3, interval = .005)
   print("-----------------------------------------")
   
   print("-----------------Cycle Interval----------")
   plot(data.1.1$absorption ~ data.1.1$mean.cycle.interval, main = data.1.1$subject[1], xlab = "Cycle Interval", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.1.1$mean.cycle.interval, data.1.1$absorption, x.lim = c(.65, 7), sub.line = 1.3, interval = .0001)
+  PlotModels(data.1.1$mean.cycle.interval, data.1.1$absorption, x.lim = c(.25, 2), sub.line = 1.3, interval = .001)
   print("-----------------------------------------")
   
   print("-----------------PCoI--------------------")
@@ -130,7 +131,7 @@ data.2$absorption[data.2$absorption < 1] <- 1
 rm(absorption.matrix)
 ```
 
-```{r distribution-selected-data-1, echo=FALSE, message=FALSE, warning=FALSE}
+```{r distribution-1, echo=FALSE, message=FALSE, warning=FALSE}
 par("mfcol" = c(2, 1), mar = c(2.5, 2.5, 2.5, 3.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
 
 for(i in unique(as.numeric(data.2$subject))) {
@@ -142,169 +143,153 @@ for(i in unique(as.numeric(data.2$subject))) {
 rm(data.2.1, i)
 ```
 
-```{r linear-regression-selected-data-2, echo=FALSE, message=FALSE, warning=FALSE}
-for(i in unique(as.numeric(data.3$subject))) {
-  data.3.1 <- data.3[as.numeric(data.3$subject) == i, ]
+```{r linear-models-1, echo=FALSE, message=FALSE, warning=FALSE}
+for(i in unique(as.numeric(data.1$subject))) {
+  data.2.1 <- data.2[as.numeric(data.2$subject) == i, ]
   
   par("mfcol" = c(2, 3), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
   
-  plot(data.3.1$absorption ~ data.3.1$meanhr, main = data.3.1$subject[1], xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
-  mod <- lm(data.3.1$absorption ~ data.3.1$meanhr)
-  abline(mod)
-  
   print("-----------------Mean HR-----------------")
-  print(summary(mod))
+  plot(data.2.1$absorption ~ data.2.1$meanhr, main = data.2.1$subject[1], xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
+  PlotModels(data.2.1$meanhr, data.2.1$absorption, x.lim = c(30, 200), sub.line = 1.3, interval = 1)
   print("-----------------------------------------")
-  
-  plot(data.3.1$absorption ~ data.3.1$rmssd, main = data.3.1$subject[1], xlab = "RMSSD", ylab = "Absorption", pch = 21, bg = colors[1])
-  mod <- lm(data.3.1$absorption ~ data.3.1$rmssd)
-  abline(mod)
   
   print("-----------------RMSSD-------------------")
-  print(summary(mod))
+  plot(data.2.1$absorption ~ data.2.1$rmssd, main = data.2.1$subject[1], xlab = "RMSSD", ylab = "Absorption", pch = 21, bg = colors[1])
+  PlotModels(data.2.1$rmssd, data.2.1$absorption, x.lim = c(0, 120), sub.line = 1.3, interval = 1)
   print("-----------------------------------------")
-  
-  plot(data.3.1$absorption ~ data.3.1$mean.jerk.cost, main = data.3.1$subject[1], xlab = "Jerk Cost", ylab = "Absorption", pch = 21, bg = colors[1])
-  mod <- lm(data.3.1$absorption ~ data.3.1$mean.jerk.cost)
-  abline(mod)
   
   print("-----------------Jerk Cost---------------")
-  print(summary(mod))
+  plot(data.2.1$absorption ~ data.2.1$mean.jerk.cost, main = data.2.1$subject[1], xlab = "Jerk Cost", ylab = "Absorption", pch = 21, bg = colors[1])
+  PlotModels(data.2.1$mean.jerk.cost, data.2.1$absorption, x.lim = c(1, 10), sub.line = 1.3, interval = .005)
   print("-----------------------------------------")
-  
-  plot(data.3.1$absorption ~ data.3.1$mean.cycle.interval, main = data.3.1$subject[1], xlab = "Cycle Interval", ylab = "Absorption", pch = 21, bg = colors[1])
-  mod <- lm(data.3.1$absorption ~ data.3.1$mean.cycle.interval)
-  abline(mod)
   
   print("-----------------Cycle Interval----------")
-  print(summary(mod))
+  plot(data.2.1$absorption ~ data.2.1$mean.cycle.interval, main = data.2.1$subject[1], xlab = "Cycle Interval", ylab = "Absorption", pch = 21, bg = colors[1])
+  PlotModels(data.2.1$mean.cycle.interval, data.2.1$absorption, x.lim = c(.25, 2), sub.line = 1.3, interval = .001)
   print("-----------------------------------------")
-  
-  plot(data.3.1$absorption ~ data.3.1$mean.pcoi, main = data.3.1$subject[1], xlab = "PCoI", ylab = "Absorption", pch = 21, bg = colors[1])
-  mod <- lm(data.3.1$absorption ~ data.3.1$mean.pcoi)
-  abline(mod)
   
   print("-----------------PCoI--------------------")
-  print(summary(mod))
+  plot(data.2.1$absorption ~ data.2.1$mean.pcoi, main = data.2.1$subject[1], xlab = "PCoI", ylab = "Absorption", pch = 21, bg = colors[1])
+  PlotModels(data.2.1$mean.pcoi, data.2.1$absorption, x.lim = c(0, 1), sub.line = 1.3, interval = .01)
   print("-----------------------------------------")
   
-  plot(data.3.1$absorption ~ data.3.1$mean.nsei, main = data.3.1$subject[1], xlab = "NSEI", ylab = "Absorption", pch = 21, bg = colors[1])
-  mod <- lm(data.3.1$absorption ~ data.3.1$mean.nsei)
-  abline(mod)
-  
-  print("----------------NSEI--------------------")
-  print(summary(mod))
+  print("----------------NSEI---------------------")
+  plot(data.2.1$absorption ~ data.2.1$mean.nsei, main = data.2.1$subject[1], xlab = "NSEI", ylab = "Absorption", pch = 21, bg = colors[1])
+  PlotModels(data.2.1$mean.nsei, data.2.1$absorption, x.lim = c(0, 1), sub.line = 1.3, interval = .01)
   print("-----------------------------------------")
 }
 
-rm(data.3.1, mod, i)
+rm(data.2.1, i)
 ```
 
-```{r scale, message=FALSE, warning=FALSE, include=FALSE}
-data.4 <- data.3
+```{r standard-score-predictors, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+data.3 <- data.2
 
 normalize <- function(x) {
   return(t(scale(x)[, 1]))
 }
 
-meanhr.matrix <- matrix(data = data.3$meanhr, nrow = length(data.3$meanhr)/4, byrow = T)
+meanhr.matrix <- matrix(data = data.2$meanhr, nrow = length(data.2$meanhr)/4, byrow = T)
 meanhr.matrix <- apply(meanhr.matrix, 1, normalize)
 
-data.4$meanhr <- c(meanhr.matrix)
+data.3$meanhr <- c(meanhr.matrix)
 
-rmssd.matrix <- matrix(data = data.3$rmssd, nrow = length(data.3$rmssd)/4, byrow = T)
+rmssd.matrix <- matrix(data = data.2$rmssd, nrow = length(data.2$rmssd)/4, byrow = T)
 rmssd.matrix <- apply(rmssd.matrix, 1, normalize)
 
-data.4$rmssd <- c(rmssd.matrix)
+data.3$rmssd <- c(rmssd.matrix)
 
-mean.jerk.cost.matrix <- matrix(data = data.3$mean.jerk.cost, nrow = length(data.3$mean.jerk.cost)/4, byrow = T)
+mean.jerk.cost.matrix <- matrix(data = data.2$mean.jerk.cost, nrow = length(data.2$mean.jerk.cost)/4, byrow = T)
 mean.jerk.cost.matrix <- apply(mean.jerk.cost.matrix, 1, normalize)
 
-data.4$mean.jerk.cost <- c(mean.jerk.cost.matrix)
+data.3$mean.jerk.cost <- c(mean.jerk.cost.matrix)
 
-mean.cycle.interval.matrix <- matrix(data = data.3$mean.cycle.interval, nrow = length(data.3$mean.cycle.interval)/4, byrow = T)
+mean.cycle.interval.matrix <- matrix(data = data.2$mean.cycle.interval, nrow = length(data.2$mean.cycle.interval)/4, byrow = T)
 mean.cycle.interval.matrix <- apply(mean.cycle.interval.matrix, 1, normalize)
 
-data.4$mean.cycle.interval <- c(mean.cycle.interval.matrix)
+data.3$mean.cycle.interval <- c(mean.cycle.interval.matrix)
 
-mean.pcoi.matrix <- matrix(data = data.3$mean.pcoi, nrow = length(data.3$mean.pcoi)/4, byrow = T)
+mean.pcoi.matrix <- matrix(data = data.2$mean.pcoi, nrow = length(data.2$mean.pcoi)/4, byrow = T)
 mean.pcoi.matrix <- apply(mean.pcoi.matrix, 1, normalize)
 
-data.4$mean.pcoi <- c(mean.pcoi.matrix)
+data.3$mean.pcoi <- c(mean.pcoi.matrix)
 
-mean.nsei.matrix <- matrix(data = data.3$mean.nsei, nrow = length(data.3$mean.nsei)/4, byrow = T)
+mean.nsei.matrix <- matrix(data = data.2$mean.nsei, nrow = length(data.2$mean.nsei)/4, byrow = T)
 mean.nsei.matrix <- apply(mean.nsei.matrix, 1, normalize)
 
-data.4$mean.nsei <- c(mean.nsei.matrix)
+data.3$mean.nsei <- c(mean.nsei.matrix)
 
 rm(meanhr.matrix, rmssd.matrix, mean.jerk.cost.matrix, mean.cycle.interval.matrix, mean.pcoi.matrix, mean.nsei.matrix, normalize)
 ```
 
-```{r linear-regression-selected-data-3, echo=FALSE, message=FALSE, warning=FALSE}
-for(i in unique(as.numeric(data.4$subject))) {
-  data.4.1 <- data.4[as.numeric(data.4$subject) == i, ]
+```{r linear-models-2, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+for(i in unique(as.numeric(data.2$subject))) {
+  data.3.1 <- data.3[as.numeric(data.3$subject) == 1, ]
   
   par("mfcol" = c(2, 3), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
   
-  plot(data.4.1$absorption ~ data.4.1$meanhr, main = data.4.1$subject[1], xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
-  mod <- lm(data.4.1$absorption ~ data.4.1$meanhr)
-  abline(mod)
-  
   print("-----------------Mean HR-----------------")
-  print(summary(mod))
+  plot(data.3.1$absorption ~ data.3.1$meanhr, main = data.3.1$subject[1], xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
+  PlotModels(data.3.1$meanhr, data.3.1$absorption, x.lim = c(-2, 2), sub.line = 1.3, interval = .1)
   print("-----------------------------------------")
-  
-  plot(data.4.1$absorption ~ data.4.1$rmssd, main = data.4.1$subject[1], xlab = "RMSSD", ylab = "Absorption", pch = 21, bg = colors[1])
-  mod <- lm(data.4.1$absorption ~ data.4.1$rmssd)
-  abline(mod)
   
   print("-----------------RMSSD-------------------")
-  print(summary(mod))
+  plot(data.3.1$absorption ~ data.3.1$rmssd, main = data.3.1$subject[1], xlab = "RMSSD", ylab = "Absorption", pch = 21, bg = colors[1])
+  PlotModels(data.3.1$rmssd, data.3.1$absorption, x.lim = c(-2, 2), sub.line = 1.3, interval = .1)
   print("-----------------------------------------")
-  
-  plot(data.4.1$absorption ~ data.4.1$mean.jerk.cost, main = data.4.1$subject[1], xlab = "Jerk Cost", ylab = "Absorption", pch = 21, bg = colors[1])
-  mod <- lm(data.4.1$absorption ~ data.4.1$mean.jerk.cost)
-  abline(mod)
   
   print("-----------------Jerk Cost---------------")
-  print(summary(mod))
+  plot(data.3.1$absorption ~ data.3.1$mean.jerk.cost, main = data.3.1$subject[1], xlab = "Jerk Cost", ylab = "Absorption", pch = 21, bg = colors[1])
+  PlotModels(data.3.1$mean.jerk.cost, data.3.1$absorption, x.lim = c(-2, 2), sub.line = 1.3, interval = .1)
   print("-----------------------------------------")
-  
-  plot(data.4.1$absorption ~ data.4.1$mean.cycle.interval, main = data.4.1$subject[1], xlab = "Cycle Interval", ylab = "Absorption", pch = 21, bg = colors[1])
-  mod <- lm(data.4.1$absorption ~ data.4.1$mean.cycle.interval)
-  abline(mod)
   
   print("-----------------Cycle Interval----------")
-  print(summary(mod))
+  plot(data.3.1$absorption ~ data.3.1$mean.cycle.interval, main = data.3.1$subject[1], xlab = "Cycle Interval", ylab = "Absorption", pch = 21, bg = colors[1])
+  PlotModels(data.3.1$mean.cycle.interval, data.3.1$absorption, x.lim = c(-2, 2), sub.line = 1.3, interval = .1)
   print("-----------------------------------------")
-  
-  plot(data.4.1$absorption ~ data.4.1$mean.pcoi, main = data.4.1$subject[1], xlab = "PCoI", ylab = "Absorption", pch = 21, bg = colors[1])
-  mod <- lm(data.4.1$absorption ~ data.4.1$mean.pcoi)
-  abline(mod)
   
   print("-----------------PCoI--------------------")
-  print(summary(mod))
+  plot(data.3.1$absorption ~ data.3.1$mean.pcoi, main = data.3.1$subject[1], xlab = "PCoI", ylab = "Absorption", pch = 21, bg = colors[1])
+  PlotModels(data.3.1$mean.pcoi, data.3.1$absorption, x.lim = c(-2, 2), sub.line = 1.3, interval = .1)
   print("-----------------------------------------")
   
-  plot(data.4.1$absorption ~ data.4.1$mean.nsei, main = data.4.1$subject[1], xlab = "NSEI", ylab = "Absorption", pch = 21, bg = colors[1])
-  mod <- lm(data.4.1$absorption ~ data.4.1$mean.nsei)
-  abline(mod)
-  
-  print("----------------NSEI--------------------")
-  print(summary(mod))
+  print("----------------NSEI---------------------")
+  plot(data.3.1$absorption ~ data.3.1$mean.nsei, main = data.3.1$subject[1], xlab = "NSEI", ylab = "Absorption", pch = 21, bg = colors[1])
+  PlotModels(data.3.1$mean.nsei, data.3.1$absorption, x.lim = c(-2, 2), sub.line = 1.3, interval = .1)
   print("-----------------------------------------")
-  }
+}
 
-rm(data.4.1, mod, i)
+rm(data.3.1, i)
 ```
 
-```{r process-orientation, echo=FALSE, message=FALSE, warning=FALSE}
-max.nsei <- which.max(data.3$mean.nsei)
-min.nsei <- which.min(data.3$mean.nsei)
+```{r relations, echo=FALSE, message=FALSE, warning=FALSE}
+data.4 <- data.2
+data.4 <- data.4[-c(5, 18), ]
+
+par("mfcol" = c(3, 1), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+
+for(i in unique(as.numeric(data.4$subject))) {
+  data.4.1 <- data.4[as.numeric(data.4$subject) == i, ]
+  plot(data.4.1$meanhr, data.4.1$mean.nsei, xlab = "Mean HR", ylab = "Cardio-locomotor phase synchronisation", pch = 21, bg = colors[1])
+  PlotModels(data.4.1$meanhr, data.4.1$mean.nsei, x.lim = c(30, 200), sub.line = 1.25, interval = 1)
+  
+  plot(data.4.1$meanhr, data.4.1$absorption, xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
+  PlotModels(data.4.1$meanhr, data.4.1$absorption, x.lim = c(30, 200), sub.line = 1.25, interval = 1)
+  
+  plot(data.4.1$mean.nsei, data.4.1$absorption, xlab = "Cardio-locomotor phase synchronisation", ylab = "Absorption", pch = 21, bg = colors[1])
+  PlotModels(data.4.1$mean.nsei, data.4.1$absorption, x.lim = c(0, 1), sub.line = 1.25, interval = .01)
+}
+rm(data.4.1)
+```
+
+```{r stroboscopic-technique, echo=FALSE, message=FALSE, warning=FALSE}
+max.nsei <- which.max(data.2$mean.nsei)
+min.nsei <- which.min(data.2$mean.nsei)
 activities.1 <- rep("running", 2)
-dates <- c(as.character(data.3[min.nsei,]$date), as.character(data.3[max.nsei,]$date))
-measurements <- c(data.3[min.nsei,]$measurement, data.3[max.nsei,]$measurement)
-subjects <- c(users[as.numeric(data.3[min.nsei,]$subject)], users[as.numeric(data.3[max.nsei,]$subject)])
+dates <- c(as.character(data.2[min.nsei,]$date), as.character(data.2[max.nsei,]$date))
+measurements <- c(data.2[min.nsei,]$measurement, data.2[max.nsei,]$measurement)
+subjects <- c(users[as.numeric(data.2[min.nsei,]$subject)], users[as.numeric(data.2[max.nsei,]$subject)])
 time.range <- c(0, 900)
 ticks <- seq(time.range[1], time.range[2], 30)
 beat.plot.range <- c(150, 200)
@@ -313,25 +298,4 @@ for(i in 1:length(dates)) {
 } 
 
 rm(max.nsei, min.nsei, dates, measurements, subjects, activities.1, time.range, ticks, i, beat.plot.range, detail.plot.range)
-```
-
-```{r relations, echo=FALSE, message=FALSE, warning=FALSE}
-source("./code-snippets/functions.r")
-data.5 <- data.1
-data.5 <- data.5[-c(5, 18), ]
-
-par("mfcol" = c(3, 1), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
-
-for(i in unique(as.numeric(data.5$subject))) {
-  data.5.1 <- data.5[as.numeric(data.5$subject) == i, ]
-  plot(data.5.1$meanhr, data.5.1$mean.nsei, xlab = "Mean HR", ylab = "Cardio-locomotor phase synchronisation", pch = 21, bg = colors[1])
-  PlotModels(data.5.1$meanhr, data.5.1$mean.nsei, x.lim = c(100, 200), sub.line = 1.25, interval = 1)
-  
-  plot(data.5.1$meanhr, data.5.1$absorption, xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.5.1$meanhr, data.5.1$absorption, x.lim = c(100, 200), sub.line = 1.25, interval = 1)
-  
-  plot(data.5.1$mean.nsei, data.5.1$absorption, xlab = "Cardio-locomotor phase synchronisation", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.5.1$mean.nsei, data.5.1$absorption, x.lim = c(0, 1), sub.line = 1.25, interval = .01)
-}
-rm(data.5.1)
 ```
