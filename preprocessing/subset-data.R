@@ -17,6 +17,7 @@ for (self.report.file.name in self.report.file.names) {
   
   # Load self report data
   self.report.data <- read.csv(paste(input.data.directory, self.report.file.name, sep = ""), comment.char = "#")
+  self.report.data <- self.report.data[-1,]
   
   data.path <- paste(input.data.directory, date.directory, data.file.name, ".csv", sep = "")
   
