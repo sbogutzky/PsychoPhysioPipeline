@@ -28,7 +28,7 @@ for (self.report.file.name in self.report.file.names) {
     source("./code-snippets/extract-self-report-times.R")
     
     # Calculate fss dimensions
-    fss.measurement <- c(as.numeric(self.report.data[i, 7:16]), 0, 0, 0, as.numeric(self.report.data[i, 17:19]))
+    fss.measurement <- as.numeric(self.report.data[i, 4:19])
     fss.dimensions <- ComputeFlowShortScaleDimensions(fss.measurement)
     
     # Add fss features

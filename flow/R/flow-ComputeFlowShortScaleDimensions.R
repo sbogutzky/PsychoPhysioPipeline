@@ -9,24 +9,25 @@
 
 ComputeFlowShortScaleDimensions <- function(items) {
   
-  daf = 0
+  daf = as.numeric(NA)
   
-  daf = 0
+  if(!is.na(items[16])) {
   
-  if(items[16] == 1 | items[16] == 9)
-    daf = 1
-  
-  if(items[16] == 2 | items[16] == 8)
-    daf = 2
-  
-  if(items[16] == 3 | items[16] == 7)
-    daf = 3
-  
-  if(items[16] == 4 | items[16] == 6)
-    daf = 4
-  
-  if(items[16] == 5)
-    daf = 5
+    if(items[16] == 1 | items[16] == 9)
+      daf = 1
+    
+    if(items[16] == 2 | items[16] == 8)
+      daf = 2
+    
+    if(items[16] == 3 | items[16] == 7)
+      daf = 3
+    
+    if(items[16] == 4 | items[16] == 6)
+      daf = 4
+    
+    if(items[16] == 5)
+      daf = 5
+  }
   
   data.frame(flow = mean(items[1:10]), flow.sd = sd(items[1:10]),
              fluency = mean(items[c(8,7,9,4,5,2)]), fluency.sd = sd(items[c(8,7,9,4,5,2)]), 
