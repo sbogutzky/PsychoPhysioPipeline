@@ -51,38 +51,38 @@ DetectMidSwings <- function(t.s, angular.velocity.deg.s, fs = 102.4, ff.1 = 4, f
   y.1 <- f.1
   y.2 <- f.2
   
-  # Add minima original data
-  minima    <- SearchExtrema(y, which = "minima")
-  minima.f  <- rep(0, length(minima))
+  # Add maxima original data
+  maxima    <- SearchExtrema(y, which = "maxima")
+  maxima.f  <- rep(0, length(maxima))
   
-  # Add minima from the filtered signal (1st level)
-  minima.1  <- SearchExtrema(y.1, which = "minima")
-  minima    <- c(minima, minima.1)
-  minima.f  <- c(minima.f, rep(1, length(minima.1)))
-  rm(minima.1)
+  # Add maxima from the filtered signal (1st level)
+  maxima.1  <- SearchExtrema(y.1, which = "maxima")
+  maxima    <- c(maxima, maxima.1)
+  maxima.f  <- c(maxima.f, rep(1, length(maxima.1)))
+  rm(maxima.1)
   
-  # Add minima from the filtered signal (2nd level)
-  minima.2  <- SearchExtrema(y.2, which = "minima")
-  minima    <- c(minima, minima.2)
-  minima.f  <- c(minima.f, rep(2, length(minima.2)))
-  rm(minima.2)
+  # Add maxima from the filtered signal (2nd level)
+  maxima.2  <- SearchExtrema(y.2, which = "maxima")
+  maxima    <- c(maxima, maxima.2)
+  maxima.f  <- c(maxima.f, rep(2, length(maxima.2)))
+  rm(maxima.2)
   
-  # Create minima data frame (sorted)
-  minima <- data.frame(minima, minima.f)[order(-minima),]
+  # Create maxima data frame (sorted)
+  maxima <- data.frame(maxima, maxima.f)[order(-maxima),]
   
   # Identify and sort mid swings
   mid.swing.indexes <- c()
   found.level.2   <- F
   found.level.1   <- F
-  for(j in 1:nrow(minima)) {
+  for(j in 1:nrow(maxima)) {
     if(!found.level.2)
-      found.level.2 <- as.numeric(minima$minima.f[j]) == 2
+      found.level.2 <- as.numeric(maxima$maxima.f[j]) == 2
     else {
       if(!found.level.1)
-        found.level.1 <- as.numeric(minima$minima.f[j]) == 1
+        found.level.1 <- as.numeric(maxima$maxima.f[j]) == 1
       else {
-        if(as.numeric(minima$minima.f[j]) == 0) {
-          mid.swing.indexes <- c(mid.swing.indexes, minima$minima[j])
+        if(as.numeric(maxima$maxima.f[j]) == 0) {
+          mid.swing.indexes <- c(mid.swing.indexes, maxima$maxima[j])
           found.level.2   <- F
           found.level.1   <- F
         }
