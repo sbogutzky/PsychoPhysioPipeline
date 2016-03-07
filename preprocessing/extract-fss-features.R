@@ -5,8 +5,8 @@ rm(list = ls(all = T))
 library(flow)
 
 # Set root data directory path
-if(file.exists("/Volumes/OSX/flow/data"))
-  root.data.directory.path        <- "/Volumes/OSX/flow/data/"
+if(file.exists("/Users/sbogutzky/Desktop/data"))
+  root.data.directory.path        <- "/Users/sbogutzky/Desktop/data/"
 
 # Set cleaned data directory path
 cleaned.data.directory.path <- paste(root.data.directory.path, "cleaned-data/", sep = "")

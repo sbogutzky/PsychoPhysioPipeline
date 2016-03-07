@@ -7,13 +7,8 @@ require(signal)
 require(flow)
 
 # Set root data directory path
-root.data.directory.path <- ""
-if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
-  root.data.directory.path        <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
-if(file.exists("//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
-  root.data.directory.path        <- "//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
-if(file.exists("C:/Users/Simon Bogutzky/Documents/Archiv/flow/data"))
-  root.data.directory.path        <- "C:/Users/Simon Bogutzky/Documents/Archiv/flow/data/"
+if(file.exists("/Users/sbogutzky/Desktop/data"))
+  root.data.directory.path        <- "/Users/sbogutzky/Desktop/data/"
 
 # Set preprocessed data directory path
 preprocessed.data.directory.path <- "./data/preprocessed-data/"
@@ -259,7 +254,7 @@ saveData <- function(output.data, file.name, preprocessed.data.directory.path, a
 
 for (i in 1:nrow(fss.features)) {
   
-  properties      <- fss.features[i, c(6:12)]
+  properties      <- fss.features[i, c(7:13)]
   activity.start  <- properties[, 2]
   measurement     <- properties[, 5]
   if(measurement == 1) {

@@ -5,13 +5,8 @@ rm(list = ls(all = T))
 require(signal)
 
 # Set root data directory path
-root.data.directory.path <- ""
-if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
-  root.data.directory.path        <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
-if(file.exists("//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
-  root.data.directory.path        <- "//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
-if(file.exists("C:/Users/Simon Bogutzky/Documents/Archiv/flow/data"))
-  root.data.directory.path        <- "C:/Users/Simon Bogutzky/Documents/Archiv/flow/data/"
+if(file.exists("/Users/sbogutzky/Desktop/data"))
+  root.data.directory.path        <- "/Users/sbogutzky/Desktop/data/"
 
 # Set cleaned data directory path
 cleaned.data.directory.path       <- paste(root.data.directory.path, "cleaned-data/", sep = "")
@@ -33,7 +28,7 @@ fss.features        <- read.csv(paste(features.directory.path, activity.director
 
 for (i in 1:nrow(fss.features)) {
   
-  properties      <- fss.features[i, c(6:13)]
+  properties      <- fss.features[i, c(7:14)]
   activity.start  <- properties[, 2]
   activity.end    <- properties[, 3]
   measurement     <- properties[, 5]
