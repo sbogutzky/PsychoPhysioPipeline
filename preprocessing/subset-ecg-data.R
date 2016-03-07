@@ -94,7 +94,7 @@ for (i in 1:nrow(fss.features)) {
       
       # Determine fs
       x   <- round(n.subset / ((ecg.data.subset[n.subset,1] - ecg.data.subset[1,1]) / 1000))
-      fs  <- 2^ceiling(log(x)/log(2))
+      fs   <- 205
       print(paste("Sampling rate   (Hz):", fs))
       
       t.ms      <- seq(ecg.data.subset[1, 1], ecg.data.subset[n.subset, 1], by = 1000/fs)
