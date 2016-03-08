@@ -256,9 +256,6 @@ ComputeOptimalCutoffFrequency <- function(x, fn, N) {
   
   rm(m, n, model)
   
-  if(rsmes[1] < noises[1])
-    fc <- 0.001
-  
   return(fc)
 }
 
@@ -364,9 +361,9 @@ for (i in 1:nrow(fss.features)) {
     # Smooth acceleration data
     A <- M[, 1:4]
     fn <- fs/2
-    n <- 2
+    n <- 4
     
-    fc <- ComputeOptimalCutoffFrequency(A[, 2], fn, n)
+    fc <- 1.75 # ComputeOptimalCutoffFrequency(A[, 2], fn, n)
     print(paste("Optimal Cutoff Frequency:", fc))
     
     fcs <- c(fcs, fc)
@@ -389,7 +386,7 @@ for (i in 1:nrow(fss.features)) {
     mean.j.x <- c(NA, CalculateJerk(x.p, mean.a.x))
     plot(x.p, mean.j.x, type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Mean Jerk X ("~m/s^3~")"))
     
-    fc <- ComputeOptimalCutoffFrequency(A[, 3], fn, n)
+    fc <- 2.5 # ComputeOptimalCutoffFrequency(A[, 3], fn, n)
     print(paste("Optimal Cutoff Frequency:", fc))
     
     fcs <- c(fcs, fc)
@@ -412,7 +409,7 @@ for (i in 1:nrow(fss.features)) {
     mean.j.x <- c(NA, CalculateJerk(x.p, mean.a.x))
     plot(x.p, mean.j.x, type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Mean Jerk Y ("~m/s^3~")"))
     
-    fc <- ComputeOptimalCutoffFrequency(A[, 4], fn, n)
+    fc <- 6 # ComputeOptimalCutoffFrequency(A[, 4], fn, n)
     print(paste("Optimal Cutoff Frequency:", fc))
     
     fcs <- c(fcs, fc)
@@ -435,21 +432,21 @@ for (i in 1:nrow(fss.features)) {
     mean.j.x <- c(NA, CalculateJerk(x.p, mean.a.x))
     plot(x.p, mean.j.x, type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Mean Jerk Z ("~m/s^3~")"))
        
-#     # Compute output data
-#     cycle.jerk.costs <- ComputeCycleJerkCosts(A, mid.swing.indexes)
-#     cycle.intervals <- diff(M[, 1][mid.swing.indexes] / 1000)
-#     output.data <- data.frame(t.s = M[, 1][mid.swing.indexes[2:length(mid.swing.indexes)]] / 1000, cycle.interval.s = cycle.intervals, jerk.cost.m2s5 = cycle.jerk.costs)
-#     output.data <- output.data[output.data[, 2] < 1.5, ]
-#     
-#     # Compute mean to compare
-#     jerk.cost.by.all.accelerations <- CalculateJerkCost(A[, 1] / 1000, A[, 3:4], normalized = T) 
-#     jerk.cost.by.cycle.mean <- mean(output.data[, 3], na.rm = T)
-#     print(paste("Jerk Cost by Cycle:            ", jerk.cost.by.cycle.mean / 10^4))
-#     print(paste("Jerk Cost by all Accelerations:", jerk.cost.by.all.accelerations / 10^4))
+    # Compute output data
+    cycle.jerk.costs <- ComputeCycleJerkCosts(A, mid.swing.indexes)
+    cycle.intervals <- diff(M[, 1][mid.swing.indexes] / 1000)
+    output.data <- data.frame(t.s = M[, 1][mid.swing.indexes[2:length(mid.swing.indexes)]] / 1000, cycle.interval.s = cycle.intervals, jerk.cost.m2s5 = cycle.jerk.costs)
+    output.data <- output.data[output.data[, 2] < 1.5, ]
+
+    # Compute mean to compare
+    jerk.cost.by.all.accelerations <- CalculateJerkCost(A[, 1] / 1000, A[, 3:4], normalized = T)
+    jerk.cost.by.cycle.mean <- mean(output.data[, 3], na.rm = T)
+    print(paste("Jerk Cost by Cycle:            ", jerk.cost.by.cycle.mean / 10^4))
+    print(paste("Jerk Cost by all Accelerations:", jerk.cost.by.all.accelerations / 10^4))
     
     # Save data
-    # saveData(output.data, paste(body.position, "-jerk-cost-data-", measurement, ".csv", sep = ""), preprocessed.data.directory.path, activity.directory, user.directory, date.directory, activity.start)
-    
+    saveData(output.data, paste(body.position, "-jerk-cost-data-", measurement, ".csv", sep = ""), preprocessed.data.directory.path, activity.directory, user.directory, date.directory, activity.start)
+
     # readline("Press return to continue > ")
     
   } else {
@@ -457,4 +454,5 @@ for (i in 1:nrow(fss.features)) {
   }
 }
 
-rowMeans(matrix(fcs, 3, 72/3), na.rm = T)
+# fcs[fcs == 10] <- NA
+# rowMeans(matrix(fcs, 3, 72/3), na.rm = T)
