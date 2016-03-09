@@ -18,6 +18,8 @@ for (self.report.file.name in self.report.file.names) {
   self.report.data <- read.csv(paste(input.data.directory, self.report.file.name, sep = ""), comment.char = "#")
   self.report.data <- self.report.data[-1,]
   
+  #TODO: Compute the optimal cutoff frequency
+  
   # Loop measurements
   for(i in 1:nrow(self.report.data)) {
     
@@ -35,13 +37,23 @@ for (self.report.file.name in self.report.file.names) {
       A <- data[, 1:4]
       
       # Plot raw acceleration
+      # TODO: Plot also X
       PlotMostCommonCycleAcceleration(A[, 3], mid.swing.indexes, main = "Vertical")
       PlotMostCommonCycleAcceleration(A[, 4], mid.swing.indexes, main = "Horizontal")
       
       # Smooth acceleration
       fs <- 102.4
       fn <- fs/2
-      n <- 2
+      n <- 4
+      
+      #TODO: Filter also X
+      # fc <- 6.5
+      # W <- fc/fn
+      # lp.vertical <- butter(n, W)
+      # lp.vertical.freg <- freqz(lp.vertical, Fs = fs)
+      # par(mfcol = c(2, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
+      # plot(lp.vertical.freg$f, abs(lp.vertical.freg$h), type = "l", xlim = c(0, 30), xlab = "Frequency (Hz)", ylab = "Magnitude Response", main = "Vertical acceleration filter")
+      # A[, 3] <- filtfilt(lp.vertical, A[, 3])
       
       fc <- 6.5
       W <- fc/fn
@@ -59,6 +71,7 @@ for (self.report.file.name in self.report.file.names) {
       A[, 4] <- filtfilt(lp.horizontal, A[, 4])
       
       # Plot filtered acceleration
+      # TODO: Plot also X
       PlotMostCommonCycleAcceleration(A[, 3], mid.swing.indexes, main = "Vertical")
       PlotMostCommonCycleAcceleration(A[, 4], mid.swing.indexes, main = "Horizontal")
       
@@ -75,11 +88,11 @@ for (self.report.file.name in self.report.file.names) {
         
         # Compute jerk cost of each cycle
         t.ms                <- A[, 1][m:n]
-        # acceleration.x.ms.2 <- A[, 2][m:n]
+        acceleration.x.ms.2 <- A[, 2][m:n]
         acceleration.y.ms.2 <- A[, 3][m:n]
         acceleration.z.ms.2 <- A[, 4][m:n]
         
-        jerk.cost   <- ComputeJerkCost(t.ms / 1000, data.frame(acceleration.y.ms.2, acceleration.z.ms.2), normalized = T)
+        jerk.cost   <- ComputeJerkCost(t.ms / 1000, data.frame(acceleration.x.ms.2, acceleration.y.ms.2, acceleration.z.ms.2), normalized = T)
         jerk.cost.m2s5  <- c(jerk.cost.m2s5, jerk.cost)
       }
       
@@ -87,16 +100,16 @@ for (self.report.file.name in self.report.file.names) {
       output.data <- output.data[cycle.interval.s < 1.25,]
       
       # Detect outliers
-      anomaly <- DetectAnomaly(cycle.interval.s, jerk.cost.m2s5 / 10^4, "Cycle Interval (s)", expression("JC (x"~10^4~m^2*s^{-5}~")"), c(min(cycle.interval.s), max(cycle.interval.s)), c(min(jerk.cost.m2s5 / 10^4), max(jerk.cost.m2s5 / 10^4)))
+      anomaly <- DetectAnomaly(cycle.interval.s, jerk.cost.m2s5 / 10^5, "Cycle Interval (s)", expression("JC (x"~10^5~m^2*s^{-5}~")"), c(min(cycle.interval.s), max(cycle.interval.s)), c(min(jerk.cost.m2s5 / 10^4), max(jerk.cost.m2s5 / 10^4)))
       if(length(anomaly$outliers) > 0) {
         output.data <- output.data[-anomaly$outliers, ]
       }
       
       # Compute mean to compare
-      jerk.cost.by.all.accelerations <- ComputeJerkCost(A[, 1] / 1000, A[, 3:4], normalized = T) 
+      jerk.cost.by.all.accelerations <- ComputeJerkCost(A[, 1] / 1000, A[, 2:4], normalized = T) 
       jerk.cost.by.cycle.mean <- mean(output.data[, 3], na.rm = T)
-      print(paste("Jerk Cost by Cycle:            ", jerk.cost.by.cycle.mean / 10^4))
-      print(paste("Jerk Cost by all Accelerations:", jerk.cost.by.all.accelerations / 10^4))
+      print(paste("Jerk Cost by Cycle:            ", jerk.cost.by.cycle.mean / 10^5))
+      print(paste("Jerk Cost by all Accelerations:", jerk.cost.by.all.accelerations / 10^5))
       
       # Create directory, if needed
       output.directory <- paste(preprocessed.data.directory, activity.directory, user.directory, date.directory, sep="")

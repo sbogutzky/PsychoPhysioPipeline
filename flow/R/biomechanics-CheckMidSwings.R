@@ -33,7 +33,7 @@ CheckMidSwings <- function(t.ms, angular.velocity.deg.s, length.s, mid.swing.ind
       points(t.ms[mid.swing.indexes][in.loop.points] / 1000, angular.velocity.deg.s[mid.swing.indexes][in.loop.points], pch = 21, bg = "red")
       title("Select to remove")
       
-      remove  <- identify(t.ms[mid.swing.indexes] / 1000, angular.velocity.deg.s[mid.swing.indexes], tolerance = .5)
+      remove  <- identify(t.ms[mid.swing.indexes] / 1000, angular.velocity.deg.s[mid.swing.indexes])
       
       # Remove selected mid swings
       if(length(remove) > 0) {
@@ -48,7 +48,7 @@ CheckMidSwings <- function(t.ms, angular.velocity.deg.s, length.s, mid.swing.ind
       title("Select to add")
       
       # Add mid swings and control
-      add  <- identify(t.ms / 1000, angular.velocity.deg.s, tolerance = .5)
+      add  <- identify(t.ms / 1000, angular.velocity.deg.s)
       if(length(add) > 0) {
         mid.swing.indexes <- c(mid.swing.indexes, add)
         mid.swing.indexes <- sort(mid.swing.indexes)
