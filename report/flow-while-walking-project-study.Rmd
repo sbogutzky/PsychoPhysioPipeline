@@ -1,0 +1,370 @@
+---
+title: "Flow beim Gehen (interdividell)"
+author: "Simon Bogutzky"
+date: "25. Februar 2016"
+output: html_document
+---
+  
+```{r load-data, include=FALSE}
+# Remove all variables
+rm(list = ls(all = T)) 
+
+# Load functions
+source("./code-snippets/functions.r")
+
+# Set root path
+if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/gang-klang"))
+  root.path <- "/Volumes/flow/Documents/archiv/daten/2015/gang-klang/"
+
+# Define Colors
+colors <- c("#3FADCB", "#33D100", "white")
+
+# Set test users
+users <- c("anke", "danilo", "kiana", "maike", "susanna", "tobias", "birthe", "hilke", "linde", "max", "timo", "vreni")
+activities <- c("walking")
+
+# Collect data
+data.1 <- data.frame()
+for (activity in activities) {
+  for (user in users) {
+    
+    # Load FSS features
+    fss.feature.path <- paste(root.path, "features", "/", activity, "/", user, "/", "fss-features.csv", sep = "")
+    fss.features <- read.csv(fss.feature.path)
+    rm(fss.feature.path)
+    
+    # Load HRV features
+    source("code-snippets/load-hrv-features.R")
+
+    # Load JC features
+    source("code-snippets/load-jc-features-2.R")
+
+    # Set factors
+    subjects <- factor(fss.features$first.name, levels = c("anke", "birthe", "danilo", "hilke", "kiana","linde", "maike", "max", "susanna", "timo", "tobias", "vreni"), labels = c("anke", "birthe", "danilo", "hilke", "kiana","linde", "maike", "max", "susanna", "timo", "tobias", "vreni"))
+    dates <- factor(fss.features$session.start)
+
+    # Create data frame
+    data.1 <- rbind(data.1, data.frame(subject = subjects, date = dates, fss.features[, 1:5], hrv.features[, c(3:6, 11:12, 17:18, 24:25, 45:46)], jc.features[, 1:2]))
+    
+  }
+  rm(user, fss.features, hrv.features, jc.features, subjects, dates)
+}
+rownames(data.1) <- seq(length = nrow(data.1))
+rm(activity)
+```
+
+```{r distribution, echo=FALSE, message=FALSE, warning=FALSE}
+par("mfcol" = c(2, 1), mar = c(2.5, 2.5, 2.5, 3.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+
+hist(data.1$absorption, main = "", xlab = "Absorption")
+print(shapiro.test(data.1$absorption))
+plot(data.1$absorption ~ data.1$subject, xlab = "Subject", ylab = "Absorption", pch = 21, bg = colors[1])
+```
+
+```{r linear-models, echo=FALSE, message=FALSE, warning=FALSE}
+par("mfcol" = c(2, 3), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+  
+print("-----------------Mean HR-----------------")
+plot(data.1$absorption ~ data.1$meanhr, xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.1$meanhr, data.1$absorption, x.lim = c(30, 200), sub.line = 1.3, interval = 1)
+print("-----------------------------------------")
+
+print("-----------------RMSSD-------------------")
+plot(data.1$absorption ~ data.1$rmssd, xlab = "RMSSD", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.1$rmssd, data.1$absorption, x.lim = c(0, 120), sub.line = 1.3, interval = 1)
+print("-----------------------------------------")
+
+print("-----------------Jerk Cost---------------")
+plot(data.1$absorption ~ data.1$mean.jerk.cost, xlab = "Jerk Cost", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.1$mean.jerk.cost, data.1$absorption, x.lim = c(0, 10), sub.line = 1.3, interval = .005)
+print("-----------------------------------------")
+
+print("-----------------Cycle Interval----------")
+plot(data.1$absorption ~ data.1$mean.cycle.interval, xlab = "Cycle Interval", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.1$mean.cycle.interval, data.1$absorption, x.lim = c(.25, 2), sub.line = 1.3, interval = .001)
+print("-----------------------------------------")
+
+print("-----------------LF----------------------")
+plot(data.1$absorption ~ data.1$lfpowfft, xlab = "LF", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.1$lfpowfft, data.1$absorption, x.lim = c(50, 2000), sub.line = 1.3, interval = 1)
+print("-----------------------------------------")
+
+print("-----------------HF----------------------")
+plot(data.1$absorption ~ data.1$hfpowfft, xlab = "HF", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.1$hfpowfft, data.1$absorption, x.lim = c(5, 750), sub.line = 1.3, interval = 1)
+print("-----------------------------------------")
+```
+
+```{r select-data, message=FALSE, warning=FALSE, include=FALSE}
+data.2 <- data.1[data.1$subject != "maike" & data.1$subject != "timo" & data.1$date != "2015-06-03 23:04:41" & data.1$date != "2015-06-04 23:04:35" & data.1$date != "" & data.1$date != "2015-06-09 22:23:59", ]
+
+rownames(data.2) <- seq(length = nrow(data.2))
+```
+
+```{r distribution-1, echo=FALSE, message=FALSE, warning=FALSE}
+par("mfcol" = c(2, 1), mar = c(2.5, 2.5, 2.5, 3.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+
+hist(data.2$absorption, main = "", xlab = "Absorption")
+print(shapiro.test(data.2$absorption))
+plot(data.2$absorption ~ data.2$subject, xlab = "Subject", ylab = "Absorption", pch = 21, bg = colors[1])
+```
+
+```{r linear-models-1, echo=FALSE, message=FALSE, warning=FALSE}
+par("mfcol" = c(2, 3), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+  
+print("-----------------Mean HR-----------------")
+plot(data.2$absorption ~ data.2$meanhr, xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.2$meanhr, data.2$absorption, x.lim = c(30, 200), sub.line = 1.3, interval = 1)
+print("-----------------------------------------")
+
+print("-----------------RMSSD-------------------")
+plot(data.2$absorption ~ data.2$rmssd, xlab = "RMSSD", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.2$rmssd, data.2$absorption, x.lim = c(0, 120), sub.line = 1.3, interval = 1)
+print("-----------------------------------------")
+
+print("-----------------Jerk Cost---------------")
+plot(data.2$absorption ~ data.2$mean.jerk.cost, xlab = "Jerk Cost", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.2$mean.jerk.cost, data.2$absorption, x.lim = c(0, 10), sub.line = 1.3, interval = .005)
+print("-----------------------------------------")
+
+print("-----------------Cycle Interval----------")
+plot(data.2$absorption ~ data.2$mean.cycle.interval, xlab = "Cycle Interval", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.2$mean.cycle.interval, data.2$absorption, x.lim = c(.25, 2), sub.line = 1.3, interval = .001)
+print("-----------------------------------------")
+
+print("-----------------LF----------------------")
+plot(data.2$absorption ~ data.2$lfpowfft, xlab = "LF", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.2$lfpowfft, data.2$absorption, x.lim = c(50, 2000), sub.line = 1.3, interval = 1)
+print("-----------------------------------------")
+
+print("-----------------HF----------------------")
+plot(data.2$absorption ~ data.2$hfpowfft, xlab = "HF", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.2$hfpowfft, data.2$absorption, x.lim = c(5, 750), sub.line = 1.3, interval = 1)
+print("-----------------------------------------")
+```
+
+```{r standard-score-predictors, message=FALSE, warning=FALSE, include=FALSE}
+data.3 <- data.2
+
+#absorption <- c()
+mean.hr <- c()
+rmssd <- c()
+mean.jerk.cost <- c()
+mean.cycle.interval <- c()
+lf <- c()
+hf <- c()
+for(i in unique(as.numeric(data.3$subject))) {
+  data.3.1 <- data.3[as.numeric(data.3$subject) == i, ]
+  
+  #absorption <- c(absorption, scale(data.3.1$absorption)[, 1])
+  mean.hr <- c(mean.hr, scale(data.3.1$meanhr)[, 1])
+  rmssd <- c(rmssd, scale(data.3.1$rmssd)[, 1])
+  mean.jerk.cost <- c(mean.jerk.cost, scale(data.3.1$mean.jerk.cost)[, 1])
+  mean.cycle.interval <- c(mean.cycle.interval, scale(data.3.1$mean.cycle.interval)[, 1])
+  lf <- c(lf, scale(data.3.1$lfpowfft)[, 1])
+  hf <- c(hf, scale(data.3.1$hfpowfft)[, 1])
+}
+
+#data.3$absorption <- absorption
+data.3$meanhr <- mean.hr
+data.3$rmssd <- rmssd
+data.3$mean.jerk.cost <- mean.jerk.cost
+data.3$mean.cycle.interval <- mean.cycle.interval
+data.3$lfpowfft <- lf
+data.3$hfpowfft <- hf
+
+rm(data.3.1, i, mean.hr, rmssd, mean.jerk.cost, mean.cycle.interval, lf, hf)
+```
+
+```{r distribution-2, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+par("mfcol" = c(2, 1), mar = c(2.5, 2.5, 2.5, 3.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+
+hist(data.3$absorption, main = "", xlab = "Absorption")
+print(shapiro.test(data.3$absorption))
+plot(data.3$absorption ~ data.3$subject, xlab = "Subject", ylab = "Absorption", pch = 21, bg = colors[1])
+```
+
+```{r linear-regression-2, echo=FALSE, message=FALSE, warning=FALSE}
+par("mfcol" = c(2, 3), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+  
+print("-----------------Mean HR-----------------")
+plot(data.3$absorption ~ data.3$meanhr, xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.3$meanhr, data.3$absorption, x.lim = c(-2, 2), sub.line = 1.3, interval = .1)
+print("-----------------------------------------")
+
+print("-----------------RMSSD-------------------")
+plot(data.3$absorption ~ data.3$rmssd, xlab = "RMSSD", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.3$rmssd, data.3$absorption,x.lim = c(-2, 2), sub.line = 1.3, interval = .1)
+print("-----------------------------------------")
+
+print("-----------------Jerk Cost---------------")
+plot(data.3$absorption ~ data.3$mean.jerk.cost, xlab = "Jerk Cost", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.3$mean.jerk.cost, data.3$absorption, x.lim = c(-2, 2), sub.line = 1.3, interval = .1)
+print("-----------------------------------------")
+
+print("-----------------Cycle Interval----------")
+plot(data.3$absorption ~ data.3$mean.cycle.interval, xlab = "Cycle Interval", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.3$mean.cycle.interval, data.3$absorption, x.lim = c(-2, 2), sub.line = 1.3, interval = .1)
+print("-----------------------------------------")
+
+print("-----------------LF----------------------")
+plot(data.3$absorption ~ data.3$lfpowfft, xlab = "LF", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.3$lfpowfft, data.3$absorption, x.lim = c(-2, 2), sub.line = 1.3, interval = .1)
+print("-----------------------------------------")
+
+print("-----------------HF----------------------")
+plot(data.3$absorption ~ data.3$hfpowfft, xlab = "HF", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.3$hfpowfft, data.3$absorption, x.lim = c(-2, 2), sub.line = 1.3, interval = .1)
+print("-----------------------------------------")
+```
+
+```{r multi-model-subject-effect, echo=FALSE, message=FALSE, warning=FALSE}
+library(lmerTest)
+
+data.4 <- data.2[complete.cases(data.2[,20:21]), ]
+
+linear.model <- lm(absorption ~ 1, data.4)
+print(summary(linear.model))
+
+null.model <- lmer(absorption ~ (1 | subject), data = data.4, REML = F)
+print(summary(null.model))
+
+between.variance <- as.data.frame(VarCorr(null.model))[1, 4]
+within.variance <- as.data.frame(VarCorr(null.model))[2, 4]
+total.variance <- between.variance + within.variance
+
+variance.partition.coefficient <- between.variance / total.variance
+
+print(paste("VPC:", variance.partition.coefficient))
+
+lr <- 2 * (as.data.frame(logLik(null.model))[1, 1] - as.data.frame(logLik(linear.model))[1, 1])
+
+print(paste("LR:", lr, "chi-squared distribution on 1 d.f.:", qchisq(.95, df = 1)))
+
+print("---------------Jerk Cost-----------------")
+
+fit.model <- lmer(absorption ~ mean.jerk.cost + (1 | subject), data = data.4, REML = F)
+print(summary(fit.model))
+
+between.variance <- as.data.frame(VarCorr(fit.model))[1, 4]
+within.variance <- as.data.frame(VarCorr(fit.model))[2, 4]
+total.variance <- between.variance + within.variance
+
+variance.partition.coefficient <- between.variance / total.variance
+
+print(paste("VPC:", variance.partition.coefficient))
+
+anova(null.model, fit.model)
+
+print("-----------------------------------------")
+
+print("-----------------Cycle Interval----------")
+
+fit.model <- lmer(absorption ~ mean.cycle.interval + (1 | subject), data = data.4, REML = F)
+print(summary(fit.model))
+
+between.variance <- as.data.frame(VarCorr(fit.model))[1, 4]
+within.variance <- as.data.frame(VarCorr(fit.model))[2, 4]
+total.variance <- between.variance + within.variance
+
+variance.partition.coefficient <- between.variance / total.variance
+
+print(paste("VPC:", variance.partition.coefficient))
+
+anova(null.model, fit.model)
+
+print("-----------------------------------------")
+
+data.5 <- data.4[complete.cases(data.4), ]
+
+linear.model <- lm(absorption ~ 1, data.5)
+print(summary(linear.model))
+
+null.model <- lmer(absorption ~ (1 | subject), data = data.5, REML = F)
+print(summary(null.model))
+
+between.variance <- as.data.frame(VarCorr(null.model))[1, 4]
+within.variance <- as.data.frame(VarCorr(null.model))[2, 4]
+total.variance <- between.variance + within.variance
+
+variance.partition.coefficient <- between.variance / total.variance
+
+print(paste("VPC:", variance.partition.coefficient))
+
+lr <- 2 * (as.data.frame(logLik(null.model))[1, 1] - as.data.frame(logLik(linear.model))[1, 1])
+
+print(paste("LR:", lr, "chi-squared distribution on 1 d.f.:", qchisq(.95, df = 1)))
+
+print("-----------------Mean HR-----------------")
+
+fit.model <- lmer(absorption ~ meanhr + (1 | subject), data = data.5, REML = F)
+print(summary(fit.model))
+
+between.variance <- as.data.frame(VarCorr(fit.model))[1, 4]
+within.variance <- as.data.frame(VarCorr(fit.model))[2, 4]
+total.variance <- between.variance + within.variance
+
+variance.partition.coefficient <- between.variance / total.variance
+
+print(paste("VPC:", variance.partition.coefficient))
+
+anova(null.model, fit.model)
+
+print("-----------------------------------------")
+
+print("-----------------RMSSD-------------------")
+
+fit.model <- lmer(absorption ~ rmssd + (1 | subject), data = data.5, REML = F)
+print(summary(fit.model))
+
+between.variance <- as.data.frame(VarCorr(fit.model))[1, 4]
+within.variance <- as.data.frame(VarCorr(fit.model))[2, 4]
+total.variance <- between.variance + within.variance
+
+variance.partition.coefficient <- between.variance / total.variance
+
+print(paste("VPC:", variance.partition.coefficient))
+
+anova(null.model, fit.model)
+
+print("-----------------------------------------")
+
+print("-----------------LF----------------------")
+
+fit.model <- lmer(absorption ~ lfpowfft + I(lfpowfft^2) + (1 | subject), data = data.5, REML = F)
+print(summary(fit.model))
+
+between.variance <- as.data.frame(VarCorr(fit.model))[1, 4]
+within.variance <- as.data.frame(VarCorr(fit.model))[2, 4]
+total.variance <- between.variance + within.variance
+
+variance.partition.coefficient <- between.variance / total.variance
+
+print(paste("VPC:", variance.partition.coefficient))
+
+anova(null.model, fit.model)
+
+print("-----------------------------------------")
+
+print("-----------------HF----------------------")
+
+fit.model <- lmer(absorption ~ hfpowfft + I(hfpowfft^2) + (1 | subject), data = data.5, REML = F)
+print(summary(fit.model))
+
+between.variance <- as.data.frame(VarCorr(fit.model))[1, 4]
+within.variance <- as.data.frame(VarCorr(fit.model))[2, 4]
+total.variance <- between.variance + within.variance
+
+variance.partition.coefficient <- between.variance / total.variance
+
+print(paste("VPC:", variance.partition.coefficient))
+
+anova(null.model, fit.model)
+
+print("-----------------------------------------")
+
+
+rm(null.model, linear.model, lr, fit.model, variance.partition.coefficient, between.variance, within.variance, total.variance, l.lmerTest.private.contrast, reml.lmerTest.private, devFunOnly.lmerTest.private)
+```
+
+Before testing the hypotheses, we assessed the variance components on the within-subject level (level 1) and on the between-subject level (level 2) for the flow-subscale absorption. For absorption 84.1 % of the variance was located on the between-subject level and 15.9 % of the variance on the within-subject level, respectively.
