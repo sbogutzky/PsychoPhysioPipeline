@@ -39,7 +39,7 @@ fss.features        <- read.csv(paste(features.directory.path, activity.director
 
 for (i in 1:nrow(fss.features)) {
   
-  properties      <- fss.features[i, c(6:12)]
+  properties      <- fss.features[i, c(7:13)]
   activity.start  <- properties[, 2]
   activity.end    <- properties[, 3]
   measurement     <- properties[, 5]
