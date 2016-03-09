@@ -20,25 +20,24 @@ processed.data.directory.path <- paste(root.data.directory.path, "processed-data
 features.directory.path <- paste(root.data.directory.path, "features/", sep = "")
 
 # Read activity directory
-activity.directory  <- readline("Type in activity directory and press return to continue (e. g. walking/) > ")
+activity.directory  <- "running/" #readline("Type in activity directory and press return to continue (e. g. walking/) > ")
 
 # Read user directory
-user.directory      <- readline("Type in user directory and press return to continue (e. g. doe-john/) > ")
+user.directory      <- "buse-patrick/" #readline("Type in user directory and press return to continue (e. g. doe-john/) > ")
 
 # Read in body position
-body.position       <- readline("Type in body position and press return to continue (e. g. leg) > ")
+body.position       <- "leg" # readline("Type in body position and press return to continue (e. g. leg) > ")
 
 # Read in subset length in seconds
-length.s         <- as.numeric(readline("Type in subset size in seconds for visual control and press return to continue (e. g. 30) > "))
+length.s         <- 30 #  as.numeric(readline("Type in subset size in seconds for visual control and press return to continue (e. g. 30) > "))
 
 # Load fss features
 fss.features        <- read.csv(paste(features.directory.path, activity.directory, user.directory, "fss-features.csv", sep = ""))
 
-ComputeSamplingRate <- function(t.ms) {
-  n <- length(t.ms)
-  fs <- round(n / ((t.ms[n] - t.ms[1]) / 1000))
-  new.fs <- 2^ceiling(log(fs)/log(2))
-  return(new.fs)
+ComputeSamplingRate <- function(t.s) {
+  n <- length(t.s)
+  fs <- n / (t.s[n] - t.s[1])
+  return(fs)
 }
 
 ResampleData <- function(data, fs, t.ms) {
@@ -198,11 +197,11 @@ ComputeCycleJerkCosts <- function(A, mid.swing.indexes) {
     n <- mid.swing.indexes[(i+1)]
     # Compute jerk cost of each cycle
     t.ms                <- A[, 1][m:n]
-    # acceleration.x.ms.2 <- A[, 2][m:n]
+    acceleration.x.ms.2 <- A[, 2][m:n]
     acceleration.y.ms.2 <- A[, 3][m:n]
     acceleration.z.ms.2 <- A[, 4][m:n]
     
-    jerk.cost   <- CalculateJerkCost(t.ms / 1000, data.frame(acceleration.y.ms.2, acceleration.z.ms.2), normalized = T)
+    jerk.cost   <- CalculateJerkCost(t.ms / 1000, data.frame(acceleration.x.ms.2, acceleration.y.ms.2, acceleration.z.ms.2), normalized = T)
     jerk.costs  <- c(jerk.costs, jerk.cost)
   }
   
@@ -251,7 +250,8 @@ ComputeOptimalCutoffFrequency <- function(x, fn, N) {
   noises <- model$coefficients[1] + fcs * model$coefficients[2]
   lines(fcs, noises)
   signals <- rsmes - noises
-  fc <- fcs[which.min(abs(noises[1:m] - 5 * signals[1:m]))]
+  index <- which.min(abs(noises[1:m] - 5 * signals[1:m]))
+  fc <- fcs[index]
   abline(v = fc)
   
   rm(m, n, model)
@@ -279,7 +279,7 @@ saveData <- function(output.data, file.name, preprocessed.data.directory.path, a
   print(paste("Wrote:", output.file.path))
 }
 
-fcs <- c()
+# fcs <- c()
 for (i in 1:nrow(fss.features)) {
   
   properties      <- fss.features[i, c(7:13)]
@@ -294,14 +294,10 @@ for (i in 1:nrow(fss.features)) {
     
     # Load motion data
     motion.data <- read.csv(motion.data.path)
-    t.ms <- motion.data[, 1]
     
     # Compute FS and FN
-    fs <- 512 # ComputeSamplingRate(t.ms)
+    fs <- ComputeSamplingRate(motion.data$t.ms/1000)
     fn <- fs/2
-    
-    # Resample data
-    M <- ResampleData(motion.data[, 2:7], fs, t.ms)
     
     # Check for mid swing indexes
     mid.swing.indexes <- c()
@@ -312,40 +308,40 @@ for (i in 1:nrow(fss.features)) {
     if(length(mid.swing.indexes) == 0) {
       
       # Plot resampled data
-      value.range <- (200 * fs):(210 * fs)
+      time.period <- (200 * fs):(210 * fs)
       par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
-      plot(M[, 1][value.range]/1000, M[, 5][value.range], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Angular Velocity ("~deg/s~")"))
+      plot(motion.data$t.ms[time.period]/1000, motion.data$motion.rot.rate.x.deg.s[time.period], type = "l", xlab = expression("Time ("~s~")"), ylab = expression("Angular Velocity ("~deg/s~")"))
       
       # Compute main freq
-      main.freq <- ComputeMainFrequency(M[, 5], fs)
+      main.freq <- ComputeMainFrequency(motion.data$motion.rot.rate.x.deg.s, fs)
       
       # Filter (1nd level)
       fc <- main.freq * 4
       W <- fc/fn
       n <- 2
       lp.1 <- butter(n, W)
-      f.1 <- filter(lp.1, M[, 5])
-      lines(M[, 1][value.range]/1000, f.1[value.range], col = 2)
+      f.1 <- filter(lp.1, motion.data$motion.rot.rate.x.deg.s)
+      lines(motion.data$t.ms[time.period]/1000, f.1[time.period], col = 2)
       
       # Filter (2nd level)
       fc <- main.freq * .5
       W <- fc/fn
       lp.2 <- butter(n, W)
-      f.2 <- filter(lp.2, M[, 5])
-      lines(M[, 1][value.range]/1000, f.2[value.range], col = 3)
+      f.2 <- filter(lp.2, motion.data$motion.rot.rate.x.deg.s)
+      lines(motion.data$t.ms[time.period]/1000, f.2[time.period], col = 3)
       readline("Press return to continue > ")
       
       # Detect Midswings
-      mid.swing.indexes <- DetectMidSwings(M[, 5], f.1, f.2)
+      mid.swing.indexes <- DetectMidSwings(motion.data$motion.rot.rate.x.deg.s, f.1, f.2)
       
       # Remove changes below 50 deg per second
-      mid.swing.indexes <- mid.swing.indexes[M[, 5][mid.swing.indexes] > 50 | M[, 5][mid.swing.indexes] < -50]
+      mid.swing.indexes <- mid.swing.indexes[motion.data$motion.rot.rate.x.deg.s[mid.swing.indexes] > 50 | motion.data$motion.rot.rate.x.deg.s[mid.swing.indexes] < -50]
       
       # Detect Annomaly
-      temp.diff <- diff(M[, 1][mid.swing.indexes] / 1000)
-      interval.t.s <- c(mean(temp.diff), temp.diff)
-      angular.velocity.deg.s <- M[, 5][mid.swing.indexes] / 100
-      annomaly <- DetectAnomaly(interval.t.s, angular.velocity.deg.s, expression("Cycle Interval ("~s~")"), expression("Angular Velocity (x"~10^2~deg/s~")"), c(min(interval.t.s), max(interval.t.s)), c(min(angular.velocity.deg.s), max(angular.velocity.deg.s)), epsilon = 0)
+      cycle.interval <- diff(motion.data$t.ms[mid.swing.indexes]/1000)
+      cycle.interval <- c(mean(cycle.interval), cycle.interval)
+      angular.velocity.deg.s <- motion.data$motion.rot.rate.x.deg.s[mid.swing.indexes]
+      annomaly <- DetectAnomaly(cycle.interval, angular.velocity.deg.s, expression("Cycle Interval ("~s~")"), expression("Angular Velocity ("~deg/s~")"), c(min(cycle.interval), max(cycle.interval)), c(min(angular.velocity.deg.s), max(angular.velocity.deg.s)), epsilon = 0)
       
       if(length(annomaly$outliers) > 0) {
         mid.swing.indexes <- mid.swing.indexes[-annomaly$outliers]
@@ -353,100 +349,58 @@ for (i in 1:nrow(fss.features)) {
     }
     
     # Check data
-    #mid.swing.indexes <- CheckMidSwingDetection(M[, 1], M[, 5], length.s, mid.swing.indexes)
+    mid.swing.indexes <- CheckMidSwingDetection(motion.data$t.ms, motion.data$motion.rot.rate.x.deg.s, length.s, mid.swing.indexes)
     
     # Save Midswing indexes
-    #saveData(mid.swing.indexes, paste("mid-swing-indexes-", measurement, ".csv", sep = ""), preprocessed.data.directory.path, activity.directory, user.directory, date.directory, activity.start)
+    saveData(mid.swing.indexes, paste("mid-swing-indexes-", measurement, ".csv", sep = ""), preprocessed.data.directory.path, activity.directory, user.directory, date.directory, activity.start)
     
-    # Smooth acceleration data
-    A <- M[, 1:4]
-    fn <- fs/2
-    n <- 4
-    
-    fc <- 1.75 # ComputeOptimalCutoffFrequency(A[, 2], fn, n)
-    print(paste("Optimal Cutoff Frequency:", fc))
-    
-    fcs <- c(fcs, fc)
-
-    W <- fc/fn
-    lp <- butter(n, W)
-    lp.freg <- freqz(lp, Fs = fs)
-    #plot(lp.freg$f, abs(lp.freg$h), type = "l", xlim = c(0, 30), xlab = "Frequency (Hz)", ylab = "Magnitude Response")
-    A[, 2] <- filtfilt(lp, A[, 2])
-
-    par(mfcol = c(3, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
-    mean.x <- ComputeCycleMeanMatrix(A, 2, mid.swing.indexes)
-    x.p <- 1:length(mean.x[, 1]) / length(mean.x[, 1]) * 100
-    plot(x.p,  mean.x[, 1], type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Accelerations X ("~m/s^2~")"))
-    for (j in 2:length(mean.x[1, ])) {
-      lines(x.p, mean.x[,j], type = "l")
-    }
-    mean.a.x <- rowMeans(mean.x)
-    plot(x.p, mean.a.x, type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Mean Acceleration X ("~m/s^2~")"))
-    mean.j.x <- c(NA, CalculateJerk(x.p, mean.a.x))
-    plot(x.p, mean.j.x, type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Mean Jerk X ("~m/s^3~")"))
-    
-    fc <- 2.5 # ComputeOptimalCutoffFrequency(A[, 3], fn, n)
-    print(paste("Optimal Cutoff Frequency:", fc))
-    
-    fcs <- c(fcs, fc)
-    
-    W <- fc/fn
-    lp <- butter(n, W)
-    lp.freg <- freqz(lp, Fs = fs)
-    #plot(lp.freg$f, abs(lp.freg$h), type = "l", xlim = c(0, 30), xlab = "Frequency (Hz)", ylab = "Magnitude Response")
-    A[, 3] <- filtfilt(lp, A[, 3])
-    
-    par(mfcol = c(3, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
-    mean.x <- ComputeCycleMeanMatrix(A, 3, mid.swing.indexes)
-    x.p <- 1:length(mean.x[, 1]) / length(mean.x[, 1]) * 100
-    plot(x.p,  mean.x[, 1], type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Accelerations Y ("~m/s^2~")"))
-    for (j in 2:length(mean.x[1, ])) {
-      lines(x.p, mean.x[,j], type = "l")
-    }
-    mean.a.x <- rowMeans(mean.x)
-    plot(x.p, mean.a.x, type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Mean Acceleration Y ("~m/s^2~")"))
-    mean.j.x <- c(NA, CalculateJerk(x.p, mean.a.x))
-    plot(x.p, mean.j.x, type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Mean Jerk Y ("~m/s^3~")"))
-    
-    fc <- 6 # ComputeOptimalCutoffFrequency(A[, 4], fn, n)
-    print(paste("Optimal Cutoff Frequency:", fc))
-    
-    fcs <- c(fcs, fc)
-    
-    W <- fc/fn
-    lp <- butter(n, W)
-    lp.freg <- freqz(lp, Fs = fs)
-    #plot(lp.freg$f, abs(lp.freg$h), type = "l", xlim = c(0, 30), xlab = "Frequency (Hz)", ylab = "Magnitude Response")
-    A[, 4] <- filtfilt(lp, A[, 4])
-    
-    par(mfcol = c(3, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
-    mean.x <- ComputeCycleMeanMatrix(A, 4, mid.swing.indexes)
-    x.p <- 1:length(mean.x[, 1]) / length(mean.x[, 1]) * 100
-    plot(x.p,  mean.x[, 1], type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Accelerations Z ("~m/s^2~")"))
-    for (j in 2:length(mean.x[1, ])) {
-      lines(x.p, mean.x[,j], type = "l")
-    }
-    mean.a.x <- rowMeans(mean.x)
-    plot(x.p, mean.a.x, type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Mean Acceleration Z ("~m/s^2~")"))
-    mean.j.x <- c(NA, CalculateJerk(x.p, mean.a.x))
-    plot(x.p, mean.j.x, type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Mean Jerk Z ("~m/s^3~")"))
-       
-    # Compute output data
-    cycle.jerk.costs <- ComputeCycleJerkCosts(A, mid.swing.indexes)
-    cycle.intervals <- diff(M[, 1][mid.swing.indexes] / 1000)
-    output.data <- data.frame(t.s = M[, 1][mid.swing.indexes[2:length(mid.swing.indexes)]] / 1000, cycle.interval.s = cycle.intervals, jerk.cost.m2s5 = cycle.jerk.costs)
-    output.data <- output.data[output.data[, 2] < 1.5, ]
-
-    # Compute mean to compare
-    jerk.cost.by.all.accelerations <- CalculateJerkCost(A[, 1] / 1000, A[, 3:4], normalized = T)
-    jerk.cost.by.cycle.mean <- mean(output.data[, 3], na.rm = T)
-    print(paste("Jerk Cost by Cycle:            ", jerk.cost.by.cycle.mean / 10^4))
-    print(paste("Jerk Cost by all Accelerations:", jerk.cost.by.all.accelerations / 10^4))
-    
-    # Save data
-    saveData(output.data, paste(body.position, "-jerk-cost-data-", measurement, ".csv", sep = ""), preprocessed.data.directory.path, activity.directory, user.directory, date.directory, activity.start)
-
+    # # Smooth acceleration data
+    # A <- motion.data[, 1:4]
+    # n <- 4
+    # 
+    # fc <- ComputeOptimalCutoffFrequency(A[, 2], fn, n)
+    # print(paste("Optimal Cutoff Frequency:", fc))
+    # 
+    # W <- fc/fn
+    # lp <- butter(n, W)
+    # A[, 2] <- filtfilt(lp, A[, 2])
+    # 
+    # fc <- ComputeOptimalCutoffFrequency(A[, 3], fn, n)
+    # print(paste("Optimal Cutoff Frequency:", fc))
+    # 
+    # W <- fc/fn
+    # lp <- butter(n, W)
+    # A[, 3] <- filtfilt(lp, A[, 3])
+    # 
+    # fc <- ComputeOptimalCutoffFrequency(A[, 4], fn, n)
+    # print(paste("Optimal Cutoff Frequency:", fc))
+    # W <- fc/fn
+    # lp <- butter(n, W)
+    # A[, 4] <- filtfilt(lp, A[, 4])
+    # 
+    # par(mfcol = c(1, 2), mar = c(3.5, 4, 3.5, 2) + 0.1, mgp = c(2.5, 1, 0))
+    # mean.x <- ComputeCycleMeanMatrix(A, 4, mid.swing.indexes)
+    # mean.a.x <- rowMeans(mean.x)
+    # x.p <- 1:length(mean.x[, 1]) / length(mean.x[, 1]) * 100
+    # plot(x.p, mean.a.x, type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Mean Acceleration Z ("~m/s^2~")"))
+    # mean.j.x <- c(NA, CalculateJerk(x.p * 1/fs, mean.a.x))
+    # plot(x.p, mean.j.x, type = "l", xlab = expression("Time ( % Stride )"), ylab = expression("Mean Jerk Z ("~m/s^3~")"))
+    #    
+    # # Compute output data
+    # cycle.jerk.costs <- ComputeCycleJerkCosts(A, mid.swing.indexes)
+    # cycle.intervals <- diff(motion.data$t.ms[mid.swing.indexes] / 1000)
+    # output.data <- data.frame(t.s = motion.data$t.ms[mid.swing.indexes[2:length(mid.swing.indexes)]] / 1000, cycle.interval.s = cycle.intervals, jerk.cost.m2s5 = cycle.jerk.costs)
+    # output.data <- output.data[output.data[, 2] < 1.5, ]
+    # 
+    # # Compute mean to compare
+    # jerk.cost.by.all.accelerations <- CalculateJerkCost(A[, 1] / 1000, A[, 2:4], normalized = T)
+    # jerk.cost.by.cycle.mean <- mean(output.data[, 3], na.rm = T)
+    # print(paste("Jerk Cost by Cycle:            ", jerk.cost.by.cycle.mean / 10^4))
+    # print(paste("Jerk Cost by all Accelerations:", jerk.cost.by.all.accelerations / 10^4))
+    # 
+    # # Save data
+    # saveData(output.data, paste(body.position, "-jerk-cost-data-", measurement, ".csv", sep = ""), preprocessed.data.directory.path, activity.directory, user.directory, date.directory, activity.start)
+    # 
     # readline("Press return to continue > ")
     
   } else {
