@@ -8,8 +8,9 @@
 
 ComputeOptimalCutoffFrequency <- function(x, fs, N) {
   par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
+  fn <- fs/2
   rsmes <- c()
-  fcs <- seq(0.5, fs/2, 0.5)
+  fcs <- seq(0.5, fn, 0.5)
   for (fc in fcs) {
     W <- fc/fn
     lp <- butter(N, W)
@@ -19,7 +20,7 @@ ComputeOptimalCutoffFrequency <- function(x, fs, N) {
   rm(fc, W, lp, model)
   
   fcb <- fs / 10
-  fce <- (fs / 2) - 5
+  fce <- fn - 5
   
   rsmeb <- rsmes[which.min(abs(fcs - fcb))]
   rsmee <- rsmes[which.min(abs(fcs - fce))]
