@@ -14,8 +14,8 @@ cleaned.data.directory.path       <- paste(root.data.directory.path, "cleaned-da
 # Set features directory path
 features.directory.path           <- paste(root.data.directory.path, "features/", sep = "")
 
-# Set preprocessed data directory path
-preprocessed.data.directory.path  <- "./data/preprocessed-data/"
+# Set processed data directory path
+processed.data.directory.path <- paste(root.data.directory.path, "processed-data/", sep = "")
 
 # Read activity directory
 activity.directory  <- readline("Type in activity directory and press return to continue (e. g. walking/) > ")
@@ -53,7 +53,7 @@ for (i in 1:nrow(fss.features)) {
       first.timestamp <- ecg.data[1,4]
       
       # Create output directory, if needed
-      output.directory.path <- paste(preprocessed.data.directory.path, activity.directory, user.directory, date.directory, sep="")
+      output.directory.path <- paste(processed.data.directory.path, activity.directory, user.directory, date.directory, sep="")
       if(!file.exists(substr(output.directory.path, 1, nchar(output.directory.path) - 1))) {
         dir.create(output.directory.path, recursive = TRUE)
       }

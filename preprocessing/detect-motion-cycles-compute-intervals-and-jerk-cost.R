@@ -221,12 +221,12 @@ ComputeCycleMeanMatrix <- function(M, col, mid.swing.indexes) {
     m <- mid.swing.indexes[i]
     n <- mid.swing.indexes[(i+1)]
     values.temp <- M[, col][m:n]
-    if(center == length(values.temp)) {
+    if(center + 1 == length(values.temp)) {
       values <- c(values, values.temp)
       j = j + 1
     }
   }
-  M <- matrix(values, center, j)
+  M <- matrix(values, center + 1, j)
   
   return(M)
 }
@@ -296,6 +296,7 @@ fcs <- c()
     date.directory  <- paste(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d--%H-%M-%S"), "/", sep ="")
   }
   motion.data.path <- paste(preprocessed.data.directory.path, activity.directory, user.directory, date.directory, body.position, "-motion-data-", measurement,  ".csv", sep="")
+  ecg.data.path <- paste(processed.data.directory.path, activity.directory, user.directory, date.directory, "ecg-data-", measurement,  ".csv", sep="")
   mid.swing.indexes.path <- paste(processed.data.directory.path, activity.directory, user.directory, date.directory, "mid-swing-indexes-", measurement,  ".csv", sep="")
   if(file.exists(motion.data.path)) {
     
@@ -360,6 +361,44 @@ fcs <- c()
     
     # Save Midswing indexes
     saveData(mid.swing.indexes, paste("mid-swing-indexes-", measurement, ".csv", sep = ""), preprocessed.data.directory.path, activity.directory, user.directory, date.directory, activity.start)
+    
+    # Plot cycle data
+    par(mfrow = c(3, 2), mar = c(3, 4, 2, 2) + 0.1, mgp = c(2, 1, 0), xaxs = "i", yaxs = "i", xpd = NA)
+    if(file.exists(ecg.data.path)) {
+      par(mfrow = c(4, 2))
+      ecg.data <- read.csv(ecg.data.path)
+      
+      y.limits <- data.frame(min.y = c(0, -4, -4, -4), max.y = c(0, 4, 4, 4))
+      y.labels <- c("", expression("EKG RA-LL ("~mV~")"), expression("EKG RA-LL ("~mV~")"),expression("EKG LA-LL ("~mV~")")) 
+      line.color <- c("black", "black", "black", "black")
+      
+      t.ms <- motion.data$t.ms[mid.swing.indexes]
+      indexes <- c()
+      for (l in 1:length(t.ms)) {
+        indexes <- c(indexes, which.min(abs(ecg.data$t.ms - t.ms[l])))
+      }
+      
+      for(k in 3:4) {
+        cycle.mean.matrix <- ComputeCycleMeanMatrix(ecg.data, k, indexes)
+        y <- ecg.data[indexes[1000]:indexes[1001], k]
+        x <- 1:length(y) / length(y) * 100
+        plot(x, y, type = "l", xlab = "Zeit (% Doppelschritt)", ylim = c(y.limits[k, 1], y.limits[k, 2]), ylab = y.labels[k], col = line.color[k])
+        text(0, y.limits[k, 1], labels = "MS", pos = 1, offset = 0.5)
+      }
+      rm(t.ms, indexes, y.labels, line.color, k, l, y, x) #y.limits,
+    }
+    
+    y.limits <- data.frame(min.y = c(0, -30, -30, -30, -600, -600, -600), max.y = c(0, 30, 30, 30, 600, 600, 600))
+    y.labels <- c("", expression("Beschleunigung X ("~m/s^2~")"), expression("Beschleunigung Y ("~m/s^2~")"), expression("Beschleunigung Z ("~m/s^2~")"), expression("Winkelgeschwindigkeit X ("~deg/s~")"), expression("Winkelgeschwindigkeit Y ("~deg/s~")"), expression("Winkelgeschwindigkeit Z ("~deg/s~")"))
+    line.color <- c("black", "green", "blue", "red", "green", "blue", "red")
+    for(k in c(2,5,3,6,4,7)) {
+      cycle.mean.matrix <- ComputeCycleMeanMatrix(motion.data, k, mid.swing.indexes)
+      y <- rowMeans(cycle.mean.matrix)
+      x <- 1:length(y) / length(y) * 100
+      plot(x, y, type = "l", xlab = "Zeit (% Doppelschritt)", ylim = c(y.limits[k, 1], y.limits[k, 2]), ylab = y.labels[k], col = line.color[k])
+      text(0, y.limits[k, 1], labels = "MS", pos = 1, offset = 0.5)
+    }
+    rm(y.labels, y.limits, line.color, k, y, x)
     
     # Smooth acceleration data
     A <- motion.data[, 1:4]
