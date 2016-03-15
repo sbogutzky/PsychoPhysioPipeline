@@ -1,10 +1,10 @@
 # Read root data directory
-root.directory <- readline("Type in root directory and press return to continue (with: /) > ")
+root.directory <- "/Users/sbogutzky/Desktop/data/2016/" # readline("Type in root directory and press return to continue (with: /) > ")
 
 # Read properties
-first.name <- readline("Type in first name and press return to continue > ")
-last.name <- readline("Type in last name and press return to continue > ")
-activity <- readline("Type in activity and press return to continue > ")
+first.name <- "Simon" # readline("Type in first name and press return to continue > ")
+last.name <- "Bogutzky" # readline("Type in last name and press return to continue > ")
+activity <- "Laufen" # readline("Type in activity and press return to continue > ")
 
 # Set directories
 raw.data.directory <- paste(root.directory, "raw-data/", sep = "")

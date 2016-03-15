@@ -53,12 +53,17 @@ for (self.report.file.name in self.report.file.names) {
         session.zoom()
         
         # Check data
-        for(j in 2:ncol(data.subset)) {
+        
+        
+        #for(j in 2:ncol(data.subset)) {
+          j <- 2
+          if(ncol(data.subset) > 4)
+            j <- 5
           par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
           plot(data.subset$timestamp.ms / 1000, data.subset[, j], type = "l", xlab = "Timestamp (s)", ylab = ReturnFieldLabels(colnames(data.subset)[j]))
           title(paste(strftime(session.start, format="%Y/%m/%d %H:%M"), " #", i, sep = ""))
           session.zoom()
-        }
+        #}
         
         # Write to csv file
         output.directory <- paste(preprocessed.data.directory, activity.directory, user.directory, date.directory, sep = "")
