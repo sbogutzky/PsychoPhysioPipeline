@@ -5,6 +5,7 @@ rm(list = ls(all = T))
 
 # Load libraries
 require(flow)
+require(signal)
 
 source("./code-snippets/read-set-load.R")
 
