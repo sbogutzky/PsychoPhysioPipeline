@@ -43,8 +43,7 @@ for (self.report.file.name in self.report.file.names) {
       step.times <- c(jerk.cost.data.1$t.s, jerk.cost.data.2$t.s)
       step.times <- sort(step.times)
       
-      kubios.hrv.data.time.data <- read.csv(kubios.hrv.data.file.path, header = F, na.strings = "", fill = T, skip = 117, stringsAsFactors = F, col.names = c("", "t.s", "rr.interval.s", "", "", "", "", "", "", "", ""))[,2:3]
-      kubios.hrv.data.time.data <- kubios.hrv.data.time.data[complete.cases(kubios.hrv.data.time.data), ]
+      source("./code-snippets/read-kubios-hrv-data.R")
       
       # Data
       # step.times <- jerk.cost.data$t.s
@@ -58,7 +57,7 @@ for (self.report.file.name in self.report.file.names) {
       y.lim <- c(0, 1)
       
       # SPM vs. BPM 
-      plot(step.times[-1], spm, xlab = "", ylab = "Cadence & HR", xaxt = "n", xlim = time.range.s, ylim = y.lim.1, xaxs = "i", yaxs = "i", pch = 21)
+      plot(step.times[-1], spm, xlab = "", ylab = "Cadence & HR", xaxt = "n", xlim = time.range.s, ylim = y.lim.1, xaxs = "i", pch = 21)
       points(heart.times[-1], bpm, pch = 22)
       abline(v = seq(time.range.s[1], time.range.s[2], time.window.s), lty = "dashed", col = "grey")
       axis(1, at = seq(time.range.s[1], time.range.s[2], time.window.s), labels = seq(time.range.s[1], time.range.s[2], time.window.s), las = 1)
