@@ -150,6 +150,6 @@ for (self.report.file.name in self.report.file.names) {
     } else {
       print(paste("No files found:", data.path))
     }
-    readline("Press return to continue > ")
+    #readline("Press return to continue > ")
   }
 }

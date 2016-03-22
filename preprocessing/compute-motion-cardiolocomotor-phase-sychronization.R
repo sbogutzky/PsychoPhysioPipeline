@@ -8,9 +8,9 @@ require(flow)
 
 source("./code-snippets/read-set-load.R")
 
-data.file.name.1 <- readline("Type in data file name of the kubios file and press return to continue > ")
-data.file.name.2 <- readline("Type in data file name of the first motion file and press return to continue > ")
-data.file.name.3 <- readline("Type in data file name of the second motion file and press return to continue > ")
+data.file.name.1 <- "imu-rn42-bd38" #readline("Type in data file name of the kubios file and press return to continue > ")
+data.file.name.2 <- "imu-rn42-bc98" #readline("Type in data file name of the first motion file and press return to continue > ")
+data.file.name.3 <- "imu-rn42-3b70" #readline("Type in data file name of the second motion file and press return to continue > ")
 
 # Set time range
 time.range.s  <- c(as.numeric(readline("Type in start for visualisation in seconds and press return to continue (e. g. 0) > ")), as.numeric(readline("Type in end for visualisation in seconds and press return to continue (e. g. 900) > ")))
@@ -39,9 +39,14 @@ for (self.report.file.name in self.report.file.names) {
       # Load data
       jerk.cost.data.1            <- read.csv(jerk.cost.data.file.path.1, skip = 0)
       jerk.cost.data.2            <- read.csv(jerk.cost.data.file.path.2, skip = 0)
+      jerk.cost.data.1$side <- rep("R", nrow(jerk.cost.data.1))
+      jerk.cost.data.2$side <- rep("L", nrow(jerk.cost.data.2))
       
-      step.times <- c(jerk.cost.data.1$t.s, jerk.cost.data.2$t.s)
-      step.times <- sort(step.times)
+      jerk.cost.data <- rbind(jerk.cost.data.1, jerk.cost.data.2)
+      jerk.cost.data <- jerk.cost.data[order(jerk.cost.data$t.s),]
+      
+      #step.times <- c(jerk.cost.data.1$t.s, jerk.cost.data.2$t.s)
+      step.times <- jerk.cost.data$t.s
       
       source("./code-snippets/read-kubios-hrv-data.R")
       
@@ -129,6 +134,6 @@ for (self.report.file.name in self.report.file.names) {
     } else {
       print("No data")
     }
-    readline("Press return to continue > ")
+    #readline("Press return to continue > ")
   }
 }
