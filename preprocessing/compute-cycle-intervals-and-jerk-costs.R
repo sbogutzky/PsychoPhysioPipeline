@@ -58,7 +58,7 @@ for (self.report.file.name in self.report.file.names) {
       
       # Load motion data and midswing indexes
       data <- read.csv(data.path)
-      mid.swing.indexes <- read.csv(mid.swing.path)[, 1]
+      mid.swing.indexes <- read.csv(mid.swing.path)[, 2]
       A <- data[, 1:4]
       
       # Plot raw acceleration
@@ -121,13 +121,13 @@ for (self.report.file.name in self.report.file.names) {
       }
       
       output.data <- data.frame(t.s, cycle.interval.s, jerk.cost.m2s5)
-      output.data <- output.data[cycle.interval.s < 1.25,]
+      # output.data <- output.data[cycle.interval.s < 1.25,]
       
       # Detect outliers
-      anomaly <- DetectAnomaly(cycle.interval.s, jerk.cost.m2s5 / 10^5, "Cycle Interval (s)", expression("JC (x"~10^5~m^2*s^{-5}~")"), c(min(cycle.interval.s), max(cycle.interval.s)), c(min(jerk.cost.m2s5 / 10^5), max(jerk.cost.m2s5 / 10^5)))
-      if(length(anomaly$outliers) > 0) {
-        output.data <- output.data[-anomaly$outliers, ]
-      }
+      # anomaly <- DetectAnomaly(cycle.interval.s, jerk.cost.m2s5 / 10^5, "Cycle Interval (s)", expression("JC (x"~10^5~m^2*s^{-5}~")"), c(min(cycle.interval.s), max(cycle.interval.s)), c(min(jerk.cost.m2s5 / 10^5), max(jerk.cost.m2s5 / 10^5)))
+      # if(length(anomaly$outliers) > 0) {
+      #   output.data <- output.data[-anomaly$outliers, ]
+      # }
       
       # Compute mean to compare
       jerk.cost.by.all.accelerations <- ComputeJerkCost(A[, 1] / 1000, A[, 2:4], normalized = T) 

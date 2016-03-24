@@ -30,26 +30,30 @@ for (self.report.file.name in self.report.file.names) {
     
     source("./code-snippets/extract-self-report-times.R")
     
-    jerk.cost.data.file.path.1 <- paste(preprocessed.data.directory, activity.directory, user.directory, date.directory, data.file.name.2, "-cycle-intervals-jerk-costs-", i, ".csv", sep="")
-    jerk.cost.data.file.path.2 <- paste(preprocessed.data.directory, activity.directory, user.directory, date.directory, data.file.name.3, "-cycle-intervals-jerk-costs-", i, ".csv", sep="")
+    mid.swing.data.file.path.1 <- paste(preprocessed.data.directory, activity.directory, user.directory, date.directory, data.file.name.2, "-mid-swing-indexes-", i, ".csv", sep="")
+    mid.swing.data.file.path.2 <- paste(preprocessed.data.directory, activity.directory, user.directory, date.directory, data.file.name.3, "-mid-swing-indexes-", i, ".csv", sep="")
     kubios.hrv.data.file.path <- paste(preprocessed.data.directory, activity.directory, user.directory, date.directory, data.file.name.1, "-", i, "_hrv.txt", sep="")
   
-    if(file.exists(jerk.cost.data.file.path.1) & file.exists(kubios.hrv.data.file.path)) {
+    if(file.exists(mid.swing.data.file.path.1) & file.exists(kubios.hrv.data.file.path)) {
     
       # Load data
-      jerk.cost.data.1            <- read.csv(jerk.cost.data.file.path.1, skip = 0)
-      jerk.cost.data.2            <- read.csv(jerk.cost.data.file.path.2, skip = 0)
+      mid.swing.data.1            <- read.csv(mid.swing.data.file.path.1, skip = 0)
+      mid.swing.data.2            <- read.csv(mid.swing.data.file.path.2, skip = 0)
+      mid.swing.data.1$side <- rep("R", nrow(mid.swing.data.1))
+      mid.swing.data.2$side <- rep("L", nrow(mid.swing.data.2))
       
-      step.times <- c(jerk.cost.data.1$t.s, jerk.cost.data.2$t.s)
-      step.times <- sort(step.times)
+      mid.swing.data <- rbind(mid.swing.data.1, mid.swing.data.2)
+      mid.swing.data <- mid.swing.data[order(mid.swing.data$timestamp.ms),]
+      
+      #step.times <- c(mid.swing.data.1$timestamp.ms, mid.swing.data.2$timestamp.ms)
+      step.times <- mid.swing.data$timestamp.ms / 1000
       
       source("./code-snippets/read-kubios-hrv-data.R")
       
       # Data
-      # step.times <- jerk.cost.data$t.s
       heart.times <- c(kubios.hrv.data.time.data$t.s[1] - kubios.hrv.data.time.data$rr.interval.s[1], kubios.hrv.data.time.data$t.s)
-      spm <- 60 / diff(step.times)
-      bpm <- 60 / kubios.hrv.data.time.data$rr.interval.s
+      spm <- 60 / diff(step.times) 
+      bpm <- 60 / diff(heart.times) 
       y.lim.1 <- c(min(mean(spm) - sd(spm) * 2, mean(bpm) - sd(bpm) * 2), max(mean(spm) + sd(spm) * 2, mean(bpm) + sd(bpm) * 2))
       
       # Plot
