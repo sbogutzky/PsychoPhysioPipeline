@@ -69,8 +69,8 @@ for (self.report.file.name in self.report.file.names) {
         output.data <- data.frame(timestamp.ms = data$timestamp.ms[mid.swing.indexes], row = mid.swing.indexes)
         write.csv(output.data, output.directory, row.names = F)
         print(paste("Worte:", output.directory))
-        print(paste("First step: ", round(min(output.data$timestamp.ms / 1000) / 60), "m ",  round(min(output.data$timestamp.ms / 1000) %% 60), "s", sep = ""))
-        print(paste("Last step: ", round(max(output.data$timestamp.ms / 1000) / 60), "m ",  round(max(output.data$timestamp.ms / 1000) %% 60), "s", sep = ""))
+        print(paste("First step: ", round(min(output.data$timestamp.ms / 1000)) + round(min(output.data$timestamp.ms / 1000) %% 60), "s", sep = ""))
+        print(paste("Last step: ", round(max(output.data$timestamp.ms / 1000)) + round(max(output.data$timestamp.ms / 1000) %% 60), "s", sep = ""))
       } else {
         print("No mid swings detected")
       } 

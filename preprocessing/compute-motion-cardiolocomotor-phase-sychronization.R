@@ -8,9 +8,9 @@ require(flow)
 
 source("./code-snippets/read-set-load.R")
 
-data.file.name.1 <- readline("Type in data file name of the kubios file and press return to continue > ")
-data.file.name.2 <- readline("Type in data file name of the first motion file and press return to continue > ")
-data.file.name.3 <- readline("Type in data file name of the second motion file and press return to continue > ")
+data.file.name.1 <- "imu-rn42-bd38" # readline("Type in data file name of the kubios file and press return to continue > ")
+data.file.name.2 <- "imu-rn42-bc98" # readline("Type in data file name of the first motion file and press return to continue > ")
+data.file.name.3 <- "imu-rn42-3b70" # readline("Type in data file name of the second motion file and press return to continue > ")
 
 # Set time range
 time.range.s  <- c(as.numeric(readline("Type in start for visualisation in seconds and press return to continue (e. g. 0) > ")), as.numeric(readline("Type in end for visualisation in seconds and press return to continue (e. g. 900) > ")))
