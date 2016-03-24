@@ -10,6 +10,7 @@ library(zoom)
 source("./code-snippets/read-set-load.R")
 
 data.file.name <- readline("Type in data file name and press return to continue > ")
+range.ms <- as.numeric(c(readline("Type in start time in milliseconds and press return to continue > "), readline("Type in stop time in milliseconds and press return to continue > ")))
 
 for (self.report.file.name in self.report.file.names) {
   
@@ -31,7 +32,11 @@ for (self.report.file.name in self.report.file.names) {
       source("./code-snippets/extract-self-report-times.R")
       
       # Subset data
-      data.subset <- data[activity.start.ms <= data$timestamp.ms & data$timestamp.ms < activity.end.ms, ]
+      if(is.na(range.ms[1]) & is.na(range.ms[2]))
+      
+        data.subset <- data[activity.start.ms <= data$timestamp.ms & data$timestamp.ms < activity.end.ms, ]
+      else 
+        data.subset <- data[range.ms[1] <= data$timestamp.ms & data$timestamp.ms < range.ms[2], ]
       
       # Check for dublicates
       duplicates <- which(duplicated(data.subset))
@@ -62,7 +67,7 @@ for (self.report.file.name in self.report.file.names) {
           par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
           plot(data.subset$timestamp.ms / 1000, data.subset[, j], type = "l", xlab = "Timestamp (s)", ylab = ReturnFieldLabels(colnames(data.subset)[j]))
           title(paste(strftime(session.start, format="%Y/%m/%d %H:%M"), " #", i, sep = ""))
-          session.zoom()
+          #session.zoom()
         #}
         
         # Write to csv file

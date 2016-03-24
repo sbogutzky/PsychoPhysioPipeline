@@ -11,7 +11,7 @@ source("./code-snippets/read-set-load.R")
 data.file.name <- readline("Type in data file name and press return to continue > ")
 
 # Read in subset length in seconds
-length.s <- as.numeric(readline("Type in subset size in seconds for visual control and press return to continue (e. g. 30) > "))
+length.s <- 60 #as.numeric(readline("Type in subset size in seconds for visual control and press return to continue (e. g. 30) > "))
 
 for (self.report.file.name in self.report.file.names) {
   
