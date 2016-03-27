@@ -10,7 +10,7 @@ library(zoom)
 source("./code-snippets/read-set-load.R")
 
 data.file.name <- readline("Type in data file name and press return to continue > ")
-range.s <- as.numeric(c(readline("Type in start time in milliseconds and press return to continue > "), readline("Type in stop time in milliseconds and press return to continue > ")))
+range.s <- as.numeric(c(readline("Type in start time in seconds and press return to continue > "), readline("Type in stop time in seconds and press return to continue > ")))
 
 for (self.report.file.name in self.report.file.names) {
   

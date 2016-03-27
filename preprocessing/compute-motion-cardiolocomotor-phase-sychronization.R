@@ -62,7 +62,7 @@ for (self.report.file.name in self.report.file.names) {
       
       # SPM vs. BPM 
       plot(step.times[-1], spm, xlab = "", ylab = "Cadence & HR", xaxt = "n", xlim = time.range.s, ylim = y.lim.1, xaxs = "i", pch = 21)
-      points(heart.times[-1], bpm, pch = 22)
+      points(heart.times[-1], bpm, pch = 22, bg = 2)
       abline(v = seq(time.range.s[1], time.range.s[2], time.window.s), lty = "dashed", col = "grey")
       axis(1, at = seq(time.range.s[1], time.range.s[2], time.window.s), labels = seq(time.range.s[1], time.range.s[2], time.window.s), las = 1)
       legend("topright", c("SPM", "BPM"), pch = c(21, 22), bg = "white")
@@ -133,6 +133,6 @@ for (self.report.file.name in self.report.file.names) {
     } else {
       print("No data")
     }
-    readline("Press return to continue > ")
+    #readline("Press return to continue > ")
   }
 }
