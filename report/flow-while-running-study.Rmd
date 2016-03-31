@@ -47,7 +47,8 @@ for (i in 1:participant.count) {
   fss.features <- read.csv(fss.feature.path)
   
   # Load HRV features
-  #source("code-snippets/load-hrv-features.R")
+  kubios.hrv.feature.path <- list.files(path = paste(root.path, "features/", activity.dir, "/", participant.dir, sep = ""), pattern = "imu-rn42-bd38-1_hrv.txt", full.names = T, recursive = T)
+  kubios.hrv.features <- read.table(kubios.hrv.feature.path, header = T, sep = ",", nrows = 1)
   
   # Load JC features
   #source("code-snippets/load-jc-features.R")
@@ -58,10 +59,10 @@ for (i in 1:participant.count) {
   cls.indexes <- cls.indexes[complete.cases(cls.indexes), ]
   
   # Create data frame
-  data.1 <- rbind(data.1, data.frame(subject = subjects, fss.features[, 1:5], t(colMeans(cls.indexes[, 2:3]))))
+  data.1 <- rbind(data.1, data.frame(subject = subjects, fss.features[, 1:5], kubios.hrv.features[, c(4, 6, 17, 18)], t(colMeans(cls.indexes[, 2:3]))))
   
 }
-rm(i, participant.dir, subjects, fss.feature.path, fss.features, cls.index.path, cls.indexes)
+rm(i, participant.dir, subjects, fss.feature.path, fss.features, kubios.hrv.feature.path, kubios.hrv.features, cls.index.path, cls.indexes)
 
 rownames(data.1) <- seq(length = nrow(data.1))
 rownames(data.1b) <- seq(length = nrow(data.1b))
@@ -79,18 +80,18 @@ print(shapiro.test(data.1$absorption))
 
 ```{r linear-models, echo=FALSE, message=FALSE, warning=FALSE}
 
-par("mfcol" = c(2, 1), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+par("mfcol" = c(2, 2), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
 
-# print("-----------------Mean HR-----------------")
-# plot(data.1$absorption ~ data.1$meanhr, xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
-# PlotModels(data.1$meanhr, data.1$absorption, x.lim = c(30, 200), sub.line = 1.3, interval = 1)
-# print("-----------------------------------------")
+print("-----------------Mean HR-----------------")
+plot(data.1$absorption ~ data.1$meanhr, xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.1$meanhr, data.1$absorption, x.lim = c(30, 200), sub.line = 1.3, interval = 1)
+print("-----------------------------------------")
 
-# print("-----------------RMSSD-------------------")
-# plot(data.1$absorption ~ data.1$rmssd, xlab = "RMSSD", ylab = "Absorption", pch = 21, bg = colors[1])
-# PlotModels(data.1$rmssd, data.1$absorption, x.lim = c(0, 20), sub.line = 1.3, interval = .5)
-# print("-----------------------------------------")
-# 
+print("-----------------RMSSD-------------------")
+plot(data.1$absorption ~ data.1$rmssd, xlab = "RMSSD", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.1$rmssd, data.1$absorption, x.lim = c(0, 20), sub.line = 1.3, interval = .5)
+print("-----------------------------------------")
+
 # print("-----------------Jerk Cost---------------")
 # plot(data.1$absorption ~ data.1$mean.jerk.cost, xlab = "Jerk Cost", ylab = "Absorption", pch = 21, bg = colors[1])
 # PlotModels(data.1$mean.jerk.cost, data.1$absorption, x.lim = c(1, 10), sub.line = 1.3, interval = .005)
@@ -130,18 +131,18 @@ print(shapiro.test(data.2$absorption))
 ```
 
 ```{r linear-models-1, echo=FALSE, message=FALSE, warning=FALSE}
-par("mfcol" = c(2, 1), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+par("mfcol" = c(2, 2), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
 
-# print("-----------------Mean HR-----------------")
-# plot(data.2$absorption ~ data.2$meanhr, xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
-# PlotModels(data.2$meanhr, data.2$absorption, x.lim = c(30, 200), sub.line = 1.3, interval = 1)
-# print("-----------------------------------------")
+print("-----------------Mean HR-----------------")
+plot(data.2$absorption ~ data.2$meanhr, xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.2$meanhr, data.2$absorption, x.lim = c(30, 200), sub.line = 1.3, interval = 1)
+print("-----------------------------------------")
 
-# print("-----------------RMSSD-------------------")
-# plot(data.2$absorption ~ data.2$rmssd, xlab = "RMSSD", ylab = "Absorption", pch = 21, bg = colors[1])
-# PlotModels(data.2$rmssd, data.2$absorption, x.lim = c(0, 20), sub.line = 1.3, interval = .5)
-# print("-----------------------------------------")
-# 
+print("-----------------RMSSD-------------------")
+plot(data.2$absorption ~ data.2$rmssd, xlab = "RMSSD", ylab = "Absorption", pch = 21, bg = colors[1])
+PlotModels(data.2$rmssd, data.2$absorption, x.lim = c(0, 20), sub.line = 1.3, interval = .5)
+print("-----------------------------------------")
+
 # print("-----------------Jerk Cost---------------")
 # plot(data.2$absorption ~ data.2$mean.jerk.cost, xlab = "Jerk Cost", ylab = "Absorption", pch = 21, bg = colors[1])
 # PlotModels(data.2$mean.jerk.cost, data.2$absorption, x.lim = c(1, 10), sub.line = 1.3, interval = .005)
@@ -181,3 +182,8 @@ par("mfcol" = c(1, 1), mar = c(2.5, 2.5, .5, 1.5) + 0.1, mgp = c(1.5, .5, 0), la
 plot(cls.phases$t.s, cls.phases$psi,xlab = "", ylab = expression(Psi(t)), ylim = c(0, 1), pch = 21, bg = "#3FADCB")
 
 ```
+
+```{r view}
+View(cbind(data.2, participant.dirs))
+```
+
