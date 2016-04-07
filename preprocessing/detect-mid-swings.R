@@ -10,9 +10,6 @@ source("./code-snippets/read-set-load.R")
 
 data.file.name <- readline("Type in data file name and press return to continue > ")
 
-# Read in subset length in seconds
-length.s <- 60 #as.numeric(readline("Type in subset size in seconds for visual control and press return to continue (e. g. 30) > "))
-
 for (self.report.file.name in self.report.file.names) {
   
   source("./code-snippets/extract-session-start.R")
@@ -55,9 +52,10 @@ for (self.report.file.name in self.report.file.names) {
         if(length(anomaly$outliers) > 0) {
           mid.swing.indexes <- mid.swing.indexes[-anomaly$outliers]
         }
+        readline("Press return to continue > ")
       
         # Visual check
-        mid.swing.indexes <- CheckMidSwings(data$timestamp.ms, data$angular.velocity.x.deg.s, length.s, mid.swing.indexes)
+        mid.swing.indexes <- CheckMidSwings(data$timestamp.ms / 1000, data$angular.velocity.x.deg.s, mid.swing.indexes)
       
         # Write to csv file
         output.directory <- paste(preprocessed.data.directory, activity.directory, user.directory, date.directory, sep = "")
@@ -68,7 +66,7 @@ for (self.report.file.name in self.report.file.names) {
         output.directory <- paste(output.directory, output.file.name, sep = "")
         output.data <- data.frame(timestamp.ms = data$timestamp.ms[mid.swing.indexes], row = mid.swing.indexes)
         write.csv(output.data, output.directory, row.names = F)
-        print(paste("Worte:", output.directory))
+        print(paste("Wrote:", output.directory))
         print(paste("First step: ", round(min(output.data$timestamp.ms / 1000)), "s", sep = ""))
         print(paste("Last step: ", round(max(output.data$timestamp.ms / 1000)), "s", sep = ""))
       } else {

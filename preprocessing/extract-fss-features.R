@@ -48,4 +48,4 @@ if(!file.exists(substr(output.directory, 1, nchar(output.directory) - 1))) {
 }
 output.directory <- paste(output.directory, "fss-features.csv", sep = "")
 write.csv(fss.features, output.directory, row.names = F)
-print(paste("Worte:", output.directory))
+print(paste("Wrote:", output.directory))
