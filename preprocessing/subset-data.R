@@ -68,7 +68,7 @@ for (self.report.file.name in self.report.file.names) {
         output.file.name <- paste(data.file.name, "-", i, ".csv", sep = "")
         output.directory <- paste(output.directory, output.file.name, sep = "")
         write.csv(data.subset, output.directory, row.names = F)
-        print(paste("Worte:", output.directory))
+        print(paste("Wrote:", output.directory))
       } else {
         
         date.time <- session.start + data.subset$timestamp.ms / 1000
