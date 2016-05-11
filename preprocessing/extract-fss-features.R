@@ -5,8 +5,8 @@ rm(list = ls(all = T))
 library(flow)
 
 # Set root data directory path
-if(file.exists("/Users/sbogutzky/Desktop/data"))
-  root.data.directory.path        <- "/Users/sbogutzky/Desktop/data/"
+if(file.exists("C:/Users/sbogutzky/Desktop/data (lokal)/2013"))
+  root.data.directory.path        <- "C:/Users/sbogutzky/Desktop/data (lokal)/2013/"
 
 # Set cleaned data directory path
 cleaned.data.directory.path <- paste(root.data.directory.path, "cleaned-data/", sep = "")
@@ -54,7 +54,7 @@ for (fss.data.file.name in fss.data.file.names) {
     fss.factors     <- CalculateFlowShortScaleFactors(as.numeric(fss.data[i, 3:18]))
     
     # Add fss fss features
-    fss.features    <- rbind(fss.features, data.frame(round(fss.factors[c(1, 3, 5, 7, 9, 11)], 2), activity, activity.start, activity.end, inquiry.end, measurement = i, last.name, first.name, date.of.birth))
+    fss.features    <- rbind(fss.features, data.frame(round(fss.factors, 2), activity, activity.start, activity.end, inquiry.end, measurement = i, last.name, first.name, date.of.birth))
     fss.measurements    <- rbind(fss.measurements, data.frame(fss.data[i, 3:18]))
   }
 }

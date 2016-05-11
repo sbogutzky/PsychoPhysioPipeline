@@ -1,23 +1,24 @@
 cls.features  <- data.frame()
+cls.feature.names <- c("mean.pcoi", "mean.nsei")
 for (i in 1:nrow(fss.features)) {
+  
   source("code-snippets/set-additional-features.R")
   cls.data.path <- paste(root.path, "processed-data", "/", activity, "/", user, "/", strftime(date, format="%Y-%m-%d--%H-%M-%S"), "/", "leg-cls-indexes-", measurement, ".csv", sep = "")
-  range.intervals <- seq(600, 900, 300)
+  rm(measurement)
+  
   if(file.exists(cls.data.path)) {
     cls.data <- read.csv(cls.data.path, skip = 2)
-    for (j in 1:(length(range.intervals) - 1)) {
-      cls.data.subset <- cls.data[cls.data[, 1] >= range.intervals[j] & cls.data[, 1] < range.intervals[j + 1], ]
-      cls.feature.row <- colMeans(cls.data.subset[, 2:3], na.rm = T)
-      cls.features <- rbind(cls.features, cls.feature.row)
-    }
-    rm(cls.data, cls.data.subset, cls.feature.row, j)
-  } else {
-    for (j in 1:(length(range.intervals) - 1)) {
-      cls.feature.row <- rep(NA, 2)
-      cls.features <- rbind(cls.features, cls.feature.row)
-    }
-    rm(cls.feature.row, j)
+    cls.feature.row <- data.frame(t(colMeans(cls.data[, 2:3], na.rm = T)))
+    names(cls.feature.row) <- cls.feature.names
+    cls.features <- rbind(cls.features, cls.feature.row)
+    rm(cls.data)
+  } 
+  
+  else {
+    cls.feature.row <- data.frame(t(rep(NA, 2)))
+    names(cls.feature.row) <- cls.feature.names
+    cls.features <- rbind(cls.features, cls.feature.row)
   }
+  rm(cls.data.path, cls.feature.row)
 }
-names(cls.features) <- c("mean.pcoi", "mean.nsei")
-rm(cls.data.path, range.intervals, i, additional.features, activity.start, date, measurement, m, hrv.file.name.prefix, jc.file.name.prefix)
+rm(cls.feature.names, i, date)

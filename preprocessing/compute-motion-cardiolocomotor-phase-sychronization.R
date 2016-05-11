@@ -5,13 +5,7 @@ rm(list = ls(all = T))
 require(flow)
 
 # Set root data directory path
-root.data.directory.path          <- ""
-if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
-  root.data.directory.path        <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
-if(file.exists("//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
-  root.data.directory.path        <- "//gangstore.ddns.net/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
-if(file.exists("C:/Users/Simon Bogutzky/Documents/Archiv/flow/data"))
-  root.data.directory.path        <- "C:/Users/Simon Bogutzky/Documents/Archiv/flow/data/"
+root.data.directory.path          <- "C:/Users/sbogutzky/Desktop/data (lokal)/2013/"
 
 # Set processed data directory path
 processed.data.directory.path <- paste(root.data.directory.path, "processed-data/", sep = "")
@@ -20,10 +14,10 @@ processed.data.directory.path <- paste(root.data.directory.path, "processed-data
 features.directory.path <- paste(root.data.directory.path, "features/", sep = "")
 
 # Read activity directory
-activity.directory <- readline("Type in activity directory and press return to continue (e. g. walking/) > ")
+activity.directory <- "running/"
 
 # Read user directory
-user.directory <- readline("Type in user directory and press return to continue (e. g. doe-john/) > ")
+user.directory <- "buse-patrick/"
 
 # Read in body position
 body.position <- "leg" # readline("Type in body position and press return to continue (e. g. leg) > ")
@@ -38,8 +32,7 @@ time.window.s <- 10 # as.numeric(readline("Type in time window in seconds and pr
 fss.features        <- read.csv(paste(features.directory.path, activity.directory, user.directory, "fss-features.csv", sep = ""), stringsAsFactors = F)
 
 for (i in 1:nrow(fss.features)) {
-  
-  properties      <- fss.features[i, c(7:13)]
+  properties      <- fss.features[i, c(13:20)]
   activity.start  <- properties[, 2]
   activity.end    <- properties[, 3]
   measurement     <- properties[, 5]
@@ -77,6 +70,9 @@ for (i in 1:nrow(fss.features)) {
     box()
     
     title(format(as.POSIXct(activity.start/1000, origin = "1970-01-01", tz = "CET"), "%Y-%m-%d %H:%M", tz = "CET"))
+    
+    heart.times <- heart.times[heart.times > 60]
+    step.times <- step.times[step.times > 60]
     
     # Stroboscopic Technique
     instantaneous.phase.data <- CalculateInstantaneousPhases(heart.times, step.times)
