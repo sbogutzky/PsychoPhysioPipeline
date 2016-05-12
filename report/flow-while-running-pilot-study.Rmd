@@ -62,76 +62,174 @@ rownames(data.1) <- seq(length = nrow(data.1))
 rm(user, activity, fss.features, hrv.features, jc.features, cls.features, subjects, dates, measurements)
 ```
 
-```{r course-of-flow}
-library(lme4, lattice)
-
-random.intercept.model <- lmer(flow ~ mean.nsei + (1 | date), data = data.1, REML = FALSE)
-random.intercept.model <- update(random.intercept.model, subset = !is.na(mean.nsei))
-# fixef(random.intercept.model)
-# ranef(random.intercept.model)
-
-null.model <- update(random.intercept.model,	~	.	-mean.nsei)
-# fixef(null.model)
-# ranef(null.model)
-
-anova(null.model, random.intercept.model)
-
-pred.flow <- fitted(random.intercept.model)
-
-data.2 <- unique(data.frame(cbind(pred.flow = pred.flow, mean.nsei = mean.nsei[!is.na(mean.nsei)], date = date[!is.na(mean.nsei)])))
-
-xyplot(pred.flow ~ mean.nsei, data = data.2, groups = date, type = c("p", "l"), col = 3)
-```
-
-
-
-
-
-```{r Zeiteffekt}
-parameter <- data.1$mean.hr
+```{r day-effect-on-absorption}
+attach(data.1)
 
 par(mfrow = c(1, 1))
-hist(parameter)
-print(shapiro.test(parameter))
+hist(absorption)
+print(shapiro.test(absorption))
 
-flow.daten <- data.frame(parameter = parameter, messzeitpunkt = factor(rep(c("15'", "30'", "45'", "60'"), 6)))
+mean.absorption <- tapply(absorption, date, mean, na.rm = TRUE)
+sd.absorption <- tapply(absorption, date, sd, na.rm = TRUE)
 
-flow.mittelwerte <- tapply(flow.daten$parameter, flow.daten$messzeitpunkt, mean, na.rm=TRUE)
-flow.mittelwerte
-flow.standardabweichung <- tapply(flow.daten$parameter, flow.daten$messzeitpunkt, sd, na.rm=TRUE)
+par(mfrow = c(1, 1), mar = c(6, 4, 4, 2) + 0.1)
+bar.plot <- barplot(mean.absorption, las = 2, ylim = c(0, 6))
+arrows(bar.plot, mean.absorption - sd.absorption, bar.plot, mean.absorption + sd.absorption, angle = 90, code = 3)
 
-x.werte <- barplot(flow.mittelwerte, las = 2)
-arrows(x.werte, flow.mittelwerte - flow.standardabweichung, x.werte, flow.mittelwerte + flow.standardabweichung, angle = 90, code = 3)
+aov.1 <- aov(absorption ~ date, data = data.1)
+summary(aov.1)
 
-plot(flow.daten$parameter ~ flow.daten$messzeitpunkt, las = 2, xlab = "", col = 2)
+levene(absorption, date)
+summary.lm(aov.1)
 
-flow.aov <- aov(parameter ~ messzeitpunkt, data = flow.daten)
-summary(flow.aov)
+pairwise.t.test(absorption, date, p.adj = "holm")
 
-par(mfrow = c(2, 2))
-plot(flow.aov)
+detach(data.1)
+```
 
-levene <- function(y,group) {
-  group.means <- tapply(y,group,mean)
-  ynew <- abs(y-group.means[group])
-  summary(aov(ynew ~ group))
-}
-
-levene(flow.daten$parameter, flow.daten$messzeitpunkt)
-summary.lm(flow.aov)
-
-pairwise.t.test(flow.daten$parameter, flow.daten$messzeitpunkt, p.adj = "holm")
+```{r time-effect-on-absorption}
+attach(data.1)
 
 par(mfrow = c(1, 1))
-plot(data.1$mean.nsei[-c(1:4, 17, 21)], data.1$flow[-c(1:4, 17, 21)], col = flow.daten$messzeitpunkt[-c(1:4, 17, 21)])
+hist(absorption)
+print(shapiro.test(absorption))
 
-modl <- lm(data.1$flow[-c(1:4, 17, 21)] ~ data.1$mean.nsei[-c(1:4, 17, 21)])
-summary(modl)
-abline(modl)
+mean.absorption <- tapply(absorption, measurement, mean, na.rm = TRUE)
+sd.absorption <- tapply(absorption, measurement, sd, na.rm = TRUE)
 
-plot(modl)
+par(mfrow = c(1, 1), mar = c(6, 4, 4, 2) + 0.1)
+bar.plot <- barplot(mean.absorption, las = 2, ylim = c(0, 6))
+arrows(bar.plot, mean.absorption - sd.absorption, bar.plot, mean.absorption + sd.absorption, angle = 90, code = 3)
 
+aov.1 <- aov(absorption ~ measurement, data = data.1)
+summary(aov.1)
+
+levene(absorption, measurement)
+summary.lm(aov.1)
+
+pairwise.t.test(absorption, measurement, p.adj = "holm")
+
+detach(data.1)
 ```
+
+```{r day-effect-on-flow}
+attach(data.1)
+
+par(mfrow = c(1, 1))
+hist(flow)
+print(shapiro.test(flow))
+
+mean.flow <- tapply(flow, date, mean, na.rm = TRUE)
+sd.flow <- tapply(flow, date, sd, na.rm = TRUE)
+
+par(mfrow = c(1, 1), mar = c(6, 4, 4, 2) + 0.1)
+bar.plot <- barplot(mean.flow, las = 2, ylim = c(0, 6))
+arrows(bar.plot, mean.flow - sd.flow, bar.plot, mean.flow + sd.flow, angle = 90, code = 3)
+
+aov.1 <- aov(flow ~ date, data = data.1)
+summary(aov.1)
+
+levene(flow, date)
+summary.lm(aov.1)
+
+pairwise.t.test(flow, date, p.adj = "holm")
+
+detach(data.1)
+```
+
+```{r time-effect-on-flow}
+attach(data.1)
+
+par(mfrow = c(1, 1))
+hist(flow)
+print(shapiro.test(flow))
+
+mean.flow <- tapply(flow, measurement, mean, na.rm = TRUE)
+sd.flow <- tapply(flow, measurement, sd, na.rm = TRUE)
+
+par(mfrow = c(1, 1), mar = c(6, 4, 4, 2) + 0.1)
+bar.plot <- barplot(mean.flow, las = 2, ylim = c(0, 6))
+arrows(bar.plot, mean.flow - sd.flow, bar.plot, mean.flow + sd.flow, angle = 90, code = 3)
+
+aov.1 <- aov(flow ~ measurement, data = data.1)
+summary(aov.1)
+
+levene(flow, measurement)
+summary.lm(aov.1)
+
+pairwise.t.test(flow, measurement, p.adj = "holm")
+
+detach(data.1)
+```
+
+```{r normalized-absorption-day-wise}
+require(lme4) 
+attach(data.1)
+
+plot(absorption ~ date, ylim = c(2, 7))
+points(data.1.pre$absorption)
+
+mean.absorption <- tapply(absorption, date, mean, na.rm = TRUE)
+plot(mean.absorption, data.1.pre$flow)
+linear.model <-lm(data.1.pre$flow ~ mean.absorption)
+summary(linear.model)
+abline(linear.model)
+
+absorption.matrix <- matrix(data = data.1$absorption, nrow = 6, ncol = 4, byrow = TRUE)
+normalized.absorption.matrix <-absorption.matrix - data.1.pre$absorption
+normalized.absorption <- c(t(normalized.absorption.matrix))
+
+random.intercept.model <- lmer(normalized.absorption ~ (1 | date), data = data.1, REML = FALSE)
+null.model <- lm(normalized.absorption ~ 1, data = data.1)
+
+random.intercept.model.log.lik <- as.numeric(logLik(random.intercept.model))
+null.model.log.lik <- as.numeric(logLik(null.model))
+lr <- 2 * (random.intercept.model.log.lik - null.model.log.lik)
+
+print(paste("LR:", lr, "chi-squared distribution on 1 d.f.:", qchisq(.95, df = 1)))
+
+plot(mean.nsei, normalized.absorption, col = date)
+single.model <- lm(normalized.absorption ~ mean.nsei)
+summary(single.model)
+abline(single.model)
+
+detach(data.1)
+```
+
+```{r normalized-flow-day-wise}
+require(lme4) 
+attach(data.1)
+
+plot(flow ~ date, ylim = c(2, 7))
+points(data.1.pre$flow)
+
+mean.flow <- tapply(flow, date, mean, na.rm = TRUE)
+plot(mean.flow, data.1.pre$flow)
+linear.model <-lm(data.1.pre$flow ~ mean.flow)
+summary(linear.model)
+abline(linear.model)
+
+flow.matrix <- matrix(data = data.1$flow, nrow = 6, ncol = 4, byrow = TRUE)
+normalized.flow.matrix <-flow.matrix - data.1.pre$flow
+normalized.flow <- c(t(normalized.flow.matrix))
+
+random.intercept.model <- lmer(normalized.flow ~ (1 | date), data = data.1, REML = FALSE)
+null.model <- lm(normalized.flow ~ 1, data = data.1)
+
+random.intercept.model.log.lik <- as.numeric(logLik(random.intercept.model))
+null.model.log.lik <- as.numeric(logLik(null.model))
+lr <- 2 * (random.intercept.model.log.lik - null.model.log.lik)
+
+print(paste("LR:", lr, "chi-squared distribution on 1 d.f.:", qchisq(.95, df = 1)))
+
+plot(mean.nsei, normalized.flow, col = date)
+single.model <- lm(normalized.flow ~ mean.nsei)
+summary(single.model)
+abline(single.model)
+
+detach(data.1)
+```
+
 
 ```{r distribution, echo=FALSE, message=FALSE, warning=FALSE}
 par("mfcol" = c(2, 1), mar = c(2.5, 2.5, 2.5, 3.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")

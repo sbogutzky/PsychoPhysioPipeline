@@ -31,7 +31,7 @@ time.window.s <- 10 # as.numeric(readline("Type in time window in seconds and pr
 # Load fss features
 fss.features        <- read.csv(paste(features.directory.path, activity.directory, user.directory, "fss-features.csv", sep = ""), stringsAsFactors = F)
 
-for (i in 1:nrow(fss.features)) {
+for (i in 21:nrow(fss.features)) {
   properties      <- fss.features[i, c(13:20)]
   activity.start  <- properties[, 2]
   activity.end    <- properties[, 3]
@@ -55,10 +55,14 @@ for (i in 1:nrow(fss.features)) {
     heart.times <- c(kubios.hrv.data.time.data$t.s[1] - kubios.hrv.data.time.data$rr.interval.s[1], kubios.hrv.data.time.data$t.s)
     spm <- 120 / jerk.cost.data$cycle.interval.s
     bpm <- 60 / kubios.hrv.data.time.data$rr.interval.s
+    
+    print(mean(spm))
+    print(mean(bpm))
+    
     y.lim.1 <- c(min(mean(spm) - sd(spm) * 2, mean(bpm) - sd(bpm) * 2), max(mean(spm) + sd(spm) * 2, mean(bpm) + sd(bpm) * 2))
     
     # Plot
-    par(mfcol = c(4, 1), mar = c(3.5, 4, 2, 4) + 0.1, mgp = c(2.5, 1, 0))
+    par(mfcol = c(3, 1), mar = c(3.5, 4, 2, 4) + 0.1, mgp = c(2.5, 1, 0))
     y.lim <- c(0, 1)
     
     # SPM vs. BPM 
@@ -91,48 +95,48 @@ for (i in 1:nrow(fss.features)) {
     phase.coherence.indexes <- c()
     normalized.shannon.entropy.indexes <- c()
     for (time.point in time.points) {
-      phase.coherence.indexes <- c(phase.coherence.indexes, CalculatePhaseCoherenceIndex(t, psi, time.point, time.window.s))
+      # phase.coherence.indexes <- c(phase.coherence.indexes, CalculatePhaseCoherenceIndex(t, psi, time.point, time.window.s))
       normalized.shannon.entropy.indexes <- c(normalized.shannon.entropy.indexes, CalculateNormalizedShannonEntropyIndex(t, psi, time.point, time.window.s)) 
     }
     rm(time.point)
-    plot(time.points, phase.coherence.indexes, type = "l", xlab = "t (s)", ylab = "Indexes", xaxt = "n",  yaxt = "n", xlim = time.range.s, xaxs = "i", yaxs = "i", ylim = y.lim)
-    lines(time.points, normalized.shannon.entropy.indexes, lty = 2)
+    plot(time.points, normalized.shannon.entropy.indexes, type = "l", xlab = "t (s)", ylab = "Indexes", xaxt = "n",  yaxt = "n", xlim = time.range.s, xaxs = "i", yaxs = "i", ylim = y.lim)
+    # lines(time.points, phase.coherence.indexes, lty = 2)
     abline(v = seq(time.range.s[1], time.range.s[2], time.window.s), lty = "dashed", col = "grey")
     axis(1, at = seq(time.range.s[1], time.range.s[2], time.window.s), labels = seq(time.range.s[1], time.range.s[2], time.window.s), las = 1)
     axis(2, at = seq(y.lim[1], y.lim[2], .2), labels = seq(y.lim[1], y.lim[2], .2))
-    legend("topright", c("PCoI", "NSEI"), lty = c("solid", "dashed"),  bg = "white")
+    # legend("topright", c("PCoI", "NSEI"), lty = c("solid", "dashed"),  bg = "white")
     box()
     
     # Distribution
-    hist(psi, breaks = seq(0, 1, .05), col = "black", border = "white", main = "", xlab = expression(Psi),  xaxs = "i", yaxs = "i", ylab = "")
+    # hist(psi, breaks = seq(0, 1, .05), col = "black", border = "white", main = "", xlab = expression(Psi),  xaxs = "i", yaxs = "i", ylab = "")
     
-    # Create directory, if needed
-    output.directory.path <- paste(processed.data.directory.path, activity.directory, user.directory, date.directory, sep="")
-    if(!file.exists(substr(output.directory.path, 1, nchar(output.directory.path) - 1))) {
-      dir.create(output.directory.path, recursive = TRUE)
-    }
-    
-    # Write csv file
-    output.file.path <- paste(output.directory.path, body.position, "-cls-indexes-", measurement, ".csv", sep = "")
-    op <- options(digits.secs=3)
-    con <- file(output.file.path, 'w') 
-    writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"), con = con)
-    writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%H:%M:%OS"), con = con)
-    write.csv(data.frame(t.s = time.points, pcoi = phase.coherence.indexes, nsei = normalized.shannon.entropy.indexes), file = con, row.names = FALSE)
-    close(con)
-    options(op) #reset options
-    print(paste("Wrote:", output.file.path))
-    
-    # Write csv file
-    output.file.path <- paste(output.directory.path,  body.position, "-cls-phases-", measurement, ".csv", sep = "")
-    op <- options(digits.secs=3)
-    con <- file(output.file.path, 'w') 
-    writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"), con = con)
-    writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%H:%M:%OS"), con = con)
-    write.csv(data.frame(t.s = t, fi, psi), file = con, row.names = FALSE)
-    close(con)
-    options(op) #reset options
-    print(paste("Wrote:", output.file.path))
+    # # Create directory, if needed
+    # output.directory.path <- paste(processed.data.directory.path, activity.directory, user.directory, date.directory, sep="")
+    # if(!file.exists(substr(output.directory.path, 1, nchar(output.directory.path) - 1))) {
+    #   dir.create(output.directory.path, recursive = TRUE)
+    # }
+    # 
+    # # Write csv file
+    # output.file.path <- paste(output.directory.path, body.position, "-cls-indexes-", measurement, ".csv", sep = "")
+    # op <- options(digits.secs=3)
+    # con <- file(output.file.path, 'w') 
+    # writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"), con = con)
+    # writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%H:%M:%OS"), con = con)
+    # write.csv(data.frame(t.s = time.points, pcoi = phase.coherence.indexes, nsei = normalized.shannon.entropy.indexes), file = con, row.names = FALSE)
+    # close(con)
+    # options(op) #reset options
+    # print(paste("Wrote:", output.file.path))
+    # 
+    # # Write csv file
+    # output.file.path <- paste(output.directory.path,  body.position, "-cls-phases-", measurement, ".csv", sep = "")
+    # op <- options(digits.secs=3)
+    # con <- file(output.file.path, 'w') 
+    # writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"), con = con)
+    # writeLines(strftime(as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%H:%M:%OS"), con = con)
+    # write.csv(data.frame(t.s = t, fi, psi), file = con, row.names = FALSE)
+    # close(con)
+    # options(op) #reset options
+    # print(paste("Wrote:", output.file.path))
     
   } else {
     print("No data")
