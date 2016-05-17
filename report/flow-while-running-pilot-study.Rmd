@@ -6,69 +6,233 @@ output: html_document
 ---
   
 ```{r load-data, include=FALSE}
+
 # Remove all variables
-rm(list = ls(all = T)) 
+rm(list = ls(all = T))
 
 # Load functions
 source("./code-snippets/functions.r")
 
 # Set root path
-if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
-  root.path <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
+root.path <- "C:/Users/sbogutzky/Desktop/data (lokal)/2013/"
 
 # Define Colors
 colors <- c("#3FADCB", "#33D100", "white")
 
 # Set test users
-users <- c("buse-patrick")
-activities <- c("running")
+user <- "buse-patrick"
+activity <- "laufen"
 
 # Collect data
 data.1 <- data.frame()
-data.1b <- data.frame()
-for (activity in activities) {
-  for (user in users) {
-    
-    # Load FSS features baseline
-    fss.feature.path <- paste(root.path, "features", "/", "baseline", "/", user, "/", "fss-features.csv", sep = "")
-    fss.features <- read.csv(fss.feature.path)
-    subjects <- factor(fss.features$first.name, levels = c("Patrick"), labels = c("Male"))
-    dates <- factor(strftime(as.POSIXct(fss.features$activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"))
-    data.1b <- rbind(data.1b, data.frame(subject = subjects, date = dates, fss.features[, 1:5]))
-    rm(fss.feature.path)
-    
-    # Load FSS features
-    fss.feature.path <- paste(root.path, "features", "/", activity, "/", user, "/", "fss-features.csv", sep = "")
-    fss.features <- read.csv(fss.feature.path)
-    rm(fss.feature.path)
-    
-    # Load HRV features
-    source("code-snippets/load-hrv-features.R")
-    
-    # Load JC features
-    source("code-snippets/load-jc-features.R")
-    
-    # Load CLS features
-    source("code-snippets/load-cls-features.R") 
+data.1.pre <- data.frame()
 
-    # Set factors
-    subjects <- factor(fss.features$first.name, levels = c("Patrick"), labels = c("Male"))
-    dates <- factor(strftime(as.POSIXct(fss.features$activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"))
-    measurements <- factor(fss.features$measurement, levels = c(1, 2, 3, 4), labels = c("15'", "30'", "45'", "60'"))
+# Load FSS features pre
+fss.feature.path <- paste(root.path, "features", "/", "baseline", "/", user, "/", "fss-features.csv", sep = "")
+fss.features <- read.csv(fss.feature.path)
+subjects <- factor(fss.features$first.name, levels = c("Patrick"), labels = c("Male"))
+data.1.pre <- rbind(data.1.pre, data.frame(subject = subjects, session.start = factor(fss.features$session.start), fss.features[, c(1:8)]))
+rm(fss.feature.path)
+    
+# Load FSS features
+fss.feature.path <- paste(root.path, "features", "/", activity, "/", user, "/", "fss-features.csv", sep = "")
+fss.features <- read.csv(fss.feature.path)
+rm(fss.feature.path)
+    
+# Load HRV features
+source("code-snippets/load-hrv-features.R")
+    
+# Load JC features
+# source("code-snippets/load-jc-features.R")
+    
+# Load CLS features
+source("code-snippets/load-cls-features.R") 
+
+# Set factors
+subjects <- factor(fss.features$first.name, levels = c("Patrick"), labels = c("Male"))
+measurements <- factor(fss.features$measurement, levels = c(1, 2, 3, 4), labels = c("15'", "30'", "45'", "60'"))
   
-    # Create data frame
-    n.row <- nrow(fss.features)
-    e.seq <- seq(3, n.row * 3, 3)
-    data.1 <- rbind(data.1, data.frame(subject = subjects, date = dates, measurement = measurements, fss.features[, 1:5], hrv.features[e.seq, c(3:6, 11:12, 17:18, 24:25, 45:46)], jc.features[e.seq, 1:2], cls.features[e.seq, 1:2]))
+# Create data frame
+data.1 <- rbind(data.1, data.frame(subject = subjects, session.start = factor(fss.features$session.start), measurement = measurements, fss.features[, c(1:8)], hrv.features[, c(3, 5)], cls.features[, 1:2])) #, jc.features[, 1:2]))
     
-  }
-  rm(user, fss.features, hrv.features, jc.features, cls.features, n.row, e.seq, subjects, dates, measurements)
-}
-
 rownames(data.1) <- seq(length = nrow(data.1))
-rownames(data.1b) <- seq(length = nrow(data.1b))
-rm(activity)
+
+rm(user, activity, fss.features, hrv.features, cls.features, subjects, measurements) # jc.features, 
 ```
+
+```{r plot}
+plot(data.1$absorption, data.1$mean.hr)  
+```
+
+
+```{r day-effect-on-absorption}
+attach(data.1)
+
+par(mfrow = c(1, 1))
+hist(absorption)
+print(shapiro.test(absorption))
+
+mean.absorption <- tapply(absorption, date, mean, na.rm = TRUE)
+sd.absorption <- tapply(absorption, date, sd, na.rm = TRUE)
+
+par(mfrow = c(1, 1), mar = c(6, 4, 4, 2) + 0.1)
+bar.plot <- barplot(mean.absorption, las = 2, ylim = c(0, 6))
+arrows(bar.plot, mean.absorption - sd.absorption, bar.plot, mean.absorption + sd.absorption, angle = 90, code = 3)
+
+aov.1 <- aov(absorption ~ date, data = data.1)
+summary(aov.1)
+
+levene(absorption, date)
+summary.lm(aov.1)
+
+pairwise.t.test(absorption, date, p.adj = "holm")
+
+detach(data.1)
+```
+
+```{r time-effect-on-absorption}
+attach(data.1)
+
+par(mfrow = c(1, 1))
+hist(absorption)
+print(shapiro.test(absorption))
+
+mean.absorption <- tapply(absorption, measurement, mean, na.rm = TRUE)
+sd.absorption <- tapply(absorption, measurement, sd, na.rm = TRUE)
+
+par(mfrow = c(1, 1), mar = c(6, 4, 4, 2) + 0.1)
+bar.plot <- barplot(mean.absorption, las = 2, ylim = c(0, 6))
+arrows(bar.plot, mean.absorption - sd.absorption, bar.plot, mean.absorption + sd.absorption, angle = 90, code = 3)
+
+aov.1 <- aov(absorption ~ measurement, data = data.1)
+summary(aov.1)
+
+levene(absorption, measurement)
+summary.lm(aov.1)
+
+pairwise.t.test(absorption, measurement, p.adj = "holm")
+
+detach(data.1)
+```
+
+```{r day-effect-on-flow}
+attach(data.1)
+
+par(mfrow = c(1, 1))
+hist(flow)
+print(shapiro.test(flow))
+
+mean.flow <- tapply(flow, date, mean, na.rm = TRUE)
+sd.flow <- tapply(flow, date, sd, na.rm = TRUE)
+
+par(mfrow = c(1, 1), mar = c(6, 4, 4, 2) + 0.1)
+bar.plot <- barplot(mean.flow, las = 2, ylim = c(0, 6))
+arrows(bar.plot, mean.flow - sd.flow, bar.plot, mean.flow + sd.flow, angle = 90, code = 3)
+
+aov.1 <- aov(flow ~ date, data = data.1)
+summary(aov.1)
+
+levene(flow, date)
+summary.lm(aov.1)
+
+pairwise.t.test(flow, date, p.adj = "holm")
+
+detach(data.1)
+```
+
+```{r time-effect-on-flow}
+attach(data.1)
+
+par(mfrow = c(1, 1))
+hist(flow)
+print(shapiro.test(flow))
+
+mean.flow <- tapply(flow, measurement, mean, na.rm = TRUE)
+sd.flow <- tapply(flow, measurement, sd, na.rm = TRUE)
+
+par(mfrow = c(1, 1), mar = c(6, 4, 4, 2) + 0.1)
+bar.plot <- barplot(mean.flow, las = 2, ylim = c(0, 6))
+arrows(bar.plot, mean.flow - sd.flow, bar.plot, mean.flow + sd.flow, angle = 90, code = 3)
+
+aov.1 <- aov(flow ~ measurement, data = data.1)
+summary(aov.1)
+
+levene(flow, measurement)
+summary.lm(aov.1)
+
+pairwise.t.test(flow, measurement, p.adj = "holm")
+
+detach(data.1)
+```
+
+```{r normalized-absorption-day-wise}
+require(lme4) 
+attach(data.1)
+
+plot(absorption ~ date, ylim = c(2, 7))
+points(data.1.pre$absorption)
+
+mean.absorption <- tapply(absorption, date, mean, na.rm = TRUE)
+plot(mean.absorption, data.1.pre$flow)
+linear.model <-lm(data.1.pre$flow ~ mean.absorption)
+summary(linear.model)
+abline(linear.model)
+
+absorption.matrix <- matrix(data = data.1$absorption, nrow = 6, ncol = 4, byrow = TRUE)
+normalized.absorption.matrix <-absorption.matrix - data.1.pre$absorption
+normalized.absorption <- c(t(normalized.absorption.matrix))
+
+random.intercept.model <- lmer(normalized.absorption ~ (1 | date), data = data.1, REML = FALSE)
+null.model <- lm(normalized.absorption ~ 1, data = data.1)
+
+random.intercept.model.log.lik <- as.numeric(logLik(random.intercept.model))
+null.model.log.lik <- as.numeric(logLik(null.model))
+lr <- 2 * (random.intercept.model.log.lik - null.model.log.lik)
+
+print(paste("LR:", lr, "chi-squared distribution on 1 d.f.:", qchisq(.95, df = 1)))
+
+plot(mean.nsei, normalized.absorption, col = date, pch = as.numeric(measurement))
+single.model <- lm(normalized.absorption ~ mean.nsei)
+summary(single.model)
+abline(single.model)
+
+detach(data.1)
+```
+
+```{r normalized-flow-day-wise}
+require(lme4) 
+attach(data.1)
+
+plot(flow ~ date, ylim = c(2, 7))
+points(data.1.pre$flow)
+
+mean.flow <- tapply(flow, date, mean, na.rm = TRUE)
+plot(mean.flow, data.1.pre$flow)
+linear.model <-lm(data.1.pre$flow ~ mean.flow)
+summary(linear.model)
+abline(linear.model)
+
+flow.matrix <- matrix(data = data.1$flow, nrow = 6, ncol = 4, byrow = TRUE)
+normalized.flow.matrix <-flow.matrix - data.1.pre$flow
+normalized.flow <- c(t(normalized.flow.matrix))
+
+random.intercept.model <- lmer(normalized.flow ~ (1 | date), data = data.1, REML = FALSE)
+null.model <- lm(normalized.flow ~ 1, data = data.1)
+
+random.intercept.model.log.lik <- as.numeric(logLik(random.intercept.model))
+null.model.log.lik <- as.numeric(logLik(null.model))
+lr <- 2 * (random.intercept.model.log.lik - null.model.log.lik)
+
+print(paste("LR:", lr, "chi-squared distribution on 1 d.f.:", qchisq(.95, df = 1)))
+
+plot(mean.nsei, normalized.flow, col = measurement)
+single.model <- lm(normalized.flow ~ mean.nsei)
+summary(single.model)
+abline(single.model)
+
+detach(data.1)
+```
+
 
 ```{r distribution, echo=FALSE, message=FALSE, warning=FALSE}
 par("mfcol" = c(2, 1), mar = c(2.5, 2.5, 2.5, 3.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
