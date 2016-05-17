@@ -33,7 +33,7 @@ ComputeFlowShortScaleDimensions <- function(items) {
              fluency = mean(items[c(8,7,9,4,5,2)]), fluency.sd = sd(items[c(8,7,9,4,5,2)]), 
              absorption = mean(items[c(6,1,10,3)]), absorption.sd = sd(items[c(6,1,10,3)]), 
              anxiety = mean(items[11:13]), anxiety.sd = sd(items[11:13]), 
-             challange = items[14], skill = items[15], fit = items[16],
+             challenge = items[14], skill = items[15], fit = items[16],
              fit.m = fit.m
   )
 }
