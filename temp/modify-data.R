@@ -39,6 +39,13 @@ if(nrow(fss.data) == 5) {
   ecg.data.baseline <- ecg.data.1[ecg.data.1$SensorTime < self.report.baseline$timestamp.stop.ms, 1:3]
   names(ecg.data.baseline) <- c("timestamp.ms", "ecg.ra.ll.mv", "ecg.la.ll.mv")
   
+  # Resample data
+  fs <- 205
+  M <- ResampleData(ecg.data.baseline[, 2:3], fs, ecg.data.baseline$timestamp.ms)
+  data.1 <- data.frame(M)
+  colnames(data.1) <- colnames(ecg.data.baseline)
+  ecg.data.baseline <- data.1
+
   my.write(ecg.data.baseline, "C:/Users/sbogutzky/Desktop/data (lokal)/2013/raw-data/baseline/buse-patrick/2013-10-03--17-39-21/imu-rn42-bd38.csv", header.comment, footer.comment, quote = FALSE, row.names = FALSE)
   
   leg.data.1 <- leg.data
@@ -78,6 +85,13 @@ if(nrow(fss.data) == 5) {
   names(ecg.data.laufen) <- c("timestamp.ms", "ecg.ra.ll.mv", "ecg.la.ll.mv")
   ecg.data.laufen$timestamp.ms <- ecg.data.laufen$timestamp.ms - ecg.data.laufen$timestamp.ms[1]
   ecg.data.laufen <- ecg.data.laufen[ecg.data.laufen$timestamp.ms < self.report.laufen.4$timestamp.stop.ms, ]
+  
+  # Resample data
+  fs <- 205
+  M <- ResampleData(ecg.data.laufen[, 2:3], fs, ecg.data.laufen$timestamp.ms)
+  data.1 <- data.frame(M)
+  colnames(data.1) <- colnames(ecg.data.laufen)
+  ecg.data.laufen <- data.1
   
   my.write(ecg.data.laufen, "C:/Users/sbogutzky/Desktop/data (lokal)/2013/raw-data/laufen/buse-patrick/2013-10-03--17-55-54/imu-rn42-bd38.csv", header.comment, footer.comment, quote = FALSE, row.names = FALSE)
   

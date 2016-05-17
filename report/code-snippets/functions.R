@@ -45,3 +45,9 @@ PlotModels <- function(x, y, x.lim, sub.line, interval) {
   
   title(sub = bquote({R[linear]}^2 ~ "=" ~ .(linear.adj.r.squared) ~ .(linear.sig) ~ "(solid)     " ~ {R[quadratic]}^2 ~ "=" ~ .(quadratic.adj.r.squared) ~ .(quadratic.sig) ~ "(dashed)"), line = sub.line, cex.sub = .8)
 }
+
+levene <- function(y,group) {
+  group.means <- tapply(y,group,mean)
+  ynew <- abs(y-group.means[group])
+  summary(aov(ynew ~ group))
+}
