@@ -18,8 +18,8 @@ data.file.name.2 <- readline("Type in data file name of the first motion file an
 data.file.name.3 <- readline("Type in data file name of the second motion file and press return to continue (optional) > ")
 
 # Set time window
-time.window.s <- as.numeric(readline("Type in time window in seconds and press return to continue (e. g. 10) > "))
-if(is.na(time.window.s)) time.window.s = 10
+time.window.s <- as.numeric(readline("Type in time window in seconds and press return to continue (e. g. 30) > "))
+if(is.na(time.window.s)) time.window.s = 30
 
 for (self.report.file.name in self.report.file.names) {
   
