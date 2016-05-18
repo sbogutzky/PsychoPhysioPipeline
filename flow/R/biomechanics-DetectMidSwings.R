@@ -19,7 +19,7 @@ DetectMidSwings <- function(t.s, angular.velocity.deg.s, fs = 102.4, ff.1 = 4, f
   canPlot = F #!is.na(t.s[range[1]])
   if(canPlot) {
     par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
-    plot(t.s[range], angular.velocity.deg.s[range], type = "l", xlab = "Timestamp (s)", ylab = expression("Angular Velocity (" ~ deg/s ~ ")"))
+    plot(t.s[range], angular.velocity.deg.s[range], type = "l", xlab = "Timestamp (s)", ylab = "Angular Velocity (deg/s)")
   }
   
   # Compute main frequncy

@@ -7,6 +7,9 @@ rm(list = ls(all = T))
 library(flow)
 library(zoom)
 
+# Set working directory
+setwd("~/psychophysiopipeline/preprocessing")
+
 source("./code-snippets/read-set-load.R")
 
 data.file.name <- readline("Type in data file name and press return to continue > ")
@@ -57,7 +60,8 @@ for (self.report.file.name in self.report.file.names) {
           par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
           plot(data.subset$timestamp.ms / 1000, data.subset[, j], type = "l", xlab = "Timestamp (s)", ylab = ReturnFieldLabels(colnames(data.subset)[j]))
           title(paste(strftime(session.start, format="%Y/%m/%d %H:%M"), " #", i, sep = ""))
-          session.zoom()
+          # session.zoom()
+          readline("Press return to continue > ")
         }
         
         # Write to csv file

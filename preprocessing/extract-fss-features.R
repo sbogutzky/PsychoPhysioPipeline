@@ -7,6 +7,9 @@ rm(list = ls(all = T))
 library(flow)
 library(multilevel)
 
+# Set working directory
+setwd("~/psychophysiopipeline/preprocessing")
+
 source("./code-snippets/read-set-load.R")
 
 date.of.birth <- readline("Type in date of birth and press return to continue (format: YYYY-MM-dd) > ")

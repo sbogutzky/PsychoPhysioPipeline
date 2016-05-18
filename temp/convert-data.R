@@ -7,7 +7,7 @@ rm(list = ls(all = T))
 library(flow)
 
 # Set input variables
-input.directory.path <- "C:/Users/sbogutzky/Desktop/2013-10-17/2013-10-17-t17-48-30-"
+input.directory.path <- "C:/Users/sbogutzky/Desktop/2013-10-03/2013-10-03-t17-39-20-"
 root.directory.path <- "C:/Users/sbogutzky/Desktop/data (lokal)/2013/raw-data/"
 user.directory <- "buse-patrick/"
 activity.directory <- "laufen/"
@@ -31,6 +31,7 @@ time.difference.fss.leg <- fss.data[1, 17] - leg.data[1, 8]
 print(paste("FSS - ECG time difference:", time.difference.fss.ecg, "ms"))
 print(paste("FSS - LEG time difference:", time.difference.fss.leg, "ms"))
 offset <- max(time.difference.fss.ecg, time.difference.fss.leg)
+rm(time.difference.fss.ecg, time.difference.fss.leg)
 
 # With baseline measurement
 if(nrow(fss.data) == 5) {
@@ -79,15 +80,15 @@ if(nrow(fss.data) == 5) {
   names(leg.data.baseline) <- c("timestamp.ms", "acceleration.x.ms.2", "acceleration.y.ms.2", "acceleration.z.ms.2", "angular.velocity.x.deg.s", "angular.velocity.y.deg.s", "angular.velocity.z.deg.s")
   
   # Switch axes
-  leg.data.baseline$acceleration.x.ms.2 <- -leg.data.baseline$acceleration.x.ms.2
-  leg.data.baseline$acceleration.z.ms.2 <- -leg.data.baseline$acceleration.z.ms.2
-  leg.data.baseline$angular.velocity.x.deg.s <- -leg.data.baseline$angular.velocity.x.deg.s
-  leg.data.baseline$angular.velocity.z.deg.s <- -leg.data.baseline$angular.velocity.z.deg.s
+  leg.data.baseline[, 2] <- -leg.data.baseline[, 2]
+  leg.data.baseline[, 4] <- -leg.data.baseline[, 4]
+  leg.data.baseline[, 5] <- -leg.data.baseline[, 5]
+  leg.data.baseline[, 7] <- -leg.data.baseline[, 7]
   
   # Write leg data
   GenericWrite(leg.data.baseline, paste(output.directory.path, "imu-rn42-3b70.csv", sep = ""), header.comment, footer.comment, quote = FALSE, row.names = FALSE)
   
-  rm(ecg.data.1, ecg.data.baseline, leg.data.1, leg.data.baseline, resampled.data, date.directory, footer.comment, header.comment, start.time, stop.time, output.directory.path)
+  rm(ecg.data.1, leg.data.1, resampled.data, date.directory, footer.comment, header.comment, offset, start.time, stop.time, output.directory.path)
   
   # Activity
   
@@ -121,9 +122,6 @@ if(nrow(fss.data) == 5) {
     dir.create(output.directory.path, recursive = TRUE)
   }
   
-  # Write self report data
-  GenericWrite(self.report.activity, paste(output.directory.path, "self-report.csv", sep = ""), header.comment, footer.comment, quote = FALSE, row.names = FALSE)
-  
   # Set ecg data
   ecg.data.1 <- ecg.data
   ecg.data.1[, 1] <- ecg.data[, 1] - ecg.data[1, 1]
@@ -150,20 +148,28 @@ if(nrow(fss.data) == 5) {
   leg.data.activity <- leg.data.activity[leg.data.activity[, 1] < self.report.activity[4, 3], ]
   
   # Switch axes
-  leg.data.activity$acceleration.x.ms.2 <- -leg.data.activity$acceleration.x.ms.2
-  leg.data.activity$acceleration.z.ms.2 <- -leg.data.activity$acceleration.z.ms.2
-  leg.data.activity$angular.velocity.x.deg.s <- -leg.data.activity$angular.velocity.x.deg.s
-  leg.data.activity$angular.velocity.z.deg.s <- -leg.data.activity$angular.velocity.z.deg.s
+  leg.data.activity[, 2] <- -leg.data.activity[, 2]
+  leg.data.activity[, 4] <- -leg.data.activity[, 4]
+  leg.data.activity[, 5] <- -leg.data.activity[, 5]
+  leg.data.activity[, 7] <- -leg.data.activity[, 7]
   
   # Write leg data
   GenericWrite(leg.data.activity, paste(output.directory.path, "imu-rn42-3b70.csv", sep = ""), header.comment, footer.comment, quote = FALSE, row.names = FALSE)
   
-  rm(ecg.data.1, ecg.data.activity, leg.data.1, resampled.data, date.directory, footer.comment, header.comment, start.time, stop.time, output.directory.path)
 } else {
 }
 
+steps <- seq(0, nrow(leg.data.activity), 10)
+plot(leg.data.activity[steps, 1] / 1000, leg.data.activity[steps, 5], type = "l", xlab = "Time (s)", ylab = "Angular Velocity X (deg/s)")
+abline(v = self.report.activity[, 1] / 1000, col = "tomato", lty = "dashed")
+title(gsub("-", "/", start.time))
+start.pos <- identify(x = leg.data.activity[steps, 1] / 1000, leg.data.activity[steps, 5], plot = FALSE, n = 4)
 
-s <- seq(0, nrow(leg.data.activity), 10)
-plot(leg.data.activity[s, 1], leg.data.activity[s, 5], type = "l")
-abline(v = self.report.activity[, 1], col = "red")
-session.zoom()
+if(length(start.pos) == 4) {
+  self.report.activity[, 2] <- leg.data.activity[steps, 1][start.pos]
+  
+  # Write self report data
+  GenericWrite(self.report.activity, paste(output.directory.path, "self-report.csv", sep = ""), header.comment, footer.comment, quote = FALSE, row.names = FALSE)
+}
+
+rm(ecg.data.1, leg.data.1, resampled.data, date.directory, footer.comment, header.comment, offset, stop.time, output.directory.path, steps, start.pos)
