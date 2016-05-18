@@ -10,6 +10,9 @@ output: html_document
 # Remove all variables
 rm(list = ls(all = T))
 
+# Set working directory
+setwd("~/psychophysiopipeline/report")
+
 # Load functions
 source("./code-snippets/functions.r")
 
@@ -61,7 +64,7 @@ rm(user, activity, fss.features, hrv.features, cls.features, subjects, measureme
 ```
 
 ```{r plot}
-plot(data.1$absorption, data.1$mean.hr)  
+plot(data.1$absorption, data.1$mean.nsei, xlab = "Absorption", ylab = "Normalized Shannon Entropy Index", pch = 21, bg = "tomato")  
 ```
 
 
