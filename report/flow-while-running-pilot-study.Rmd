@@ -64,7 +64,7 @@ rm(user, activity, fss.features, hrv.features, cls.features, subjects, measureme
 ```
 
 ```{r plot}
-plot(data.1$absorption, data.1$mean.nsei, xlab = "Absorption", ylab = "Normalized Shannon Entropy Index", pch = 21, bg = "tomato")  
+plot(data.1$mean.nsei, data.1$absorption, xlab = "Normalized Shannon Entropy Index", ylab = "Absorption", pch = 21, bg = "tomato")  
 ```
 
 
