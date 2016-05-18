@@ -24,12 +24,13 @@ print(paste("ECG start time:", as.POSIXlt(ecg.data[1, 4] / 1000, "Europe/Berlin"
 print(paste("LEG start time:", as.POSIXlt(leg.data[1, 8] / 1000, "Europe/Berlin", origin = "1970-01-01")))
 
 # Compute time differences
-time.difference.fss.ecg <- fss.data$SystemTime[1] - ecg.data$SystemTime[1] - 900000
-time.difference.fss.leg <- fss.data$SystemTime[1] - leg.data$SystemTime[1] - 900000
+time.difference.fss.ecg <- fss.data[1, 17] - ecg.data[1, 4]
+time.difference.fss.leg <- fss.data[1, 17] - leg.data[1, 8]
 
 # Log time differences
 print(paste("FSS - ECG time difference:", time.difference.fss.ecg, "ms"))
 print(paste("FSS - LEG time difference:", time.difference.fss.leg, "ms"))
+offset <- max(time.difference.fss.ecg, time.difference.fss.leg)
 
 # With baseline measurement
 if(nrow(fss.data) == 5) {
@@ -37,14 +38,14 @@ if(nrow(fss.data) == 5) {
   # baseline
   
   # Set variables
-  start.time <- as.POSIXlt((fss.data[1, 17] - 900000) / 1000, "Europe/Berlin", origin = "1970-01-01")
+  start.time <- as.POSIXlt((fss.data[1, 17] - offset) / 1000, "Europe/Berlin", origin = "1970-01-01")
   stop.time <- as.POSIXlt(fss.data[1, 18] / 1000, "Europe/Berlin", origin = "1970-01-01")
   date.directory <- gsub(" ", "--", gsub(":", "-", start.time))
   header.comment <- gsub("-", "/", paste("# StartTime:", start.time))
   footer.comment <- gsub("-", "/", paste("# StopTime:", stop.time))
   
   # Set self report data
-  self.report.baseline <- data.frame(c(900000, 900000, 900000 + fss.data[1, 18] - fss.data[1, 17], fss.data[1, 1:16]))
+  self.report.baseline <- data.frame(c(offset, offset, offset + fss.data[1, 18] - fss.data[1, 17], fss.data[1, 1:16]))
   names(self.report.baseline) <- c("timestamp.show.ms", "timestamp.start.ms", "timestamp.stop.ms", "item.01", "item.02", "item.03", "item.04", "item.05", "item.06", "item.07", "item.08", "item.09", "item.10", "item.11", "item.12", "item.13", "item.14", "item.15", "item.16")
   
   # Create directory, if needed
@@ -58,7 +59,7 @@ if(nrow(fss.data) == 5) {
   
   # Set ecg data
   ecg.data.1 <- ecg.data
-  ecg.data.1[, 1] <- ecg.data[, 1] - ecg.data[1, 1] + time.difference.fss.ecg
+  ecg.data.1[, 1] <- ecg.data[, 1] - ecg.data[1, 1]
   ecg.data.baseline <- ecg.data.1[ecg.data.1[, 1] < self.report.baseline[1, 3], 1:3]
   names(ecg.data.baseline) <- c("timestamp.ms", "ecg.ra.ll.mv", "ecg.la.ll.mv")
   
@@ -73,7 +74,7 @@ if(nrow(fss.data) == 5) {
   
   # Set leg data
   leg.data.1 <- leg.data
-  leg.data.1[, 1] <- leg.data[, 1] - leg.data[1, 1] + time.difference.fss.leg
+  leg.data.1[, 1] <- leg.data[, 1] - leg.data[1, 1]
   leg.data.baseline <- leg.data.1[leg.data.1[, 1] < self.report.baseline[1, 3], 1:7]
   names(leg.data.baseline) <- c("timestamp.ms", "acceleration.x.ms.2", "acceleration.y.ms.2", "acceleration.z.ms.2", "angular.velocity.x.deg.s", "angular.velocity.y.deg.s", "angular.velocity.z.deg.s")
   
@@ -98,14 +99,19 @@ if(nrow(fss.data) == 5) {
   footer.comment <- gsub("-", "/", paste("# StopTime:", stop.time))
   
   # Set self report data
-  self.report.activity.1 <- data.frame(c(900000, 900000, 900000 + fss.data[2, 18] - fss.data[2, 17], fss.data[2, 1:16]))
+  offset <- abs(fss.data[1, 18] - fss.data[2, 17])
+  self.report.activity.1 <- data.frame(c(offset, offset, offset + fss.data[2, 18] - fss.data[2, 17], fss.data[2, 1:16]))
   names(self.report.activity.1) <- c("timestamp.show.ms", "timestamp.start.ms", "timestamp.stop.ms", "item.01", "item.02", "item.03", "item.04", "item.05", "item.06", "item.07", "item.08", "item.09", "item.10", "item.11", "item.12", "item.13", "item.14", "item.15", "item.16")
-  self.report.activity.2 <- data.frame(c(self.report.activity.1$timestamp.stop.ms + 900000, self.report.activity.1$timestamp.stop.ms + 900000, self.report.activity.1$timestamp.stop.ms + 900000 + fss.data[3, 18] - fss.data[3, 17], fss.data[3, 1:16]))
+  offset <- offset + fss.data[2, 18] - fss.data[2, 17] + abs(fss.data[2, 18] - fss.data[3, 17])
+  self.report.activity.2 <- data.frame(c(offset, offset, offset + fss.data[3, 18] - fss.data[3, 17], fss.data[3, 1:16]))
   names(self.report.activity.2) <- c("timestamp.show.ms", "timestamp.start.ms", "timestamp.stop.ms", "item.01", "item.02", "item.03", "item.04", "item.05", "item.06", "item.07", "item.08", "item.09", "item.10", "item.11", "item.12", "item.13", "item.14", "item.15", "item.16")
-  self.report.activity.3 <- data.frame(c(self.report.activity.2$timestamp.stop.ms + 900000, self.report.activity.2$timestamp.stop.ms + 900000, self.report.activity.2$timestamp.stop.ms + 900000 + fss.data[4, 18] - fss.data[4, 17], fss.data[4, 1:16]))
+  offset <- offset + fss.data[3, 18] - fss.data[3, 17] + abs(fss.data[3, 18] - fss.data[4, 17])
+  self.report.activity.3 <- data.frame(c(offset, offset, offset + fss.data[4, 18] - fss.data[4, 17], fss.data[4, 1:16]))
   names(self.report.activity.3) <- c("timestamp.show.ms", "timestamp.start.ms", "timestamp.stop.ms", "item.01", "item.02", "item.03", "item.04", "item.05", "item.06", "item.07", "item.08", "item.09", "item.10", "item.11", "item.12", "item.13", "item.14", "item.15", "item.16")
-  self.report.activity.4 <- data.frame(c(self.report.activity.3$timestamp.stop.ms + 900000, self.report.activity.3$timestamp.stop.ms + 900000, self.report.activity.3$timestamp.stop.ms + 900000 + fss.data[5, 18] - fss.data[5, 17], fss.data[5, 1:16]))
+  offset <- offset + fss.data[4, 18] - fss.data[4, 17] + abs(fss.data[4, 18] - fss.data[5, 17])
+  self.report.activity.4 <- data.frame(c(offset, offset, offset + fss.data[5, 18] - fss.data[5, 17], fss.data[5, 1:16]))
   names(self.report.activity.4) <- c("timestamp.show.ms", "timestamp.start.ms", "timestamp.stop.ms", "item.01", "item.02", "item.03", "item.04", "item.05", "item.06", "item.07", "item.08", "item.09", "item.10", "item.11", "item.12", "item.13", "item.14", "item.15", "item.16")
+  
   self.report.activity <- rbind(self.report.activity.1, self.report.activity.2, self.report.activity.3, self.report.activity.4)
   rm(self.report.activity.1, self.report.activity.2, self.report.activity.3, self.report.activity.4)
   
@@ -120,8 +126,8 @@ if(nrow(fss.data) == 5) {
   
   # Set ecg data
   ecg.data.1 <- ecg.data
-  ecg.data.1[, 1] <- ecg.data[, 1] - ecg.data[1, 1] + time.difference.fss.ecg
-  ecg.data.activity <- ecg.data.1[ecg.data.1[, 1] >= self.report.activity[1, 3], 1:3]
+  ecg.data.1[, 1] <- ecg.data[, 1] - ecg.data[1, 1]
+  ecg.data.activity <- ecg.data.1[ecg.data.1[, 1] >= self.report.baseline[1, 3], 1:3]
   names(ecg.data.activity) <- c("timestamp.ms", "ecg.ra.ll.mv", "ecg.la.ll.mv")
   ecg.data.activity[, 1] <- ecg.data.activity[, 1] - ecg.data.activity[1, 1]
   ecg.data.activity <- ecg.data.activity[ecg.data.activity[, 1] < self.report.activity[4, 3], ]
@@ -137,8 +143,8 @@ if(nrow(fss.data) == 5) {
   
   # Set leg data
   leg.data.1 <- leg.data
-  leg.data.1[, 1] <- leg.data[, 1] - leg.data[1, 1] + time.difference.fss.leg
-  leg.data.activity <- leg.data.1[leg.data.1[, 1] >= self.report.activity[1, 3], 1:7]
+  leg.data.1[, 1] <- leg.data[, 1] - leg.data[1, 1]
+  leg.data.activity <- leg.data.1[leg.data.1[, 1] >= self.report.baseline[1, 3], 1:7]
   names(leg.data.activity) <- c("timestamp.ms", "acceleration.x.ms.2", "acceleration.y.ms.2", "acceleration.z.ms.2", "angular.velocity.x.deg.s", "angular.velocity.y.deg.s", "angular.velocity.z.deg.s")
   leg.data.activity[, 1] <- leg.data.activity[, 1] - leg.data.activity[1, 1]
   leg.data.activity <- leg.data.activity[leg.data.activity[, 1] < self.report.activity[4, 3], ]
@@ -152,12 +158,12 @@ if(nrow(fss.data) == 5) {
   # Write leg data
   GenericWrite(leg.data.activity, paste(output.directory.path, "imu-rn42-3b70.csv", sep = ""), header.comment, footer.comment, quote = FALSE, row.names = FALSE)
   
-  rm(ecg.data.1, ecg.data.activity, leg.data.1, leg.data.activity, resampled.data, date.directory, footer.comment, header.comment, start.time, stop.time, output.directory.path)
+  rm(ecg.data.1, ecg.data.activity, leg.data.1, resampled.data, date.directory, footer.comment, header.comment, start.time, stop.time, output.directory.path)
 } else {
 }
 
 
-# s <- seq(0, nrow(data), 10)
-# plot(data$timestamp.ms[s], data$angular.velocity.x.deg.s[s], type = "l")
-# abline(v = self.report.data$timestamp.start.ms, col = "red")
-# session.zoom()
+s <- seq(0, nrow(leg.data.activity), 10)
+plot(leg.data.activity[s, 1], leg.data.activity[s, 5], type = "l")
+abline(v = self.report.activity[, 1], col = "red")
+session.zoom()
