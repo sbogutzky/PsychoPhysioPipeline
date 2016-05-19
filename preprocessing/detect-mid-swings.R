@@ -68,8 +68,14 @@ for (self.report.file.name in self.report.file.names) {
         write.csv(output.data, output.directory, row.names = F)
         
         print(paste("Wrote:", output.directory))
-        print(paste("First step: ", round(min(output.data[, 1] / 1000)), "s", sep = ""))
-        print(paste("Last step: ", round(max(output.data[, 1] / 1000)), "s", sep = ""))
+        
+        
+        first.step <- round(min(output.data[, 1] / 1000))
+        last.step <- round(max(output.data[, 1] / 1000))
+        step.duration <- last.step - first.step
+        print(paste("First step: ", sprintf("%02d", trunc(first.step / 60)), ":", sprintf("%02d", trunc(first.step %% 60)), " (", first.step, " s)", sep = ""))
+        print(paste("Duration  : ", sprintf("%02d", trunc(step.duration / 60)), ":", sprintf("%02d", trunc(step.duration %% 60)), " (", step.duration, " s)", sep = ""))
+        print(paste("Last step : ", sprintf("%02d", trunc(last.step / 60)), ":", sprintf("%02d", trunc(last.step %% 60)), " (", last.step, " s)", sep = ""))
       
       } else {
         print("No mid swings detected")
