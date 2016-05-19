@@ -7,6 +7,9 @@ rm(list = ls(all = T))
 require(flow)
 require(signal)
 
+# Set working directory
+setwd("~/psychophysiopipeline/preprocessing")
+
 source("./code-snippets/read-set-load.R")
 
 data.file.name <- readline("Type in data file name and press return to continue > ")

@@ -40,9 +40,9 @@ for (self.report.file.name in self.report.file.names) {
   }
 }
 
-print(paste("Cronbach's Alpha Flow: ", round(multilevel::cronbach(fss.measurements[, 1:10])$Alpha, 2)))
-print(paste("Cronbach's Alpha Fluency: ", round(multilevel::cronbach(fss.measurements[, c(8,7,9,4,5,2)])$Alpha, 2)))
-print(paste("Cronbach's Alpha Absorption: ", round(multilevel::cronbach(fss.measurements[, c(6,1,10,3)])$Alpha, 2)))
+print(paste("Cronbach's Alpha Flow:", round(multilevel::cronbach(fss.measurements[, 1:10])$Alpha, 2)))
+print(paste("Cronbach's Alpha Fluency:", round(multilevel::cronbach(fss.measurements[, c(8,7,9,4,5,2)])$Alpha, 2)))
+print(paste("Cronbach's Alpha Absorption:", round(multilevel::cronbach(fss.measurements[, c(6,1,10,3)])$Alpha, 2)))
 
 # Write to csv file
 output.directory <- paste(feature.directory, activity.directory, user.directory, sep = "")

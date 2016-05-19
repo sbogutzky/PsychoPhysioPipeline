@@ -16,26 +16,15 @@ setwd("~/psychophysiopipeline/report")
 # Load functions
 source("./code-snippets/functions.r")
 
-# Set root path
+# Set paths
 root.path <- "C:/Users/sbogutzky/Desktop/data (lokal)/2013/"
 
-# Define Colors
-colors <- c("#3FADCB", "#33D100", "white")
-
-# Set test users
+# Set variables
 user <- "buse-patrick"
 activity <- "laufen"
 
 # Collect data
 data.1 <- data.frame()
-data.1.pre <- data.frame()
-
-# Load FSS features pre
-fss.feature.path <- paste(root.path, "features", "/", "baseline", "/", user, "/", "fss-features.csv", sep = "")
-fss.features <- read.csv(fss.feature.path)
-subjects <- factor(fss.features$first.name, levels = c("Patrick"), labels = c("Male"))
-data.1.pre <- rbind(data.1.pre, data.frame(subject = subjects, session.start = factor(fss.features$session.start), fss.features[, c(1:8)]))
-rm(fss.feature.path)
     
 # Load FSS features
 fss.feature.path <- paste(root.path, "features", "/", activity, "/", user, "/", "fss-features.csv", sep = "")
@@ -45,10 +34,10 @@ rm(fss.feature.path)
 # Load HRV features
 source("code-snippets/load-hrv-features.R")
     
-# Load JC features
-# source("code-snippets/load-jc-features.R")
+# Load jerk cost features
+source("code-snippets/load-jc-features.R")
     
-# Load CLS features
+# Load synchronization features
 source("code-snippets/load-cls-features.R") 
 
 # Set factors
@@ -56,17 +45,57 @@ subjects <- factor(fss.features$first.name, levels = c("Patrick"), labels = c("M
 measurements <- factor(fss.features$measurement, levels = c(1, 2, 3, 4), labels = c("15'", "30'", "45'", "60'"))
   
 # Create data frame
-data.1 <- rbind(data.1, data.frame(subject = subjects, session.start = factor(fss.features$session.start), measurement = measurements, fss.features[, c(1:8)], hrv.features[, c(3, 5)], cls.features[, 1:2])) #, jc.features[, 1:2]))
-    
+data.1 <- rbind(data.1, data.frame(subject = subjects, session.start = factor(fss.features$session.start), measurement = measurements, fss.features[, c(1:8)], hrv.features[, c(3, 5)], cls.features[, 1:2], jc.features[, 1:2]))
 rownames(data.1) <- seq(length = nrow(data.1))
 
-rm(user, activity, fss.features, hrv.features, cls.features, subjects, measurements) # jc.features, 
+rm(user, activity, fss.features, hrv.features, cls.features, jc.features, subjects, measurements)
 ```
 
 ```{r plot}
-plot(data.1$mean.nsei, data.1$absorption, xlab = "Normalized Shannon Entropy Index", ylab = "Absorption", pch = 21, bg = "tomato")  
-```
+par(mfcol = c(4, 2))
 
+outlier <- c(1, 5, 6, 7, 8, 9, 13, 17, 20)
+# 1
+plot(data.1$mean.nsei[-outlier], data.1$flow[-outlier], xlab = "Mean Normalized Shannon Entropy Index", ylab = "Flow", pch = 21, bg = "darkolivegreen1") 
+linear.model <- lm(data.1$flow[-outlier] ~ data.1$mean.nsei[-outlier])
+abline(linear.model)
+summary(linear.model)
+# 2
+plot(data.1$mean.hr[-outlier], data.1$flow[-outlier], xlab = "Mean HR", ylab = "Flow", pch = 21, bg = "tomato")
+linear.model <- lm(data.1$flow[-outlier] ~ data.1$mean.hr[-outlier])
+abline(linear.model)
+summary(linear.model)
+#3
+plot(data.1$mean.jerk.cost[-outlier], data.1$flow[-outlier], xlab = "Mean Jerk Cost", ylab = "Flow", pch = 23, bg = "deepskyblue") 
+linear.model <- lm(data.1$flow[-outlier] ~ data.1$mean.jerk.cost[-outlier])
+abline(linear.model)
+summary(linear.model)
+#4
+plot(data.1$mean.cycle.interval[-outlier], data.1$flow[-outlier], xlab = "Mean Cycle Interval", ylab = "Flow", pch = 23, bg = "deepskyblue")
+linear.model <- lm(data.1$flow[-outlier] ~ data.1$mean.cycle.interval[-outlier])
+abline(linear.model)
+summary(linear.model)
+#5
+plot(data.1$mean.nsei[-outlier], data.1$absorption[-outlier], xlab = "Mean Normalized Shannon Entropy Index", ylab = "Absorption", pch = 21, bg = "darkolivegreen1") 
+linear.model <- lm(data.1$absorption[-outlier] ~ data.1$mean.nsei[-outlier])
+abline(linear.model)
+summary(linear.model)
+#6
+plot(data.1$mean.hr[-outlier], data.1$absorption[-outlier], xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = "tomato") 
+linear.model <- lm(data.1$absorption[-outlier] ~ data.1$mean.hr[-outlier])
+abline(linear.model)
+summary(linear.model)
+#7
+plot(data.1$mean.jerk.cost[-outlier], data.1$absorption[-outlier], xlab = "Mean Jerk Cost", ylab = "Absorption", pch = 23, bg = "deepskyblue") 
+linear.model <- lm(data.1$absorption[-outlier] ~ data.1$mean.jerk.cost[-outlier])
+abline(linear.model)
+summary(linear.model)
+#8
+plot(data.1$mean.cycle.interval[-outlier], data.1$absorption[-outlier], xlab = "Mean Cycle Interval", ylab = "Absorption", pch = 23, bg = "deepskyblue") 
+linear.model <- lm(data.1$absorption[-outlier] ~ data.1$mean.cycle.interval[-outlier])
+abline(linear.model)
+summary(linear.model)
+```
 
 ```{r day-effect-on-absorption}
 attach(data.1)
@@ -287,15 +316,6 @@ for(i in unique(as.numeric(data.1$subject))) {
 }
 
 rm(data.1.1, i)
-```
-
-```{r substract-baseline-absorption, message=FALSE, warning=FALSE, include=FALSE}
-data.2 <- data.1
-absorption.matrix <- matrix(data = data.2$absorption, nrow = length(data.2$absorption)/4, byrow = T)
-absorption.matrix <- sweep(absorption.matrix, 1, (data.1b$absorption - 1), "-")
-data.2$absorption <- c(t(absorption.matrix))
-data.2$absorption[data.2$absorption < 1] <- 1
-rm(absorption.matrix)
 ```
 
 ```{r distribution-1, echo=FALSE, message=FALSE, warning=FALSE}
