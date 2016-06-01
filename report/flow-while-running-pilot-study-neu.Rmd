@@ -1,0 +1,284 @@
+---
+title: "Flow beim Laufen (intraindividell)"
+author: "Simon Bogutzky"
+date: "1 Juni 2016"
+header-includes:
+   - \usepackage{rotating}
+   - \usepackage{tikz}
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+
+# Remove all variables
+rm(list = ls(all = T))
+
+# Set working directory
+setwd("~/psychophysiopipeline/report")
+
+# Load libraries
+library("flow")
+library("tikzDevice")
+
+# Set paths
+root.path <- "C:/Users/sbogutzky/Desktop/data (lokal)/2013/"
+
+# Set directories
+preprocessed.data.directory <- "preprocessed/"
+activity.directory <- "laufen/"
+user.directory <- "buse-patrick/"
+
+```
+
+# Rohdaten
+
+```{r create-raw-data-figure, include=FALSE}
+
+# Set directories
+date.directory <- "2013-10-31--18-31-19/"
+kinematic.data.file.name <- "imu-rn42-3b70-3.csv"
+mid.swing.data.file.name <- "imu-rn42-3b70-mid-swing-indexes-3.csv"
+ecg.data.file.name <- "imu-rn42-bd38-3.csv"
+
+# Set paths
+kinematic.data.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, kinematic.data.file.name, sep = "")
+mid.swing.data.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, mid.swing.data.file.name, sep = "")
+ecg.data.file.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, ecg.data.file.name, sep = "")
+    
+# Load kinematic and midswing data
+kinematic.data <- read.csv(kinematic.data.path)
+mid.swing.data <- read.csv(mid.swing.data.path)
+ecg.data <- read.csv(ecg.data.file.path)
+
+# Setup tikz device
+tikz("./tikz/5-2-daten.tex", width = 7.91, height = 5.22)
+
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfcol = c(2, 4))
+
+# Plot ECG data
+n <- 200
+y <- ecg.data[ecg.data[, 1] > mid.swing.data[n, 1] & ecg.data[, 1] < mid.swing.data[n + 1, 1], 2]
+x.p <- 1:length(y) / length(y) * 100
+plot(x.p, y, type = "l", xlab = "Zeit ($\\% Doppelschritt$)", ylab = "EKG RA-LL ($mV$)", ylim = c(-3, 3), xaxs = "i")
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+y <- ecg.data[ecg.data[, 1] > mid.swing.data[n, 1] & ecg.data[, 1] < mid.swing.data[n + 1, 1], 3]
+plot(x.p, y, type = "l", xlab = "Zeit ($\\% Doppelschritt$)", ylab = "EKG LA-LL ($mV$)", ylim = c(-3, 3), xaxs = "i")
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+# Plot kinematic Data
+most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 2], mid.swing.data[, 2])
+y <- rowMeans(most.common.cycle.matrix)
+x.p <- 1:length(y) / length(y) * 100
+plot(x.p, -c(y[31:60], y[1:30]), type = "l", xlab = "Zeit ($\\% Doppelschritt$)", ylab = "Beschleunigung Y ($m/s^2$)", ylim = c(-30, 30), xaxs = "i", col = rgb(155/255, 193/255, 54/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 5], mid.swing.data[, 2])
+y <- rowMeans(most.common.cycle.matrix)
+plot(x.p, -c(y[31:60], y[1:30]), type = "l", xlab = "Zeit ($\\% Doppelschritt$)", ylab = "Winkelgeschwindigkeit X ($deg/s$)", ylim = c(-600, 600), xaxs = "i", col = rgb(155/255, 193/255, 54/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 3], mid.swing.data[, 2])
+y <- rowMeans(most.common.cycle.matrix)
+plot(x.p, c(y[31:60], y[1:30]), type = "l", xlab = "Zeit ($\\% Doppelschritt$)", ylab = "Beschleunigung Y ($m/s^2$)", ylim = c(-30, 30), xaxs = "i", col = rgb(0/255, 152/255, 199/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 6], mid.swing.data[, 2])
+y <- rowMeans(most.common.cycle.matrix)
+plot(x.p, c(y[31:60], y[1:30]), type = "l", xlab = "Zeit ($\\% Doppelschritt$)", ylab = "Winkelgeschwindigkeit Y ($deg/s$)", ylim = c(-600, 600), xaxs = "i", col = rgb(0/255, 152/255, 199/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 4], mid.swing.data[, 2])
+y <- rowMeans(most.common.cycle.matrix)
+plot(x.p, -c(y[31:60], y[1:30]), type = "l", xlab = "Zeit ($\\% Doppelschritt$)", ylab = "Beschleunigung Z ($m/s^2$)", ylim = c(-30, 30), xaxs = "i", col = rgb(229/255, 66/255, 66/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 7], mid.swing.data[, 2])
+y <- rowMeans(most.common.cycle.matrix)
+plot(x.p, -c(y[31:60], y[1:30]), type = "l", xlab = "Zeit ($\\% Doppelschritt$)", ylab = "Winkelgeschwindigkeit Z ($deg/s$)", ylim = c(-600, 600), xaxs = "i", col = rgb(229/255, 66/255, 66/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+dev.off()
+
+# Clean up
+rm(ecg.data, kinematic.data, mid.swing.data, most.common.cycle.matrix, date.directory, ecg.data.file.path, ecg.data.file.name, kinematic.data.path, kinematic.data.file.name, mid.swing.data.path, mid.swing.data.file.name, n, x.p, y)
+      
+```
+
+\begin{sidewaysfigure}
+	\input{./tikz/5-2-daten}
+	\caption{Aufgenommene Datenströme. Von links nach rechts: (schwarz) EKG-Ableitung RA-LL und EKG-Ableitung LA-LL; (grün) Beschleunigung in X-Richtung und Winkelgeschwindigkeit um die X Achse; (blau) Beschleunigung in Y-Richtung und Winkelgeschwindigkeit um die Y-Achse; (rot) Beschleunigung in Z-Richtung und Winkelgeschwindigkeit um die Z-Achse. Quelle: Eigene Darstellung}
+	\label{figure:5-2-daten}
+\end{sidewaysfigure}
+
+```{r load-data, include=FALSE}
+
+# Load functions
+source("./code-snippets/functions.r")
+
+# Set directories
+feature.directory <- "features/"
+
+# Collect data
+data.1 <- data.frame()
+    
+# Load FSS features
+fss.feature.path <- paste(root.path, feature.directory, activity.directory, user.directory, "fss-features.csv", sep = "")
+fss.features <- read.csv(fss.feature.path)
+rm(fss.feature.path)
+    
+# Load HRV features
+source("code-snippets/load-hrv-features.R")
+    
+# Load jerk cost features
+source("code-snippets/load-jc-features.R")
+    
+# Load synchronization features
+source("code-snippets/load-cls-features.R") 
+
+# Set factors
+subjects <- factor(fss.features$first.name, levels = c("Patrick"), labels = c("Male"))
+measurements <- factor(fss.features$measurement, levels = c(1, 2, 3, 4), labels = c("15'", "30'", "45'", "60'"))
+  
+# Create data frame
+data.1 <- rbind(data.1, data.frame(subject = subjects, session.start = factor(fss.features$session.start), measurement = measurements, fss.features[, c(1:8)], hrv.features[, c(3, 5)], cls.features[, 1:2], jc.features[, 1:2]))
+rownames(data.1) <- seq(length = nrow(data.1))
+
+# Clean up
+rm(fss.features, hrv.features, cls.features, jc.features, subjects, measurements)
+```
+
+```{r remove-outliers, include=FALSE}
+outliers <- c(1, 5, 9, 13, 17, 21)
+data.2 <- data.1[-outliers, ]
+```
+
+```{r check-day-effect-on-fluency, include=FALSE}
+
+# One-way repeated measures ANOVA
+# Stichproben nicht gepaart, aber Messungen sind abhängig
+
+# Visual check
+boxplot(data.2$fluency ~ data.2$session.start, main = "Glatter Verlauf nach Sitzungstag", xlab = "Sitzungstag", ylab = "Glatter Verlauf")
+
+
+data.3 <- cbind(data.2$fluency[as.numeric(data.2$measurement) == 2], data.2$fluency[as.numeric(data.2$measurement) == 3],data.2$fluency[as.numeric(data.2$measurement) == 4])
+
+library(car)
+groups <- as.factor(c(1, 2, 3))
+linear.model <- lm(data.3 ~ 1)
+analysis <- Anova(m.model, idata = data.frame(groups), idesign = ~groups)
+
+summary(analysis)
+
+
+
+
+
+
+# Check normality
+hist(data.2$fluency)
+print(shapiro.test(data.2$fluency))
+boxplot(data.2$fluency ~ data.2$session.start)
+
+# Check
+levene(data.2$fluency, data.2$session.start)
+
+# One way anova
+aov.1 <- aov(fluency ~ session.start, data = data.2)
+summary.aov(aov.1)
+
+
+
+pairwise.t.test(data.2$fluency, data.2$session.start, p.adj = "holm")
+
+# Clean up
+rm(aov.1)
+```
+
+```{r check-day-effect-on-absorption, include=FALSE}
+par(mfrow = c(2, 1))
+
+# Check normality
+hist(data.2$absorption)
+print(shapiro.test(data.2$absorption))
+boxplot(data.2$absorption ~ data.2$session.start)
+
+aov.1 <- aov(absorption ~ session.start, data = data.2)
+summary(aov.1)
+levene(data.2$absorption, data.2$session.start)
+summary.lm(aov.1)
+
+pairwise.t.test(data.2$absorption, data.2$session.start, p.adj = "holm")
+
+# Clean up
+rm(aov.1)
+```
+
+```{r check-day-effect-on-flow, include=FALSE}
+par(mfrow = c(2, 1))
+
+# Check normality
+hist(data.2$flow)
+print(shapiro.test(data.2$flow))
+boxplot(data.2$flow ~ data.2$session.start)
+
+aov.1 <- aov(flow ~ session.start, data = data.2)
+summary.aov(aov.1)
+levene(data.2$flow, data.2$session.start)
+
+pairwise.t.test(data.2$flow, data.2$session.start, p.adj = "holm")
+
+# Clean up
+rm(aov.1)
+```
+
+```{r check-time-effect-on-fluency, include=FALSE}
+
+# Two plots
+par(mfrow = c(2, 1))
+
+# Check normality
+hist(data.2$fluency)
+print(shapiro.test(data.2$fluency))
+boxplot(data.2$fluency ~ data.2$measurement)
+
+aov.1 <- aov(fluency ~ measurement, data = data.2)
+summary.lm(aov.1)
+levene(data.2$fluency, data.2$measurement)
+
+pairwise.t.test(data.2$fluency, data.2$measurement, p.adj = "holm")
+
+# Clean up
+rm(aov.1)
+```
+
+```{r check-time-effect-on-absorption, include=FALSE}
+
+# Two plots
+par(mfrow = c(2, 1))
+
+# Check normality
+hist(data.2$absorption)
+print(shapiro.test(data.2$absorption))
+boxplot(data.2$absorption ~ data.2$measurement)
+
+# Anova
+aov.1 <- aov(absorption ~ measurement, data = data.2)
+summary.lm(aov.1)
+levene(data.2$absorption, data.2$measurement)
+
+# Pairwise t-test
+pairwise.t.test(data.2$absorption, data.2$measurement, p.adj = "holm")
+
+# Clean up
+rm(aov.1)
+```

@@ -3,7 +3,7 @@ jc.feature.names <- c("mean.cycle.interval", "mean.jerk.cost")
 for (i in 1:nrow(fss.features)) {
   
   source("code-snippets/set-additional-features.R")
-  jc.data.path <- paste(root.path, "preprocessed", "/", activity, "/", user, "/", strftime(date, format="%Y-%m-%d--%H-%M-%S"), "/", "imu-rn42-3b70-cycle-intervals-jerk-costs-", measurement, ".csv", sep = "")
+  jc.data.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, strftime(date, format="%Y-%m-%d--%H-%M-%S"), "/", "imu-rn42-3b70-cycle-intervals-jerk-costs-", measurement, ".csv", sep = "")
   rm(measurement)
   
   if(file.exists(jc.data.path)) {

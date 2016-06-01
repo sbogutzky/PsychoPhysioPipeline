@@ -3,7 +3,7 @@ cls.feature.names <- c("mean.pcoi", "mean.nsei")
 for (i in 1:nrow(fss.features)) {
   
   source("code-snippets/set-additional-features.R")
-  cls.data.path <- paste(root.path, "preprocessed", "/", activity, "/", user, "/", strftime(date, format="%Y-%m-%d--%H-%M-%S"), "/", "cls-indexes-", measurement, ".csv", sep = "")
+  cls.data.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, strftime(date, format="%Y-%m-%d--%H-%M-%S"), "/", "cls-indexes-", measurement, ".csv", sep = "")
   rm(measurement)
   
   if(file.exists(cls.data.path)) {
