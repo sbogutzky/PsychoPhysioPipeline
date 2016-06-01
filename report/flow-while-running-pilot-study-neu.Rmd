@@ -5,6 +5,11 @@ date: "1 Juni 2016"
 header-includes:
    - \usepackage{rotating}
    - \usepackage{tikz}
+   - \usepackage{booktabs} 
+   - \usepackage{dcolumn}
+   - \newcolumntype{x}{D{,}{\pm}{3.3}} 
+   - \newcolumntype{y}{D{,}{\pm}{5.3}}
+   - \newcolumntype{z}{D{,}{\pm}{7.7}}
 output: pdf_document
 ---
 
@@ -19,6 +24,7 @@ setwd("~/psychophysiopipeline/report")
 # Load libraries
 library("flow")
 library("tikzDevice")
+library("xtable")
 
 # Set paths
 root.path <- "C:/Users/sbogutzky/Desktop/data (lokal)/2013/"
@@ -147,9 +153,11 @@ source("code-snippets/load-cls-features.R")
 # Set factors
 subjects <- factor(fss.features$first.name, levels = c("Patrick"), labels = c("Male"))
 measurements <- factor(fss.features$measurement, levels = c(1, 2, 3, 4), labels = c("15'", "30'", "45'", "60'"))
+sessions <- factor(fss.features$session.start, levels = c("2013-10-03 17:55:54", "2000-01-02 12:41:56", "2013-10-17 18:07:11", "2013-10-24 17:32:14", "2013-10-31 18:31:19", "2013-11-07 17:34:06"), labels = c("03.10", "10.10", "17.10", "24.10", "31.10", "07.11"))
   
 # Create data frame
-data.1 <- rbind(data.1, data.frame(subject = subjects, session.start = factor(fss.features$session.start), measurement = measurements, fss.features[, c(1:8)], hrv.features[, c(3, 5)], cls.features[, 1:2], jc.features[, 1:2]))
+data.1 <- rbind(data.1, data.frame(subject = subjects, session = sessions, measurement = measurements, fss.features[, c(1:8)], hrv.features[, c(3, 5)], cls.features[, 1:2], jc.features[, 1:2]))
+data.1 <- data.1[c(5:8, 1:4, 9:24), ]
 rownames(data.1) <- seq(length = nrow(data.1))
 
 # Clean up
@@ -159,11 +167,12 @@ rm(fss.features, hrv.features, cls.features, jc.features, subjects, measurements
 ```{r remove-outliers, include=FALSE}
 outliers <- c(1, 5, 9, 13, 17, 21)
 data.2 <- data.1[-outliers, ]
+data.2$measurement <- factor(data.2$measurement, levels = c("30'", "45'", "60'"), labels = c("30'", "45'", "60'"))
 ```
 
-## Indikatoren 
+## Variabeln
 
-```{r indicator-session-wise, echo=FALSE, warning=FALSE, results="asis"}
+```{r variables-session-wise, echo=FALSE, warning=FALSE, results="asis"}
     
   # Create table
   options(stringsAsFactors = FALSE)
@@ -173,7 +182,7 @@ data.2 <- data.1[-outliers, ]
   }
   
   colnames(feature.table) <- c(levels(data.2[, 2]), "Gesamt")
-  rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz ($BPM$)", "RMSSD ($ms$)", "Norm. Shan. Entr. Index", "Bewegungsaufw. ($m^2s^{-5}$)")
+  rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz ($BPM$)", "RMSSD ($ms$)", "Norm. Shan. Entr. Index", "Bewegungsaufw. ($m^2/s^5$)")
   
   # Print latex table
   table                   <- xtable(feature.table, label = "tab:indikatoren-nach-sitzung", align = "lyyyyyyy", caption = "Variabeln: Arithmetisches Mittel B1 Standardabweichung zu den sechs Sitzungen [N = 3]") 
@@ -183,7 +192,7 @@ data.2 <- data.1[-outliers, ]
   rm(feature.table, table, i)
 ```
 
-```{r indicator-measurement-wise, echo=FALSE, warning=FALSE, results="asis"}
+```{r variables-measurement-wise, echo=FALSE, warning=FALSE, results="asis"}
     
   # Create table
   options(stringsAsFactors = FALSE)
@@ -193,7 +202,7 @@ data.2 <- data.1[-outliers, ]
   }
   
   colnames(feature.table) <- c(levels(data.2[, 3]), "Gesamt")
-  rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz ($BPM$)", "RMSSD ($ms$)", "Norm. Shan. Entr. Index", "Bewegungsaufw. ($m^2s^{-5}$)")
+  rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz ($BPM$)", "RMSSD ($ms$)", "Norm. Shan. Entr. Index", "Bewegungsaufw. ($m^2/s^5$)")
   
   # Print latex table
   table                   <- xtable(feature.table, label = "tab:variabeln-nach-messzeitpunkt", align = "lyyyy", caption = "Variabeln: Arithmetisches Mittel B1 Standardabweichung zu den drei Messzeitpunkten [N = 6]") 
@@ -202,6 +211,8 @@ data.2 <- data.1[-outliers, ]
   # Clean up
   rm(feature.table, table, i)
 ```
+
+## TOCHECK
 
 ```{r statistical-effect-tests, include=FALSE}
 
@@ -376,7 +387,7 @@ m <- max(cls.phases$t.s[complete.cases(cls.phases)]) #
 heart.beat.times <- c(kubios.hrv.data.time.data$t.s[1] - kubios.hrv.data.time.data$rr.interval.s[1], kubios.hrv.data.time.data$t.s)
 plot(kubios.hrv.data.time.data$t.s[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], 60 / diff(heart.beat.times)[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], xlab = "", ylab = "Mittlere HR (BPM)", xaxs = "i", yaxs = "i", ylim = c(150, 190), pch = 21, bg = "tomato")
 
-title("Cberforderung: - Absorbiertheit: 3.75")
+title("Überforderung: - Absorbiertheit: 3.75")
 
 plot(cls.phases$t.s[cls.phases > n & cls.phases < m], cls.phases$psi[cls.phases > n & cls.phases < m], xlab = "", ylab = expression("Relative Phase " ~ Psi(t)), xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 21, bg = "darkolivegreen1")
 
@@ -385,4 +396,3 @@ plot(jc$t.s[jc$t.s > n & jc$t.s < m], jc$jerk.cost.m2s5[jc$t.s > n & jc$t.s < m]
 boxplot(data.3$absorption)
 
 ```
-

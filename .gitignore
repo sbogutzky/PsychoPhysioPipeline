@@ -5,3 +5,6 @@ data/cleaned-data
 data/preprocessed-data
 .DS_Store
 flow.Rcheck
+report/flow-while-running-pilot-study-neu-tikzDictionary
+report/flow-while-running-pilot-study-neu.pdf
+report/tikz/5-2-daten.tex
