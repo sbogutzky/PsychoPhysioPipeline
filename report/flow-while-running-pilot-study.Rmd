@@ -9,10 +9,12 @@ header-includes:
   - \usepackage{tikz}
   - \usepackage{booktabs} 
   - \usepackage{dcolumn}
-  - \newcolumntype{x}{D{,}{\pm}{3.3}} 
-  - \newcolumntype{y}{D{,}{\pm}{5.3}}
-  - \newcolumntype{z}{D{,}{\pm}{7.7}}
-output: pdf_document
+  - \newcolumntype{x}{D{;}{\pm}{3.3}} 
+  - \newcolumntype{y}{D{;}{\pm}{5.3}}
+  - \newcolumntype{z}{D{;}{\pm}{7.7}}
+output: 
+  pdf_document: 
+    keep_tex: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -71,12 +73,12 @@ par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfcol = c(2, 4))
 n <- 200
 y <- ecg.data[ecg.data[, 1] > mid.swing.data[n, 1] & ecg.data[, 1] < mid.swing.data[n + 1, 1], 2]
 x.p <- 1:length(y) / length(y) * 100
-plot(x.p, y, type = "l", xlab = "Zeit ($\\% Doppelschritt$)", ylab = "EKG RA-LL ($mV$)", ylim = c(-3, 3), xaxs = "i")
+plot(x.p, y, type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "EKG RA-LL ($mV$)", ylim = c(-3, 3), xaxs = "i")
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 
 y <- ecg.data[ecg.data[, 1] > mid.swing.data[n, 1] & ecg.data[, 1] < mid.swing.data[n + 1, 1], 3]
-plot(x.p, y, type = "l", xlab = "Zeit ($\\% Doppelschritt$)", ylab = "EKG LA-LL ($mV$)", ylim = c(-3, 3), xaxs = "i")
+plot(x.p, y, type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "EKG LA-LL ($mV$)", ylim = c(-3, 3), xaxs = "i")
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 
@@ -84,37 +86,37 @@ box()
 most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 2], mid.swing.data[, 2])
 y <- rowMeans(most.common.cycle.matrix)
 x.p <- 1:length(y) / length(y) * 100
-plot(x.p, -c(y[31:60], y[1:30]), type = "l", xlab = "Zeit ($\\% Doppelschritt$)", ylab = "Beschleunigung Y ($m \\cdot s^{-2}$)", ylim = c(-30, 30), xaxs = "i", col = rgb(155/255, 193/255, 54/255))
+plot(x.p, -c(y[31:60], y[1:30]), type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Beschleunigung Y ($m \\cdot s^{-2}$)", ylim = c(-30, 30), xaxs = "i", col = rgb(155/255, 193/255, 54/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 
 most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 5], mid.swing.data[, 2])
 y <- rowMeans(most.common.cycle.matrix)
-plot(x.p, -c(y[31:60], y[1:30]), type = "l", xlab = "Zeit ($\\% Doppelschritt$)", ylab = "Winkelgeschwindigkeit X ($deg \\cdot s^{-1}$)", ylim = c(-600, 600), xaxs = "i", col = rgb(155/255, 193/255, 54/255))
+plot(x.p, -c(y[31:60], y[1:30]), type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Winkelgeschwindigkeit X ($deg \\cdot s^{-1}$)", ylim = c(-600, 600), xaxs = "i", col = rgb(155/255, 193/255, 54/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 
 most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 3], mid.swing.data[, 2])
 y <- rowMeans(most.common.cycle.matrix)
-plot(x.p, c(y[31:60], y[1:30]), type = "l", xlab = "Zeit ($\\% Doppelschritt$)", ylab = "Beschleunigung Y ($m \\cdot s^{-2}$)", ylim = c(-30, 30), xaxs = "i", col = rgb(0/255, 152/255, 199/255))
+plot(x.p, c(y[31:60], y[1:30]), type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Beschleunigung Y ($m \\cdot s^{-2}$)", ylim = c(-30, 30), xaxs = "i", col = rgb(0/255, 152/255, 199/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 
 most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 6], mid.swing.data[, 2])
 y <- rowMeans(most.common.cycle.matrix)
-plot(x.p, c(y[31:60], y[1:30]), type = "l", xlab = "Zeit ($\\% Doppelschritt$)", ylab = "Winkelgeschwindigkeit Y ($deg \\cdot s^{-1}$)", ylim = c(-600, 600), xaxs = "i", col = rgb(0/255, 152/255, 199/255))
+plot(x.p, c(y[31:60], y[1:30]), type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Winkelgeschwindigkeit Y ($deg \\cdot s^{-1}$)", ylim = c(-600, 600), xaxs = "i", col = rgb(0/255, 152/255, 199/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 
 most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 4], mid.swing.data[, 2])
 y <- rowMeans(most.common.cycle.matrix)
-plot(x.p, -c(y[31:60], y[1:30]), type = "l", xlab = "Zeit ($\\% Doppelschritt$)", ylab = "Beschleunigung Z ($m \\cdot s^{-2}$)", ylim = c(-30, 30), xaxs = "i", col = rgb(229/255, 66/255, 66/255))
+plot(x.p, -c(y[31:60], y[1:30]), type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Beschleunigung Z ($m \\cdot s^{-2}$)", ylim = c(-30, 30), xaxs = "i", col = rgb(229/255, 66/255, 66/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 
 most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 7], mid.swing.data[, 2])
 y <- rowMeans(most.common.cycle.matrix)
-plot(x.p, -c(y[31:60], y[1:30]), type = "l", xlab = "Zeit ($\\% Doppelschritt$)", ylab = "Winkelgeschwindigkeit Z ($deg \\cdot s^{-1}$)", ylim = c(-600, 600), xaxs = "i", col = rgb(229/255, 66/255, 66/255))
+plot(x.p, -c(y[31:60], y[1:30]), type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Winkelgeschwindigkeit Z ($deg \\cdot s^{-1}$)", ylim = c(-600, 600), xaxs = "i", col = rgb(229/255, 66/255, 66/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 
@@ -126,7 +128,7 @@ rm(ecg.data, kinematic.data, mid.swing.data, most.common.cycle.matrix, date.dire
 
 \begin{sidewaysfigure}
 	\input{./tikz/5-2-daten}
-	\caption{Aufgenommene DatenstrÃ¶me. Von links nach rechts: (schwarz) EKG-Ableitung RA-LL und EKG-Ableitung LA-LL; (grÃ¼n) Beschleunigung in X-Richtung und Winkelgeschwindigkeit um die X Achse; (blau) Beschleunigung in Y-Richtung und Winkelgeschwindigkeit um die Y-Achse; (rot) Beschleunigung in Z-Richtung und Winkelgeschwindigkeit um die Z-Achse. Quelle: Eigene Darstellung}
+	\caption{Aufgenommene Datenströme. Von links nach rechts: (schwarz) EKG-Ableitung RA-LL und EKG-Ableitung LA-LL; (grün) Beschleunigung in X-Richtung und Winkelgeschwindigkeit um die X Achse; (blau) Beschleunigung in Y-Richtung und Winkelgeschwindigkeit um die Y-Achse; (rot) Beschleunigung in Z-Richtung und Winkelgeschwindigkeit um die Z-Achse. Quelle: Eigene Darstellung}
 	\label{figure:5-2-daten}
 \end{sidewaysfigure}
 
@@ -172,7 +174,7 @@ data.2 <- data.1[-outliers, ]
 data.2$measurement <- factor(data.2$measurement, levels = c("30'", "45'", "60'"), labels = c("30'", "45'", "60'"))
 ```
 
-# Variabeln
+# Variablen
 
 ```{r variables-session-wise, echo=FALSE, warning=FALSE, results="asis"}
     
@@ -180,15 +182,15 @@ data.2$measurement <- factor(data.2$measurement, levels = c("30'", "45'", "60'")
   options(stringsAsFactors = FALSE)
   feature.table <- data.frame()
   for (i in c(4, 5, 6, 12, 13, 15, 17)) {
-    feature.table <- rbind(feature.table, c(paste(formatC(round(tapply(data.2[, i], data.2[, 2], mean, na.rm=TRUE), 2), format = "f", digits = 2), ",", formatC(round(tapply(data.2[, i], data.2[, 2], sd, na.rm=TRUE), 2), format = "f", digits = 2)),  paste(formatC(round(mean(data.2[, i], na.rm=TRUE), 2), format = "f", digits = 2), ",", formatC(round(sd(data.2[, i], na.rm=TRUE), 2), format = "f", digits = 2))))
+    feature.table <- rbind(feature.table, c(paste(formatC(round(tapply(data.2[, i], data.2[, 2], mean, na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(tapply(data.2[, i], data.2[, 2], sd, na.rm=TRUE), 2), format = "f", digits = 2)),  paste(formatC(round(mean(data.2[, i], na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(sd(data.2[, i], na.rm=TRUE), 2), format = "f", digits = 2))))
   }
   
   colnames(feature.table) <- c(levels(data.2[, 2]), "Gesamt")
-  rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz ($BPM$)", "RMSSD ($ms$)", "Norm. Shan. Entr. Index", "Bew. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)")
+  rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz (BPM)", "RMSSD ($ms$)", "Norm. Shan. Entr. Index", "Bew. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)")
   
   # Print latex table
-  table                   <- xtable(feature.table, label = "tab:indikatoren-nach-sitzung", align = "lyyyyyyy", caption = "Variabeln: Arithmetisches Mittel Â± Standardabweichung zu den sechs Sitzungen [N = 3] \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
-  print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
+  table                   <- xtable(feature.table, label = "table:variablen-nach-sitzung", align = "lyyyyyyy", caption = "Variablen: Arithmetisches Mittel $\\pm$ Standardabweichung zu den sechs Sitzungen [$N = 3$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
+  print(table, floating.environment="sidewaystable", caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
   # Clean up
   rm(feature.table, table, i)
@@ -200,14 +202,14 @@ data.2$measurement <- factor(data.2$measurement, levels = c("30'", "45'", "60'")
   options(stringsAsFactors = FALSE)
   feature.table <- data.frame()
   for (i in c(4, 5, 6, 12, 13, 15, 17)) {
-    feature.table <- rbind(feature.table, c(paste(formatC(round(tapply(data.2[, i], data.2[, 3], mean, na.rm=TRUE), 2), format = "f", digits = 2), ",", formatC(round(tapply(data.2[, i], data.2[, 3], sd, na.rm=TRUE), 2), format = "f", digits = 2)),  paste(formatC(round(mean(data.2[, i], na.rm=TRUE), 2), format = "f", digits = 2), ",", formatC(round(sd(data.2[, i], na.rm=TRUE), 2), format = "f", digits = 2))))
+    feature.table <- rbind(feature.table, c(paste(formatC(round(tapply(data.2[, i], data.2[, 3], mean, na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(tapply(data.2[, i], data.2[, 3], sd, na.rm=TRUE), 2), format = "f", digits = 2)),  paste(formatC(round(mean(data.2[, i], na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(sd(data.2[, i], na.rm=TRUE), 2), format = "f", digits = 2))))
   }
   
   colnames(feature.table) <- c(levels(data.2[, 3]), "Gesamt")
-  rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz ($BPM$)", "RMSSD ($ms$)", "Norm. Shan. Entr. Index", "Bew. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)")
+  rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz (BPM)", "RMSSD ($ms$)", "Norm. Shan. Entr. Index", "Bew. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)")
   
   # Print latex table
-  table                   <- xtable(feature.table, label = "tab:variabeln-nach-messzeitpunkt", align = "lyyyy", caption = "Variabeln: Arithmetisches Mittel Â± Standardabweichung zu den drei Messzeitpunkten [N = 6] \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
+  table                   <- xtable(feature.table, label = "tab:variablen-nach-messzeitpunkt", align = "lyyyy", caption = "Variablen: Arithmetisches Mittel $\\pm$ Standardabweichung zu den drei Messzeitpunkten [$N = 6$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
   print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
   # Clean up
@@ -243,9 +245,9 @@ wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 2, 12] ~ data.2[as.numeric(dat
 rm(i)
 ```
 
-Ein Wilcoxon-Vorzeichen-Rang-Test zeigte, dass die mittlere HR sich von der Messung 30' (*Mdn* = `r round(mdn.30, 2)`) zu Messung 45' (*Mdn* = `r round(mdn.45, 2)`) unterscheidet, *Z* = -2.02 , *p* < .1 , *r* = .64.
+Ein Wilcoxon-Vorzeichen-Rang-Test zeigte, dass die mittlere HR sich von der Messung 30' ($Mdn = `r round(mdn.30, 2)`$) zu Messung 45' ($Mdn = `r round(mdn.45, 2)`$) unterscheidet, $Z = -2{,}02; p < 0{,}1 , r = 0{,}64$.
 
-Ein Wilcoxon-Vorzeichen-Rang-Test zeigte, dass die mittlere HR sich von der Messung 30' (*Mdn* = `r round(mdn.30, 2)`) zu Messung 60' (*Mdn* = `r round(mdn.60, 2)`) unterscheidet, *Z* = -2.02 , *p* < .1 , *r* = .64.
+Ein Wilcoxon-Vorzeichen-Rang-Test zeigte, dass die mittlere HR sich von der Messung 30' ($Mdn = `r round(mdn.30, 2)`$) zu Messung 60' ($Mdn = `r round(mdn.60, 2)`$) unterscheidet, $Z = -2{,}02; p < 0{,}1 , r = 0{,}64$.
 
 ```{r clean-up, include=FALSE}
 
@@ -267,18 +269,15 @@ data.3$session <- factor(data.3$session, levels = c("03.10", "10.10", "24.10", "
 apa.table.cor <- apa.cor.table(data.3[, c(1, 2, 3, 4, 5, 6, 12, 13, 15, 17)], show.conf.interval = FALSE)
 cor.table <- data.frame(apa.table.cor$table.body)[seq(1, 14, 2), 2:9]
 colnames(cor.table) <- c("M", "SD", "1", "2", "3", "4", "5", "6")
-rownames(cor.table) <- c("1. Generalfaktor", "2. Glatter Verlauf", "3. Absorbiertheit", "4. Herzfrequenz ($BPM$)", "5. RMSSD ($ms$)", " 6. Norm. Shan. Entr. Index", "7. Bew. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)")
+rownames(cor.table) <- c("1. Generalfaktor", "2. Glatter Verlauf", "3. Absorbiertheit", "4. Herzfrequenz (BPM)", "5. RMSSD ($ms$)", " 6. Norm. Shan. Entr. Index", "7. Bew. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)")
   
 # Print latex table
-table <- xtable(cor.table, label = "tab:korrelation", align = "lxxxxxxxx", caption = "Variabeln: Arithmetisches Mittel, Standardabweichung und Korrelationen") 
-print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
+table <- xtable(cor.table, label = "table:korrelation-pilot-laufen", align = "lxxxxxxxx", caption = "Variablen: Arithmetisches Mittel, Standardabweichung und Korrelationen [$N = 6$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- * Korrelation ist auf dem Niveau von 0,05 (zweiseitig) signifikant. -+- ** Korrelation ist auf dem Niveau von 0,01 (zweiseitig) signifikant.") 
+print(table, floating.environment="sidewaystable", caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
 # Clean up
 rm(apa.table.cor, cor.table, table)
 ```
-*Anmerkung:* * Korrelation ist auf dem Niveau von .05 (zweiseitig) signifikant
-** Korrelation ist auf dem Niveau von .01 (zweiseitig) signifikant
-Bew. = Bewegungsaufwand.
 
 ```{r regression-analysis, include=FALSE}
 
@@ -294,7 +293,7 @@ summary.lm(linear.model)
 mean.hr <- data.3$mean.hr
 linear.model.2 <- lm(data.3$absorption ~ mean.hr + mean.hr.squared)
 summary.lm(linear.model.2)
-plot(data.3$mean.hr, data.3$absorption, xlab = "Mittlere HR ($BPM$)", ylab = "Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
+plot(data.3$mean.hr, data.3$absorption, xlab = "Mittlere HR (BPM)", ylab = "Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
 abline(linear.model)
 mean.hr <- seq(160, 190, by = .5)
 mean.hr.squared <- mean.hr^2
@@ -314,7 +313,7 @@ box()
 mtext("B", side = 2, line = 3, padj = -7, las = 1)
 
 # Plot absorption on NSEI
-plot(data.3$mean.nsei, data.3$absorption, xlab = "Normalisierter Shannon Entropie Index", ylab = "Absorbiertheit", pch = 24, bg = rgb(96/255, 65/255, 79/255))
+plot(data.3$mean.nsei, data.3$absorption, xlab = "Norm. Shannon Entropie Index", ylab = "Absorbiertheit", pch = 24, bg = rgb(96/255, 65/255, 79/255))
 linear.model <- lm(data.3$absorption ~ data.3$mean.nsei)
 abline(linear.model)
 summary(linear.model)
@@ -323,7 +322,7 @@ box()
 mtext("C", side = 2, line = 3, padj = -7, las = 1)
 
 # Plot fluency on jerk cost
-plot(data.3$mean.jerk.cost, data.3$fluency, xlab = "Bewegungsaufwand ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)", ylab = "Glatter Verlauf", pch = 23, bg = rgb(0/255, 152/255, 199/255))
+plot(data.3$mean.jerk.cost, data.3$fluency, xlab = "Bewegungsaufw. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)", ylab = "Glatter Verlauf", pch = 23, bg = rgb(0/255, 152/255, 199/255))
 linear.model <- lm(data.3$fluency ~ data.3$mean.jerk.cost)
 abline(linear.model)
 summary(linear.model)
@@ -339,7 +338,7 @@ rm(mean.hr, mean.hr.squared, linear.model, linear.model.2)
 
 \begin{figure}
 	\input{./tikz/5-8-regression}
-	\caption{Obversationen. (A) Absorbiertheit und mittlerer HR; (B) Absorbiertheit und RMSSD; (C) Glatterverlauf und mittlerer Bewegungsaufwand; (D) Absorbiertheit und mittlerer normalisierter Shannon Entropie Index. \emph{Anmerkung}: Durchgezogene Linie stellt das bestmÃ¶gliche liniare Modell dar. Gestrichelte Linie stellt ggf. das bestmÃ¶gliche quardratische Modell dar. Quelle: Eigene Darstellung}
+	\caption{Beobachtungen. (A) Absorbiertheit und mittlerer HR; (B) Absorbiertheit und RMSSD; (C) Glatterverlauf und mittlerer Bewegungsaufwand; (D) Absorbiertheit und mittlerer normalisierter Shannon Entropie Index. Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
 	\label{figure:5-8-regression}
 \end{figure}
 
@@ -415,7 +414,7 @@ cls.data <- read.csv(cls.data.file.path, skip = 2)
 n <- max(cls.data$t.s[complete.cases(cls.data)]) - 180 # min(cls.data$t.s[complete.cases(cls.data)])  
 m <- max(cls.data$t.s[complete.cases(cls.data)]) 
 heart.beat.times <- c(kubios.hrv.data.time.data$t.s[1] - kubios.hrv.data.time.data$rr.interval.s[1], kubios.hrv.data.time.data$t.s)
-plot(kubios.hrv.data.time.data$t.s[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], 60 / diff(heart.beat.times)[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], xlab = "", ylab = "Mittlere HR ($BPM$)", xaxs = "i", yaxs = "i", ylim = c(150, 190), pch = 21, bg = rgb(229/255, 66/255, 66/255))
+plot(kubios.hrv.data.time.data$t.s[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], 60 / diff(heart.beat.times)[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], xlab = "", ylab = "Mittlere HR (BPM)", xaxs = "i", yaxs = "i", ylim = c(150, 190), pch = 21, bg = rgb(229/255, 66/255, 66/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 plot(cls.data$t.s[cls.data > n & cls.data < m], cls.data$psi[cls.data > n & cls.data < m], xlab = "", ylab = "Relative Phase ($Psi(t)$)", xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 24, bg = rgb(96/255, 65/255, 79/255))
@@ -502,7 +501,7 @@ rm(cls.data, jc.data, kubios.hrv.data.time.data, cls.data.file.path, cls.data.fi
 
 \begin{sidewaysfigure}
 	\input{./tikz/5-9-prozessorientierter-ansatz}
-	\caption{Drei Minuten Daten aus einem Lauf mit Unterforderung (links), einem optimalen Lauf (mitte) und einem Lauf mit Ãœberforderung (rechts) \emph{Anmerkung}: Bew. = Bewegungsaufwand. Quelle: Eigene Darstellung}
+	\caption{Drei Minuten Daten aus einem Lauf mit Unterforderung (links), einem optimalen Lauf (mitte) und einem Lauf mit Überforderung (rechts). Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Bew. = Bewegungsaufwand.}
 	\label{figure:5-9-prozessorientierter-ansatz}
 \end{sidewaysfigure}
 
@@ -537,7 +536,7 @@ rm(absorption.predicted, linear.model, linear.model.2, mean.hr, mean.hr.squared)
 
 \begin{figure}
 	\input{./tikz/5-10-regression-extra}
-	\caption{Obversationen. Mittlerer normalisierter Shannon Entropie Index und mittlerer HR \emph{Anmerkung}: Durchgezogene Linie stellt das bestmÃ¶gliche liniare Modell dar. Gestrichelte Linie stellt ggf. das bestmÃ¶gliche quardratische Modell dar. Quelle: Eigene Darstellung}
+	\caption{Beobachtungen. Mittlerer normalisierter Shannon Entropie Index und mittlerer HR. Quelle: Eigene Darstellung -+ -\emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar}
 	\label{figure:5-10-regression-extra}
 \end{figure}
 
