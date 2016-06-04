@@ -127,16 +127,16 @@ for (self.report.file.name in self.report.file.names) {
       options(op) #reset options
       print(paste("Wrote:", output.file.path))
 
-      # # Write csv file
-      # output.file.path <- paste(output.directory.path, "cls-phases-", i, ".csv", sep = "")
-      # op <- options(digits.secs=3)
-      # con <- file(output.file.path, 'w')
-      # writeLines(strftime(session.start, format="%Y-%m-%d"), con = con)
-      # writeLines(strftime(session.start, format="%H:%M:%OS"), con = con)
-      # write.csv(data.frame(t.s = t, fi, psi), file = con, row.names = FALSE)
-      # close(con)
-      # options(op) #reset options
-      # print(paste("Wrote:", output.file.path))
+      # Write csv file
+      output.file.path <- paste(output.directory.path, "cls-phases-", i, ".csv", sep = "")
+      op <- options(digits.secs=3)
+      con <- file(output.file.path, 'w')
+      writeLines(strftime(session.start, format="%Y-%m-%d"), con = con)
+      writeLines(strftime(session.start, format="%H:%M:%OS"), con = con)
+      write.csv(data.frame(t.s = t, fi, psi), file = con, row.names = FALSE)
+      close(con)
+      options(op) #reset options
+      print(paste("Wrote:", output.file.path))
       
     } else {
       print("No data")
