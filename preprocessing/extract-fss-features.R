@@ -10,9 +10,9 @@ library(multilevel)
 # Set working directory
 setwd("~/psychophysiopipeline/preprocessing")
 
+# User input
 source("./code-snippets/read-set-load.R")
-
-date.of.birth <- readline("Type in date of birth and press return to continue (format: YYYY-MM-dd) > ")
+date.of.birth <- readline("Geburtsdatum der Untersuchungsperson (Format: YYYY-MM-dd) > ")
 
 # Create fss feature and measurement data frame
 fss.features <- data.frame()
@@ -39,6 +39,9 @@ for (self.report.file.name in self.report.file.names) {
     fss.measurements <- rbind(fss.measurements, fss.measurement)
   }
 }
+
+# Clean up
+rm(fss.dimensions, self.report.data, activity, activity.end.ms, activity.start.ms, date.of.birth, first.name, fss.measurement, i, last.name, self.report.end.ms, self.report.file.name, self.report.file.names, session.start, start.time.line)
 
 fss.item.statements <- c("Ich fühle mich optimal beansprucht.", "Meine Gedanken bzw. Aktivitäten laufen flüssig und glatt.", "Ich merke gar nicht, wie die Zeit vergeht.", "Ich habe keine Mühe mich zu konzentrieren.", "Mein Kopf ist völlig klar.", "Ich bin ganz vertieft in das, was ich gerade mache.", "Die richtigen Gedanken/ Bewegungen kommen wie von selbst.", "Ich weiß bei jedem Schritt, was ich zu tun habe.", "Ich habe das Gefühl, den Ablauf unter Kontrolle zu haben.", "Ich bin völlig selbstvergessen.")
 fss.item.mean.values <- colMeans(fss.measurements[, 1:10], na.rm = TRUE)
@@ -70,6 +73,11 @@ output.directory <- paste(feature.directory, activity.directory, user.directory,
 if(!file.exists(substr(output.directory, 1, nchar(output.directory) - 1))) {
   dir.create(output.directory, recursive = T)
 }
-output.directory <- paste(output.directory, "fss-features.csv", sep = "")
+output.directory <- paste(output.directory, "fks-features.csv", sep = "") #TODO: Deutsche Übersetzung
 write.csv(fss.features, output.directory, row.names = F)
-print(paste("Wrote:", output.directory))
+
+print("---")
+print(paste(output.directory, "geschrieben."))
+
+# Clean up
+rm(factor.item.correlation.absorption, factor.item.correlation.fluency, factor.item.correlation.flow, fss.item.sd.values, fss.item.statements, fss.item.mean.values)
