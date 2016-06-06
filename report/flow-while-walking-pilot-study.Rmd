@@ -31,6 +31,7 @@ library("tikzDevice")
 library("xtable")
 library("apaTables")
 library("lme4") 
+library("coin")
 
 # Set paths
 root.path <- "C:/Users/sbogutzky/Desktop/daten (lokal)/2014/"
@@ -44,7 +45,7 @@ user.directory <- "grueter-barbara/"
 
 # Rohdaten
 
-```{r raw-data, include=FALSE}
+```{r raw-data, include=FALSE, eval = FALSE}
 
 # Set directories
 date.directory <- "2014-06-03--12-29-16/"
@@ -126,11 +127,11 @@ dev.off()
 rm(ecg.data, kinematic.data, mid.swing.data, most.common.cycle.matrix, date.directory, ecg.data.file.path, ecg.data.file.name, kinematic.data.path, kinematic.data.file.name, mid.swing.data.path, mid.swing.data.file.name, n, x.p, y)
 ```
 
-\begin{sidewaysfigure}
-	\input{./tikz/5-2-daten}
-	\caption{Aufgenommene Datenströme. Von links nach rechts: (schwarz) EKG-Ableitung RA-LL und EKG-Ableitung LA-LL; (grün) Beschleunigung in X-Richtung und Winkelgeschwindigkeit um die X Achse; (blau) Beschleunigung in Y-Richtung und Winkelgeschwindigkeit um die Y-Achse; (rot) Beschleunigung in Z-Richtung und Winkelgeschwindigkeit um die Z-Achse. Quelle: Eigene Darstellung}
-	\label{figure:5-2-daten}
-\end{sidewaysfigure}
+%\begin{sidewaysfigure}
+%	\input{./tikz/5-2-daten}
+%	\caption{Aufgenommene DatenstrÃ¶me. Von links nach rechts: (schwarz) EKG-Ableitung RA-LL und EKG-Ableitung LA-LL; (grÃ¼n) Beschleunigung in X-Richtung und Winkelgeschwindigkeit um die X Achse; (blau) Beschleunigung in Y-Richtung und Winkelgeschwindigkeit um die Y-Achse; (rot) Beschleunigung in Z-Richtung und Winkelgeschwindigkeit um die Z-Achse. Quelle: Eigene Darstellung}
+%	\label{figure:5-2-daten}
+%\end{sidewaysfigure}
 
 ```{r load-data, include=FALSE}
 
@@ -171,19 +172,15 @@ rm(fss.features, hrv.features, cls.features, jc.features, subjects, sessions, me
 
 ```{r variables-session-wise, echo=FALSE, warning=FALSE, results="asis"}
     
-  data.2 <- data.1
-  data.2[12, c(4:10)] <- NA
-  data.2[17, c(9:17)] <- NA
-
   # Create table
   options(stringsAsFactors = FALSE)
   feature.table <- data.frame()
   for (i in c(4, 5, 6, 12, 13, 14, 16, 18)) {
-    feature.table <- rbind(feature.table, c(paste(formatC(round(tapply(data.2[, i], data.2[, 2], mean, na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(tapply(data.2[, i], data.2[, 2], sd, na.rm=TRUE), 2), format = "f", digits = 2)),  paste(formatC(round(mean(data.2[, i], na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(sd(data.2[, i], na.rm=TRUE), 2), format = "f", digits = 2))))
+    feature.table <- rbind(feature.table, c(paste(formatC(round(tapply(data.1[, i], data.1[, 2], mean, na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(tapply(data.1[, i], data.1[, 2], sd, na.rm=TRUE), 2), format = "f", digits = 2)),  paste(formatC(round(mean(data.1[, i], na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(sd(data.1[, i], na.rm=TRUE), 2), format = "f", digits = 2))))
   }
   
-  colnames(feature.table) <- c(levels(data.2[, 2]), "Gesamt")
-  rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz (BPM)", "LF ($ms^2$)", "HF ($ms^2$)", "Norm. Shan. Entr. Index", "Bew. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)")
+  colnames(feature.table) <- c(levels(data.1[, 2]), "Gesamt")
+  rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz (BPM)", "LF ($ms^2$)", "HF ($ms^2$)", "Norm. Shan. Entr. Index", "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
   
   # Print latex table
   table                   <- xtable(feature.table, label = "table:variablen-nach-sitzung", align = "lyyyyyyy", caption = "Variablen: Arithmetisches Mittel $\\pm$ Standardabweichung zu den sechs Sitzungen [$N = 4$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
@@ -199,11 +196,11 @@ rm(fss.features, hrv.features, cls.features, jc.features, subjects, sessions, me
   options(stringsAsFactors = FALSE)
   feature.table <- data.frame()
   for (i in c(4, 5, 6, 12, 13, 14, 16, 18)) {
-    feature.table <- rbind(feature.table, c(paste(formatC(round(tapply(data.2[, i], data.2[, 3], mean, na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(tapply(data.2[, i], data.2[, 3], sd, na.rm=TRUE), 2), format = "f", digits = 2)),  paste(formatC(round(mean(data.2[, i], na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(sd(data.2[, i], na.rm=TRUE), 2), format = "f", digits = 2))))
+    feature.table <- rbind(feature.table, c(paste(formatC(round(tapply(data.1[, i], data.1[, 3], mean, na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(tapply(data.1[, i], data.1[, 3], sd, na.rm=TRUE), 2), format = "f", digits = 2)),  paste(formatC(round(mean(data.1[, i], na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(sd(data.1[, i], na.rm=TRUE), 2), format = "f", digits = 2))))
   }
   
-  colnames(feature.table) <- c(levels(data.2[, 3]), "Gesamt")
-  rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz (BPM)", "LF ($ms^2$)", "HF ($ms^2$)", "Norm. Shan. Entr. Index", "Bew. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)")
+  colnames(feature.table) <- c(levels(data.1[, 3]), "Gesamt")
+  rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz (BPM)", "LF ($ms^2$)", "HF ($ms^2$)", "Norm. Shan. Entr. Index", "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
   
   # Print latex table
   table                   <- xtable(feature.table, label = "tab:variablen-nach-messzeitpunkt", align = "lyyyyy", caption = "Variablen: Arithmetisches Mittel $\\pm$ Standardabweichung zu den drei Messzeitpunkten [$N = 7$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
@@ -217,70 +214,58 @@ rm(fss.features, hrv.features, cls.features, jc.features, subjects, sessions, me
 
 # Check normality of the measurement blocks
 for (i in c(4, 5, 6, 12, 13, 14, 16, 18)) {
-  print(colnames(data.2)[i])
-  print(tapply(data.2[, i], data.2[, 3], shapiro.test))
+  print(colnames(data.1)[i])
+  print(tapply(data.1[, i], data.1[, 3], shapiro.test))
 }
 
 # Friedman test of the measurement blocks
 for (i in c(4, 5, 6, 12, 13, 14, 16, 18)) {
-  print(colnames(data.2)[i])
-  print(friedman.test(data.2[, i], data.2[, 3], data.2[, 2]))
+  print(colnames(data.1)[i])
+  print(friedman.test(data.1[, i], data.1[, 3], data.1[, 2]))
 }
-
-# Compute medians for output
-mdn.30 <- median((data.2[as.numeric(data.2[, 3]) == 1, 4]))
-mdn.45 <- median((data.2[as.numeric(data.2[, 3]) == 2, 4]), na.rm = TRUE)
-mdn.60 <- median((data.2[as.numeric(data.2[, 3]) == 3, 4]), na.rm = TRUE)
  
 # Wilcox signed-rank test to check the symmetry of flow
-library(coin)
-wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 1, 4] ~ data.2[as.numeric(data.2[, 3]) == 2, 4], distribution="exact")
-wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 1, 4] ~ data.2[as.numeric(data.2[, 3]) == 3, 4], distribution="exact")
-wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 1, 4] ~ data.2[as.numeric(data.2[, 3]) == 4, 4], distribution="exact")
-wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 2, 4] ~ data.2[as.numeric(data.2[, 3]) == 3, 4], distribution="exact")
-wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 2, 4] ~ data.2[as.numeric(data.2[, 3]) == 4, 4], distribution="exact")
-wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 3, 4] ~ data.2[as.numeric(data.2[, 3]) == 4, 4], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 4] ~ data.1[as.numeric(data.1[, 3]) == 2, 4], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 4] ~ data.1[as.numeric(data.1[, 3]) == 3, 4], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 4] ~ data.1[as.numeric(data.1[, 3]) == 4, 4], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 2, 4] ~ data.1[as.numeric(data.1[, 3]) == 3, 4], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 2, 4] ~ data.1[as.numeric(data.1[, 3]) == 4, 4], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 3, 4] ~ data.1[as.numeric(data.1[, 3]) == 4, 4], distribution="exact")
 
-wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 1, 5] ~ data.2[as.numeric(data.2[, 3]) == 2, 5], distribution="exact")
-wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 1, 5] ~ data.2[as.numeric(data.2[, 3]) == 3, 5], distribution="exact")
-wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 1, 5] ~ data.2[as.numeric(data.2[, 3]) == 4, 5], distribution="exact")
-wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 2, 5] ~ data.2[as.numeric(data.2[, 3]) == 3, 5], distribution="exact")
-wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 2, 5] ~ data.2[as.numeric(data.2[, 3]) == 4, 5], distribution="exact")
-wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 3, 5] ~ data.2[as.numeric(data.2[, 3]) == 4, 5], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 5] ~ data.1[as.numeric(data.1[, 3]) == 2, 5], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 5] ~ data.1[as.numeric(data.1[, 3]) == 3, 5], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 5] ~ data.1[as.numeric(data.1[, 3]) == 4, 5], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 2, 5] ~ data.1[as.numeric(data.1[, 3]) == 3, 5], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 2, 5] ~ data.1[as.numeric(data.1[, 3]) == 4, 5], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 3, 5] ~ data.1[as.numeric(data.1[, 3]) == 4, 5], distribution="exact")
 
-wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 1, 6] ~ data.2[as.numeric(data.2[, 3]) == 2, 6], distribution="exact")
-wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 1, 6] ~ data.2[as.numeric(data.2[, 3]) == 3, 6], distribution="exact")
-wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 1, 6] ~ data.2[as.numeric(data.2[, 3]) == 4, 6], distribution="exact")
-wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 2, 6] ~ data.2[as.numeric(data.2[, 3]) == 3, 6], distribution="exact")
-wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 2, 6] ~ data.2[as.numeric(data.2[, 3]) == 4, 6], distribution="exact")
-wilcoxsign_test(data.2[as.numeric(data.2[, 3]) == 3, 6] ~ data.2[as.numeric(data.2[, 3]) == 4, 6], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 6] ~ data.1[as.numeric(data.1[, 3]) == 2, 6], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 6] ~ data.1[as.numeric(data.1[, 3]) == 3, 6], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 6] ~ data.1[as.numeric(data.1[, 3]) == 4, 6], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 2, 6] ~ data.1[as.numeric(data.1[, 3]) == 3, 6], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 2, 6] ~ data.1[as.numeric(data.1[, 3]) == 4, 6], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 3, 6] ~ data.1[as.numeric(data.1[, 3]) == 4, 6], distribution="exact")
+
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 14] ~ data.1[as.numeric(data.1[, 3]) == 2, 14], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 14] ~ data.1[as.numeric(data.1[, 3]) == 3, 14], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 14] ~ data.1[as.numeric(data.1[, 3]) == 4, 14], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 2, 14] ~ data.1[as.numeric(data.1[, 3]) == 3, 14], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 2, 14] ~ data.1[as.numeric(data.1[, 3]) == 4, 14], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 3, 14] ~ data.1[as.numeric(data.1[, 3]) == 4, 14], distribution="exact")
 
 # Clean up
 rm(i)
 ```
 
-Ein Wilcoxon-Vorzeichen-Rang-Test zeigte, dass der Flow sich von der Messung 30' ($Mdn = `r round(mdn.30, 2)`$) zu Messung 45' ($Mdn = `r round(mdn.45, 2)`$) unterscheidet, $Z = -2{,}2; p < 0{,}05$.
-
-Ein Wilcoxon-Vorzeichen-Rang-Test zeigte, dass Flow sich von der Messung 30' ($Mdn = `r round(mdn.30, 2)`$) zu Messung 60' ($Mdn = `r round(mdn.60, 2)`$) unterscheidet, $Z = -2{,}2; p < 0{,}05$.
-
-Ein Wilcoxon-Vorzeichen-Rang-Test zeigte, dass Flow sich von der Messung 45' ($Mdn = `r round(mdn.30, 2)`$) zu Messung 60' ($Mdn = `r round(mdn.60, 2)`$) unterscheidet, $Z = -2{,}2; p < 0{,}05$.
-
-```{r clean-up, include=FALSE}
-
-# Clean up
-rm(mdn.30, mdn.45, mdn.60)
-```
-
 # Analyse
 
 ```{r correlation-analysis, echo=FALSE, warning=FALSE, results="asis"}
-data.3 <- data.2
 
 # Create APA table
-apa.table.cor <- apa.cor.table(data.3[, c(4, 5, 6, 12, 13, 14, 16, 18)], show.conf.interval = FALSE)
+apa.table.cor <- apa.cor.table(data.1[, c(4, 5, 6, 12, 13, 14, 16, 18)], show.conf.interval = FALSE)
 cor.table <- data.frame(apa.table.cor$table.body)[seq(1, 16, 2), 2:10]
 colnames(cor.table) <- c("M", "SD", "1", "2", "3", "4", "5", "6", "7")
-rownames(cor.table) <- c("1. Generalfaktor", "2. Glatter Verlauf", "3. Absorbiertheit", "4. Herzfrequenz (BPM)", "5. LF ($ms^2$)", "6. HF ($ms^2$)", "7. Norm. Shan. Entr. Index", "8. Bew. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)")
+rownames(cor.table) <- c("1. Generalfaktor", "2. Glatter Verlauf", "3. Absorbiertheit", "4. Herzfrequenz (BPM)", "5. LF ($ms^2$)", "6. HF ($ms^2$)", "7. Norm. Shan. Entr. Index", "8. Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
   
 # Print latex table
 table <- xtable(cor.table, label = "table:korrelation-pilot-laufen", align = "lxxxxxxxxx", caption = "Variablen: Arithmetisches Mittel, Standardabweichung und Korrelationen [$N = 15$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- * Korrelation ist auf dem Niveau von 0,05 (zweiseitig) signifikant. -+- ** Korrelation ist auf dem Niveau von 0,01 (zweiseitig) signifikant.") 
@@ -290,7 +275,7 @@ print(table, floating.environment="sidewaystable", caption.placement = "top", sa
 rm(apa.table.cor, cor.table, table)
 ```
 
-```{r regression-analysis, include=FALSE}
+```{r regression-analysis, include=FALSE, eval=FALSE}
 
 # Setup tikz device
 tikz("./tikz/5-8-regression.tex", width = 5.22, height = 5.22)
@@ -298,13 +283,13 @@ tikz("./tikz/5-8-regression.tex", width = 5.22, height = 5.22)
 par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(3, 2))
 
 # Plot absorption on mean HR
-mean.hr.squared <- data.3$mean.hr^2
-linear.model <- lm(absorption ~ mean.hr, data = data.3)
+mean.hr.squared <- data.1$mean.hr^2
+linear.model <- lm(absorption ~ mean.hr, data = data.1)
 summary.lm(linear.model)
-mean.hr <- data.3$mean.hr
-linear.model.2 <- lm(data.3$absorption ~ mean.hr + mean.hr.squared)
+mean.hr <- data.1$mean.hr
+linear.model.2 <- lm(data.1$absorption ~ mean.hr + mean.hr.squared)
 summary.lm(linear.model.2)
-plot(data.3$mean.hr, data.3$absorption, xlab = "Mittlere HR (BPM)", ylab = "Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
+plot(data.1$mean.hr, data.1$absorption, xlab = "Mittlere HR (BPM)", ylab = "Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
 abline(linear.model)
 mean.hr <- seq(90, 120, by = .5)
 mean.hr.squared <- mean.hr^2
@@ -315,13 +300,13 @@ box()
 mtext("A", side = 2, line = 3, padj = -7, las = 1)
 
 # Plot absorption on LF
-lfpowfft.squared <- data.3$lfpowfft^2
-linear.model <- lm(absorption ~ lfpowfft, data = data.3)
+lfpowfft.squared <- data.1$lfpowfft^2
+linear.model <- lm(absorption ~ lfpowfft, data = data.1)
 summary.lm(linear.model)
-lfpowfft <- data.3$lfpowfft
-linear.model.2 <- lm(data.3$absorption ~ lfpowfft + lfpowfft.squared)
+lfpowfft <- data.1$lfpowfft
+linear.model.2 <- lm(data.1$absorption ~ lfpowfft + lfpowfft.squared)
 summary.lm(linear.model.2)
-plot(data.3$lfpowfft, data.3$absorption, xlab = "LF ($ms^2$)", ylab = "Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
+plot(data.1$lfpowfft, data.1$absorption, xlab = "LF ($ms^2$)", ylab = "Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
 abline(linear.model)
 lfpowfft <- seq(5, 45, by = .5)
 lfpowfft.squared <- lfpowfft^2
@@ -332,8 +317,8 @@ box()
 mtext("B", side = 2, line = 3, padj = -7, las = 1)
 
 # Plot absorption on HF
-plot(data.3$hfpowfft, data.3$absorption, xlab = "HF ($ms^2$)", ylab = "Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
-linear.model <- lm(data.3$absorption ~ data.3$hfpowfft)
+plot(data.1$hfpowfft, data.1$absorption, xlab = "HF ($ms^2$)", ylab = "Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
+linear.model <- lm(data.1$absorption ~ data.1$hfpowfft)
 abline(linear.model)
 summary(linear.model)
 grid(col = rgb(186/255, 187/255, 194/255))
@@ -341,8 +326,8 @@ box()
 mtext("C", side = 2, line = 3, padj = -7, las = 1)
 
 # Plot absorption on NSEI
-plot(data.3$mean.nsei, data.3$absorption, xlab = "Norm. Shannon Entropie Index", ylab = "Absorbiertheit", pch = 24, bg = rgb(96/255, 65/255, 79/255))
-linear.model <- lm(data.3$absorption ~ data.3$mean.nsei)
+plot(data.1$mean.nsei, data.1$absorption, xlab = "Norm. Shannon Entropie Index", ylab = "Absorbiertheit", pch = 24, bg = rgb(96/255, 65/255, 79/255))
+linear.model <- lm(data.1$absorption ~ data.1$mean.nsei)
 abline(linear.model)
 summary(linear.model)
 grid(col = rgb(186/255, 187/255, 194/255))
@@ -350,8 +335,8 @@ box()
 mtext("D", side = 2, line = 3, padj = -7, las = 1)
 
 # Plot fluency on jerk cost
-plot(data.3$mean.jerk.cost, data.3$fluency, xlab = "Bewegungsaufw. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)", ylab = "Glatter Verlauf", pch = 23, bg = rgb(0/255, 152/255, 199/255))
-linear.model <- lm(data.3$fluency ~ data.3$mean.jerk.cost)
+plot(data.1$mean.jerk.cost, data.1$fluency, xlab = "Bewegungsaufw. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", ylab = "Glatter Verlauf", pch = 23, bg = rgb(0/255, 152/255, 199/255))
+linear.model <- lm(data.1$fluency ~ data.1$mean.jerk.cost)
 abline(linear.model)
 summary(linear.model)
 grid(col = rgb(186/255, 187/255, 194/255))
@@ -364,52 +349,11 @@ dev.off()
 rm(mean.hr, mean.hr.squared, linear.model, linear.model.2)
 ```
 
-\begin{figure}
-	\input{./tikz/5-8-regression}
-	\caption{Beobachtungen. (A) Absorbiertheit und mittlerer HR; (B) Absorbiertheit und LF; (C) Absorbiertheit und HF; (D) Glatterverlauf und mittlerer Bewegungsaufwand; (F) Absorbiertheit und mittlerer normalisierter Shannon Entropie Index. Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
-	\label{figure:5-8-regression}
-\end{figure}
-
-```{r multilevel-model-for-absorption-on-mean-hr, eval = FALSE, echo=FALSE, include=FALSE}
-
-# Compare linear models
-random.intercept.model <- lmer(absorption ~ mean.hr + (1 | measurement), data = data.3, REML = FALSE)
-summary(random.intercept.model)
-linear.model <- lm(absorption ~ mean.hr, data = data.3)
-summary(linear.model)
-random.intercept.model.log.lik <- as.numeric(logLik(random.intercept.model))
-linear.model.log.lik <- as.numeric(logLik(linear.model))
-lik.ratio <- 2 * (random.intercept.model.log.lik - linear.model.log.lik)
-print(paste("lik.ratio:", lik.ratio, "chi-squared distribution on 1 d.f.:", qchisq(.95, df = 1)))
-
-# Plot prediction
-par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 1))
-absorption.predicted <- fitted(random.intercept.model)
-plot(data.3$mean.hr, absorption.predicted, xlab = "Mittlere HR", ylab = "Voraus. Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-
-# Compare quadratic models
-mean.hr.squared <- data.3$mean.hr^2
-random.intercept.model <- lmer(absorption ~ mean.hr + mean.hr.squared + (1 | measurement), data = data.3, REML = FALSE)
-summary(random.intercept.model)
-linear.model <- lm(absorption ~ mean.hr + mean.hr.squared, data = data.3)
-summary(linear.model)
-random.intercept.model.log.lik <- as.numeric(logLik(random.intercept.model))
-linear.model.log.lik <- as.numeric(logLik(linear.model))
-lik.ratio <- 2 * (random.intercept.model.log.lik - linear.model.log.lik)
-print(paste("lik.ratio:", lik.ratio, "chi-squared distribution on 1 d.f.:", qchisq(.95, df = 1)))
-
-# Plot prediction
-par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 1))
-absorption.predicted <- fitted(random.intercept.model)
-plot(data.3$mean.hr, absorption.predicted, xlab = "Mittlere HR", ylab = "Voraus. Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-
-# Clean up
-rm(absorption.predicted, lik.ratio, linear.model, linear.model.log.lik, mean.hr.squared, random.intercept.model.log.lik, random.intercept.model)
-```
+%\begin{figure}
+%	\input{./tikz/5-8-regression}
+%	\caption{Beobachtungen. (A) Absorbiertheit und mittlerer HR; (B) Absorbiertheit und LF; (C) Absorbiertheit und HF; %(D) Glatterverlauf und mittlerer Bewegungsaufwand; (F) Absorbiertheit und mittlerer normalisierter Shannon Entropie %Index. Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Durchgezogene Linie stellt das bestmÃ¶gliche liniare Modell %dar. -+- Gestrichelte Linie stellt ggf. das bestmÃ¶gliche quardratische Modell dar.}
+%	\label{figure:5-8-regression}
+%\end{figure}
 
 ```{r process-oriented-approach, echo=FALSE, include=FALSE}
 
@@ -417,7 +361,7 @@ rm(absorption.predicted, lik.ratio, linear.model, linear.model.log.lik, mean.hr.
 tikz("./tikz/5-9-prozessorientierter-ansatz.tex", width = 7.91, height = 5.22)
 
 # Set graphic parameter
-par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfcol = c(3, 3))
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfcol = c(3, 2))
 
 # Plot underload measure
 # Set directories
@@ -448,10 +392,10 @@ box()
 plot(cls.data$t.s[cls.data > n & cls.data < m], cls.data$psi[cls.data > n & cls.data < m], xlab = "", ylab = "Relative Phase ($Psi(t)$)", xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 24, bg = rgb(96/255, 65/255, 79/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
-plot(jc.data$t.s[jc.data$t.s > n & jc.data$t.s < m], jc.data$jerk.cost.m2s5[jc.data$t.s > n & jc.data$t.s < m] / 10^5, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(.02, .04)  , pch = 23, bg = rgb(0/255, 152/255, 199/255))
+plot(jc.data$t.s[jc.data$t.s > n & jc.data$t.s < m], jc.data$jerk.cost.m2s5[jc.data$t.s > n & jc.data$t.s < m] / 10^3, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(2, 4)  , pch = 23, bg = rgb(0/255, 152/255, 199/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
-title(sub = "Unterforderung - Absorbiertheit: 4.3")
+title(sub = "nach 15 Minuten - Absorbiertheit: 4.3")
 
 # Plot optimal measure
 # Set directories
@@ -482,44 +426,10 @@ box()
 plot(cls.data$t.s[cls.data > n & cls.data < m], cls.data$psi[cls.data > n & cls.data < m], xlab = "", ylab = "Relative Phase ($Psi(t)$)", xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 24, bg = rgb(96/255, 65/255, 79/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
-plot(jc.data$t.s[jc.data$t.s > n & jc.data$t.s < m], jc.data$jerk.cost.m2s5[jc.data$t.s > n & jc.data$t.s < m] / 10^5, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(.02, .04)  , pch = 23, bg = rgb(0/255, 152/255, 199/255))
+plot(jc.data$t.s[jc.data$t.s > n & jc.data$t.s < m], jc.data$jerk.cost.m2s5[jc.data$t.s > n & jc.data$t.s < m] / 10^3, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(2, 4), pch = 23, bg = rgb(0/255, 152/255, 199/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
-title(sub = "optimal - Absorbiertheit: 6.25")
-
-# Plot overload measure
-# Set directories
-date.directory <- "2014-06-05--13-18-49/"
-
-# Set data file names
-kubios.hrv.data.file.name <- "imu-rn42-bd38-4_hrv.txt"
-jc.data.file.name <- "imu-rn42-3b70-cycle-intervals-jerk-costs-4.csv"
-cls.data.file.name <- "cls-phases-4.csv"
-
-# Set paths
-kubios.hrv.data.file.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, kubios.hrv.data.file.name, sep = "")
-jc.data.file.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, jc.data.file.name, sep = "")
-cls.data.file.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, cls.data.file.name, sep = "")
-    
-# Load hrv, jerk cost and cls data
-source("../preprocessing/code-snippets/read-kubios-hrv-data.R")
-jc.data <- read.csv(jc.data.file.path)
-cls.data <- read.csv(cls.data.file.path, skip = 2)
-
-# Plot
-n <- max(cls.data$t.s[complete.cases(cls.data)]) - 180 # min(cls.data$t.s[complete.cases(cls.data)])  
-m <- max(cls.data$t.s[complete.cases(cls.data)]) 
-heart.beat.times <- c(kubios.hrv.data.time.data$t.s[1] - kubios.hrv.data.time.data$rr.interval.s[1], kubios.hrv.data.time.data$t.s)
-plot(kubios.hrv.data.time.data$t.s[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], 60 / diff(heart.beat.times)[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], xlab = "", ylab = "Mittlere HR ($BPM$)", xaxs = "i", yaxs = "i", ylim = c(90, 120), pch = 21, bg = rgb(229/255, 66/255, 66/255))
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-plot(cls.data$t.s[cls.data > n & cls.data < m], cls.data$psi[cls.data > n & cls.data < m], xlab = "", ylab = "Relative Phase ($Psi(t)$)", xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 24, bg = rgb(96/255, 65/255, 79/255))
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-plot(jc.data$t.s[jc.data$t.s > n & jc.data$t.s < m], jc.data$jerk.cost.m2s5[jc.data$t.s > n & jc.data$t.s < m] / 10^5, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(.02, .04) , pch = 23, bg = rgb(0/255, 152/255, 199/255))
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-title(sub = "Ueberforderung - Absorbiertheit: 7")
+title(sub = "nach 45 Minuten - Absorbiertheit: 6.25")
 
 dev.off()
 
@@ -529,7 +439,7 @@ rm(cls.data, jc.data, kubios.hrv.data.time.data, cls.data.file.path, cls.data.fi
 
 \begin{sidewaysfigure}
 	\input{./tikz/5-9-prozessorientierter-ansatz}
-	\caption{Drei Minuten Daten aus einem Lauf mit Unterforderung (links), einem optimalen Lauf (mitte) und einem Lauf mit Überforderung (rechts). Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Bew. = Bewegungsaufwand.}
+	\caption{Drei Minuten Daten aus einem Lauf mit Unterforderung (links), einem optimalen Lauf (mitte) und einem Lauf mit Ãœberforderung (rechts). Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Bew. = Bewegungsaufwand.}
 	\label{figure:5-9-prozessorientierter-ansatz}
 \end{sidewaysfigure}
 
@@ -541,13 +451,13 @@ tikz("./tikz/5-10-regression-extra.tex", width = 5.22, height = 5.22)
 par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 1))
 
 # Plot NSEI on mean HR
-mean.hr.squared <- data.3$mean.hr^2
-linear.model <- lm(mean.nsei ~ mean.hr, data = data.3)
+mean.hr.squared <- data.1$mean.hr^2
+linear.model <- lm(mean.nsei ~ mean.hr, data = data.1)
 summary.lm(linear.model)
-mean.hr <- data.3$mean.hr
-linear.model.2 <- lm(data.3$mean.nsei ~ mean.hr + mean.hr.squared)
+mean.hr <- data.1$mean.hr
+linear.model.2 <- lm(data.1$mean.nsei ~ mean.hr + mean.hr.squared)
 summary.lm(linear.model.2)
-plot(data.3$mean.hr, data.3$mean.nsei, xlab = "Mittlere HR ($BPM$)", ylab = "Normalisierter Shannon Entropie Index", pch = 21, bg = rgb(229/255, 66/255, 66/255))
+plot(data.1$mean.hr, data.1$mean.nsei, xlab = "Mittlere HR ($BPM$)", ylab = "Normalisierter Shannon Entropie Index", pch = 21, bg = rgb(229/255, 66/255, 66/255))
 abline(linear.model)
 mean.hr <- seq(90, 120, by = .5)
 mean.hr.squared <- mean.hr^2
@@ -560,10 +470,11 @@ dev.off()
 
 # Clean up
 rm(absorption.predicted, linear.model, linear.model.2, mean.hr, mean.hr.squared)
+
 ```
 
 \begin{figure}
 	\input{./tikz/5-10-regression-extra}
-	\caption{Beobachtungen. Mittlerer normalisierter Shannon Entropie Index und mittlerer HR. Quelle: Eigene Darstellung -+ -\emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar}
+	\caption{Beobachtungen. Mittlerer normalisierter Shannon Entropie Index und mittlerer HR. Quelle: Eigene Darstellung -+ -\emph{Anmerkung}: Durchgezogene Linie stellt das bestmÃ¶gliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmÃ¶gliche quardratische Modell dar}
 	\label{figure:5-10-regression-extra}
 \end{figure}
