@@ -417,7 +417,7 @@ heart.beat.times <- c(kubios.hrv.data.time.data$t.s[1] - kubios.hrv.data.time.da
 plot(kubios.hrv.data.time.data$t.s[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], 60 / diff(heart.beat.times)[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], xlab = "", ylab = "Mittlere HR (BPM)", xaxs = "i", yaxs = "i", ylim = c(150, 190), pch = 21, bg = rgb(229/255, 66/255, 66/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
-plot(cls.data$t.s[cls.data > n & cls.data < m], cls.data$psi[cls.data > n & cls.data < m], xlab = "", ylab = "Relative Phase ($Psi(t)$)", xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 24, bg = rgb(96/255, 65/255, 79/255))
+plot(cls.data$t.s[cls.data > n & cls.data < m], cls.data$psi[cls.data > n & cls.data < m], xlab = "", ylab = "Rel. Phase ($Psi(t)$)", xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 24, bg = rgb(96/255, 65/255, 79/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 plot(jc.data$t.s[jc.data$t.s > n & jc.data$t.s < m], jc.data$jerk.cost.m2s5[jc.data$t.s > n & jc.data$t.s < m] / 10^3, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(10, 20)  , pch = 23, bg = rgb(0/255, 152/255, 199/255))
@@ -451,7 +451,7 @@ heart.beat.times <- c(kubios.hrv.data.time.data$t.s[1] - kubios.hrv.data.time.da
 plot(kubios.hrv.data.time.data$t.s[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], 60 / diff(heart.beat.times)[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], xlab = "", ylab = "Mittlere HR ($BPM$)", xaxs = "i", yaxs = "i", ylim = c(150, 190), pch = 21, bg = rgb(229/255, 66/255, 66/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
-plot(cls.data$t.s[cls.data > n & cls.data < m], cls.data$psi[cls.data > n & cls.data < m], xlab = "", ylab = "Relative Phase ($Psi(t)$)", xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 24, bg = rgb(96/255, 65/255, 79/255))
+plot(cls.data$t.s[cls.data > n & cls.data < m], cls.data$psi[cls.data > n & cls.data < m], xlab = "", ylab = "Rel. Phase ($Psi(t)$)", xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 24, bg = rgb(96/255, 65/255, 79/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 plot(jc.data$t.s[jc.data$t.s > n & jc.data$t.s < m], jc.data$jerk.cost.m2s5[jc.data$t.s > n & jc.data$t.s < m] / 10^3, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(10, 20)  , pch = 23, bg = rgb(0/255, 152/255, 199/255))
@@ -485,7 +485,7 @@ heart.beat.times <- c(kubios.hrv.data.time.data$t.s[1] - kubios.hrv.data.time.da
 plot(kubios.hrv.data.time.data$t.s[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], 60 / diff(heart.beat.times)[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], xlab = "", ylab = "Mittlere HR ($BPM$)", xaxs = "i", yaxs = "i", ylim = c(150, 190), pch = 21, bg = rgb(229/255, 66/255, 66/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
-plot(cls.data$t.s[cls.data > n & cls.data < m], cls.data$psi[cls.data > n & cls.data < m], xlab = "", ylab = "Relative Phase ($Psi(t)$)", xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 24, bg = rgb(96/255, 65/255, 79/255))
+plot(cls.data$t.s[cls.data > n & cls.data < m], cls.data$psi[cls.data > n & cls.data < m], xlab = "", ylab = "Rel. Phase ($Psi(t)$)", xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 24, bg = rgb(96/255, 65/255, 79/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 plot(jc.data$t.s[jc.data$t.s > n & jc.data$t.s < m], jc.data$jerk.cost.m2s5[jc.data$t.s > n & jc.data$t.s < m] / 10^3, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(10, 20) , pch = 23, bg = rgb(0/255, 152/255, 199/255))
@@ -501,7 +501,7 @@ rm(cls.data, jc.data, kubios.hrv.data.time.data, cls.data.file.path, cls.data.fi
 
 \begin{sidewaysfigure}
 	\input{./tikz/5-9-prozessorientierter-ansatz}
-	\caption{Drei Minuten Daten aus einem Lauf mit Unterforderung (links), einem optimalen Lauf (mitte) und einem Lauf mit Überforderung (rechts). Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Bew. = Bewegungsaufwand.}
+	\caption{Drei Minuten Daten aus einem Lauf mit Unterforderung (links), einem optimalen Lauf (mitte) und einem Lauf mit Überforderung (rechts). Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- Rel. Phase = Relative Phase.}
 	\label{figure:5-9-prozessorientierter-ansatz}
 \end{sidewaysfigure}
 
@@ -536,7 +536,7 @@ rm(absorption.predicted, linear.model, linear.model.2, mean.hr, mean.hr.squared)
 
 \begin{figure}
 	\input{./tikz/5-10-regression-extra}
-	\caption{Beobachtungen. Mittlerer normalisierter Shannon Entropie Index und mittlerer HR. Quelle: Eigene Darstellung -+ -\emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar}
+	\caption{Beobachtungen. Mittlerer normalisierter Shannon Entropie Index und mittlerer HR. Quelle: Eigene Darstellung -+ -\emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
 	\label{figure:5-10-regression-extra}
 \end{figure}
 
