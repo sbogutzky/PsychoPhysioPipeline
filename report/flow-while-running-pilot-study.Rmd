@@ -33,7 +33,7 @@ library("apaTables")
 library("lme4") 
 
 # Set paths
-root.path <- "C:/Users/sbogutzky/Desktop/data (lokal)/2013/"
+root.path <- "C:/Users/sbogutzky/Desktop/daten (lokal)/2013/"
 
 # Set directories
 preprocessed.data.directory <- "preprocessed/"
@@ -128,7 +128,7 @@ rm(ecg.data, kinematic.data, mid.swing.data, most.common.cycle.matrix, date.dire
 
 \begin{sidewaysfigure}
 	\input{./tikz/5-2-daten}
-	\caption{Aufgenommene Datenströme. Von links nach rechts: (schwarz) EKG-Ableitung RA-LL und EKG-Ableitung LA-LL; (grün) Beschleunigung in X-Richtung und Winkelgeschwindigkeit um die X Achse; (blau) Beschleunigung in Y-Richtung und Winkelgeschwindigkeit um die Y-Achse; (rot) Beschleunigung in Z-Richtung und Winkelgeschwindigkeit um die Z-Achse. Quelle: Eigene Darstellung}
+	\caption{Aufgenommene DatenstrÃ¶me. Von links nach rechts: (schwarz) EKG-Ableitung RA-LL und EKG-Ableitung LA-LL; (grÃ¼n) Beschleunigung in X-Richtung und Winkelgeschwindigkeit um die X Achse; (blau) Beschleunigung in Y-Richtung und Winkelgeschwindigkeit um die Y-Achse; (rot) Beschleunigung in Z-Richtung und Winkelgeschwindigkeit um die Z-Achse. Quelle: Eigene Darstellung}
 	\label{figure:5-2-daten}
 \end{sidewaysfigure}
 
@@ -186,10 +186,10 @@ data.2$measurement <- factor(data.2$measurement, levels = c("30'", "45'", "60'")
   }
   
   colnames(feature.table) <- c(levels(data.2[, 2]), "Gesamt")
-  rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz (BPM)", "RMSSD ($ms$)", "Norm. Shan. Entr. Index", "Bew. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)")
+  rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz (BPM)", "RMSSD ($ms$)", "Norm. Shan. Entr. Index", "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
   
   # Print latex table
-  table                   <- xtable(feature.table, label = "table:variablen-nach-sitzung", align = "lyyyyyyy", caption = "Variablen: Arithmetisches Mittel $\\pm$ Standardabweichung zu den sechs Sitzungen [$N = 3$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
+  table                   <- xtable(feature.table, label = "table:variablen-nach-sitzung-pilotstudie-laufen", align = "lyyyyyyy", caption = "Variablen: Arithmetisches Mittel $\\pm$ Standardabweichung zu den sechs Sitzungen [$N = 3$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
   print(table, floating.environment="sidewaystable", caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
   # Clean up
@@ -206,10 +206,10 @@ data.2$measurement <- factor(data.2$measurement, levels = c("30'", "45'", "60'")
   }
   
   colnames(feature.table) <- c(levels(data.2[, 3]), "Gesamt")
-  rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz (BPM)", "RMSSD ($ms$)", "Norm. Shan. Entr. Index", "Bew. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)")
+  rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz (BPM)", "RMSSD ($ms$)", "Norm. Shan. Entr. Index", "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
   
   # Print latex table
-  table                   <- xtable(feature.table, label = "tab:variablen-nach-messzeitpunkt", align = "lyyyy", caption = "Variablen: Arithmetisches Mittel $\\pm$ Standardabweichung zu den drei Messzeitpunkten [$N = 6$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
+  table                   <- xtable(feature.table, label = "table:variablen-nach-messzeitpunkt-pilotstudie-laufen", align = "lyyyy", caption = "Variablen: Arithmetisches Mittel $\\pm$ Standardabweichung zu den drei Messzeitpunkten [$N = 6$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
   print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
   # Clean up
@@ -269,10 +269,10 @@ data.3$session <- factor(data.3$session, levels = c("03.10", "10.10", "24.10", "
 apa.table.cor <- apa.cor.table(data.3[, c(1, 2, 3, 4, 5, 6, 12, 13, 15, 17)], show.conf.interval = FALSE)
 cor.table <- data.frame(apa.table.cor$table.body)[seq(1, 14, 2), 2:9]
 colnames(cor.table) <- c("M", "SD", "1", "2", "3", "4", "5", "6")
-rownames(cor.table) <- c("1. Generalfaktor", "2. Glatter Verlauf", "3. Absorbiertheit", "4. Herzfrequenz (BPM)", "5. RMSSD ($ms$)", " 6. Norm. Shan. Entr. Index", "7. Bew. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)")
+rownames(cor.table) <- c("1. Generalfaktor", "2. Glatter Verlauf", "3. Absorbiertheit", "4. Herzfrequenz (BPM)", "5. RMSSD ($ms$)", " 6. Norm. Shan. Entr. Index", "7. Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
   
 # Print latex table
-table <- xtable(cor.table, label = "table:korrelation-pilot-laufen", align = "lxxxxxxxx", caption = "Variablen: Arithmetisches Mittel, Standardabweichung und Korrelationen [$N = 6$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- * Korrelation ist auf dem Niveau von 0,05 (zweiseitig) signifikant. -+- ** Korrelation ist auf dem Niveau von 0,01 (zweiseitig) signifikant.") 
+table <- xtable(cor.table, label = "table:korrelation-pilot-laufen", align = "lxxxxxxxx", caption = "Variablen: Arithmetisches Mittel, Standardabweichung und Korrelationen [$N = 15$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- * Korrelation ist auf dem Niveau von 0,05 (zweiseitig) signifikant. -+- ** Korrelation ist auf dem Niveau von 0,01 (zweiseitig) signifikant.") 
 print(table, floating.environment="sidewaystable", caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
 # Clean up
@@ -322,7 +322,7 @@ box()
 mtext("C", side = 2, line = 3, padj = -7, las = 1)
 
 # Plot fluency on jerk cost
-plot(data.3$mean.jerk.cost, data.3$fluency, xlab = "Bewegungsaufw. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)", ylab = "Glatter Verlauf", pch = 23, bg = rgb(0/255, 152/255, 199/255))
+plot(data.3$mean.jerk.cost, data.3$fluency, xlab = "Bewegungsaufw. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", ylab = "Glatter Verlauf", pch = 23, bg = rgb(0/255, 152/255, 199/255))
 linear.model <- lm(data.3$fluency ~ data.3$mean.jerk.cost)
 abline(linear.model)
 summary(linear.model)
@@ -338,7 +338,7 @@ rm(mean.hr, mean.hr.squared, linear.model, linear.model.2)
 
 \begin{figure}
 	\input{./tikz/5-8-regression}
-	\caption{Beobachtungen. (A) Absorbiertheit und mittlerer HR; (B) Absorbiertheit und RMSSD; (C) Glatterverlauf und mittlerer Bewegungsaufwand; (D) Absorbiertheit und mittlerer normalisierter Shannon Entropie Index. Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
+	\caption{Beobachtungen. (A) Absorbiertheit und mittlerer HR; (B) Absorbiertheit und RMSSD; (C) Glatterverlauf und mittlerer Bewegungsaufwand; (D) Absorbiertheit und mittlerer normalisierter Shannon Entropie Index. Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Durchgezogene Linie stellt das bestmÃ¶gliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmÃ¶gliche quardratische Modell dar.}
 	\label{figure:5-8-regression}
 \end{figure}
 
@@ -420,7 +420,7 @@ box()
 plot(cls.data$t.s[cls.data > n & cls.data < m], cls.data$psi[cls.data > n & cls.data < m], xlab = "", ylab = "Relative Phase ($Psi(t)$)", xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 24, bg = rgb(96/255, 65/255, 79/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
-plot(jc.data$t.s[jc.data$t.s > n & jc.data$t.s < m], jc.data$jerk.cost.m2s5[jc.data$t.s > n & jc.data$t.s < m] / 10^5, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(.1, .2)  , pch = 23, bg = rgb(0/255, 152/255, 199/255))
+plot(jc.data$t.s[jc.data$t.s > n & jc.data$t.s < m], jc.data$jerk.cost.m2s5[jc.data$t.s > n & jc.data$t.s < m] / 10^3, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(10, 20)  , pch = 23, bg = rgb(0/255, 152/255, 199/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 title(sub = "Unterforderung - Absorbiertheit: 4.25")
@@ -454,7 +454,7 @@ box()
 plot(cls.data$t.s[cls.data > n & cls.data < m], cls.data$psi[cls.data > n & cls.data < m], xlab = "", ylab = "Relative Phase ($Psi(t)$)", xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 24, bg = rgb(96/255, 65/255, 79/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
-plot(jc.data$t.s[jc.data$t.s > n & jc.data$t.s < m], jc.data$jerk.cost.m2s5[jc.data$t.s > n & jc.data$t.s < m] / 10^5, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(.1, .2)  , pch = 23, bg = rgb(0/255, 152/255, 199/255))
+plot(jc.data$t.s[jc.data$t.s > n & jc.data$t.s < m], jc.data$jerk.cost.m2s5[jc.data$t.s > n & jc.data$t.s < m] / 10^3, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(10, 20)  , pch = 23, bg = rgb(0/255, 152/255, 199/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 title(sub = "optimal - Absorbiertheit: 5.25")
@@ -488,10 +488,10 @@ box()
 plot(cls.data$t.s[cls.data > n & cls.data < m], cls.data$psi[cls.data > n & cls.data < m], xlab = "", ylab = "Relative Phase ($Psi(t)$)", xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 24, bg = rgb(96/255, 65/255, 79/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
-plot(jc.data$t.s[jc.data$t.s > n & jc.data$t.s < m], jc.data$jerk.cost.m2s5[jc.data$t.s > n & jc.data$t.s < m] / 10^5, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(.1, .2) , pch = 23, bg = rgb(0/255, 152/255, 199/255))
+plot(jc.data$t.s[jc.data$t.s > n & jc.data$t.s < m], jc.data$jerk.cost.m2s5[jc.data$t.s > n & jc.data$t.s < m] / 10^3, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(10, 20) , pch = 23, bg = rgb(0/255, 152/255, 199/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
-title(sub = "Ueberforderung - Absorbiertheit: 3.75")
+title(sub = "\"Uberforderung - Absorbiertheit: 3.75")
 
 dev.off()
 
@@ -501,7 +501,7 @@ rm(cls.data, jc.data, kubios.hrv.data.time.data, cls.data.file.path, cls.data.fi
 
 \begin{sidewaysfigure}
 	\input{./tikz/5-9-prozessorientierter-ansatz}
-	\caption{Drei Minuten Daten aus einem Lauf mit Unterforderung (links), einem optimalen Lauf (mitte) und einem Lauf mit Überforderung (rechts). Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Bew. = Bewegungsaufwand.}
+	\caption{Drei Minuten Daten aus einem Lauf mit Unterforderung (links), einem optimalen Lauf (mitte) und einem Lauf mit Ãœberforderung (rechts). Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Bew. = Bewegungsaufwand.}
 	\label{figure:5-9-prozessorientierter-ansatz}
 \end{sidewaysfigure}
 
@@ -536,7 +536,7 @@ rm(absorption.predicted, linear.model, linear.model.2, mean.hr, mean.hr.squared)
 
 \begin{figure}
 	\input{./tikz/5-10-regression-extra}
-	\caption{Beobachtungen. Mittlerer normalisierter Shannon Entropie Index und mittlerer HR. Quelle: Eigene Darstellung -+ -\emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar}
+	\caption{Beobachtungen. Mittlerer normalisierter Shannon Entropie Index und mittlerer HR. Quelle: Eigene Darstellung -+ -\emph{Anmerkung}: Durchgezogene Linie stellt das bestmÃ¶gliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmÃ¶gliche quardratische Modell dar}
 	\label{figure:5-10-regression-extra}
 \end{figure}
 
@@ -658,7 +658,7 @@ box()
 mtext("C", side = 2, line = 3, padj = -7, las = 1)
 
 # Plot fluency on jerk cost
-plot(data.4$mean.jerk.cost, data.4$fluency, xlab = "Bewegungsaufwand ($\\times 10^5 \\: m^2 \\cdot s^{-5}$)", ylab = "Glatter Verlauf", pch = 23, bg = rgb(0/255, 152/255, 199/255))
+plot(data.4$mean.jerk.cost, data.4$fluency, xlab = "Bewegungsaufwand ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", ylab = "Glatter Verlauf", pch = 23, bg = rgb(0/255, 152/255, 199/255))
 linear.model <- lm(data.4$fluency ~ data.4$mean.jerk.cost)
 abline(linear.model)
 summary(linear.model)
