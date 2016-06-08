@@ -13,6 +13,7 @@ setwd("~/psychophysiopipeline/preprocessing")
 source("./code-snippets/read-set-load.R")
 
 data.file.name <- readline("Type in data file name and press return to continue > ")
+sampling.rate <- as.numeric(readline("Type in sampling rate and press return to continue > "))
 
 optimal.cutoff.frequencies <- c()
 count <- 0
@@ -29,14 +30,16 @@ for (self.report.file.name in self.report.file.names) {
     source("./code-snippets/extract-self-report-times.R")
     data.path <- paste(preprocessed.data.directory, activity.directory, user.directory, date.directory, data.file.name, "-", i,  ".csv", sep = "")
     
-    # Compute optimal cutoff frequencies
-    data <- read.csv(data.path)
+    if(file.exists(data.path)) {
     
-    A <- data[, 1:4]
-    fs <- 102.4
-    n <- 4
-    count <- count + 1
-    optimal.cutoff.frequencies <- c(optimal.cutoff.frequencies, ComputeOptimalCutoffFrequency(A[, 2], fs, n), ComputeOptimalCutoffFrequency(A[, 3], fs, n), ComputeOptimalCutoffFrequency(A[, 4], fs, n))
+      # Compute optimal cutoff frequencies
+      data <- read.csv(data.path)
+    
+      A <- data[, 1:4]
+      n <- 4
+      count <- count + 1
+      optimal.cutoff.frequencies <- c(optimal.cutoff.frequencies, ComputeOptimalCutoffFrequency(A[, 2], sampling.rate, n), ComputeOptimalCutoffFrequency(A[, 3], sampling.rate, n), ComputeOptimalCutoffFrequency(A[, 4], sampling.rate, n))
+    }
   }
 }
 
@@ -70,8 +73,7 @@ for (self.report.file.name in self.report.file.names) {
       PlotMostCommonCycleAcceleration(A[, 4], mid.swing.indexes, main = "Axial")
       
       # Smooth acceleration
-      fs <- 102.4
-      fn <- fs/2
+      fn <- sampling.rate/2
       n <- 4
       
       par(mfcol = c(3, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
@@ -79,21 +81,21 @@ for (self.report.file.name in self.report.file.names) {
       fc <- optimal.cutoff.frequencies[1]
       W <- fc/fn
       lp.coronary <- butter(n, W)
-      lp.coronary.freg <- freqz(lp.coronary, Fs = fs)
+      lp.coronary.freg <- freqz(lp.coronary, Fs = sampling.rate)
       plot(lp.coronary.freg$f, abs(lp.coronary.freg$h), type = "l", xlim = c(0, 30), xlab = "Frequency (Hz)", ylab = "Magnitude Response", main = "Coronary acceleration filter")
       A[, 2] <- filtfilt(lp.coronary, A[, 2])
       
       fc <- optimal.cutoff.frequencies[2]
       W <- fc/fn
       lp.sagittal <- butter(n, W)
-      lp.sagittal.freg <- freqz(lp.sagittal, Fs = fs)
+      lp.sagittal.freg <- freqz(lp.sagittal, Fs = sampling.rate)
       plot(lp.sagittal.freg$f, abs(lp.sagittal.freg$h), type = "l", xlim = c(0, 30), xlab = "Frequency (Hz)", ylab = "Magnitude Response", main = "Sagittal acceleration filter")
       A[, 3] <- filtfilt(lp.sagittal, A[, 3])
       
       fc <- optimal.cutoff.frequencies[3]
       W <- fc/fn
       lp.axial <- butter(n, W)
-      lp.axial.freg <- freqz(lp.axial, Fs = fs)
+      lp.axial.freg <- freqz(lp.axial, Fs = sampling.rate)
       plot(lp.axial.freg$f, abs(lp.axial.freg$h), type = "l", xlim = c(0, 30), xlab = "Frequency (Hz)", ylab = "Magnitude Response", main = "Axial acceleration filter")
       A[, 4] <- filtfilt(lp.axial, A[, 4])
       
@@ -135,8 +137,8 @@ for (self.report.file.name in self.report.file.names) {
       # Compute mean to compare
       jerk.cost.by.all.accelerations <- ComputeJerkCost(A[, 1] / 1000, A[, 2:4], normalized = T) 
       jerk.cost.by.cycle.mean <- mean(output.data[, 3], na.rm = T)
-      print(paste("Jerk Cost by Cycle:            ", jerk.cost.by.cycle.mean / 10^5))
-      print(paste("Jerk Cost by all Accelerations:", jerk.cost.by.all.accelerations / 10^5))
+      print(paste("Jerk Cost by Cycle:            (x10^3 m2s5)", jerk.cost.by.cycle.mean / 10^3))
+      print(paste("Jerk Cost by all Accelerations (x10^3 m2s5):", jerk.cost.by.all.accelerations / 10^3))
       
       # Create directory, if needed
       output.directory <- paste(preprocessed.data.directory, activity.directory, user.directory, date.directory, sep="")
