@@ -51,18 +51,22 @@ for (self.report.file.name in self.report.file.names) {
         fs <- ComputeSamplingRate(data.subset$timestamp.ms)
         print(paste("Sampling rate:", round(fs, 2), "Hz"))
         print(paste("Duration:", round(duration.s, 2), "s"))
-        # plot(diff(data.subset$timestamp.ms / 1000), xlab = "#", ylab = "Interval (s)") # data.subset$timestamp.ms[-1] / 1000, -- Timestamp (s)
-        # title(paste(strftime(session.start, format="%Y/%m/%d %H:%M"), " #", i, sep = ""))
-        # session.zoom()
+        plot(diff(data.subset$timestamp.ms / 1000), xlab = "#", ylab = "Interval (s)") # data.subset$timestamp.ms[-1] / 1000, -- Timestamp (s)
+        title(paste(strftime(session.start, format="%Y/%m/%d %H:%M"), " #", i, sep = ""))
+        session.zoom()
         
         # Check data
-        for(j in 2:2) { #2:ncol(data.subset)) {
-          par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
-          plot(data.subset$timestamp.ms / 1000, data.subset[, j], type = "l", xlab = "Timestamp (s)", ylab = ReturnFieldLabels(colnames(data.subset)[j]))
-          title(paste(strftime(session.start, format="%Y/%m/%d %H:%M"), " #", i, sep = ""))
-          # session.zoom()
-          readline("Press return to continue > ")
+        
+        j <- 2
+        if(nrow(data.subset) > 4) {
+          j <- 5
         }
+        par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
+        plot(data.subset$timestamp.ms / 1000, data.subset[, j], type = "l", xlab = "Timestamp (s)", ylab = ReturnFieldLabels(colnames(data.subset)[j]))
+        title(paste(strftime(session.start, format="%Y/%m/%d %H:%M"), " #", i, sep = ""))
+        session.zoom()
+        readline("Press return to continue > ")
+        
         
         # Write to csv file
         output.directory <- paste(preprocessed.data.directory, activity.directory, user.directory, date.directory, sep = "")
