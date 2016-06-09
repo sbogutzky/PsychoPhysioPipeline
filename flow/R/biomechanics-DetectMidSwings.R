@@ -1,51 +1,31 @@
-#' Detects mid swings form angular velocity.
+#' Detects mid swings based on angular velocity.
 #' 
 #' \code{DetectMidSwings} returns mid swings. Uses the angular velocity and filtering like in "Quasi real-time gait event detection using shank-attached gyroscopes" of Lee & Park (2011).
-#' @param t.s. A numerical vector of seconds
-#' @param angular.velocity.deg.s. A numerical vector of angular velocity in deg/s
-#' @param fs. A numerical that specifies the sampling rate
-#' @param ff.1. A numerical that specifies the first filter factor to compute the cut off frequency
-#' @param ff.2. A numerical that specifies the second filter factor to compute the cut off frequency
-#' @return A numerical vector of mid swing indexes
+#' @param t.s a numerical vector of seconds
+#' @param angular.velocity.deg.s a numerical vector of angular velocity in deg/s.
+#' @param fs a numerical that specifies the sampling rate (default 100 Hz).
+#' @param cf.1 a numerical that specifies the cut off frequency of the first low pass filter (default = 3 Hz).
+#' @param cf.2 a numerical that specifies the cut off frequency of the second low pass filter (default = 1 Hz).
+#' @param plot a boolean for control plot.
+#' @return A numerical vector of mid swing indexes.
 
-DetectMidSwings <- function(t.s, angular.velocity.deg.s, fs = 102.4, ff.1 = 4, ff.2 = .5, plot = F) {
+DetectMidSwings <- function(t.s, angular.velocity.deg.s, fs = 100, cf.1 = 3, cf.2 = 1, plot = FALSE) {
   
   require(signal)
+  require(zoom)
   
   fn <- fs/2
-  
-  # Plot data (10s)
-  range <- (30 * fs):(40 * fs)
-  canPlot = plot
-  if(canPlot) {
-    par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
-    plot(t.s[range], angular.velocity.deg.s[range], type = "l", xlab = "Timestamp (s)", ylab = "Angular Velocity (deg/s)")
-  }
-  
-  # Compute main frequncy
-  main.freq <- ComputeMainFrequency(angular.velocity.deg.s, fs)
-  main.freq <- ceiling(main.freq)
-  
-  # Filter (1nd level)
-  fc <- main.freq * ff.1
-  W <- fc/fn
+
+  # Filter (1st level)
+  W <- cf.1/fn
   n <- 2
   lp.1 <- butter(n, W)
   f.1 <- filter(lp.1, angular.velocity.deg.s)
-  if(canPlot) {
-    lines(t.s[range], f.1[range], col = 2)
-  }
   
   # Filter (2nd level)
-  fc <- main.freq * ff.2
-  W <- fc/fn
+  W <- cf.2/fn
   lp.2 <- butter(n, W)
   f.2 <- filter(lp.2, angular.velocity.deg.s)
-  if(canPlot) {
-    lines(t.s[range], f.2[range], col = 3)
-  }
-  
-  #readline("Press return to continue > ")
   
   y <- angular.velocity.deg.s
   y.1 <- f.1
@@ -90,6 +70,15 @@ DetectMidSwings <- function(t.s, angular.velocity.deg.s, fs = 102.4, ff.1 = 4, f
     }
   }
   mid.swing.indexes <- sort(mid.swing.indexes)
+  
+  # Plot data 
+  if(plot) {
+    par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
+    plot(t.s, angular.velocity.deg.s, type = "l", xlab = "Timestamp (s)", ylab = expression("Angular Velocity (" ~ deg%.%s^{-1} ~ ")"))
+    lines(t.s, f.1, col = rgb(229/255, 66/255, 66/255))
+    lines(t.s, f.2, col = rgb(155/255, 193/255, 54/255))
+    zm()
+  }
   
   return(mid.swing.indexes)
 }

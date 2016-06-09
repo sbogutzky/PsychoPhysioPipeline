@@ -4,25 +4,19 @@
 \alias{DetectAnomaly}
 \title{Detects anomaly of two variables.}
 \usage{
-DetectAnomaly(x, y, x.lab, y.lab, x.lim, y.lim, epsilon = 0)
+DetectAnomaly(x, y, x.lab, y.lab, x.lim, y.lim, epsilon = 0, ...)
 }
 \arguments{
-\item{x.}{A numeric vector of the first variable}
+\item{x}{a numeric vector of the first variable.}
 
-\item{y.}{A numeric vector of the second variable}
+\item{y}{a numeric vector of the second variable.}
 
-\item{x.lab.}{A character vector that specifies the x label of the plot}
+\item{epsilon}{a numeric that specifies a new epsilon (default = 0).}
 
-\item{y.lab.}{A character vector that specifies the y label of the plot}
-
-\item{x.lim.}{A two dimensional numeric vector that specifies x lim}
-
-\item{y.lim.}{A two dimensional numeric vector that specifies y lim}
-
-\item{epsilon.}{A numeric that specifies a new epsilon. Default is 0}
+\item{...}{Arguments to be passed to methods, such as graphical parameters (see par).}
 }
 \value{
-Epsilon "epsilon" and a numeric vector with indexes of outliers "outliers"
+Epsilon "epsilon" and a numeric vector with indexes of outliers "outliers".
 }
 \description{
 \code{DetectAnomaly} returns outliers and a new epsilon for a new iteration.

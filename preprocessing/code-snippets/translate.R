@@ -1,10 +1,3 @@
-#' Returns label for the fields.
-#' 
-#' \code{ReturnFieldLabels} returns the field label by column
-#' 
-#' @param col.name. A character vector that specifies the column name
-#' @return A expression for the field label
-
 ReturnFieldLabels <- function(col.name) {
   field.label = col.name
   if(col.name == "acceleration.x.ms.2") {

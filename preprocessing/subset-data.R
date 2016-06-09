@@ -11,7 +11,7 @@ library(zoom)
 setwd("~/psychophysiopipeline/preprocessing")
 
 # User input
-root.directory.path <- readline("Quellverzeichnis > ") #
+root.directory.path <- readline("Quellverzeichnis > ") 
 first.name <- readline("Vorname der Untersuchungsperson > ")
 last.name <- readline("Nachname der Untersuchungsperson > ")
 activity <- readline("Aktivität der Untersuchung > ")
@@ -56,6 +56,7 @@ for (self.report.file.name in self.report.file.names) {
       if(nrow(data.1.subset) > 4) {
         j <- 5
       }
+      source("./code-snippets/translate.R")
       par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
       plot(data.1.subset[, 1] / 1000, data.1.subset[, j], type = "l", xlab = "Zeit (s)", ylab = ReturnFieldLabels(colnames(data.1.subset)[j]))
       title(paste(strftime(session.start + activity.start.ms / 1000, format="%d.%m.%Y %H:%M"), " #", i, sep = ""))

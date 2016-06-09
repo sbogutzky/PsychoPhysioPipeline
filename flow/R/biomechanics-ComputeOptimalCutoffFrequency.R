@@ -1,13 +1,15 @@
 #' Computes optimal cut off frequency for a low pass butterworth filter
 #' 
 #' \code{ComputeOptimalCutoffFrequency} returns the index.
-#' @param x vector with data.
+#' @param x a numerical vector.
 #' @param fs sampling rate.
-#' @param N Order of the filter.
+#' @param N filter order.
+#' @param plot a boolean for control plot.
 #' @return the optimal cut off frequency.
 
-ComputeOptimalCutoffFrequency <- function(x, fs, N, plot = F) {
-  par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
+ComputeOptimalCutoffFrequency <- function(x, fs, N, plot = FALSE) {
+  library(signal)
+  
   fn <- fs/2
   rsmes <- c()
   fcs <- seq(0.5, fn, 0.5)
@@ -31,7 +33,8 @@ ComputeOptimalCutoffFrequency <- function(x, fs, N, plot = F) {
   fc <- fcs[index]
   
   if(plot) {
-    plot(fcs, rsmes, type = "l", xlab = "Filter cutoff frequencies (Hz)", ylab = "RMS deviation", ylim = c(0, (max(max(rsmes), max(noises))) + 1))
+    par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
+    plot(fcs, rsmes, type = "l", xlab = "Filter cutoff frequencies (Hz)", ylab = "RMS deviation", ylim = c(0, (max(max(rsmes), max(noises))) + 1), xaxs = "i")
     lines(fcs, noises)
     abline(v = c(fce, fcb))
     abline(h = noises[1])

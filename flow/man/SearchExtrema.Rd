@@ -12,7 +12,7 @@ SearchExtrema(y, which = c("both", "maxima", "minima"))
 \item{which.}{One of "both", "maxima", "minima". Default is "both"}
 }
 \value{
-A numerical vector of extrema indixes
+A numerical vector of extrema indexes
 }
 \description{
 \code{SearchExtrema} returns extrema of a signal.

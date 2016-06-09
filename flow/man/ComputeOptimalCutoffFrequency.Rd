@@ -4,14 +4,16 @@
 \alias{ComputeOptimalCutoffFrequency}
 \title{Computes optimal cut off frequency for a low pass butterworth filter}
 \usage{
-ComputeOptimalCutoffFrequency(x, fs, N)
+ComputeOptimalCutoffFrequency(x, fs, N, plot = FALSE)
 }
 \arguments{
-\item{x}{vector with data.}
+\item{x}{a numerical vector.}
 
 \item{fs}{sampling rate.}
 
-\item{N}{Order of the filter.}
+\item{N}{filter order.}
+
+\item{plot}{a boolean for control plot.}
 }
 \value{
 the optimal cut off frequency.
