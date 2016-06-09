@@ -8,22 +8,22 @@
 ReturnFieldLabels <- function(col.name) {
   field.label = col.name
   if(col.name == "acceleration.x.ms.2") {
-    field.label = expression("Acceleration X (" ~ m/s^2 ~ ")")
+    field.label = expression("Beschleunigung X (" ~ m%.%s^{-2} ~ ")")
   }
   if(col.name == "acceleration.y.ms.2") {
-    field.label = expression("Acceleration Y (" ~ m/s^2 ~ ")")
+    field.label = expression("Beschleunigung Y (" ~ m%.%s^{-2} ~ ")")
   }
   if(col.name == "acceleration.z.ms.2") {
-    field.label = expression("Acceleration Z (" ~ m/s^2 ~ ")")
+    field.label = expression("Beschleunigung Z (" ~ m%.%s^{-2} ~ ")")
   }
   if(col.name == "angular.velocity.x.deg.s") {
-    field.label = expression("Angular Velocity X (" ~ deg/s ~ ")")
+    field.label = expression("Winkelgeschwindigkeit X (" ~ deg%.%s^{-1} ~ ")")
   }
   if(col.name == "angular.velocity.y.deg.s") {
-    field.label = expression("Angular Velocity Y (" ~ deg/s ~ ")")
+    field.label = expression("Winkelgeschwindigkeit Y (" ~ deg%.%s^{-1} ~ ")")
   }
   if(col.name == "angular.velocity.z.deg.s") {
-    field.label = expression("Angular Velocity Z (" ~ deg/s ~ ")")
+    field.label = expression("Winkelgeschwindigkeit Z (" ~ deg%.%s^{-1} ~ ")")
   }
   return(field.label)
 }

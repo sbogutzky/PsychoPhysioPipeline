@@ -10,98 +10,98 @@ library(zoom)
 # Set working directory
 setwd("~/psychophysiopipeline/preprocessing")
 
-source("./code-snippets/read-set-load.R")
+# User input
+root.directory.path <- readline("Quellverzeichnis > ") #
+first.name <- readline("Vorname der Untersuchungsperson > ")
+last.name <- readline("Nachname der Untersuchungsperson > ")
+activity <- readline("Aktivität der Untersuchung > ")
+data.file.name <- readline("Dateiname der Datendatei (ohne .csv) > ")
+is.gps.data <- "JA" == readline("Sind die Daten GPS-Daten (JA/NEIN) > ")
 
-data.file.name <- readline("Type in data file name and press return to continue > ")
+# Set directory paths
+source("./code-snippets/set-directory-paths.R")
+
+# List self report names
+self.report.file.names <- list.files(path = raw.data.directory.path, pattern = "self-report.csv", recursive = TRUE)
 
 for (self.report.file.name in self.report.file.names) {
   
-  source("./code-snippets/extract-session-start.R")
+  source("./code-snippets/get-session-start.R")
   
   # Load self report data
-  self.report.data <- read.csv(paste(input.data.directory, self.report.file.name, sep = ""), comment.char = "#")
+  self.report.data <- read.csv(paste(raw.data.directory.path, self.report.file.name, sep = ""), comment.char = "#")
   
-  data.path <- paste(input.data.directory, date.directory, data.file.name, ".csv", sep = "")
-  
-  if(file.exists(data.path)) {
-  
-    # Load data
-    data <- read.csv(data.path, comment.char = "#")
+  # Load data
+  data.1 <- read.csv(paste(raw.data.directory.path, date.directory, data.file.name, ".csv", sep = ""), comment.char = "#")
     
-    # Loop measurements
-    for(i in 1:nrow(self.report.data)) {
+  # Loop measurements
+  for(i in 1:nrow(self.report.data)) {
       
-      source("./code-snippets/extract-self-report-times.R")
+    source("./code-snippets/get-self-report-times.R")
       
-      # Subset data
-      data.subset <- data[activity.start.ms <= data$timestamp.ms & data$timestamp.ms < activity.end.ms, ]
+    # Subset data
+    data.1.subset <- data.1[activity.start.ms <= data.1[, 1] & data.1[, 1] < activity.end.ms, ]
       
-      # Check for dublicates
-      duplicates <- which(duplicated(data.subset))
-      if(length(duplicates) > 0) {
-        data.subset <- data.subset[-duplicates, ]
-        print(paste(length(duplicates), "removed duplicates in ", paste(input.data.directory, date.directory, data.file.name, ".csv", sep = ""), i))
-        readline("Press return to continue > ")
+    if(!is.gps.data) {
+        
+      # Check sampling rate
+      duration.s <- (max(data.1.subset[, 1]) - min(data.1.subset[, 1])) / 1000
+      fs <- ComputeSamplingRate(data.1.subset[, 1])
+      print("---")
+      print(paste("Abtastrate:", round(fs, 2), "Hz"))
+      print(paste("Länge:", round(duration.s, 2), "s"))
+      
+      # Check data
+      j <- 2
+      if(nrow(data.1.subset) > 4) {
+        j <- 5
+      }
+      par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
+      plot(data.1.subset[, 1] / 1000, data.1.subset[, j], type = "l", xlab = "Zeit (s)", ylab = ReturnFieldLabels(colnames(data.1.subset)[j]))
+      title(paste(strftime(session.start + activity.start.ms / 1000, format="%d.%m.%Y %H:%M"), " #", i, sep = ""))
+      zm()
+      readline("Weiter > ")
+      
+      # Write to csv file
+      if(!dir.exists(paste(processed.data.directory.path, date.directory, sep =""))) {
+        dir.create(paste(processed.data.directory.path, date.directory, sep =""), recursive = T)
+      }
+      write.csv(data.1.subset, paste(processed.data.directory.path, date.directory, data.file.name, "-", i, ".csv", sep = ""), row.names = F)
+      
+      print("---")
+      print(paste(paste(data.file.name, "-", i, ".csv", sep = ""), "in", paste(processed.data.directory.path, date.directory, sep =""), "geschrieben."))
+      
+      # Clean up
+      rm(j)
+      
+    } else {
+      
+      date.time <- session.start + data.1.subset[, 1] / 1000
+      date.time <- format(date.time, "%Y-%m-%d %H:%M:%OS3")
+      latitude  <- data.1.subset[, 2]
+      longitude <- data.1.subset[, 3]
+      altitude  <- data.1.subset[, 4]
+      
+      # Write to csv file
+      if(!dir.exists(paste(processed.data.directory.path, date.directory, sep =""))) {
+        dir.create(paste(processed.data.directory.path, date.directory, sep =""), recursive = T)
       }
       
-      if(data.file.name != "gps-position") {
-        
-        # Check sampling rate
-        duration.s <- ((data.subset$timestamp.ms[nrow(data.subset)] - data.subset$timestamp.ms[1]) / 1000)
-        fs <- ComputeSamplingRate(data.subset$timestamp.ms)
-        print(paste("Sampling rate:", round(fs, 2), "Hz"))
-        print(paste("Duration:", round(duration.s, 2), "s"))
-        plot(diff(data.subset$timestamp.ms / 1000), xlab = "#", ylab = "Interval (s)") # data.subset$timestamp.ms[-1] / 1000, -- Timestamp (s)
-        title(paste(strftime(session.start, format="%Y/%m/%d %H:%M"), " #", i, sep = ""))
-        session.zoom()
-        
-        # Check data
-        
-        j <- 2
-        if(nrow(data.subset) > 4) {
-          j <- 5
-        }
-        par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
-        plot(data.subset$timestamp.ms / 1000, data.subset[, j], type = "l", xlab = "Timestamp (s)", ylab = ReturnFieldLabels(colnames(data.subset)[j]))
-        title(paste(strftime(session.start, format="%Y/%m/%d %H:%M"), " #", i, sep = ""))
-        session.zoom()
-        readline("Press return to continue > ")
-        
-        
-        # Write to csv file
-        output.directory <- paste(preprocessed.data.directory, activity.directory, user.directory, date.directory, sep = "")
-        if(!file.exists(substr(output.directory, 1, nchar(output.directory) - 1))) {
-          dir.create(output.directory, recursive = T)
-        }
-        output.file.name <- paste(data.file.name, "-", i, ".csv", sep = "")
-        output.directory <- paste(output.directory, output.file.name, sep = "")
-        write.csv(data.subset, output.directory, row.names = F)
-        print(paste("Wrote:", output.directory))
-      } else {
-        
-        date.time <- session.start + data.subset$timestamp.ms / 1000
-        date.time <- format(date.time, "%Y-%m-%d %H:%M:%OS3")
-        latitude  <- data.subset[, 2]
-        longitude <- data.subset[, 3]
-        altitude  <- data.subset[, 4]
-        
-        # Write to kml file
-        output.directory <- paste(preprocessed.data.directory, activity.directory, user.directory, date.directory, sep = "")
-        if(!file.exists(substr(output.directory, 1, nchar(output.directory) - 1))) {
-          dir.create(output.directory, recursive = T)
-        }
-        
-        header <- "<?xml version=\"1.0\" encoding=\"UTF-8\"?><kml xmlns=\"http://earth.google.com/kml/2.2\"><!-- TimeStamp is recommended for Point. Each Point represents a sample from a GPS. --><Document><name>Points with TimeStamps</name><Style id=\"paddle-a\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/kml/paddle/A.png</href></Icon><hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/></IconStyle></Style><Style id=\"paddle-b\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/kml/paddle/B.png</href></Icon><hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/></IconStyle></Style><Style id=\"hiker-icon\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/hiker.png</href></Icon><hotSpot x=\"0\" y=\".5\" xunits=\"fraction\" yunits=\"fraction\"/></IconStyle></Style><Style id=\"check-hide-children\"><ListStyle><listItemType>checkHideChildren</listItemType></ListStyle></Style>"
-        footer <- "</Document></kml>"
-        
-        output.directory <- paste(output.directory, "gps-position-", i, ".kml", sep = "")
-        write(header, output.directory)
-        write(paste("<Placemark><TimeStamp><when>", strftime(date.time, format = "%F", tz = "CET"), "T", strftime(date.time, format = "%T"), "Z</when></TimeStamp><styleUrl>#hiker-icon</styleUrl><Point><coordinates>", longitude, ",", latitude, ",", altitude, "</coordinates></Point></Placemark>", sep = ""), output.directory, append = T)
-        write(footer, output.directory, append = T)
-        print(paste("Wrote:", output.directory))
-      }
+      header <- "<?xml version=\"1.0\" encoding=\"UTF-8\"?><kml xmlns=\"http://earth.google.com/kml/2.2\"><!-- TimeStamp is recommended for Point. Each Point represents a sample from a GPS. --><Document><name>Points with TimeStamps</name><Style id=\"paddle-a\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/kml/paddle/A.png</href></Icon><hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/></IconStyle></Style><Style id=\"paddle-b\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/kml/paddle/B.png</href></Icon><hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/></IconStyle></Style><Style id=\"hiker-icon\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/hiker.png</href></Icon><hotSpot x=\"0\" y=\".5\" xunits=\"fraction\" yunits=\"fraction\"/></IconStyle></Style><Style id=\"check-hide-children\"><ListStyle><listItemType>checkHideChildren</listItemType></ListStyle></Style>"
+      footer <- "</Document></kml>"
+      
+      write(header, paste(processed.data.directory.path, date.directory, data.file.name, "-", i, ".kml", sep = ""))
+      write(paste("<Placemark><TimeStamp><when>", strftime(date.time, format = "%F", tz = "CET"), "T", strftime(date.time, format = "%T"), "Z</when></TimeStamp><styleUrl>#hiker-icon</styleUrl><Point><coordinates>", longitude, ",", latitude, ",", altitude, "</coordinates></Point></Placemark>", sep = ""), paste(processed.data.directory.path, date.directory, data.file.name, "-", i, ".kml", sep = ""), append = T)
+      write(footer, paste(processed.data.directory.path, date.directory, data.file.name, "-", i, ".kml", sep = ""), append = T)
+      
+      print("---")
+      print(paste(paste(data.file.name, "-", i, ".kml", sep = ""), "in", paste(processed.data.directory.path, date.directory, sep =""), "geschrieben."))
+    
+      # Clean up
+      rm(header, footer)
     }
-  } else {
-    print(paste("No file found:", data.path))
   }
 }
+
+# Clean up
+rm(activity, activity.end.ms, activity.start.ms, first.name, i, last.name, self.report.end.ms, self.report.file.name, self.report.file.names, session.start)
