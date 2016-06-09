@@ -3,14 +3,15 @@ jc.feature.names <- c("mean.cycle.interval", "mean.jerk.cost")
 for (i in 1:nrow(fss.features)) {
   
   source("code-snippets/set-additional-features.R")
-  jc.data.path <- paste(root.path, "processed-data", "/", activity, "/", user, "/", strftime(date, format="%Y-%m-%d--%H-%M-%S"), "/", "leg-jerk-cost-data-", measurement, ".csv", sep = "")
+  jc.data.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, strftime(date, format="%Y-%m-%d--%H-%M-%S"), "/", "imu-rn42-3b70-cycle-intervals-jerk-costs-", measurement, ".csv", sep = "")
   rm(measurement)
   
   if(file.exists(jc.data.path)) {
     jc.data <- read.csv(jc.data.path, skip = 2)
     
-    jc.data[, 3] <- jc.data[, 3] / 10^5
+    jc.data[, 3] <- jc.data[, 3] / 10^3
     jc.data <- jc.data[jc.data[, 2] < 1.25, ]
+    jc.data <- jc.data[max(jc.data[, 1]) - 12 * 60 < jc.data[, 1], ]
     
     jc.feature.row <- data.frame(t(colMeans(jc.data[, 2:3], na.rm = T)))
     names(jc.feature.row) <- jc.feature.names

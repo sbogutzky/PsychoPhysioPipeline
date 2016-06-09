@@ -1,82 +1,83 @@
+# Version 2.0
+
 # Remove all variables
 rm(list = ls(all = T))  
 
 # Load libraries
 library(flow)
+library(multilevel)
 
-# Set root data directory path
-if(file.exists("C:/Users/sbogutzky/Desktop/data (lokal)/2013"))
-  root.data.directory.path        <- "C:/Users/sbogutzky/Desktop/data (lokal)/2013/"
+# Set working directory
+setwd("~/psychophysiopipeline/preprocessing")
 
-# Set cleaned data directory path
-cleaned.data.directory.path <- paste(root.data.directory.path, "cleaned-data/", sep = "")
+# User input
+source("./code-snippets/read-set-load.R")
+date.of.birth <- readline("Geburtsdatum der Untersuchungsperson (Format: YYYY-MM-dd) > ")
 
-# Set features directory path
-features.directory.path <- paste(root.data.directory.path, "features/", sep = "")
+# Create fss feature and measurement data frame
+fss.features <- data.frame()
+fss.measurements <- data.frame()
 
-# Set properties
-first.name        <- "Patrick"
-last.name         <- "Buse"
-date.of.birth     <- "1984-05-05"
-activity          <- "Running"
-
-activity.directory <- paste(tolower(activity), "/",  sep = "")
-user.directory <- paste(tolower(last.name), "-", tolower(first.name), "/",  sep = "")
-
-# Load all file names
-input.data.directory.path <- paste(cleaned.data.directory.path, activity.directory, user.directory, sep = "")
-fss.data.file.names <- list.files(path = input.data.directory.path, pattern = "fss-data.csv", recursive = T)
-
-# Create fss feature data frame
-fss.features  <- data.frame()
-fss.measurements  <- data.frame()
-
-# Fill fss features data frame
-for (fss.data.file.name in fss.data.file.names) {
+for (self.report.file.name in self.report.file.names) {
   
-  # Load fss data
-  fss.data  <- read.csv(paste(input.data.directory.path, fss.data.file.name, sep = ""), header = T) 
+  source("./code-snippets/extract-session-start.R")
+  
+  # Load self report data
+  self.report.data <- read.csv(paste(input.data.directory, self.report.file.name, sep = ""), comment.char = "#") 
   
   # Loop measurements
-  for(i in 1:nrow(fss.data)) {
+  for(i in 1:nrow(self.report.data)) {
     
-    # Extract times
-    if(i == 1) {
-      activity.start  <- fss.data[i, 1] - 15 * 60000
-    } else {
-      activity.start  <- inquiry.end
-    }
+    source("./code-snippets/extract-self-report-times.R")
     
-    activity.end <- fss.data[i, 1]
-    inquiry.end  <- fss.data[i, 2]
+    # Calculate fss dimensions
+    fss.measurement <- as.numeric(self.report.data[i, 4:19])
+    fss.dimensions <- ComputeFlowShortScaleDimensions(fss.measurement)
     
-    # Calculate fss factors
-    fss.factors     <- CalculateFlowShortScaleFactors(as.numeric(fss.data[i, 3:18]))
-    
-    # Add fss fss features
-    fss.features    <- rbind(fss.features, data.frame(round(fss.factors, 2), activity, activity.start, activity.end, inquiry.end, measurement = i, last.name, first.name, date.of.birth))
-    fss.measurements    <- rbind(fss.measurements, data.frame(fss.data[i, 3:18]))
+    # Add fss features
+    fss.features <- rbind(fss.features, data.frame(round(fss.dimensions[c(1, 3, 5, 7, 9:12)], 2), session.start, activity, activity.start.ms, activity.end.ms, self.report.end.ms, measurement = i, last.name, first.name, date.of.birth))
+    fss.measurements <- rbind(fss.measurements, fss.measurement)
   }
 }
 
-print(paste("Cronbach's Alpha Flow", multilevel::cronbach(fss.measurements[, 1:10])$Alpha))
-print(paste("Cronbach's Alpha Fluency", multilevel::cronbach(fss.measurements[, c(8,7,9,4,5,2)])$Alpha))
-print(paste("Cronbach's Alpha Absorption", multilevel::cronbach(fss.measurements[, c(6,1,10,3)])$Alpha))
-print(paste("Cronbach's Alpha Anxienty", multilevel::cronbach(fss.measurements[, 11:13])$Alpha))
+# Clean up
+rm(fss.dimensions, self.report.data, activity, activity.end.ms, activity.start.ms, date.of.birth, first.name, fss.measurement, i, last.name, self.report.end.ms, self.report.file.name, self.report.file.names, session.start, start.time.line)
 
-# Create output directory, if needed
-output.directory.path <- paste(features.directory.path, activity.directory, user.directory, sep = "")
-if(!file.exists(substr(output.directory.path, 1, nchar(output.directory.path) - 1))) {
-  dir.create(output.directory.path, recursive = TRUE)
-}
+fss.item.statements <- c("Ich fühle mich optimal beansprucht.", "Meine Gedanken bzw. Aktivitäten laufen flüssig und glatt.", "Ich merke gar nicht, wie die Zeit vergeht.", "Ich habe keine Mühe mich zu konzentrieren.", "Mein Kopf ist völlig klar.", "Ich bin ganz vertieft in das, was ich gerade mache.", "Die richtigen Gedanken/ Bewegungen kommen wie von selbst.", "Ich weiß bei jedem Schritt, was ich zu tun habe.", "Ich habe das Gefühl, den Ablauf unter Kontrolle zu haben.", "Ich bin völlig selbstvergessen.")
+fss.item.mean.values <- colMeans(fss.measurements[, 1:10], na.rm = TRUE)
+fss.item.sd.values <- apply(fss.measurements[, 1:10], 2, sd, na.rm = TRUE)
+
+print("---")
+print(paste("Cronbachs Alpha Generalfaktor:", round(multilevel::cronbach(fss.measurements[, 1:10])$Alpha, 2)))
+factor.item.correlation.flow <- cor(fss.features$flow, fss.measurements[, 1:10], use = "complete.obs")[1,]
+data.table.flow <- data.frame(M = round(c(fss.item.mean.values, mean(fss.item.mean.values)), 2), SD = round(c(fss.item.sd.values, mean(fss.item.sd.values)), 2), Trennschärfe = round(c(factor.item.correlation.flow, NA), 2))
+row.names(data.table.flow) <- c(fss.item.statements, "Gesamtmittelwerte")
+print(data.table.flow)
+
+print("---")
+print(paste("Cronbachs Alpha 'Glatter Verlauf':", round(multilevel::cronbach(fss.measurements[, c(8,7,9,4,5,2)])$Alpha, 2)))
+factor.item.correlation.fluency <- cor(fss.features$fluency, fss.measurements[, c(8,7,9,4,5,2)], use = "complete.obs")[1,]
+data.table.fluency <- data.frame(M = round(c(fss.item.mean.values[c(8,7,9,4,5,2)], mean(fss.item.mean.values[c(8,7,9,4,5,2)])), 2), SD = round(c(fss.item.sd.values[c(8,7,9,4,5,2)], mean(fss.item.sd.values[c(8,7,9,4,5,2)])), 2), Trennschärfe = round(c(factor.item.correlation.fluency, NA), 2))
+row.names(data.table.fluency) <- c(fss.item.statements[c(8,7,9,4,5,2)], "Gesamtmittelwerte")
+print(data.table.fluency)
+
+print("---")
+print(paste("Cronbachs Alpha 'Absorbiertheit':", round(multilevel::cronbach(fss.measurements[, c(6,1,10,3)])$Alpha, 2)))
+factor.item.correlation.absorption <- cor(fss.features$absorption, fss.measurements[, c(6,1,10,3)], use = "complete.obs")[1,]
+data.table.absorption <- data.frame(M = round(c(fss.item.mean.values[c(6,1,10,3)], mean(fss.item.mean.values[c(6,1,10,3)])), 2), SD = round(c(fss.item.sd.values[c(6,1,10,3)], mean(fss.item.sd.values[c(6,1,10,3)])), 2), Trennschärfe = round(c(factor.item.correlation.absorption, NA), 2))
+row.names(data.table.absorption) <- c(fss.item.statements[c(6,1,10,3)], "Gesamtmittelwerte")
+print(data.table.absorption)
 
 # Write to csv file
-output.file.path <- paste(output.directory.path, "fss-features.csv", sep = "")
-if(file.exists(output.file.path)) {
-  features <- read.csv(output.file.path, stringsAsFactors = FALSE)
-  write.csv(unique(rbind(features, fss.features)), output.file.path, row.names = FALSE)
-  print(paste("Appended to", output.file.path))
-} else {
-  write.csv(fss.features, output.file.path, row.names = FALSE)
-  print(paste("Worte to", output.file.path))
+output.directory <- paste(feature.directory, activity.directory, user.directory, sep = "")
+if(!file.exists(substr(output.directory, 1, nchar(output.directory) - 1))) {
+  dir.create(output.directory, recursive = T)
 }
+output.directory <- paste(output.directory, "fks-features.csv", sep = "") #TODO: Deutsche Übersetzung
+write.csv(fss.features, output.directory, row.names = F)
+
+print("---")
+print(paste(output.directory, "geschrieben."))
+
+# Clean up
+rm(factor.item.correlation.absorption, factor.item.correlation.fluency, factor.item.correlation.flow, fss.item.sd.values, fss.item.statements, fss.item.mean.values)

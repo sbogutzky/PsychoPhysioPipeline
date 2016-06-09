@@ -19,14 +19,14 @@ lmp <- function (modelobject) {
   return(p)
 }
 
-PlotModels <- function(x, y, x.lim, sub.line, interval) {
+PlotModels <- function(x, y) {
   
   # Plot quadratic model
   x2  <- x^2
   quadratic.model <- lm(y ~ x + x2)
   print(summary(quadratic.model))
   
-  x.interval  <- seq(x.lim[1], x.lim[2], by = interval)
+  x.interval  <- seq(min(x, na.rm = TRUE), max(x, na.rm = TRUE), by = (max(x, na.rm = TRUE) - min(x, na.rm = TRUE)) / 10)
   y.predicted <- predict(quadratic.model, list(x = x.interval, x2 = x.interval^2))
   lines(x.interval, y.predicted, lty = "dashed")
   
@@ -43,7 +43,7 @@ PlotModels <- function(x, y, x.lim, sub.line, interval) {
   linear.p   <- lmp(linear.model)
   linear.sig <- GetSigString(linear.p)
   
-  title(sub = bquote({R[linear]}^2 ~ "=" ~ .(linear.adj.r.squared) ~ .(linear.sig) ~ "(solid)     " ~ {R[quadratic]}^2 ~ "=" ~ .(quadratic.adj.r.squared) ~ .(quadratic.sig) ~ "(dashed)"), line = sub.line, cex.sub = .8)
+  title(sub = bquote({R[linear]}^2 ~ "=" ~ .(linear.adj.r.squared) ~ .(linear.sig) ~ "(solid)     " ~ {R[quadratic]}^2 ~ "=" ~ .(quadratic.adj.r.squared) ~ .(quadratic.sig) ~ "(dashed)"), line = 2, cex.sub = .8)
 }
 
 levene <- function(y,group) {

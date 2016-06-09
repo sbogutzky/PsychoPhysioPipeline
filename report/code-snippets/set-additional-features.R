@@ -1,9 +1,9 @@
 
 # Set additional features
-additional.features <- fss.features[i, c(13:20)]
-activity.start <- additional.features[, 2]
-measurement <- additional.features[, 5]
+additional.features <- fss.features[i, c(9:17)]
+session.start <- additional.features[, 1]
+measurement <- additional.features[, 6]
 if(measurement == 1) {
-    date <- as.POSIXct(activity.start / 1000, origin = "1970-01-01", tz="CET")
+    date <- session.start
 }
-rm(additional.features, activity.start)
+rm(additional.features, session.start)

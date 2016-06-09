@@ -3,7 +3,7 @@ hrv.feature.names <- c("mean.rr","sdnn","mean.hr","sdhr","rmssd","nn50","pnn50",
 for (i in 1:nrow(fss.features)) {
   
   source("code-snippets/set-additional-features.R")
-  hrv.feature.path <- paste(root.path, "features", "/", activity, "/", user, "/", "kubios-hrv-features", "/", strftime(date, format="%Y-%m-%d--%H-%M-%S"), "/", "ecg-data-", measurement, "_hrv.txt", sep = "")
+  hrv.feature.path <- paste(root.path, feature.directory, activity.directory, user.directory, "kubios-hrv-features", "/", strftime(date, format="%Y-%m-%d--%H-%M-%S"), "/", "imu-rn42-bd38-", measurement, "_hrv.txt", sep = "")
   rm(measurement)
   
   if(file.exists(hrv.feature.path)) {
