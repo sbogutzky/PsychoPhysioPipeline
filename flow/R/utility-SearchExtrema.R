@@ -4,7 +4,7 @@
 #'
 #' @param y. A numerical vector of signal
 #' @param which. One of "both", "maxima", "minima". Default is "both"
-#' @return A numerical vector of extrema indixes
+#' @return A numerical vector of extrema indexes
 
 SearchExtrema <- function(y, which = c("both", "maxima", "minima")) {
   
