@@ -17,8 +17,8 @@ CheckMidSwings <- function(t.s, angular.velocity.deg.s, mid.swing.indexes) {
   InternalPlotFunction <- function(t.s, angular.velocity.deg.s, t.s.subset, angular.velocity.deg.s.subset, cycle.interval.t.s) {
     par(mfcol = c(2, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
     
-    plot(t.s, angular.velocity.deg.s, type = "l", xlab = "Time (s)", ylab = expression("Angular Velocity ("~deg/s~")"))
-    points(t.s.subset, angular.velocity.deg.s.subset, pch = 21, bg = "red")
+    plot(t.s, angular.velocity.deg.s, type = "l", xlab = "Time (s)", ylab = "Angular Velocity (deg/s)")
+    points(t.s.subset, angular.velocity.deg.s.subset, pch = 21, bg = "tomato")
     
     plot(t.s.subset, cycle.interval.t.s, xlab = "Time (s)", ylab = "Cycle Interval (s)")
   }
@@ -40,12 +40,12 @@ CheckMidSwings <- function(t.s, angular.velocity.deg.s, mid.swing.indexes) {
     in.line <- t.s >= range.s[1] & t.s < range.s[2]
     in.points <- t.s.subset >= range.s[1] & t.s.subset < range.s[2]
     
-    plot(t.s[in.line], angular.velocity.deg.s[in.line], type = "l", xlab = "Time (s)", ylab = expression("Angular Velocity ("~deg/s~")"))
-    points(t.s.subset[in.points], angular.velocity.deg.s.subset[in.points], pch = 21, bg = "red")
+    plot(t.s[in.line], angular.velocity.deg.s[in.line], type = "l", xlab = "Time (s)", ylab = "Angular Velocity (deg/s)")
+    points(t.s.subset[in.points], angular.velocity.deg.s.subset[in.points], pch = 21, bg = "tomato")
     title("Select to add")
     
     # Add mid swings and control
-    add  <- identify(t.s, angular.velocity.deg.s)
+    add  <- identify(t.s, angular.velocity.deg.s, plot = FALSE)
     if(length(add) > 0) {
       mid.swing.indexes <- c(mid.swing.indexes, add)
       mid.swing.indexes <- sort(mid.swing.indexes)
@@ -82,11 +82,11 @@ CheckMidSwings <- function(t.s, angular.velocity.deg.s, mid.swing.indexes) {
     in.line <- t.s >= range.s[1] & t.s < range.s[2]
     in.points <- t.s.subset >= range.s[1] & t.s.subset < range.s[2]
     
-    plot(t.s[in.line], angular.velocity.deg.s[in.line], type = "l", xlab = "Time (s)", ylab = expression("Angular Velocity ("~deg/s~")"))
-    points(t.s.subset[in.points], angular.velocity.deg.s.subset[in.points], pch = 21, bg = "red")
+    plot(t.s[in.line], angular.velocity.deg.s[in.line], type = "l", xlab = "Time (s)", ylab = "Angular Velocity (deg/s)")
+    points(t.s.subset[in.points], angular.velocity.deg.s.subset[in.points], pch = 21, bg = "tomato")
     title("Select to remove")
     
-    remove  <- identify(t.s.subset, angular.velocity.deg.s.subset)
+    remove  <- identify(t.s.subset, angular.velocity.deg.s.subset, plot = FALSE)
     
     # Remove selected mid swings
     if(length(remove) > 0) {

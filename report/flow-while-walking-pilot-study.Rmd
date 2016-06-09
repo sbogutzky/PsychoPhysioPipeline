@@ -1,300 +1,480 @@
 ---
 title: "Flow beim Gehen (intraindividell)"
 author: "Simon Bogutzky"
-date: "25. Februar 2016"
-output: html_document
+date: "Juni 2016"
+header-includes:
+  - \usepackage[utf8]{inputenc} 
+  - \usepackage[T1]{fontenc}
+  - \usepackage{rotating}
+  - \usepackage{tikz}
+  - \usepackage{booktabs} 
+  - \usepackage{dcolumn}
+  - \newcolumntype{x}{D{;}{\pm}{3.3}} 
+  - \newcolumntype{y}{D{;}{\pm}{5.3}}
+  - \newcolumntype{z}{D{;}{\pm}{7.7}}
+output: 
+  pdf_document: 
+    keep_tex: yes
 ---
-  
-```{r load-data, include=FALSE}
+
+```{r setup, include=FALSE}
+
 # Remove all variables
-rm(list = ls(all = T)) 
+rm(list = ls(all = T))
 
-# Load functions
-source("./code-snippets/functions.r")
+# Set working directory
+setwd("~/psychophysiopipeline/report")
 
-# Set root path
-if(file.exists("/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen"))
-  root.path <- "/Volumes/flow/Documents/archiv/daten/2015/flow-gehen-und-laufen/"
+# Load libraries
+library("flow")
+library("tikzDevice")
+library("xtable")
+library("apaTables")
+library("lme4") 
+library("coin")
 
-# Define Colors
-colors <- c("#3FADCB", "#33D100", "white")
+# Set paths
+root.path <- "C:/Users/sbogutzky/Desktop/daten (lokal)/2014/"
 
-# Set test users
-users <- c("grueter-barbara", "lochwitz-andreas", "worpenberg-annika")
-activities <- c("walking")
+# Set directories
+preprocessed.data.directory <- "preprocessed/"
+activity.directory <- "gehen/"
+user.directory <- "grueter-barbara/"
+
+```
+
+# Rohdaten
+
+```{r raw-data, include=FALSE, eval = FALSE}
+
+# Set directories
+date.directory <- "2014-06-03--12-29-16/"
+
+# Set file names
+kinematic.data.file.name <- "imu-rn42-3b70-3.csv"
+mid.swing.data.file.name <- "imu-rn42-3b70-mid-swing-indexes-3.csv"
+ecg.data.file.name <- "imu-rn42-bd38-3.csv"
+
+# Set paths
+kinematic.data.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, kinematic.data.file.name, sep = "")
+mid.swing.data.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, mid.swing.data.file.name, sep = "")
+ecg.data.file.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, ecg.data.file.name, sep = "")
+    
+# Load kinematic and midswing data
+kinematic.data <- read.csv(kinematic.data.path)
+mid.swing.data <- read.csv(mid.swing.data.path)
+ecg.data <- read.csv(ecg.data.file.path)
+
+# Setup tikz device
+#tikz("./tikz/5-2-daten.tex", width = 7.91, height = 5.22)
+
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfcol = c(2, 4))
+
+# Plot ECG data
+n <- 200
+y <- ecg.data[ecg.data[, 1] > mid.swing.data[n, 1] & ecg.data[, 1] < mid.swing.data[n + 1, 1], 2]
+x.p <- 1:length(y) / length(y) * 100
+plot(x.p, y, type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "EKG RA-LL ($mV$)", ylim = c(-3, 3), xaxs = "i")
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+y <- ecg.data[ecg.data[, 1] > mid.swing.data[n, 1] & ecg.data[, 1] < mid.swing.data[n + 1, 1], 3]
+plot(x.p, y, type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "EKG LA-LL ($mV$)", ylim = c(-3, 3), xaxs = "i")
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+# Plot kinematic Data
+most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 2], mid.swing.data[, 2])
+y <- rowMeans(most.common.cycle.matrix)
+x.p <- 1:length(y) / length(y) * 100
+plot(x.p, c(y[31:61], y[1:30]), type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Beschleunigung Y ($m \\cdot s^{-2}$)", ylim = c(-30, 30), xaxs = "i", col = rgb(155/255, 193/255, 54/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 5], mid.swing.data[, 2])
+y <- rowMeans(most.common.cycle.matrix)
+plot(x.p, c(y[31:61], y[1:30]), type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Winkelgeschwindigkeit X ($deg \\cdot s^{-1}$)", ylim = c(-600, 600), xaxs = "i", col = rgb(155/255, 193/255, 54/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 3], mid.swing.data[, 2])
+y <- rowMeans(most.common.cycle.matrix)
+plot(x.p, -c(y[31:61], y[1:30]), type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Beschleunigung Y ($m \\cdot s^{-2}$)", ylim = c(-30, 30), xaxs = "i", col = rgb(0/255, 152/255, 199/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 6], mid.swing.data[, 2])
+y <- rowMeans(most.common.cycle.matrix)
+plot(x.p, -c(y[31:61], y[1:30]), type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Winkelgeschwindigkeit Y ($deg \\cdot s^{-1}$)", ylim = c(-600, 600), xaxs = "i", col = rgb(0/255, 152/255, 199/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 4], mid.swing.data[, 2])
+y <- rowMeans(most.common.cycle.matrix)
+plot(x.p, c(y[31:61], y[1:30]), type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Beschleunigung Z ($m \\cdot s^{-2}$)", ylim = c(-30, 30), xaxs = "i", col = rgb(229/255, 66/255, 66/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 7], mid.swing.data[, 2])
+y <- rowMeans(most.common.cycle.matrix)
+plot(x.p, c(y[31:61], y[1:30]), type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Winkelgeschwindigkeit Z ($deg \\cdot s^{-1}$)", ylim = c(-600, 600), xaxs = "i", col = rgb(229/255, 66/255, 66/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+#dev.off()
+
+# Clean up
+rm(ecg.data, kinematic.data, mid.swing.data, most.common.cycle.matrix, date.directory, ecg.data.file.path, ecg.data.file.name, kinematic.data.path, kinematic.data.file.name, mid.swing.data.path, mid.swing.data.file.name, n, x.p, y)
+```
+
+%\begin{sidewaysfigure}
+%	\input{./tikz/5-2-daten}
+%	\caption{Aufgenommene Datenströme. Von links nach rechts: (schwarz) EKG-Ableitung RA-LL und EKG-Ableitung LA-LL; (grün) Beschleunigung in X-Richtung und Winkelgeschwindigkeit um die X Achse; (blau) Beschleunigung in Y-Richtung und Winkelgeschwindigkeit um die Y-Achse; (rot) Beschleunigung in Z-Richtung und Winkelgeschwindigkeit um die Z-Achse. Quelle: Eigene Darstellung}
+%	\label{figure:5-2-daten}
+%\end{sidewaysfigure}
+
+```{r load-data, include=FALSE}
+
+# Set directories
+feature.directory <- "features/"
 
 # Collect data
 data.1 <- data.frame()
-data.1b <- data.frame()
-for (activity in activities) {
-  for (user in users) {
     
-    # Load FSS features baseline
-    fss.feature.path <- paste(root.path, "features", "/", "baseline", "/", user, "/", "fss-features.csv", sep = "")
-    fss.features <- read.csv(fss.feature.path)
-    subjects <- factor(fss.features$first.name, levels = c("Barbara", "Andreas", "Annika"), labels = c("Female 1", "Male", "Female 2"))
-    dates <- factor(strftime(as.POSIXct(fss.features$activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"))
-    data.1b <- rbind(data.1b, data.frame(subject = subjects, date = dates, fss.features[, 1:5]))
-    rm(fss.feature.path)
+# Load FSS features
+fss.feature.path <- paste(root.path, feature.directory, activity.directory, user.directory, "fss-features.csv", sep = "")
+fss.features <- read.csv(fss.feature.path)
+rm(fss.feature.path)
     
-    # Load FSS features
-    fss.feature.path <- paste(root.path, "features", "/", activity, "/", user, "/", "fss-features.csv", sep = "")
-    fss.features <- read.csv(fss.feature.path)
-    rm(fss.feature.path)
+# Load HRV features
+source("code-snippets/load-hrv-features.R")
     
-    # Load HRV features
-    source("code-snippets/load-hrv-features.R")
+# Load jerk cost features
+source("code-snippets/load-jc-features.R")
     
-    # Load JC features
-    source("code-snippets/load-jc-features.R")
-    
-    # Load CLS features
-    source("code-snippets/load-cls-features.R") 
+# Load synchronization features
+source("code-snippets/load-cls-features.R") 
 
-    # Set factors
-    subjects <- factor(fss.features$first.name, levels = c("Barbara", "Andreas", "Annika"), labels = c("Female 1", "Male", "Female 2"))
-    dates <- factor(strftime(as.POSIXct(fss.features$activity.start / 1000, origin = "1970-01-01", tz="CET"), format="%Y-%m-%d"))
-    measurements <- factor(fss.features$measurement, levels = c(1, 2, 3, 4), labels = c("15'", "30'", "45'", "60'"))
+# Set factors
+subjects <- factor(fss.features$first.name, levels = c("Barbara"), labels = c("Female"))
+measurements <- factor(fss.features$measurement, levels = c(1, 2, 3, 4), labels = c("15'", "30'", "45'", "60'"))
+sessions <- factor(fss.features$session.start, levels = c("2014-05-27 12:34:52", "2014-05-28 14:13:25",  "2014-06-03 12:29:16", "2014-06-04 12:09:38", "2014-06-05 13:18:49", "2014-06-06 11:08:16"), labels = c("27.05", "28.05", "03.06", "04.06", "05.06", "06.06"))
   
-    # Create data frame
-    n.row <- nrow(fss.features)
-    e.seq <- seq(3, n.row * 3, 3)
-    data.1 <- rbind(data.1, data.frame(subject = subjects, date = dates, measurement = measurements, fss.features[, 1:5], hrv.features[e.seq, c(3:6, 11:12, 17:18, 24:25, 45:46)], jc.features[e.seq, 1:2], cls.features[e.seq, 1:2]))
-    
-  }
-  rm(user, fss.features, hrv.features, jc.features, cls.features, n.row, e.seq, subjects, dates, measurements)
-}
-
+# Create data frame
+data.1 <- rbind(data.1, data.frame(subject = subjects, session = sessions, measurement = measurements, fss.features[, c(1:8)], hrv.features[, c(3, 16, 17)], cls.features[, 1:2], jc.features[, 1:2]))
 rownames(data.1) <- seq(length = nrow(data.1))
-rownames(data.1b) <- seq(length = nrow(data.1b))
-rm(activity)
+
+# Clean up
+rm(fss.features, hrv.features, cls.features, jc.features, subjects, sessions, measurements)
 ```
 
-```{r distribution, echo=FALSE, message=FALSE, warning=FALSE}
-par("mfcol" = c(2, 3), mar = c(2.5, 2.5, 2.5, 3.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+# Variablen
 
-for(i in unique(as.numeric(data.1$subject))) {
-  data.1.1 <- data.1[as.numeric(data.1$subject) == i, ]
-  hist(data.1.1$absorption, main = data.1.1$subject[1], xlab = "Absorption")
-  print(shapiro.test(data.1.1$absorption))
-  plot(data.1.1$absorption ~ data.1.1$measurement, xlab = "Measurement", ylab = "Absorption", pch = 21, bg = colors[1])
-}
-rm(data.1.1, i)
+```{r variables-session-wise, echo=FALSE, warning=FALSE, results="asis", eval=FALSE}
+    
+  # Create table
+  options(stringsAsFactors = FALSE)
+  feature.table <- data.frame()
+  for (i in c(4, 5, 6, 12, 13, 14, 16, 18)) {
+    feature.table <- rbind(feature.table, c(paste(formatC(round(tapply(data.1[, i], data.1[, 2], mean, na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(tapply(data.1[, i], data.1[, 2], sd, na.rm=TRUE), 2), format = "f", digits = 2)),  paste(formatC(round(mean(data.1[, i], na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(sd(data.1[, i], na.rm=TRUE), 2), format = "f", digits = 2))))
+  }
+  
+  colnames(feature.table) <- c(levels(data.1[, 2]), "Gesamt")
+  rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz (BPM)", "LF ($ms^2$)", "HF ($ms^2$)", "Norm. Shan. Entr. Index", "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
+  
+  # Print latex table
+  table                   <- xtable(feature.table, label = "table:variablen-nach-sitzung", align = "lyyyyyyy", caption = "Variablen: Arithmetisches Mittel $\\pm$ Standardabweichung zu den sechs Sitzungen [$N = 4$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
+  print(table, floating.environment="sidewaystable", caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
+  
+  # Clean up
+  rm(feature.table, table, i)
 ```
 
-```{r linear-models, echo=FALSE, message=FALSE, warning=FALSE}
-for(i in unique(as.numeric(data.1$subject))) {
-  data.1.1 <- data.1[as.numeric(data.1$subject) == i, ]
+```{r variables-measurement-wise, echo=FALSE, warning=FALSE, results="asis"}
+    
+  # Create table
+  options(stringsAsFactors = FALSE)
+  feature.table <- data.frame()
+  for (i in c(4, 5, 6, 12, 13, 14, 16, 18)) {
+    feature.table <- rbind(feature.table, c(paste(formatC(round(tapply(data.1[, i], data.1[, 3], mean, na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(tapply(data.1[, i], data.1[, 3], sd, na.rm=TRUE), 2), format = "f", digits = 2)),  paste(formatC(round(mean(data.1[, i], na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(sd(data.1[, i], na.rm=TRUE), 2), format = "f", digits = 2))))
+  }
   
-  par("mfcol" = c(2, 3), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+  colnames(feature.table) <- c(levels(data.1[, 3]), "Gesamt")
+  rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz (BPM)", "LF ($ms^2$)", "HF ($ms^2$)", "Norm. Shan. Entr. Index", "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
   
-  print("-----------------Mean HR-----------------")
-  plot(data.1.1$absorption ~ data.1.1$meanhr, main = data.1.1$subject[1], xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.1.1$meanhr, data.1.1$absorption, x.lim = c(30, 200), sub.line = 1.3, interval = 1)
-  print("-----------------------------------------")
+  # Print latex table
+  table                   <- xtable(feature.table, label = "table:variablen-nach-messzeitpunkt-fallstudie-gehen", align = "lyyyyy", caption = "Variablen zur Fallstudie zum Gehen: Arithmetisches Mittel $\\pm$ Standardabweichung zu den drei Messzeitpunkten [$N = 6$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
+  print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
-  print("-----------------RMSSD-------------------")
-  plot(data.1.1$absorption ~ data.1.1$rmssd, main = data.1.1$subject[1], xlab = "RMSSD", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.1.1$rmssd, data.1.1$absorption, x.lim = c(0, 120), sub.line = 1.3, interval = 1)
-  print("-----------------------------------------")
-  
-  print("-----------------Jerk Cost---------------")
-  plot(data.1.1$absorption ~ data.1.1$mean.jerk.cost, main = data.1.1$subject[1], xlab = "Jerk Cost", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.1.1$mean.jerk.cost, data.1.1$absorption, x.lim = c(1, 10), sub.line = 1.3, interval = .005)
-  print("-----------------------------------------")
-  
-  print("-----------------Cycle Interval----------")
-  plot(data.1.1$absorption ~ data.1.1$mean.cycle.interval, main = data.1.1$subject[1], xlab = "Cycle Interval", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.1.1$mean.cycle.interval, data.1.1$absorption, x.lim = c(.25, 2), sub.line = 1.3, interval = .001)
-  print("-----------------------------------------")
-  
-  print("-----------------PCoI--------------------")
-  plot(data.1.1$absorption ~ data.1.1$mean.pcoi, main = data.1.1$subject[1], xlab = "PCoI", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.1.1$mean.pcoi, data.1.1$absorption, x.lim = c(0, 1), sub.line = 1.3, interval = .01)
-  print("-----------------------------------------")
-  
-  print("----------------NSEI---------------------")
-  plot(data.1.1$absorption ~ data.1.1$mean.nsei, main = data.1.1$subject[1], xlab = "NSEI", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.1.1$mean.nsei, data.1.1$absorption, x.lim = c(0, 1), sub.line = 1.3, interval = .01)
-  print("-----------------------------------------")
-}
-
-rm(data.1.1, i)
+  # Clean up
+  rm(feature.table, table, i)
 ```
 
-```{r substract-baseline-absorption, message=FALSE, warning=FALSE, include=FALSE}
-data.2 <- data.1
-absorption.matrix <- matrix(data = data.2$absorption, nrow = length(data.2$absorption)/4, byrow = T)
-absorption.matrix <- sweep(absorption.matrix, 1, (data.1b$absorption - 1), "-")
-data.2$absorption <- c(t(absorption.matrix))
-data.2$absorption[data.2$absorption < 1] <- 1
-rm(absorption.matrix)
-```
+```{r statistical-effect-tests, include=FALSE}
 
-```{r distribution-1, echo=FALSE, message=FALSE, warning=FALSE}
-par("mfcol" = c(2, 3), mar = c(2.5, 2.5, 2.5, 3.5) + 0.1, mgp = c(1.5, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
-
-for(i in unique(as.numeric(data.2$subject))) {
-  data.2.1 <- data.2[as.numeric(data.2$subject) == i, ]
-  hist(data.2.1$absorption, main = data.2.1$subject[1], xlab = "Absorption")
-  print(shapiro.test(data.2.1$absorption))
-  plot(data.2.1$absorption ~ data.2.1$measurement, xlab = "Measurement", ylab = "Absorption", pch = 21, bg = colors[1])
-}
-rm(data.2.1, i)
-```
-
-```{r linear-models-1, echo=FALSE, message=FALSE, warning=FALSE}
-for(i in unique(as.numeric(data.1$subject))) {
-  data.2.1 <- data.2[as.numeric(data.2$subject) == i, ]
-  
-  par("mfcol" = c(2, 3), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
-  
-  print("-----------------Mean HR-----------------")
-  plot(data.2.1$absorption ~ data.2.1$meanhr, main = data.2.1$subject[1], xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.2.1$meanhr, data.2.1$absorption, x.lim = c(30, 200), sub.line = 1.3, interval = 1)
-  print("-----------------------------------------")
-  
-  print("-----------------RMSSD-------------------")
-  plot(data.2.1$absorption ~ data.2.1$rmssd, main = data.2.1$subject[1], xlab = "RMSSD", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.2.1$rmssd, data.2.1$absorption, x.lim = c(0, 120), sub.line = 1.3, interval = 1)
-  print("-----------------------------------------")
-  
-  print("-----------------Jerk Cost---------------")
-  plot(data.2.1$absorption ~ data.2.1$mean.jerk.cost, main = data.2.1$subject[1], xlab = "Jerk Cost", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.2.1$mean.jerk.cost, data.2.1$absorption, x.lim = c(1, 10), sub.line = 1.3, interval = .005)
-  print("-----------------------------------------")
-  
-  print("-----------------Cycle Interval----------")
-  plot(data.2.1$absorption ~ data.2.1$mean.cycle.interval, main = data.2.1$subject[1], xlab = "Cycle Interval", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.2.1$mean.cycle.interval, data.2.1$absorption, x.lim = c(.25, 2), sub.line = 1.3, interval = .001)
-  print("-----------------------------------------")
-  
-  print("-----------------PCoI--------------------")
-  plot(data.2.1$absorption ~ data.2.1$mean.pcoi, main = data.2.1$subject[1], xlab = "PCoI", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.2.1$mean.pcoi, data.2.1$absorption, x.lim = c(0, 1), sub.line = 1.3, interval = .01)
-  print("-----------------------------------------")
-  
-  print("----------------NSEI---------------------")
-  plot(data.2.1$absorption ~ data.2.1$mean.nsei, main = data.2.1$subject[1], xlab = "NSEI", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.2.1$mean.nsei, data.2.1$absorption, x.lim = c(0, 1), sub.line = 1.3, interval = .01)
-  print("-----------------------------------------")
+# Check normality of the measurement blocks
+for (i in c(4, 5, 6, 12, 13, 14, 16, 18)) {
+  print(colnames(data.1)[i])
+  print(tapply(data.1[, i], data.1[, 3], shapiro.test))
 }
 
-rm(data.2.1, i)
-```
-
-```{r standard-score-predictors, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
-data.3 <- data.2
-
-normalize <- function(x) {
-  return(t(scale(x)[, 1]))
+# Friedman test of the measurement blocks
+for (i in c(4, 5, 6, 12, 13, 14, 16, 18)) {
+  print(colnames(data.1)[i])
+  print(friedman.test(data.1[, i], data.1[, 3], data.1[, 2]))
 }
+ 
+# Wilcox signed-rank test to check the symmetry of flow
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 4] ~ data.1[as.numeric(data.1[, 3]) == 2, 4], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 4] ~ data.1[as.numeric(data.1[, 3]) == 3, 4], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 4] ~ data.1[as.numeric(data.1[, 3]) == 4, 4], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 2, 4] ~ data.1[as.numeric(data.1[, 3]) == 3, 4], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 2, 4] ~ data.1[as.numeric(data.1[, 3]) == 4, 4], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 3, 4] ~ data.1[as.numeric(data.1[, 3]) == 4, 4], distribution="exact")
 
-meanhr.matrix <- matrix(data = data.2$meanhr, nrow = length(data.2$meanhr)/4, byrow = T)
-meanhr.matrix <- apply(meanhr.matrix, 1, normalize)
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 5] ~ data.1[as.numeric(data.1[, 3]) == 2, 5], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 5] ~ data.1[as.numeric(data.1[, 3]) == 3, 5], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 5] ~ data.1[as.numeric(data.1[, 3]) == 4, 5], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 2, 5] ~ data.1[as.numeric(data.1[, 3]) == 3, 5], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 2, 5] ~ data.1[as.numeric(data.1[, 3]) == 4, 5], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 3, 5] ~ data.1[as.numeric(data.1[, 3]) == 4, 5], distribution="exact")
 
-data.3$meanhr <- c(meanhr.matrix)
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 6] ~ data.1[as.numeric(data.1[, 3]) == 2, 6], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 6] ~ data.1[as.numeric(data.1[, 3]) == 3, 6], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 6] ~ data.1[as.numeric(data.1[, 3]) == 4, 6], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 2, 6] ~ data.1[as.numeric(data.1[, 3]) == 3, 6], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 2, 6] ~ data.1[as.numeric(data.1[, 3]) == 4, 6], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 3, 6] ~ data.1[as.numeric(data.1[, 3]) == 4, 6], distribution="exact")
 
-rmssd.matrix <- matrix(data = data.2$rmssd, nrow = length(data.2$rmssd)/4, byrow = T)
-rmssd.matrix <- apply(rmssd.matrix, 1, normalize)
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 14] ~ data.1[as.numeric(data.1[, 3]) == 2, 14], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 14] ~ data.1[as.numeric(data.1[, 3]) == 3, 14], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 14] ~ data.1[as.numeric(data.1[, 3]) == 4, 14], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 2, 14] ~ data.1[as.numeric(data.1[, 3]) == 3, 14], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 2, 14] ~ data.1[as.numeric(data.1[, 3]) == 4, 14], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 3, 14] ~ data.1[as.numeric(data.1[, 3]) == 4, 14], distribution="exact")
 
-data.3$rmssd <- c(rmssd.matrix)
-
-mean.jerk.cost.matrix <- matrix(data = data.2$mean.jerk.cost, nrow = length(data.2$mean.jerk.cost)/4, byrow = T)
-mean.jerk.cost.matrix <- apply(mean.jerk.cost.matrix, 1, normalize)
-
-data.3$mean.jerk.cost <- c(mean.jerk.cost.matrix)
-
-mean.cycle.interval.matrix <- matrix(data = data.2$mean.cycle.interval, nrow = length(data.2$mean.cycle.interval)/4, byrow = T)
-mean.cycle.interval.matrix <- apply(mean.cycle.interval.matrix, 1, normalize)
-
-data.3$mean.cycle.interval <- c(mean.cycle.interval.matrix)
-
-mean.pcoi.matrix <- matrix(data = data.2$mean.pcoi, nrow = length(data.2$mean.pcoi)/4, byrow = T)
-mean.pcoi.matrix <- apply(mean.pcoi.matrix, 1, normalize)
-
-data.3$mean.pcoi <- c(mean.pcoi.matrix)
-
-mean.nsei.matrix <- matrix(data = data.2$mean.nsei, nrow = length(data.2$mean.nsei)/4, byrow = T)
-mean.nsei.matrix <- apply(mean.nsei.matrix, 1, normalize)
-
-data.3$mean.nsei <- c(mean.nsei.matrix)
-
-rm(meanhr.matrix, rmssd.matrix, mean.jerk.cost.matrix, mean.cycle.interval.matrix, mean.pcoi.matrix, mean.nsei.matrix, normalize)
+# Clean up
+rm(i)
 ```
 
-```{r linear-models-2, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
-for(i in unique(as.numeric(data.2$subject))) {
-  data.3.1 <- data.3[as.numeric(data.3$subject) == i, ]
-  
-  par("mfcol" = c(2, 3), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
-  
-  print("-----------------Mean HR-----------------")
-  plot(data.3.1$absorption ~ data.3.1$meanhr, main = data.3.1$subject[1], xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.3.1$meanhr, data.3.1$absorption, x.lim = c(-2, 2), sub.line = 1.3, interval = .1)
-  print("-----------------------------------------")
-  
-  print("-----------------RMSSD-------------------")
-  plot(data.3.1$absorption ~ data.3.1$rmssd, main = data.3.1$subject[1], xlab = "RMSSD", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.3.1$rmssd, data.3.1$absorption, x.lim = c(-2, 2), sub.line = 1.3, interval = .1)
-  print("-----------------------------------------")
-  
-  print("-----------------Jerk Cost---------------")
-  plot(data.3.1$absorption ~ data.3.1$mean.jerk.cost, main = data.3.1$subject[1], xlab = "Jerk Cost", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.3.1$mean.jerk.cost, data.3.1$absorption, x.lim = c(-2, 2), sub.line = 1.3, interval = .1)
-  print("-----------------------------------------")
-  
-  print("-----------------Cycle Interval----------")
-  plot(data.3.1$absorption ~ data.3.1$mean.cycle.interval, main = data.3.1$subject[1], xlab = "Cycle Interval", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.3.1$mean.cycle.interval, data.3.1$absorption, x.lim = c(-2, 2), sub.line = 1.3, interval = .1)
-  print("-----------------------------------------")
-  
-  print("-----------------PCoI--------------------")
-  plot(data.3.1$absorption ~ data.3.1$mean.pcoi, main = data.3.1$subject[1], xlab = "PCoI", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.3.1$mean.pcoi, data.3.1$absorption, x.lim = c(-2, 2), sub.line = 1.3, interval = .1)
-  print("-----------------------------------------")
-  
-  print("----------------NSEI---------------------")
-  plot(data.3.1$absorption ~ data.3.1$mean.nsei, main = data.3.1$subject[1], xlab = "NSEI", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.3.1$mean.nsei, data.3.1$absorption, x.lim = c(-2, 2), sub.line = 1.3, interval = .1)
-  print("-----------------------------------------")
-}
+# Analyse
 
-rm(data.3.1, i)
+```{r correlation-analysis, echo=FALSE, warning=FALSE, results="asis"}
+
+# Create APA table
+apa.table.cor <- apa.cor.table(data.1[, c(4, 5, 6, 12, 13, 14, 16, 18)], show.conf.interval = FALSE)
+cor.table <- data.frame(apa.table.cor$table.body)[seq(1, 16, 2), 2:10]
+colnames(cor.table) <- c("M", "SD", "1", "2", "3", "4", "5", "6", "7")
+rownames(cor.table) <- c("1. Generalfaktor", "2. Glatter Verlauf", "3. Absorbiertheit", "4. Herzfrequenz (BPM)", "5. LF ($ms^2$)", "6. HF ($ms^2$)", "7. Norm. Shan. Entr. Index", "8. Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
+  
+# Print latex table
+table <- xtable(cor.table, label = "table:korrelation-fallstudie-gehen", align = "lxxxxxxxxx", caption = "Variablen zur Fallstudie zum Gehen: Arithmetisches Mittel, Standardabweichung und Korrelationen [$N = 23$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- * Korrelation ist auf dem Niveau von 0,05 (zweiseitig) signifikant. -+- ** Korrelation ist auf dem Niveau von 0,01 (zweiseitig) signifikant.") 
+print(table, floating.environment="sidewaystable", caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
+  
+# Clean up
+rm(apa.table.cor, cor.table, table)
 ```
 
-```{r relations, echo=FALSE, message=FALSE, warning=FALSE}
-data.4 <- data.2
+```{r regression-analysis, include=FALSE, eval=FALSE, eval=FALSE}
 
-par("mfcol" = c(3, 1), mar = c(3, 3, 2.5, 1) + 0.1, mgp = c(2, .5, 0), las = 1, cex.axis = 0.8, tck = .03, cex.lab = .8, xaxs = "r", yaxs = "r")
+# Setup tikz device
+#tikz("./tikz/5-8-regression.tex", width = 5.22, height = 5.22)
 
-for(i in unique(as.numeric(data.4$subject))) {
-  data.4.1 <- data.4[as.numeric(data.4$subject) == i, ]
-  plot(data.4.1$meanhr, data.4.1$mean.nsei, xlab = "Mean HR", ylab = "Cardio-locomotor phase synchronisation", pch = 21, bg = colors[1])
-  PlotModels(data.4.1$meanhr, data.4.1$mean.nsei, x.lim = c(30, 200), sub.line = 1.25, interval = 1)
-  
-  plot(data.4.1$meanhr, data.4.1$absorption, xlab = "Mean HR", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.4.1$meanhr, data.4.1$absorption, x.lim = c(30, 200), sub.line = 1.25, interval = 1)
-  
-  plot(data.4.1$mean.nsei, data.4.1$absorption, xlab = "Cardio-locomotor phase synchronisation", ylab = "Absorption", pch = 21, bg = colors[1])
-  PlotModels(data.4.1$mean.nsei, data.4.1$absorption, x.lim = c(0, 1), sub.line = 1.25, interval = .01)
-}
-rm(data.4.1)
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(3, 2))
+
+# Plot absorption on mean HR
+mean.hr.squared <- data.1$mean.hr^2
+linear.model <- lm(absorption ~ mean.hr, data = data.1)
+summary.lm(linear.model)
+mean.hr <- data.1$mean.hr
+linear.model.2 <- lm(data.1$absorption ~ mean.hr + mean.hr.squared)
+summary.lm(linear.model.2)
+plot(data.1$mean.hr, data.1$absorption, xlab = "Mittlere HR (BPM)", ylab = "Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
+abline(linear.model)
+mean.hr <- seq(90, 120, by = .5)
+mean.hr.squared <- mean.hr^2
+absorption.predicted <- predict.lm(linear.model.2, data.frame(mean.hr, mean.hr.squared))
+lines(mean.hr, absorption.predicted, lty = "dashed")
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+mtext("A", side = 2, line = 3, padj = -7, las = 1)
+
+# Plot absorption on LF
+lfpowfft.squared <- data.1$lfpowfft^2
+linear.model <- lm(absorption ~ lfpowfft, data = data.1)
+summary.lm(linear.model)
+lfpowfft <- data.1$lfpowfft
+linear.model.2 <- lm(data.1$absorption ~ lfpowfft + lfpowfft.squared)
+summary.lm(linear.model.2)
+plot(data.1$lfpowfft, data.1$absorption, xlab = "LF ($ms^2$)", ylab = "Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
+abline(linear.model)
+lfpowfft <- seq(5, 45, by = .5)
+lfpowfft.squared <- lfpowfft^2
+absorption.predicted <- predict.lm(linear.model.2, data.frame(lfpowfft, lfpowfft.squared))
+lines(lfpowfft, absorption.predicted, lty = "dashed")
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+mtext("B", side = 2, line = 3, padj = -7, las = 1)
+
+# Plot absorption on HF
+plot(data.1$hfpowfft, data.1$absorption, xlab = "HF ($ms^2$)", ylab = "Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
+linear.model <- lm(data.1$absorption ~ data.1$hfpowfft)
+abline(linear.model)
+summary(linear.model)
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+mtext("C", side = 2, line = 3, padj = -7, las = 1)
+
+# Plot absorption on NSEI
+plot(data.1$mean.nsei, data.1$absorption, xlab = "Norm. Shannon Entropie Index", ylab = "Absorbiertheit", pch = 24, bg = rgb(96/255, 65/255, 79/255))
+linear.model <- lm(data.1$absorption ~ data.1$mean.nsei)
+abline(linear.model)
+summary(linear.model)
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+mtext("D", side = 2, line = 3, padj = -7, las = 1)
+
+# Plot fluency on jerk cost
+plot(data.1$mean.jerk.cost, data.1$fluency, xlab = "Bewegungsaufw. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", ylab = "Glatter Verlauf", pch = 23, bg = rgb(0/255, 152/255, 199/255))
+linear.model <- lm(data.1$fluency ~ data.1$mean.jerk.cost)
+abline(linear.model)
+summary(linear.model)
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+mtext("F", side = 2, line = 3, padj = -7, las = 1)
+
+#dev.off()
+
+# Clean up
+rm(mean.hr, mean.hr.squared, linear.model, linear.model.2)
 ```
 
-```{r stroboscopic-technique, echo=FALSE, message=FALSE, warning=FALSE}
-max.nsei <- which.max(data.2$mean.nsei)
-min.nsei <- which.min(data.2$mean.nsei)
-activities.1 <- rep("walking", 2)
-dates <- c(as.character(data.2[min.nsei,]$date), as.character(data.2[max.nsei,]$date))
-measurements <- c(data.2[min.nsei,]$measurement, data.2[max.nsei,]$measurement)
-subjects <- c(users[as.numeric(data.2[min.nsei,]$subject)], users[as.numeric(data.2[max.nsei,]$subject)])
-time.range <- c(0, 900)
-ticks <- seq(time.range[1], time.range[2], 30)
-beat.plot.range <- c(80, 130)
-for(i in 1:length(dates)) {
-  source("code-snippets/load-and-plot-processes.R")
-} 
+%\begin{figure}
+%	\input{./tikz/5-8-regression}
+%	\caption{Beobachtungen. (A) Absorbiertheit und mittlerer HR; (B) Absorbiertheit und LF; (C) Absorbiertheit und HF; %(D) Glatterverlauf und mittlerer Bewegungsaufwand; (F) Absorbiertheit und mittlerer normalisierter Shannon Entropie %Index. Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell %dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
+%	\label{figure:5-8-regression}
+%\end{figure}
 
-rm(max.nsei, min.nsei, dates, measurements, subjects, activities.1, time.range, ticks, i, beat.plot.range, detail.plot.range)
+```{r process-oriented-approach, echo=FALSE, include=FALSE}
+
+# Setup tikz device
+tikz("./tikz/5-13-prozessorientierter-ansatz.tex", width = 7.91, height = 5.22)
+
+# Set graphic parameter
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfcol = c(3, 2))
+
+# Plot underload measure
+# Set directories
+date.directory <- "2014-06-04--12-09-38/"
+
+# Set data file names
+kubios.hrv.data.file.name <- "imu-rn42-bd38-1_hrv.txt"
+jc.data.file.name <- "imu-rn42-3b70-cycle-intervals-jerk-costs-1.csv"
+cls.data.file.name <- "cls-phases-1.csv"
+
+# Set paths
+kubios.hrv.data.file.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, kubios.hrv.data.file.name, sep = "")
+jc.data.file.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, jc.data.file.name, sep = "")
+cls.data.file.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, cls.data.file.name, sep = "")
+    
+# Load hrv, jerk cost and cls data
+source("../preprocessing/code-snippets/read-kubios-hrv-data.R")
+jc.data <- read.csv(jc.data.file.path)
+cls.data <- read.csv(cls.data.file.path, skip = 2)
+
+# Plot
+n <- max(cls.data$t.s[complete.cases(cls.data)]) - 180 # min(cls.data$t.s[complete.cases(cls.data)])  
+m <- max(cls.data$t.s[complete.cases(cls.data)]) 
+heart.beat.times <- c(kubios.hrv.data.time.data$t.s[1] - kubios.hrv.data.time.data$rr.interval.s[1], kubios.hrv.data.time.data$t.s)
+plot(kubios.hrv.data.time.data$t.s[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], 60 / diff(heart.beat.times)[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], xlab = "", ylab = "Mittlere HR (BPM)", xaxs = "i", yaxs = "i", ylim = c(90, 120), pch = 21, bg = rgb(229/255, 66/255, 66/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+plot(cls.data$t.s[cls.data > n & cls.data < m], cls.data$psi[cls.data > n & cls.data < m], xlab = "", ylab = "Rel. Phase ($Psi(t)$)", xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 24, bg = rgb(96/255, 65/255, 79/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+plot(jc.data$t.s[jc.data$t.s > n & jc.data$t.s < m], jc.data$jerk.cost.m2s5[jc.data$t.s > n & jc.data$t.s < m] / 10^3, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(2, 4)  , pch = 23, bg = rgb(0/255, 152/255, 199/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+title(sub = "nach 15 Minuten - Absorbiertheit: 4.3")
+
+# Plot optimal measure
+# Set directories
+date.directory <- "2014-05-28--14-13-25/"
+
+# Set data file names
+kubios.hrv.data.file.name <- "imu-rn42-bd38-3_hrv.txt"
+jc.data.file.name <- "imu-rn42-3b70-cycle-intervals-jerk-costs-3.csv"
+cls.data.file.name <- "cls-phases-3.csv"
+
+# Set paths
+kubios.hrv.data.file.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, kubios.hrv.data.file.name, sep = "")
+jc.data.file.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, jc.data.file.name, sep = "")
+cls.data.file.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, cls.data.file.name, sep = "")
+    
+# Load hrv, jerk cost and cls data
+source("../preprocessing/code-snippets/read-kubios-hrv-data.R")
+jc.data <- read.csv(jc.data.file.path)
+cls.data <- read.csv(cls.data.file.path, skip = 2)
+
+# Plot
+n <- max(cls.data$t.s[complete.cases(cls.data)]) - 180 # min(cls.data$t.s[complete.cases(cls.data)])  
+m <- max(cls.data$t.s[complete.cases(cls.data)]) 
+heart.beat.times <- c(kubios.hrv.data.time.data$t.s[1] - kubios.hrv.data.time.data$rr.interval.s[1], kubios.hrv.data.time.data$t.s)
+plot(kubios.hrv.data.time.data$t.s[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], 60 / diff(heart.beat.times)[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], xlab = "", ylab = "Mittlere HR ($BPM$)", xaxs = "i", yaxs = "i", ylim = c(90, 120), pch = 21, bg = rgb(229/255, 66/255, 66/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+plot(cls.data$t.s[cls.data > n & cls.data < m], cls.data$psi[cls.data > n & cls.data < m], xlab = "", ylab = "Rel. Phase ($Psi(t)$)", xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 24, bg = rgb(96/255, 65/255, 79/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+plot(jc.data$t.s[jc.data$t.s > n & jc.data$t.s < m], jc.data$jerk.cost.m2s5[jc.data$t.s > n & jc.data$t.s < m] / 10^3, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(2, 4), pch = 23, bg = rgb(0/255, 152/255, 199/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+title(sub = "nach 45 Minuten - Absorbiertheit: 6.25")
+
+dev.off()
+
+# Clean up
+rm(cls.data, jc.data, kubios.hrv.data.time.data, cls.data.file.path, cls.data.file.name, date.directory, heart.beat.times, jc.data.file.path, jc.data.file.name, kubios.hrv.data.file.path, kubios.hrv.data.file.name, m, n, samples)
 ```
+
+\begin{sidewaysfigure}
+	\input{./tikz/5-13-prozessorientierter-ansatz}
+	\caption{Drei Minuten Daten aus einem Gang vor der 15 Minute (links) und einem Gang vor der 45 Minute (rechts). Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- Rel. Phase = Relative Phase}
+	\label{figure:5-13-prozessorientierter-ansatz}
+\end{sidewaysfigure}
+
+```{r regression-analysis-extra, echo=FALSE, include=FALSE}
+
+# Setup tikz device
+tikz("./tikz/5-14-regression-extra.tex", width = 5.22, height = 5.22)
+
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 1))
+
+# Plot NSEI on mean HR
+mean.hr.squared <- data.1$mean.hr^2
+linear.model <- lm(mean.nsei ~ mean.hr, data = data.1)
+summary.lm(linear.model)
+mean.hr <- data.1$mean.hr
+linear.model.2 <- lm(data.1$mean.nsei ~ mean.hr + mean.hr.squared)
+summary.lm(linear.model.2)
+plot(data.1$mean.hr, data.1$mean.nsei, xlab = "Mittlere HR ($BPM$)", ylab = "Normalisierter Shannon Entropie Index", pch = 21, bg = rgb(229/255, 66/255, 66/255))
+abline(linear.model)
+mean.hr <- seq(90, 120, by = .5)
+mean.hr.squared <- mean.hr^2
+absorption.predicted <- predict.lm(linear.model.2, data.frame(mean.hr, mean.hr.squared))
+lines(mean.hr, absorption.predicted, lty = "dashed")
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+dev.off()
+
+# Clean up
+rm(absorption.predicted, linear.model, linear.model.2, mean.hr, mean.hr.squared)
+
+```
+
+\begin{figure}
+	\input{./tikz/5-14-regression-extra}
+	\caption{Beobachtungen zur Fallstudie zum Gehen. Mittlerer normalisierter Shannon Entropie Index und mittlerer HR. Quelle: Eigene Darstellung -+ -\emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
+	\label{figure:5-14-regression-extra}
+\end{figure}

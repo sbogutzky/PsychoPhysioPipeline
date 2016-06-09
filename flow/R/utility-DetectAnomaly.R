@@ -21,13 +21,13 @@ DetectAnomaly <- function(x, y, x.lab, y.lab, x.lim, y.lim, epsilon = 0) {
   
   if(epsilon == 0) {
     y <- zeros(nrow(X), 1)
-    y[identify(X)]  <- 1
+    y[identify(X, plot = FALSE)]  <- 1
     bt              <- ComputeFScoreTreshold(y, p)
     epsilon         <- bt$epsilon
   }
   
   outliers <- which(p < epsilon)
-  points(X[outliers, 1], X[outliers, 2], xlab = x.lab, ylab = y.lab, pch = 21, bg = 2)
+  points(X[outliers, 1], X[outliers, 2], xlab = x.lab, ylab = y.lab, pch = 21, bg = "tomato")
   
   return(list("epsilon" = epsilon, "outliers" = outliers))  
 }
