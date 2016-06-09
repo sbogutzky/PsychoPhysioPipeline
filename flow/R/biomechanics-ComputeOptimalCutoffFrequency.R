@@ -6,7 +6,7 @@
 #' @param N Order of the filter.
 #' @return the optimal cut off frequency.
 
-ComputeOptimalCutoffFrequency <- function(x, fs, N) {
+ComputeOptimalCutoffFrequency <- function(x, fs, N, plot = F) {
   par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
   fn <- fs/2
   rsmes <- c()
@@ -27,17 +27,17 @@ ComputeOptimalCutoffFrequency <- function(x, fs, N) {
   
   model <- lm(c(rsmee, rsmeb) ~ c(fce, fcb))
   noises <- model$coefficients[1] + fcs * model$coefficients[2]
-  
-  
-  plot(fcs, rsmes, type = "l", xlab = "Filter cutoff frequencies (Hz)", ylab = "RMS deviation", ylim = c(0, (max(max(rsmes), max(noises))) + 1))
-  lines(fcs, noises)
-  abline(v = c(fce, fcb))
-  abline(h = noises[1])
   index <- which.min(abs(rsmes - noises[1]))
-  
   fc <- fcs[index]
-  points(fc, rsmes[index])
-  abline(v = fc)
+  
+  if(plot) {
+    plot(fcs, rsmes, type = "l", xlab = "Filter cutoff frequencies (Hz)", ylab = "RMS deviation", ylim = c(0, (max(max(rsmes), max(noises))) + 1))
+    lines(fcs, noises)
+    abline(v = c(fce, fcb))
+    abline(h = noises[1])
+    points(fc, rsmes[index])
+    abline(v = fc)
+  }
   
   return(fc)
 }

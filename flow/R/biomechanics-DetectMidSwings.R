@@ -8,7 +8,7 @@
 #' @param ff.2. A numerical that specifies the second filter factor to compute the cut off frequency
 #' @return A numerical vector of mid swing indexes
 
-DetectMidSwings <- function(t.s, angular.velocity.deg.s, fs = 102.4, ff.1 = 4, ff.2 = .5) {
+DetectMidSwings <- function(t.s, angular.velocity.deg.s, fs = 102.4, ff.1 = 4, ff.2 = .5, plot = F) {
   
   require(signal)
   
@@ -16,7 +16,7 @@ DetectMidSwings <- function(t.s, angular.velocity.deg.s, fs = 102.4, ff.1 = 4, f
   
   # Plot data (10s)
   range <- (30 * fs):(40 * fs)
-  canPlot = F #!is.na(t.s[range[1]])
+  canPlot = plot
   if(canPlot) {
     par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
     plot(t.s[range], angular.velocity.deg.s[range], type = "l", xlab = "Timestamp (s)", ylab = "Angular Velocity (deg/s)")
