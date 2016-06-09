@@ -11,7 +11,7 @@ library(multilevel)
 setwd("~/psychophysiopipeline/preprocessing")
 
 # User input
-root.directory.path <- readline("Quellverzeichnis > ") # "/Users/sbogutzky/Desktop/daten (lokal)/2016t/"
+root.directory.path <- readline("Quellverzeichnis > ")
 first.name <- readline("Vorname der Untersuchungsperson > ")
 last.name <- readline("Nachname der Untersuchungsperson > ")
 date.of.birth <- readline("Geburtsdatum der Untersuchungsperson (Format: YYYY-MM-dd) > ")
@@ -24,6 +24,7 @@ source("./code-snippets/set-directory-paths.R")
 fss.features <- data.frame()
 fss.measurements <- data.frame()
 
+# List self report names
 self.report.file.names <- list.files(path = raw.data.directory.path, pattern = "self-report.csv", recursive = TRUE)
 
 for (self.report.file.name in self.report.file.names) {
