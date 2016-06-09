@@ -11,24 +11,32 @@ library(multilevel)
 setwd("~/psychophysiopipeline/preprocessing")
 
 # User input
-source("./code-snippets/read-set-load.R")
+root.directory.path <- readline("Quellverzeichnis > ") # "/Users/sbogutzky/Desktop/daten (lokal)/2016t/"
+first.name <- readline("Vorname der Untersuchungsperson > ")
+last.name <- readline("Nachname der Untersuchungsperson > ")
 date.of.birth <- readline("Geburtsdatum der Untersuchungsperson (Format: YYYY-MM-dd) > ")
+activity <- readline("Aktivität der Untersuchung > ")
+
+# Set directory paths
+source("./code-snippets/set-directory-paths.R")
 
 # Create fss feature and measurement data frame
 fss.features <- data.frame()
 fss.measurements <- data.frame()
 
+self.report.file.names <- list.files(path = raw.data.directory.path, pattern = "self-report.csv", recursive = TRUE)
+
 for (self.report.file.name in self.report.file.names) {
   
-  source("./code-snippets/extract-session-start.R")
+  source("./code-snippets/get-session-start.R")
   
   # Load self report data
-  self.report.data <- read.csv(paste(input.data.directory, self.report.file.name, sep = ""), comment.char = "#") 
+  self.report.data <- read.csv(paste(raw.data.directory.path, self.report.file.name, sep = ""), comment.char = "#")
   
   # Loop measurements
   for(i in 1:nrow(self.report.data)) {
     
-    source("./code-snippets/extract-self-report-times.R")
+    source("./code-snippets/get-self-report-times.R")
     
     # Calculate fss dimensions
     fss.measurement <- as.numeric(self.report.data[i, 4:19])
@@ -40,44 +48,45 @@ for (self.report.file.name in self.report.file.names) {
   }
 }
 
-# Clean up
-rm(fss.dimensions, self.report.data, activity, activity.end.ms, activity.start.ms, date.of.birth, first.name, fss.measurement, i, last.name, self.report.end.ms, self.report.file.name, self.report.file.names, session.start, start.time.line)
-
-fss.item.statements <- c("Ich fühle mich optimal beansprucht.", "Meine Gedanken bzw. Aktivitäten laufen flüssig und glatt.", "Ich merke gar nicht, wie die Zeit vergeht.", "Ich habe keine Mühe mich zu konzentrieren.", "Mein Kopf ist völlig klar.", "Ich bin ganz vertieft in das, was ich gerade mache.", "Die richtigen Gedanken/ Bewegungen kommen wie von selbst.", "Ich weiß bei jedem Schritt, was ich zu tun habe.", "Ich habe das Gefühl, den Ablauf unter Kontrolle zu haben.", "Ich bin völlig selbstvergessen.")
-fss.item.mean.values <- colMeans(fss.measurements[, 1:10], na.rm = TRUE)
-fss.item.sd.values <- apply(fss.measurements[, 1:10], 2, sd, na.rm = TRUE)
-
-print("---")
-print(paste("Cronbachs Alpha Generalfaktor:", round(multilevel::cronbach(fss.measurements[, 1:10])$Alpha, 2)))
-factor.item.correlation.flow <- cor(fss.features$flow, fss.measurements[, 1:10], use = "complete.obs")[1,]
-data.table.flow <- data.frame(M = round(c(fss.item.mean.values, mean(fss.item.mean.values)), 2), SD = round(c(fss.item.sd.values, mean(fss.item.sd.values)), 2), Trennschärfe = round(c(factor.item.correlation.flow, NA), 2))
-row.names(data.table.flow) <- c(fss.item.statements, "Gesamtmittelwerte")
-print(data.table.flow)
-
-print("---")
-print(paste("Cronbachs Alpha 'Glatter Verlauf':", round(multilevel::cronbach(fss.measurements[, c(8,7,9,4,5,2)])$Alpha, 2)))
-factor.item.correlation.fluency <- cor(fss.features$fluency, fss.measurements[, c(8,7,9,4,5,2)], use = "complete.obs")[1,]
-data.table.fluency <- data.frame(M = round(c(fss.item.mean.values[c(8,7,9,4,5,2)], mean(fss.item.mean.values[c(8,7,9,4,5,2)])), 2), SD = round(c(fss.item.sd.values[c(8,7,9,4,5,2)], mean(fss.item.sd.values[c(8,7,9,4,5,2)])), 2), Trennschärfe = round(c(factor.item.correlation.fluency, NA), 2))
-row.names(data.table.fluency) <- c(fss.item.statements[c(8,7,9,4,5,2)], "Gesamtmittelwerte")
-print(data.table.fluency)
-
-print("---")
-print(paste("Cronbachs Alpha 'Absorbiertheit':", round(multilevel::cronbach(fss.measurements[, c(6,1,10,3)])$Alpha, 2)))
-factor.item.correlation.absorption <- cor(fss.features$absorption, fss.measurements[, c(6,1,10,3)], use = "complete.obs")[1,]
-data.table.absorption <- data.frame(M = round(c(fss.item.mean.values[c(6,1,10,3)], mean(fss.item.mean.values[c(6,1,10,3)])), 2), SD = round(c(fss.item.sd.values[c(6,1,10,3)], mean(fss.item.sd.values[c(6,1,10,3)])), 2), Trennschärfe = round(c(factor.item.correlation.absorption, NA), 2))
-row.names(data.table.absorption) <- c(fss.item.statements[c(6,1,10,3)], "Gesamtmittelwerte")
-print(data.table.absorption)
-
 # Write to csv file
-output.directory <- paste(feature.directory, activity.directory, user.directory, sep = "")
-if(!file.exists(substr(output.directory, 1, nchar(output.directory) - 1))) {
-  dir.create(output.directory, recursive = T)
+if(!dir.exists(feature.directory.path)) {
+  dir.create(feature.directory.path, recursive = T)
 }
-output.directory <- paste(output.directory, "fks-features.csv", sep = "") #TODO: Deutsche Übersetzung
-write.csv(fss.features, output.directory, row.names = F)
+write.csv(fss.features, paste(feature.directory.path, "fss-features.csv", sep = ""), row.names = F)
 
 print("---")
-print(paste(output.directory, "geschrieben."))
+print(paste("fss-features.csv in", feature.directory.path, "geschrieben."))
 
 # Clean up
-rm(factor.item.correlation.absorption, factor.item.correlation.fluency, factor.item.correlation.flow, fss.item.sd.values, fss.item.statements, fss.item.mean.values)
+rm(fss.dimensions, self.report.data, activity, activity.end.ms, activity.start.ms, date.of.birth, first.name, fss.measurement, i, last.name, self.report.end.ms, self.report.file.name, self.report.file.names, session.start)
+
+# Check reability
+if(nrow(fss.measurements) > 1) {
+  fss.item.statements <- c("Ich fühle mich optimal beansprucht.", "Meine Gedanken bzw. Aktivitäten laufen flüssig und glatt.", "Ich merke gar nicht, wie die Zeit vergeht.", "Ich habe keine Mühe mich zu konzentrieren.", "Mein Kopf ist völlig klar.", "Ich bin ganz vertieft in das, was ich gerade mache.", "Die richtigen Gedanken/ Bewegungen kommen wie von selbst.", "Ich weiß bei jedem Schritt, was ich zu tun habe.", "Ich habe das Gefühl, den Ablauf unter Kontrolle zu haben.", "Ich bin völlig selbstvergessen.")
+  fss.item.mean.values <- colMeans(fss.measurements[, 1:10], na.rm = TRUE)
+  fss.item.sd.values <- apply(fss.measurements[, 1:10], 2, sd, na.rm = TRUE)
+  
+  print("---")
+  print(paste("Cronbachs Alpha Generalfaktor:", round(multilevel::cronbach(fss.measurements[, 1:10])$Alpha, 2)))
+  factor.item.correlation.flow <- cor(fss.features$flow, fss.measurements[, 1:10], use = "complete.obs")[1,]
+  data.table.flow <- data.frame(M = round(c(fss.item.mean.values, mean(fss.item.mean.values)), 2), SD = round(c(fss.item.sd.values, mean(fss.item.sd.values)), 2), Trennschärfe = round(c(factor.item.correlation.flow, NA), 2))
+  row.names(data.table.flow) <- c(fss.item.statements, "Gesamtmittelwerte")
+  print(data.table.flow)
+  
+  print("---")
+  print(paste("Cronbachs Alpha 'Glatter Verlauf':", round(multilevel::cronbach(fss.measurements[, c(8,7,9,4,5,2)])$Alpha, 2)))
+  factor.item.correlation.fluency <- cor(fss.features$fluency, fss.measurements[, c(8,7,9,4,5,2)], use = "complete.obs")[1,]
+  data.table.fluency <- data.frame(M = round(c(fss.item.mean.values[c(8,7,9,4,5,2)], mean(fss.item.mean.values[c(8,7,9,4,5,2)])), 2), SD = round(c(fss.item.sd.values[c(8,7,9,4,5,2)], mean(fss.item.sd.values[c(8,7,9,4,5,2)])), 2), Trennschärfe = round(c(factor.item.correlation.fluency, NA), 2))
+  row.names(data.table.fluency) <- c(fss.item.statements[c(8,7,9,4,5,2)], "Gesamtmittelwerte")
+  print(data.table.fluency)
+  
+  print("---")
+  print(paste("Cronbachs Alpha 'Absorbiertheit':", round(multilevel::cronbach(fss.measurements[, c(6,1,10,3)])$Alpha, 2)))
+  factor.item.correlation.absorption <- cor(fss.features$absorption, fss.measurements[, c(6,1,10,3)], use = "complete.obs")[1,]
+  data.table.absorption <- data.frame(M = round(c(fss.item.mean.values[c(6,1,10,3)], mean(fss.item.mean.values[c(6,1,10,3)])), 2), SD = round(c(fss.item.sd.values[c(6,1,10,3)], mean(fss.item.sd.values[c(6,1,10,3)])), 2), Trennschärfe = round(c(factor.item.correlation.absorption, NA), 2))
+  row.names(data.table.absorption) <- c(fss.item.statements[c(6,1,10,3)], "Gesamtmittelwerte")
+  print(data.table.absorption)
+  
+  # Clean up
+  rm(factor.item.correlation.absorption, factor.item.correlation.fluency, factor.item.correlation.flow, fss.item.sd.values, fss.item.statements, fss.item.mean.values)
+}
