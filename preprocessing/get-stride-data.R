@@ -60,7 +60,7 @@ for (self.report.file.name in self.report.file.names) {
         source("./code-snippets/translate.R")
         stride.per.minute <- 60 / diff(kinematic.data[mid.swing.indexes, 1] / 1000)
         stride.per.minute <- c(mean(stride.per.minute), stride.per.minute)
-        anomaly <- DetectAnomaly(stride.per.minute, kinematic.data[mid.swing.indexes, 5], epsilon = 0, xlab = "Mittlerer Doppelschritte (1/min)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xlim = c(min(stride.per.minute, na.rm = TRUE), max(stride.per.minute, na.rm = TRUE)), ylim = c(min(kinematic.data[mid.swing.indexes, 5]), max(kinematic.data[mid.swing.indexes, 5])), pch = 21, bg = rgb(229/255, 66/255, 66/255))
+        anomaly <- DetectAnomaly(stride.per.minute, kinematic.data[mid.swing.indexes, 5], epsilon = 0, xlab = "Mittlerer Doppelschritt (1/min)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xlim = c(min(stride.per.minute, na.rm = TRUE), max(stride.per.minute, na.rm = TRUE)), ylim = c(min(kinematic.data[mid.swing.indexes, 5]), max(kinematic.data[mid.swing.indexes, 5])), pch = 21, bg = rgb(229/255, 66/255, 66/255))
         if(length(anomaly$outliers) > 0) {
           mid.swing.indexes <- mid.swing.indexes[-anomaly$outliers]
         }
@@ -116,7 +116,7 @@ for (self.report.file.name in self.report.file.names) {
             outlier <- outliers[j]
             m <- outlier - 2; if (m < 0) m <- 0
             n <- outlier + 2; if (n > length(mid.swing.indexes)) n <- length(mid.swing.indexes)
-            par(mfrow = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
+            par(mfrow = c(2, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
             plot(kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 1] / 1000, kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 5], xlab = "Zeitstempel (s)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xaxs = "i", type = "l", main = paste("Kontrolle zum Entfernen", j, "von", n.outlier))
             points(kinematic.data[mid.swing.indexes[m:n], 1] / 1000, kinematic.data[mid.swing.indexes[m:n], 5], pch = 23, bg = rgb(0/255, 152/255, 199/255))
             
@@ -140,9 +140,9 @@ for (self.report.file.name in self.report.file.names) {
         stride.per.minute <- c(NA, 60 / diff(kinematic.data[mid.swing.indexes, 1] / 1000))
         mean.nn <- mean(stride.per.minute, na.rm = TRUE)
         print("---")
-        print(paste("Mitteler Doppelschritt:", round(mean.nn, 2), "1/min"))
+        print(paste("Mittlerer Doppelschritt:", round(mean.nn, 2), "1/min"))
         sd.nn <- sd(stride.per.minute, na.rm = TRUE)
-        print(paste("Mitteler Doppelschritt (SD):", round(sd.nn, 2), "1/min"))
+        print(paste("Mittlerer Doppelschritt (SD):", round(sd.nn, 2), "1/min"))
         
         # Plot kinematic data
         par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
@@ -155,10 +155,10 @@ for (self.report.file.name in self.report.file.names) {
         # Remove pauses
         stride.data <- data.frame(timestamp.ms = round(kinematic.data[mid.swing.indexes, 1], 3), nn.interval.ms = c(NA, round(diff(kinematic.data[mid.swing.indexes, 1]), 3)))
         par(mfrow = c(2, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
-        plot(stride.data[, 1] / 1000, 60 / (stride.data[, 2] / 1000), xlab = "Zeit (s)", ylab = "Mittlere Doppelschritt (1/min)", xaxs = "i", type = "l")
+        plot(stride.data[, 1] / 1000, 60 / (stride.data[, 2] / 1000), xlab = "Zeit (s)", ylab = "Mittlerer Doppelschritt (1/min)", xaxs = "i", type = "l")
         grid()
         stride.data <- stride.data[stride.data[, 2] < 1300 | is.na(stride.data[, 2]), ]
-        plot(stride.data[, 1] / 1000, 60 / (stride.data[, 2] / 1000), xlab = "Zeit (s)", ylab = "Mittlere Doppelschritt (1/min)", xaxs = "i", type = "l")
+        plot(stride.data[, 1] / 1000, 60 / (stride.data[, 2] / 1000), xlab = "Zeit (s)", ylab = "Mittlerer Doppelschritt (1/min)", xaxs = "i", type = "l")
         grid()
         zm()
 
@@ -167,9 +167,9 @@ for (self.report.file.name in self.report.file.names) {
         step.duration <- last.step - first.step
         
         print("---")
-        print(paste("Erster Schritt: ", sprintf("%02d", trunc(first.step / 60)), ":", sprintf("%02d", trunc(first.step %% 60)), " (", first.step, " s)", sep = ""))
+        print(paste("Erster Doppelschritt: ", sprintf("%02d", trunc(first.step / 60)), ":", sprintf("%02d", trunc(first.step %% 60)), " (", first.step, " s)", sep = ""))
         print(paste("Dauer: ", sprintf("%02d", trunc(step.duration / 60)), ":", sprintf("%02d", trunc(step.duration %% 60)), " (", step.duration, " s)", sep = ""))
-        print(paste("Letzter Schritt: ", sprintf("%02d", trunc(last.step / 60)), ":", sprintf("%02d", trunc(last.step %% 60)), " (", last.step, " s)", sep = ""))
+        print(paste("Letzter Doppelschritt: ", sprintf("%02d", trunc(last.step / 60)), ":", sprintf("%02d", trunc(last.step %% 60)), " (", last.step, " s)", sep = ""))
 
         # Write to csv file
         if(!dir.exists(paste(processed.data.directory.path, date.directory, sep =""))) {
