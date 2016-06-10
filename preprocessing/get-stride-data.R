@@ -15,7 +15,7 @@ root.directory.path <- readline("Quellverzeichnis > ")
 first.name <- readline("Vorname der Untersuchungsperson > ")
 last.name <- readline("Nachname der Untersuchungsperson > ")
 activity <- readline("Aktivität der Untersuchung > ")
-data.file.name <- readline("Dateiname der Datei mit kinematischen Daten (ohne .csv) > ")
+kinematic.data.file.name <- readline("Dateiname der Datei mit kinematischen Daten (ohne .csv) > ")
 angular.velocity.offset <- as.numeric(readline("Grenz bei in der keine Schritt erkannt werden sollen (+/- deg/s) > "))
 
 # Set directory paths
@@ -36,12 +36,12 @@ for (self.report.file.name in self.report.file.names) {
     
     source("./code-snippets/get-self-report-times.R")
 
-    data.path <- paste(processed.data.directory.path, date.directory, data.file.name, "-", i,  ".csv", sep = "")
+    kinematic.data.file.path <- paste(processed.data.directory.path, date.directory, kinematic.data.file.name, "-", i,  ".csv", sep = "")
     
-    if(file.exists(data.path)) {
+    if(file.exists(kinematic.data.file.path)) {
       
       # Load motion data
-      kinematic.data <- read.csv(data.path)
+      kinematic.data <- read.csv(kinematic.data.file.path)
       
       fs <- ComputeSamplingRate(kinematic.data[, 1])
       print("---")
@@ -153,17 +153,17 @@ for (self.report.file.name in self.report.file.names) {
         zm()
         
         # Remove pauses
-        processed.stride.data <- data.frame(timestamp.ms = round(kinematic.data[mid.swing.indexes, 1], 3), nn.interval.ms = c(NA, round(diff(kinematic.data[mid.swing.indexes, 1]), 3)))
+        stride.data <- data.frame(timestamp.ms = round(kinematic.data[mid.swing.indexes, 1], 3), nn.interval.ms = c(NA, round(diff(kinematic.data[mid.swing.indexes, 1]), 3)))
         par(mfrow = c(2, 1))
-        plot(processed.stride.data[, 1] / 1000, 60 / (processed.stride.data[, 2] / 1000), xlab = "Zeit (s)", ylab = "Mittlere Doppelschritt (1/min)", xaxs = "i", type = "l")
+        plot(stride.data[, 1] / 1000, 60 / (stride.data[, 2] / 1000), xlab = "Zeit (s)", ylab = "Mittlere Doppelschritt (1/min)", xaxs = "i", type = "l")
         grid()
-        processed.stride.data <- processed.stride.data[processed.stride.data[, 2] < 1300 | is.na(processed.stride.data[, 2]), ]
-        plot(processed.stride.data[, 1] / 1000, 60 / (processed.stride.data[, 2] / 1000), xlab = "Zeit (s)", ylab = "Mittlere Doppelschritt (1/min)", xaxs = "i", type = "l")
+        stride.data <- stride.data[stride.data[, 2] < 1300 | is.na(stride.data[, 2]), ]
+        plot(stride.data[, 1] / 1000, 60 / (stride.data[, 2] / 1000), xlab = "Zeit (s)", ylab = "Mittlere Doppelschritt (1/min)", xaxs = "i", type = "l")
         grid()
         zm()
 
-        first.step <- round(min(processed.stride.data[, 1] / 1000))
-        last.step <- round(max(processed.stride.data[, 1] / 1000))
+        first.step <- round(min(stride.data[, 1] / 1000))
+        last.step <- round(max(stride.data[, 1] / 1000))
         step.duration <- last.step - first.step
         
         print("---")
@@ -175,10 +175,10 @@ for (self.report.file.name in self.report.file.names) {
         if(!dir.exists(paste(processed.data.directory.path, date.directory, sep =""))) {
           dir.create(paste(processed.data.directory.path, date.directory, sep =""), recursive = T)
         }
-        write.csv(processed.stride.data, paste(processed.data.directory.path, date.directory, data.file.name, "-stride-data-", i, ".csv", sep = ""), row.names = F)
+        write.csv(stride.data, paste(processed.data.directory.path, date.directory, kinematic.data.file.name, "-stride-data-", i, ".csv", sep = ""), row.names = F)
         
         print("---")
-        print(paste(paste(data.file.name, "-", i, ".csv", sep = ""), "in", paste(processed.data.directory.path, date.directory, sep =""), "geschrieben."))
+        print(paste(paste(kinematic.data.file.name, "-stride-data-", i, ".csv", sep = ""), "in", paste(processed.data.directory.path, date.directory, sep =""), "geschrieben."))
 
       } else {
         print("---")
@@ -187,7 +187,7 @@ for (self.report.file.name in self.report.file.names) {
       
     } else {
       print("---")
-      print(paste("Datei nicht gefunden:", data.path))
+      print(paste("Datei nicht gefunden:", kinematic.data.file.path))
     }
   }
 }
