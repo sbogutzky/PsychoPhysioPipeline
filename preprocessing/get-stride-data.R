@@ -83,7 +83,7 @@ for (self.report.file.name in self.report.file.names) {
             outlier <- outliers[j]
             m <- outlier - 2; if (m < 0) m <- 0
             n <- outlier + 2; if (n > length(mid.swing.indexes)) n <- length(mid.swing.indexes)
-            par(mfrow = c(2, 1))
+            par(mfcol = c(2, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
             plot(kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 1] / 1000, kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 5], xlab = "Zeitstempel (s)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xaxs = "i", type = "l", main = paste("Kontrolle zum Hinzufügen", j, "von", n.outlier))
             points(kinematic.data[mid.swing.indexes[m:n], 1] / 1000, kinematic.data[mid.swing.indexes[m:n], 5], pch = 23, bg = rgb(0/255, 152/255, 199/255))
             # Add mid swings
@@ -116,7 +116,7 @@ for (self.report.file.name in self.report.file.names) {
             outlier <- outliers[j]
             m <- outlier - 2; if (m < 0) m <- 0
             n <- outlier + 2; if (n > length(mid.swing.indexes)) n <- length(mid.swing.indexes)
-            par(mfrow = c(2, 1))
+            par(mfrow = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
             plot(kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 1] / 1000, kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 5], xlab = "Zeitstempel (s)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xaxs = "i", type = "l", main = paste("Kontrolle zum Entfernen", j, "von", n.outlier))
             points(kinematic.data[mid.swing.indexes[m:n], 1] / 1000, kinematic.data[mid.swing.indexes[m:n], 5], pch = 23, bg = rgb(0/255, 152/255, 199/255))
             
@@ -145,7 +145,7 @@ for (self.report.file.name in self.report.file.names) {
         print(paste("Mitteler Doppelschritt (SD):", round(sd.nn, 2), "1/min"))
         
         # Plot kinematic data
-        par(mfrow = c(1, 1))
+        par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
         source("./code-snippets/translate.R")
         plot(kinematic.data[, 1], kinematic.data[, 5], xlab = "Zeit (s)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xaxs = "i", type = "l")
         points(kinematic.data[mid.swing.indexes, 1], kinematic.data[mid.swing.indexes , 5], pch = 23, bg = rgb(0/255, 152/255, 199/255))
@@ -154,7 +154,7 @@ for (self.report.file.name in self.report.file.names) {
         
         # Remove pauses
         stride.data <- data.frame(timestamp.ms = round(kinematic.data[mid.swing.indexes, 1], 3), nn.interval.ms = c(NA, round(diff(kinematic.data[mid.swing.indexes, 1]), 3)))
-        par(mfrow = c(2, 1))
+        par(mfrow = c(2, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
         plot(stride.data[, 1] / 1000, 60 / (stride.data[, 2] / 1000), xlab = "Zeit (s)", ylab = "Mittlere Doppelschritt (1/min)", xaxs = "i", type = "l")
         grid()
         stride.data <- stride.data[stride.data[, 2] < 1300 | is.na(stride.data[, 2]), ]
