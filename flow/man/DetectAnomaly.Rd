@@ -4,7 +4,7 @@
 \alias{DetectAnomaly}
 \title{Detects anomaly of two variables.}
 \usage{
-DetectAnomaly(x, y, x.lab, y.lab, x.lim, y.lim, epsilon = 0, ...)
+DetectAnomaly(x, y, epsilon = 0, pch = 1, ...)
 }
 \arguments{
 \item{x}{a numeric vector of the first variable.}
