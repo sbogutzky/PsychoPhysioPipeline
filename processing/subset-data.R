@@ -8,7 +8,7 @@ library(flow)
 library(zoom)
 
 # Set working directory
-setwd("~/psychophysiopipeline/preprocessing")
+setwd("~/psychophysiopipeline/processing")
 
 # User input
 root.directory.path <- readline("Quellverzeichnis > ") 

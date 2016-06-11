@@ -7,13 +7,13 @@
 ComputeNormalizedShannonEntropyIndex(t, psi, t.k, t.w = 10, bins = NA)
 }
 \arguments{
-\item{t}{t is a vector with the times of the relative phases.}
+\item{t}{a numerical vector of the times in second of the relative phases.}
 
-\item{psi}{psi is a vector with the realive phase.}
+\item{psi}{a numerical vector of the realive phase.}
 
-\item{t.k}{t.k is the point in time for calculting the index.}
+\item{t.k}{is the point in time for calculting the index.}
 
-\item{t.w}{t.w is the time window around t.k (default = 10).}
+\item{t.w}{is the time window around t.k in seconds (default = 10).}
 
 \item{bins}{bins is the number of bins (default = The optimal number of bins will be estimated as N = exp[0.626 + 0.4 ln(M - 1)], where M is the number of samples)}
 }

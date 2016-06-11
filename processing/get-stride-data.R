@@ -8,7 +8,7 @@ library(flow)
 library(zoom)
 
 # Set working directory
-setwd("~/psychophysiopipeline/preprocessing")
+setwd("~/psychophysiopipeline/processing")
 
 # User input
 root.directory.path <- readline("Quellverzeichnis > ")  
@@ -70,9 +70,9 @@ for (self.report.file.name in self.report.file.names) {
         stride.per.minute <- c(NA, 60 / diff(kinematic.data[mid.swing.indexes, 1] / 1000))
         mean.nn <- mean(stride.per.minute, na.rm = TRUE)
         print("---")
-        print(paste("Mitteler Doppelschritt:", round(mean.nn, 2), "1/min"))
+        print(paste("Mittlerer Doppelschritt:", round(mean.nn, 2), "1/min"))
         sd.nn <- sd(stride.per.minute, na.rm = TRUE)
-        print(paste("Mitteler Doppelschritt (SD):", round(sd.nn, 2), "1/min"))
+        print(paste("Mittlerer Doppelschritt (SD):", round(sd.nn, 2), "1/min"))
        
         # Check outliers manual
         outliers <- which(stride.per.minute < mean.nn - sd.nn * 2.5)
@@ -81,14 +81,14 @@ for (self.report.file.name in self.report.file.names) {
         if (n.outlier > 0) {
           for (j in 1:n.outlier) {
             outlier <- outliers[j]
-            m <- outlier - 2; if (m < 0) m <- 0
-            n <- outlier + 2; if (n > length(mid.swing.indexes)) n <- length(mid.swing.indexes)
+            m <- outlier - 7; if (m < 0) m <- 0
+            n <- outlier + 7; if (n > length(mid.swing.indexes)) n <- length(mid.swing.indexes)
             par(mfcol = c(2, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
             plot(kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 1] / 1000, kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 5], xlab = "Zeitstempel (s)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xaxs = "i", type = "l", main = paste("Kontrolle zum Hinzufügen", j, "von", n.outlier))
             points(kinematic.data[mid.swing.indexes[m:n], 1] / 1000, kinematic.data[mid.swing.indexes[m:n], 5], pch = 23, bg = rgb(0/255, 152/255, 199/255))
             # Add mid swings
             
-            add <- identify(kinematic.data[, 1] / 1000, kinematic.data[, 5], n = 1, plot = FALSE)
+            add <- identify(kinematic.data[, 1] / 1000, kinematic.data[, 5], plot = FALSE)
             if(length(add) > 0) {
               new.indexes <- c(new.indexes, add)
               plot(kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 1] / 1000, kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 5], xlab = "Zeitstempel (s)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xaxs = "i", type = "l", main = "hinzugefügt")
@@ -114,14 +114,14 @@ for (self.report.file.name in self.report.file.names) {
         if (n.outlier > 0) {
           for (j in 1:n.outlier) {
             outlier <- outliers[j]
-            m <- outlier - 2; if (m < 0) m <- 0
-            n <- outlier + 2; if (n > length(mid.swing.indexes)) n <- length(mid.swing.indexes)
+            m <- outlier - 7; if (m < 0) m <- 0
+            n <- outlier + 7; if (n > length(mid.swing.indexes)) n <- length(mid.swing.indexes)
             par(mfrow = c(2, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
             plot(kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 1] / 1000, kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 5], xlab = "Zeitstempel (s)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xaxs = "i", type = "l", main = paste("Kontrolle zum Entfernen", j, "von", n.outlier))
             points(kinematic.data[mid.swing.indexes[m:n], 1] / 1000, kinematic.data[mid.swing.indexes[m:n], 5], pch = 23, bg = rgb(0/255, 152/255, 199/255))
             
             # Remove selected mid swings
-            remove <- identify(kinematic.data[mid.swing.indexes, 1] / 1000, kinematic.data[mid.swing.indexes, 5], n = 1, plot = FALSE)
+            remove <- identify(kinematic.data[mid.swing.indexes, 1] / 1000, kinematic.data[mid.swing.indexes, 5], plot = FALSE)
             if(length(remove) > 0) {
               plot(kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 1] / 1000, kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 5], xlab = "Zeitstempel (s)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xaxs = "i", type = "l", main = "entfernt")
               points(kinematic.data[mid.swing.indexes[-remove], 1] / 1000, kinematic.data[mid.swing.indexes[-remove], 5], pch = 23, bg = rgb(0/255, 152/255, 199/255))

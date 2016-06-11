@@ -7,13 +7,13 @@
 ComputePhaseCoherenceIndex(t, psi, t.k, t.w = 10)
 }
 \arguments{
-\item{t}{t is a vector with the times of the relative phases.}
+\item{t}{a numerical vector of the times in second of the relative phases.}
 
-\item{psi}{psi is a vector with the realive phase.}
+\item{psi}{a numerical vector of the realive phase.}
 
-\item{t.k}{t.k is the point in time for calculting the index.}
+\item{t.k}{is the point in time for calculting the index.}
 
-\item{t.w}{t.w is the time window around t.k (default = 10).}
+\item{t.w}{is the time window around t.k in seconds (default = 10).}
 }
 \value{
 the index.

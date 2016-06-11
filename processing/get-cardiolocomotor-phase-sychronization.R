@@ -8,7 +8,7 @@ library(flow)
 library(zoom)
 
 # Set working directory
-setwd("~/psychophysiopipeline/preprocessing")
+setwd("~/psychophysiopipeline/processing")
 
 # User input
 root.directory.path <- readline("Quellverzeichnis > ")  
@@ -47,11 +47,13 @@ for (self.report.file.name in self.report.file.names) {
       
       # Set stride times
       stride.data.1 <- read.csv(stride.data.file.path.1, skip = 0)
-      m <- 2
-      if(kinematic.data.file.name.2 != "" & file.exists(stride.data.file.path.2)) {
-        stride.data.2 <- read.csv(stride.data.file.path.2, skip = 0)
-        stride.data.1 <- rbind(stride.data.1, stride.data.2)
-        m <- 1
+      multiplier <- 2
+      if(kinematic.data.file.name.2 != "") {
+        if(file.exists(stride.data.file.path.2)) {
+          stride.data.2 <- read.csv(stride.data.file.path.2, skip = 0)
+          stride.data.1 <- rbind(stride.data.1, stride.data.2)
+          multiplier <- 1
+        }
       }
       stride.data.1 <- stride.data.1[order(stride.data.1[, 1]),]
       stride.times <- stride.data.1[, 1] / 1000
@@ -60,7 +62,7 @@ for (self.report.file.name in self.report.file.names) {
       source("./code-snippets/get-kubios-hrv-data.R")
       heart.beat.times <- c(kubios.hrv.data[1, 1] - kubios.hrv.data[1, 2], kubios.hrv.data[, 1])
       
-      spm <- c(NA, 60 * m / diff(stride.times)) 
+      spm <- c(NA, 60 * multiplier / diff(stride.times)) 
       bpm <- c(NA, 60 / diff(heart.beat.times))
       
       time.range.s <- c(round(min(heart.beat.times)) - 10, round(max(heart.beat.times)) + 10)
@@ -98,7 +100,7 @@ for (self.report.file.name in self.report.file.names) {
       phase.coherence.indexes <- c()
       normalized.shannon.entropy.indexes <- c()
       for (timestamp in timestamps) {
-        phase.coherence.indexes <- c(phase.coherence.indexes, ComputePhaseCoherenceIndex(cls.phase.data[, 1]/ 1000, cls.phase.data[, 3], timestamp, time.window.s))
+        phase.coherence.indexes <- c(phase.coherence.indexes, ComputePhaseCoherenceIndex(cls.phase.data[, 1] / 1000, cls.phase.data[, 3], timestamp, time.window.s))
         normalized.shannon.entropy.indexes <- c(normalized.shannon.entropy.indexes, ComputeNormalizedShannonEntropyIndex(cls.phase.data[, 1]/ 1000, cls.phase.data[, 3], timestamp, time.window.s)) 
       }
       rm(timestamp)
@@ -118,8 +120,8 @@ for (self.report.file.name in self.report.file.names) {
       
       # Print synchronisation features
       print("---")
-      print(paste("Mittlerer normalisierter Shannon Entropie Index:", round(mean(cls.index.data[, 2], na.rm = TRUE), 2)))
-      print(paste("Mittlerer Phasenkohärenz:", round(mean(cls.index.data[, 3], na.rm = TRUE), 2)))
+      print(paste("Mittlerer normalisierter Shannon Entropie Index:", round(mean(cls.index.data[, 3], na.rm = TRUE), 2)))
+      print(paste("Mittlerer Phasenkohärenz Index:", round(mean(cls.index.data[, 2], na.rm = TRUE), 2)))
       
       # Write to csv file
       if(!dir.exists(paste(processed.data.directory.path, date.directory, sep =""))) {
@@ -136,7 +138,7 @@ for (self.report.file.name in self.report.file.names) {
       print("---")
       print(paste("Datei nicht gefunden:", ecg.data.file.name))
       print("oder")
-      print(paste("Datei nicht gefunden:", kinematic.data.1.file.path))
+      print(paste("Datei nicht gefunden:", kinematic.data.file.name.1))
     }
     readline("Weiter > ")
   }
