@@ -85,7 +85,7 @@ for (self.report.file.name in self.report.file.names) {
       instantaneous.phase.data <- ComputeInstantaneousPhases(heart.beat.times, stride.times)
       fi <- instantaneous.phase.data[, 2] # instantaneous phases
       psi <- (fi %% (2 * pi)) / (2 * pi) # relative phases
-      cls.phase.data <- data.frame(timestamp.ms = round(instantaneous.phase.data[, 1] * 1000, 3), round(fi, 3), round(psi, 3))
+      cls.phase.data <- data.frame(timestamp.ms = round(instantaneous.phase.data[, 1] * 1000, 3), fi = round(fi, 3), psi = round(psi, 3))
       rm(instantaneous.phase.data, fi, psi)
       
       y.lim <- c(0, 1)
