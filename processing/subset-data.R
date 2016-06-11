@@ -11,12 +11,12 @@ library(zoom)
 setwd("~/psychophysiopipeline/preprocessing")
 
 # User input
-root.directory.path <- "/Users/sbogutzky/Desktop/daten (lokal)/2016/" # readline("Quellverzeichnis > ") 
-first.name <- "Max" # readline("Vorname der Untersuchungsperson > ")
-last.name <- "Nagel" # readline("Nachname der Untersuchungsperson > ")
-activity <- "Laufen" # readline("Aktivität der Untersuchung > ")
-data.file.name <- "imu-rn42-bc98" # readline("Dateiname der Datendatei (ohne .csv) > ")
-is.gps.data <- FALSE # "JA" == readline("Sind die Daten GPS-Daten (JA/NEIN) > ")
+root.directory.path <- readline("Quellverzeichnis > ") 
+first.name <- readline("Vorname der Untersuchungsperson > ")
+last.name <- readline("Nachname der Untersuchungsperson > ")
+activity <- readline("Aktivität der Untersuchung > ")
+data.file.name <- readline("Dateiname der Datendatei (ohne .csv) > ")
+is.gps.data <- "JA" == readline("Sind die Daten GPS-Daten (JA/NEIN) > ")
 
 # Set directory paths
 source("./code-snippets/set-directory-paths.R")
