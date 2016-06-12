@@ -1,0 +1,12 @@
+n <- max(cls.data[complete.cases(cls.data), 1]) - 180000 # min(cls.data$t.s[complete.cases(cls.data)]) / 1000  
+m <- max(cls.data[complete.cases(cls.data), 1]) 
+heart.beat.times <- c(kubios.hrv.data[1, 1] - kubios.hrv.data[1, 1], kubios.hrv.data[, 1])
+plot(kubios.hrv.data[kubios.hrv.data[, 1] * 1000 > n & kubios.hrv.data[, 1] * 1000 < m, 1], 60 / diff(heart.beat.times)[kubios.hrv.data[, 1] * 1000 > n & kubios.hrv.data[, 1] * 1000 < m], xlab = "", ylab = "Mittlere HR (BPM)", xaxs = "i", yaxs = "i", ylim = c(150, 190), pch = 21, bg = rgb(229/255, 66/255, 66/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+plot(cls.data[cls.data[, 1] > n & cls.data[, 1] < m, 1] / 1000, cls.data[cls.data[, 1] > n & cls.data[, 1] < m, 3], xlab = "", ylab = "Rel. Phase ($Psi(t)$)", xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 24, bg = rgb(96/255, 65/255, 79/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+plot(jc.data[jc.data[, 1] > n & jc.data[, 1] < m, 1] / 1000, jc.data[jc.data[, 1] > n & jc.data[, 1] < m, 2] / 10^3, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(12, 24)  , pch = 23, bg = rgb(0/255, 152/255, 199/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()

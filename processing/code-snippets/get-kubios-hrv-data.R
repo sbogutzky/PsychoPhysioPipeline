@@ -31,5 +31,5 @@ if(samples > 1) {
 
 kubios.hrv.data <- data
 rm(data)
-names(kubios.hrv.data) <- c("t.s", "rr.interval.s")
-kubios.hrv.data <- kubios.hrv.data[order(kubios.hrv.data$t.s),]
+names(kubios.hrv.data) <- c("timestamp.s", "rr.interval.s")
+kubios.hrv.data <- kubios.hrv.data[order(kubios.hrv.data[, 1]),]
