@@ -1,4 +1,4 @@
-n <- max(cls.data[complete.cases(cls.data), 1]) - 180000 # min(cls.data$t.s[complete.cases(cls.data)]) / 1000  
+n <- max(cls.data[complete.cases(cls.data), 1]) - 180000 # min(cls.data[complete.cases(cls.data), 1]) 
 m <- max(cls.data[complete.cases(cls.data), 1]) 
 heart.beat.times <- c(kubios.hrv.data[1, 1] - kubios.hrv.data[1, 1], kubios.hrv.data[, 1])
 plot(kubios.hrv.data[kubios.hrv.data[, 1] * 1000 > n & kubios.hrv.data[, 1] * 1000 < m, 1], 60 / diff(heart.beat.times)[kubios.hrv.data[, 1] * 1000 > n & kubios.hrv.data[, 1] * 1000 < m], xlab = "", ylab = "Mittlere HR (BPM)", xaxs = "i", yaxs = "i", ylim = bpm.ylim, pch = 21, bg = rgb(229/255, 66/255, 66/255))
