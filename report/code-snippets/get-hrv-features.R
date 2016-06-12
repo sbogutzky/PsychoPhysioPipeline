@@ -2,8 +2,10 @@ hrv.features <- data.frame()
 hrv.feature.names <- c("mean.rr","sdnn","mean.hr","sdhr","rmssd","nn50","pnn50","sdann","sdnni","hrvtri","tinn","vlfpeakfft","lfpeakfft","hfpeakfft","vlfpowfft","lfpowfft","hfpowfft","vlfpowprfft","lfpowprfft","hfpowprfft","lfpownufft","hfpownufft","totpowfft","lfhffft","vlfpeakar","lfpeakar","hfpeakar","vlfpowar","lfpowar","hfpowar","vlfpowprar","lfpowprar","hfpowprar","lfpownuar","hfpownuar","totpowar","lfhfar","edr","sd1","sd2","apen","sampen","d2","dfa1","dfa2")
 for (i in 1:nrow(fss.features)) {
   
-  source("code-snippets/set-additional-features.R")
-  hrv.feature.path <- paste(root.path, feature.directory, activity.directory, user.directory, "kubios-hrv-features", "/", strftime(date, format="%Y-%m-%d--%H-%M-%S"), "/", "imu-rn42-bd38-", measurement, "_hrv.txt", sep = "")
+  session.start <- fss.features[i, 9]
+  measurement <- fss.features[i, 14]
+  
+  hrv.feature.path <- paste(root.path, feature.directory, activity.directory, user.directory, "kubios-hrv-features", "/", strftime(session.start, format="%Y-%m-%d--%H-%M-%S"), "/", "imu-rn42-bd38-", measurement, "_hrv.txt", sep = "")
   rm(measurement)
   
   if(file.exists(hrv.feature.path)) {
@@ -20,4 +22,4 @@ for (i in 1:nrow(fss.features)) {
   }
   rm(hrv.feature.path, hrv.feature.row)
 }
-rm(hrv.feature.names, i, date)
+rm(hrv.feature.names, i, session.start)

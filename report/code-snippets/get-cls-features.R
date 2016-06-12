@@ -2,8 +2,10 @@ cls.features  <- data.frame()
 cls.feature.names <- c("mean.pcoi", "mean.nsei")
 for (i in 1:nrow(fss.features)) {
   
-  source("code-snippets/set-additional-features.R")
-  cls.data.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, strftime(date, format="%Y-%m-%d--%H-%M-%S"), "/", "cls-indexes-", measurement, ".csv", sep = "")
+  session.start <- fss.features[i, 9]
+  measurement <- fss.features[i, 14]
+  
+  cls.data.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, strftime(session.start, format="%Y-%m-%d--%H-%M-%S"), "/", "cls-index-data-", measurement, ".csv", sep = "")
   rm(measurement)
   
   if(file.exists(cls.data.path)) {
@@ -21,4 +23,4 @@ for (i in 1:nrow(fss.features)) {
   }
   rm(cls.data.path, cls.feature.row)
 }
-rm(cls.feature.names, i, date)
+rm(cls.feature.names, i, session.start)
