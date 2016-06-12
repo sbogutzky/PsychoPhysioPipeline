@@ -377,6 +377,9 @@ tikz("./tikz/5-9-prozessorientierter-ansatz.tex", width = 7.91, height = 5.22)
 # Set graphic parameter
 par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfcol = c(3, 3))
 
+jc.ylim <- c(12, 24)
+bpm.ylim <- c(150, 190)
+
 # Plot underload measure
 # Set directories
 date.directory <- "2013-10-03--17-55-54/"

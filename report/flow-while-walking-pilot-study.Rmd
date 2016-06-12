@@ -1,5 +1,5 @@
 ---
-title: "Flow beim Gehen (intraindividell)"
+title: "Einzelfallanalyse Flow beim Gehen (intraindividell)"
 author: "Simon Bogutzky"
 date: "Juni 2016"
 header-includes:
@@ -37,140 +37,132 @@ library("coin")
 root.path <- "C:/Users/sbogutzky/Desktop/daten (lokal)/2014/"
 
 # Set directories
-preprocessed.data.directory <- "preprocessed/"
-activity.directory <- "gehen/"
+processed.data.directory <- "processed-data/"
+activity.directory <- "walking/"
 user.directory <- "grueter-barbara/"
 
 ```
 
 # Rohdaten
 
-```{r raw-data, include=FALSE, eval = FALSE}
+```{r raw-data, include=FALSE}
 
 # Set directories
 date.directory <- "2014-06-03--12-29-16/"
 
 # Set file names
 kinematic.data.file.name <- "imu-rn42-3b70-3.csv"
-mid.swing.data.file.name <- "imu-rn42-3b70-mid-swing-indexes-3.csv"
+stride.data.file.name <- "imu-rn42-3b70-stride-data-3.csv"
 ecg.data.file.name <- "imu-rn42-bd38-3.csv"
 
 # Set paths
-kinematic.data.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, kinematic.data.file.name, sep = "")
-mid.swing.data.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, mid.swing.data.file.name, sep = "")
-ecg.data.file.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, ecg.data.file.name, sep = "")
+kinematic.data.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, kinematic.data.file.name, sep = "")
+stride.data.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, stride.data.file.name, sep = "")
+ecg.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, ecg.data.file.name, sep = "")
     
-# Load kinematic and midswing data
+# Load kinematic and stride data
 kinematic.data <- read.csv(kinematic.data.path)
-mid.swing.data <- read.csv(mid.swing.data.path)
+stride.data <- read.csv(stride.data.path)
 ecg.data <- read.csv(ecg.data.file.path)
 
 # Setup tikz device
-#tikz("./tikz/5-2-daten.tex", width = 7.91, height = 5.22)
+tikz("./tikz/x-x-daten.tex", width = 7.91, height = 5.22)
 
 par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfcol = c(2, 4))
 
-# Plot ECG data
 n <- 200
-y <- ecg.data[ecg.data[, 1] > mid.swing.data[n, 1] & ecg.data[, 1] < mid.swing.data[n + 1, 1], 2]
-x.p <- 1:length(y) / length(y) * 100
-plot(x.p, y, type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "EKG RA-LL ($mV$)", ylim = c(-3, 3), xaxs = "i")
+
+# Plot ECG data
+ecg.data.subset <- ecg.data[ecg.data[, 1] > stride.data[n, 1] & ecg.data[, 1] < stride.data[n + 1, 1], ]
+x.p <- 1:nrow(ecg.data.subset) / nrow(ecg.data.subset) * 100
+
+plot(x.p, ecg.data.subset[, 2], type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "EKG RA-LL ($mV$)", ylim = c(-3, 3), xaxs = "i")
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
-
-y <- ecg.data[ecg.data[, 1] > mid.swing.data[n, 1] & ecg.data[, 1] < mid.swing.data[n + 1, 1], 3]
-plot(x.p, y, type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "EKG LA-LL ($mV$)", ylim = c(-3, 3), xaxs = "i")
+plot(x.p, ecg.data.subset[, 3], type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "EKG LA-LL ($mV$)", ylim = c(-3, 3), xaxs = "i")
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 
 # Plot kinematic Data
-most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 2], mid.swing.data[, 2])
-y <- rowMeans(most.common.cycle.matrix)
-x.p <- 1:length(y) / length(y) * 100
-plot(x.p, c(y[31:61], y[1:30]), type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Beschleunigung Y ($m \\cdot s^{-2}$)", ylim = c(-30, 30), xaxs = "i", col = rgb(155/255, 193/255, 54/255))
+kinematic.data.subset <- kinematic.data[kinematic.data[, 1] > stride.data[n, 1] & kinematic.data[, 1] < stride.data[n + 1, 1], ]
+x.p <- 1:nrow(kinematic.data.subset) / nrow(kinematic.data.subset) * 100
+plot(x.p, -kinematic.data.subset[, 2], type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Beschleunigung X ($m \\cdot s^{-2}$)", ylim = c(-30, 30), xaxs = "i", col = rgb(155/255, 193/255, 54/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+plot(x.p, -kinematic.data.subset[, 5], type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Winkelgeschwindigkeit X ($deg \\cdot s^{-1}$)", ylim = c(-600, 600), xaxs = "i", col = rgb(155/255, 193/255, 54/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+plot(x.p, kinematic.data.subset[, 3], type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Beschleunigung Y ($m \\cdot s^{-2}$)", ylim = c(-30, 30), xaxs = "i", col = rgb(0/255, 152/255, 199/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+plot(x.p, kinematic.data.subset[, 6], type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Winkelgeschwindigkeit Y ($deg \\cdot s^{-1}$)", ylim = c(-600, 600), xaxs = "i", col = rgb(0/255, 152/255, 199/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+plot(x.p, -kinematic.data.subset[, 4], type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Beschleunigung Z ($m \\cdot s^{-2}$)", ylim = c(-30, 30), xaxs = "i", col = rgb(229/255, 66/255, 66/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+plot(x.p,-kinematic.data.subset[, 7], type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Winkelgeschwindigkeit Z ($deg \\cdot s^{-1}$)", ylim = c(-600, 600), xaxs = "i", col = rgb(229/255, 66/255, 66/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 
-most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 5], mid.swing.data[, 2])
-y <- rowMeans(most.common.cycle.matrix)
-plot(x.p, c(y[31:61], y[1:30]), type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Winkelgeschwindigkeit X ($deg \\cdot s^{-1}$)", ylim = c(-600, 600), xaxs = "i", col = rgb(155/255, 193/255, 54/255))
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-
-most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 3], mid.swing.data[, 2])
-y <- rowMeans(most.common.cycle.matrix)
-plot(x.p, -c(y[31:61], y[1:30]), type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Beschleunigung Y ($m \\cdot s^{-2}$)", ylim = c(-30, 30), xaxs = "i", col = rgb(0/255, 152/255, 199/255))
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-
-most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 6], mid.swing.data[, 2])
-y <- rowMeans(most.common.cycle.matrix)
-plot(x.p, -c(y[31:61], y[1:30]), type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Winkelgeschwindigkeit Y ($deg \\cdot s^{-1}$)", ylim = c(-600, 600), xaxs = "i", col = rgb(0/255, 152/255, 199/255))
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-
-most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 4], mid.swing.data[, 2])
-y <- rowMeans(most.common.cycle.matrix)
-plot(x.p, c(y[31:61], y[1:30]), type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Beschleunigung Z ($m \\cdot s^{-2}$)", ylim = c(-30, 30), xaxs = "i", col = rgb(229/255, 66/255, 66/255))
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-
-most.common.cycle.matrix <- ComputeMostCommonCycleMatrix(kinematic.data[, 7], mid.swing.data[, 2])
-y <- rowMeans(most.common.cycle.matrix)
-plot(x.p, c(y[31:61], y[1:30]), type = "l", xlab = "Zeit (\\% Doppelschritt)", ylab = "Winkelgeschwindigkeit Z ($deg \\cdot s^{-1}$)", ylim = c(-600, 600), xaxs = "i", col = rgb(229/255, 66/255, 66/255))
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-
-#dev.off()
+dev.off()
 
 # Clean up
-rm(ecg.data, kinematic.data, mid.swing.data, most.common.cycle.matrix, date.directory, ecg.data.file.path, ecg.data.file.name, kinematic.data.path, kinematic.data.file.name, mid.swing.data.path, mid.swing.data.file.name, n, x.p, y)
+rm(ecg.data, kinematic.data, stride.data, ecg.data.subset, kinematic.data.subset, date.directory, ecg.data.file.path, ecg.data.file.name, kinematic.data.path, kinematic.data.file.name, stride.data.path, stride.data.file.name, n, x.p)
 ```
 
-%\begin{sidewaysfigure}
-%	\input{./tikz/5-2-daten}
-%	\caption{Aufgenommene Datenströme. Von links nach rechts: (schwarz) EKG-Ableitung RA-LL und EKG-Ableitung LA-LL; (grün) Beschleunigung in X-Richtung und Winkelgeschwindigkeit um die X Achse; (blau) Beschleunigung in Y-Richtung und Winkelgeschwindigkeit um die Y-Achse; (rot) Beschleunigung in Z-Richtung und Winkelgeschwindigkeit um die Z-Achse. Quelle: Eigene Darstellung}
-%	\label{figure:5-2-daten}
-%\end{sidewaysfigure}
+\begin{sidewaysfigure}
+	\input{./tikz/x-x-daten}
+	\caption{Aufgenommene Datenströme. Von links nach rechts: (schwarz) EKG-Ableitung RA-LL und EKG-Ableitung LA-LL; (grün) Beschleunigung in X-Richtung und Winkelgeschwindigkeit um die X Achse; (blau) Beschleunigung in Y-Richtung und Winkelgeschwindigkeit um die Y-Achse; (rot) Beschleunigung in Z-Richtung und Winkelgeschwindigkeit um die Z-Achse. Quelle: Eigene Darstellung}
+	\label{figure:5-2-daten}
+\end{sidewaysfigure}
 
 ```{r load-data, include=FALSE}
-
 # Set directories
 feature.directory <- "features/"
 
 # Collect data
 data.1 <- data.frame()
     
-# Load FSS features
+# Get FSS features
 fss.feature.path <- paste(root.path, feature.directory, activity.directory, user.directory, "fss-features.csv", sep = "")
 fss.features <- read.csv(fss.feature.path)
 rm(fss.feature.path)
     
-# Load HRV features
-source("code-snippets/load-hrv-features.R")
+# Get HRV features
+source("code-snippets/get-hrv-features.R")
+
+# Get stride features
+min.before.end <- 12
+kinematic.data.file.name <- "imu-rn42-3b70"
+source("code-snippets/get-stride-features.R")
     
-# Load jerk cost features
-source("code-snippets/load-jc-features.R")
+# Get jerk cost features
+min.before.end <- 12
+kinematic.data.file.name <- "imu-rn42-3b70"
+source("code-snippets/get-jc-features.R")
     
-# Load synchronization features
-source("code-snippets/load-cls-features.R") 
+# Get cardio-locomotor phase synchronization features
+source("code-snippets/get-cls-features.R") 
 
 # Set factors
-subjects <- factor(fss.features$first.name, levels = c("Barbara"), labels = c("Female"))
-measurements <- factor(fss.features$measurement, levels = c(1, 2, 3, 4), labels = c("15'", "30'", "45'", "60'"))
-sessions <- factor(fss.features$session.start, levels = c("2014-05-27 12:34:52", "2014-05-28 14:13:25",  "2014-06-03 12:29:16", "2014-06-04 12:09:38", "2014-06-05 13:18:49", "2014-06-06 11:08:16"), labels = c("27.05", "28.05", "03.06", "04.06", "05.06", "06.06"))
+subjects <- factor(fss.features[, 16], levels = c("Barbara"), labels = c("Female"))
+measurements <- factor(fss.features[, 14], levels = c(1, 2, 3, 4), labels = c("15'", "30'", "45'", "60'"))
+sessions <- factor(fss.features[, 9], levels = c("2014-05-27 12:34:52", "2014-05-28 14:13:25",  "2014-06-03 12:29:16", "2014-06-04 12:09:38", "2014-06-05 13:18:49", "2014-06-06 11:08:16"), labels = c("27.05", "28.05", "03.06", "04.06", "05.06", "06.06"))
   
 # Create data frame
-data.1 <- rbind(data.1, data.frame(subject = subjects, session = sessions, measurement = measurements, fss.features[, c(1:8)], hrv.features[, c(3, 16, 17)], cls.features[, 1:2], jc.features[, 1:2]))
+data.1 <- rbind(data.1, data.frame(subject = subjects, session = sessions, measurement = measurements, fss.features[, c(1:8)], hrv.features[, c(3, 16, 17)], cls.features[, 1:2], mean.ms.interval = stride.features[, 1], mean.jerk.cost = jc.features[, 1]))
 rownames(data.1) <- seq(length = nrow(data.1))
 
 # Clean up
-rm(fss.features, hrv.features, cls.features, jc.features, subjects, sessions, measurements)
+rm(fss.features, hrv.features, cls.features, stride.features, jc.features, subjects, sessions, measurements)
+
+data.1[, 18] <- data.1[, 18] / 10^3
 ```
 
 # Variablen
 
-```{r variables-session-wise, echo=FALSE, warning=FALSE, results="asis", eval=FALSE}
+```{r variables-session-wise, echo=FALSE, warning=FALSE, results="asis"}
     
   # Create table
   options(stringsAsFactors = FALSE)
@@ -275,10 +267,10 @@ print(table, floating.environment="sidewaystable", caption.placement = "top", sa
 rm(apa.table.cor, cor.table, table)
 ```
 
-```{r regression-analysis, include=FALSE, eval=FALSE, eval=FALSE}
+```{r regression-analysis, include=FALSE}
 
 # Setup tikz device
-#tikz("./tikz/5-8-regression.tex", width = 5.22, height = 5.22)
+tikz("./tikz/x-x-regression.tex", width = 5.22, height = 5.22)
 
 par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(3, 2))
 
@@ -343,17 +335,17 @@ grid(col = rgb(186/255, 187/255, 194/255))
 box()
 mtext("F", side = 2, line = 3, padj = -7, las = 1)
 
-#dev.off()
+dev.off()
 
 # Clean up
 rm(mean.hr, mean.hr.squared, linear.model, linear.model.2)
 ```
 
-%\begin{figure}
-%	\input{./tikz/5-8-regression}
-%	\caption{Beobachtungen. (A) Absorbiertheit und mittlerer HR; (B) Absorbiertheit und LF; (C) Absorbiertheit und HF; %(D) Glatterverlauf und mittlerer Bewegungsaufwand; (F) Absorbiertheit und mittlerer normalisierter Shannon Entropie %Index. Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell %dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
-%	\label{figure:5-8-regression}
-%\end{figure}
+\begin{figure}
+	\input{./tikz/x-x-regression}
+	\caption{Beobachtungen. (A) Absorbiertheit und mittlerer HR; (B) Absorbiertheit und LF; (C) Absorbiertheit und HF; %(D) Glatterverlauf und mittlerer Bewegungsaufwand; (F) Absorbiertheit und mittlerer normalisierter Shannon Entropie Index. Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
+	\label{figure:x-x-regression}
+\end{figure}
 
 ```{r process-oriented-approach, echo=FALSE, include=FALSE}
 
@@ -363,38 +355,31 @@ tikz("./tikz/5-13-prozessorientierter-ansatz.tex", width = 7.91, height = 5.22)
 # Set graphic parameter
 par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfcol = c(3, 2))
 
+jc.ylim <- c(4, 7)
+bpm.ylim <- c(90, 120)
+
 # Plot underload measure
 # Set directories
 date.directory <- "2014-06-04--12-09-38/"
 
 # Set data file names
 kubios.hrv.data.file.name <- "imu-rn42-bd38-1_hrv.txt"
-jc.data.file.name <- "imu-rn42-3b70-cycle-intervals-jerk-costs-1.csv"
-cls.data.file.name <- "cls-phases-1.csv"
+jc.data.file.name <- "imu-rn42-3b70-jerk-cost-data-1.csv"
+cls.data.file.name <- "cls-phase-data-1.csv"
 
 # Set paths
-kubios.hrv.data.file.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, kubios.hrv.data.file.name, sep = "")
-jc.data.file.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, jc.data.file.name, sep = "")
-cls.data.file.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, cls.data.file.name, sep = "")
+kubios.hrv.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, kubios.hrv.data.file.name, sep = "")
+jc.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, jc.data.file.name, sep = "")
+cls.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.data.file.name, sep = "")
     
 # Load hrv, jerk cost and cls data
-source("../preprocessing/code-snippets/read-kubios-hrv-data.R")
+source("../processing/code-snippets/get-kubios-hrv-data.R")
 jc.data <- read.csv(jc.data.file.path)
-cls.data <- read.csv(cls.data.file.path, skip = 2)
+cls.data <- read.csv(cls.data.file.path)
 
 # Plot
-n <- max(cls.data$t.s[complete.cases(cls.data)]) - 180 # min(cls.data$t.s[complete.cases(cls.data)])  
-m <- max(cls.data$t.s[complete.cases(cls.data)]) 
-heart.beat.times <- c(kubios.hrv.data.time.data$t.s[1] - kubios.hrv.data.time.data$rr.interval.s[1], kubios.hrv.data.time.data$t.s)
-plot(kubios.hrv.data.time.data$t.s[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], 60 / diff(heart.beat.times)[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], xlab = "", ylab = "Mittlere HR (BPM)", xaxs = "i", yaxs = "i", ylim = c(90, 120), pch = 21, bg = rgb(229/255, 66/255, 66/255))
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-plot(cls.data$t.s[cls.data > n & cls.data < m], cls.data$psi[cls.data > n & cls.data < m], xlab = "", ylab = "Rel. Phase ($Psi(t)$)", xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 24, bg = rgb(96/255, 65/255, 79/255))
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-plot(jc.data$t.s[jc.data$t.s > n & jc.data$t.s < m], jc.data$jerk.cost.m2s5[jc.data$t.s > n & jc.data$t.s < m] / 10^3, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(2, 4)  , pch = 23, bg = rgb(0/255, 152/255, 199/255))
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
+
+source("./code-snippets/plot-processes.R")
 title(sub = "nach 15 Minuten - Absorbiertheit: 4.3")
 
 # Plot optimal measure
@@ -403,38 +388,27 @@ date.directory <- "2014-05-28--14-13-25/"
 
 # Set data file names
 kubios.hrv.data.file.name <- "imu-rn42-bd38-3_hrv.txt"
-jc.data.file.name <- "imu-rn42-3b70-cycle-intervals-jerk-costs-3.csv"
-cls.data.file.name <- "cls-phases-3.csv"
+jc.data.file.name <- "imu-rn42-3b70-jerk-cost-data-3.csv"
+cls.data.file.name <- "cls-phase-data-3.csv"
 
 # Set paths
-kubios.hrv.data.file.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, kubios.hrv.data.file.name, sep = "")
-jc.data.file.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, jc.data.file.name, sep = "")
-cls.data.file.path <- paste(root.path, preprocessed.data.directory, activity.directory, user.directory, date.directory, cls.data.file.name, sep = "")
+kubios.hrv.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, kubios.hrv.data.file.name, sep = "")
+jc.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, jc.data.file.name, sep = "")
+cls.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.data.file.name, sep = "")
     
 # Load hrv, jerk cost and cls data
-source("../preprocessing/code-snippets/read-kubios-hrv-data.R")
+source("../processing/code-snippets/get-kubios-hrv-data.R")
 jc.data <- read.csv(jc.data.file.path)
-cls.data <- read.csv(cls.data.file.path, skip = 2)
+cls.data <- read.csv(cls.data.file.path)
 
 # Plot
-n <- max(cls.data$t.s[complete.cases(cls.data)]) - 180 # min(cls.data$t.s[complete.cases(cls.data)])  
-m <- max(cls.data$t.s[complete.cases(cls.data)]) 
-heart.beat.times <- c(kubios.hrv.data.time.data$t.s[1] - kubios.hrv.data.time.data$rr.interval.s[1], kubios.hrv.data.time.data$t.s)
-plot(kubios.hrv.data.time.data$t.s[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], 60 / diff(heart.beat.times)[kubios.hrv.data.time.data$t.s > n & kubios.hrv.data.time.data$t.s < m], xlab = "", ylab = "Mittlere HR ($BPM$)", xaxs = "i", yaxs = "i", ylim = c(90, 120), pch = 21, bg = rgb(229/255, 66/255, 66/255))
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-plot(cls.data$t.s[cls.data > n & cls.data < m], cls.data$psi[cls.data > n & cls.data < m], xlab = "", ylab = "Rel. Phase ($Psi(t)$)", xaxs = "i", yaxs = "i", ylim = c(0, 1), pch = 24, bg = rgb(96/255, 65/255, 79/255))
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-plot(jc.data$t.s[jc.data$t.s > n & jc.data$t.s < m], jc.data$jerk.cost.m2s5[jc.data$t.s > n & jc.data$t.s < m] / 10^3, xlab = "Zeit ($s$)", ylab = "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", xaxs = "i", yaxs = "i", ylim = c(2, 4), pch = 23, bg = rgb(0/255, 152/255, 199/255))
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
+source("./code-snippets/plot-processes.R")
 title(sub = "nach 45 Minuten - Absorbiertheit: 6.25")
 
 dev.off()
 
 # Clean up
-rm(cls.data, jc.data, kubios.hrv.data.time.data, cls.data.file.path, cls.data.file.name, date.directory, heart.beat.times, jc.data.file.path, jc.data.file.name, kubios.hrv.data.file.path, kubios.hrv.data.file.name, m, n, samples)
+rm(cls.data, jc.data, kubios.hrv.data, cls.data.file.path, cls.data.file.name, date.directory, heart.beat.times, jc.data.file.path, jc.data.file.name, kubios.hrv.data.file.path, kubios.hrv.data.file.name, m, n, samples)
 ```
 
 \begin{sidewaysfigure}
