@@ -9,7 +9,7 @@ for (i in 1:nrow(fss.features)) {
   rm(measurement)
   
   if(file.exists(hrv.feature.path)) {
-    hrv.feature.row <- read.csv(hrv.feature.path, skip = 0)
+    hrv.feature.row <- read.csv(hrv.feature.path, nrows = 1)
     hrv.feature.row <- hrv.feature.row[, 2:46]
     names(hrv.feature.row) <- hrv.feature.names
     hrv.features <- rbind(hrv.features, hrv.feature.row)

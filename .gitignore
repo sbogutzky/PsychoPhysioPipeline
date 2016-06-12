@@ -6,3 +6,5 @@ flow.Rcheck
 report/tikz/
 *.tex
 *.pdf
+report/case-study-flow-while-walking-tikzDictionary
+report/case-study-flow-while-running-tikzDictionary
