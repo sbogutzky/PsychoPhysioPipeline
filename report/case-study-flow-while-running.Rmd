@@ -159,6 +159,45 @@ rownames(data.1) <- seq(length = nrow(data.1))
 rm(fss.features, hrv.features, cls.features, stride.features, jc.features, subjects, sessions, measurements)
 
 data.1[, 18] <- data.1[, 18] / 10^3
+```
+
+# FKS Reabilität
+
+```{r fss-reability-running, echo=FALSE, warning=FALSE, include=FALSE}
+
+# Get all fss measurements of the running activities
+fss.features <- data.1[, 4:11]
+fss.file.paths <- list.files(path = paste(root.path, "raw-data/", activity.directory, sep = ""), pattern = "self-report.csv", full.names = TRUE, recursive = TRUE)
+
+fss.measurements <- data.frame()
+for(fss.file.path in fss.file.paths) {
+  fss.measurements <- rbind(fss.measurements, read.csv(fss.file.path, comment.char = "#")[4:13])
+}
+rm(fss.file.path, fss.file.paths)
+
+source("./code-snippets/get-fss-reability.R")
+rm(fss.measurements, fss.features)
+```
+
+```{r fss-reability-running-latex-tables, echo=FALSE, warning=FALSE, results="asis"}
+
+# Print latex table
+table <- xtable(data.table.flow, label = "table:generalfaktor-fallstudie-laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des Generalfaktors der Fallstudie zum Laufen [$N = 24$]") 
+print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
+
+# Print latex table
+table <- xtable(data.table.fluency, label = "table:glatter-verlauf-fallstudie-laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des glatten Verlaufs der Fallstudie zum Laufen [$N = 24$]") 
+print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
+  
+# Print latex table
+table <- xtable(data.table.absorption, label = "table:absorbiertheit-fallstudie-laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items der Absorbiertheit der Fallstudie zum Laufen [$N = 24$]") 
+print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
+  
+# Clean up
+rm(data.table.flow, data.table.fluency, data.table.absorption, table)
+```
+
+```{r remove-observations}
 data.1 <- data.1[-c(1, 5, 9, 13, 17, 21), ]
 data.1[, 3] <- factor(data.1[, 3], levels = c("30'", "45'", "60'"), labels = c("30'", "45'", "60'"))
 ```

@@ -112,10 +112,84 @@ data.1 <- cbind(data.1b, data.1)
 rownames(data.1) <- seq(length = nrow(data.1))
 data.1[, 25:26] <- data.1[, 25:26] / 10^3
 
-rm(u, user.directory, subjects, fss.features, hrv.features, cls.features, data.1b, jc.features, stride.features, mean.ms.interval.left, mean.ms.interval.right, mean.jerk.cost.left, mean.jerk.cost.right, min.before.end, user.count)
+rm(u, user.directory, subjects, fss.features, hrv.features, cls.features, data.1b, jc.features, stride.features, mean.ms.interval.left, mean.ms.interval.right, mean.jerk.cost.left, mean.jerk.cost.right, min.before.end, user.count, kinematic.data.file.name)
 ```
 
-```{r view}
+```{r view, echo=FALSE, warning=FALSE, eval=FALSE}
 View(cbind(data.1, user.directories))
 ```
+
+# FKS Reabilität
+
+```{r fss-reability-baseline, echo=FALSE, warning=FALSE, include=FALSE}
+
+# Get all fss measurements of the running activities
+fss.features <- data.1[, 2:8]
+fss.file.paths <- list.files(path = paste(root.path, "raw-data/", "baseline/", sep = ""), pattern = "self-report.csv", full.names = TRUE, recursive = TRUE)
+
+fss.measurements <- data.frame()
+for(fss.file.path in fss.file.paths) {
+  fss.measurements <- rbind(fss.measurements, read.csv(fss.file.path, comment.char = "#")[4:13])
+}
+rm(fss.file.path, fss.file.paths)
+
+source("./code-snippets/get-fss-reability.R")
+rm(fss.measurements, fss.features)
+```
+
+```{r fss-reability-baseline-latex-tables, echo=FALSE, warning=FALSE, results="asis"}
+
+# Print latex table
+table <- xtable(data.table.flow, label = "table:generalfaktor-studie-laufen-baseline", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des Generalfaktors der Studie zum Laufen (Baseline) [$N = 36$]") 
+print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
+
+# Print latex table
+table <- xtable(data.table.fluency, label = "table:glatter-verlauf-studie-laufen-baseline", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des glatten Verlaufs der Studie zum Laufen (Baseline) [$N = 36$]") 
+print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
+  
+# Print latex table
+table <- xtable(data.table.absorption, label = "table:absorbiertheit-studie-laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items der Absorbiertheit der Studie zum Laufen (Baseline) [$N = 36$]") 
+print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
+  
+# Clean up
+rm(data.table.flow, data.table.fluency, data.table.absorption, table)
+```
+
+```{r fss-reability-running, echo=FALSE, warning=FALSE, include=FALSE}
+
+# Get all fss measurements of the running activities
+fss.features <- data.1[, 10:17]
+fss.file.paths <- list.files(path = paste(root.path, "raw-data/", activity.directory, sep = ""), pattern = "self-report.csv", full.names = TRUE, recursive = TRUE)
+
+fss.measurements <- data.frame()
+for(fss.file.path in fss.file.paths) {
+  fss.measurements <- rbind(fss.measurements, read.csv(fss.file.path, comment.char = "#")[4:13])
+}
+rm(fss.file.path, fss.file.paths)
+
+source("./code-snippets/get-fss-reability.R")
+rm(fss.measurements, fss.features)
+```
+
+```{r fss-reability-running-latex-tables, echo=FALSE, warning=FALSE, results="asis"}
+
+# Print latex table
+table <- xtable(data.table.flow, label = "table:generalfaktor-studie-laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des Generalfaktors der Studie zum Laufen [$N = 36$]") 
+print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
+
+# Print latex table
+table <- xtable(data.table.fluency, label = "table:glatter-verlauf-studie-laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des glatten Verlaufs der Studie zum Laufen [$N = 36$]") 
+print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
+  
+# Print latex table
+table <- xtable(data.table.absorption, label = "table:absorbiertheit-studie-laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items der Absorbiertheit der Studie zum Laufen [$N = 36$]") 
+print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
+  
+# Clean up
+rm(data.table.flow, data.table.fluency, data.table.absorption, table)
+```
+
+
+
+
 
