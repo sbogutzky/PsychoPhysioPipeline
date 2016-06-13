@@ -1,0 +1,121 @@
+---
+title: "Analyse Flow beim Laufen (interindividell)"
+author: "Simon Bogutzky"
+date: "Juni 2016"
+header-includes:
+  - \usepackage[utf8]{inputenc} 
+  - \usepackage[T1]{fontenc}
+  - \usepackage{rotating}
+  - \usepackage{tikz}
+  - \usepackage{booktabs} 
+  - \usepackage{dcolumn}
+  - \newcolumntype{x}{D{;}{\pm}{3.3}} 
+  - \newcolumntype{y}{D{;}{\pm}{5.3}}
+  - \newcolumntype{z}{D{;}{\pm}{7.7}}
+output: 
+  pdf_document: 
+    keep_tex: yes
+---
+
+```{r setup, include=FALSE}
+
+# Remove all variables
+rm(list = ls(all = T))
+
+# Set working directory
+setwd("~/psychophysiopipeline/report")
+
+# Load libraries
+library("flow")
+library("tikzDevice")
+library("xtable")
+library("apaTables")
+library("lme4")
+library("coin")
+
+# Set paths
+root.path <- "C:/Users/sbogutzky/Desktop/daten (lokal)/2016/"
+
+# Set directories
+processed.data.directory <- "processed-data/"
+activity.directory <- "running/"
+
+```
+
+```{r load-data, include=FALSE}
+
+# Load user directories
+user.directories <- paste(list.dirs(path = paste(root.path, "features/baseline/", sep = ""), full.names = F, recursive = F), "/", sep = "")
+user.count <- length(user.directories)
+
+# Set directories
+feature.directory <- "features/"
+
+# Collect data
+data.1 <- data.frame()
+data.1b <- data.frame()
+
+for (u in 1:user.count) {
+  
+  subjects <- factor(u, levels = 1:user.count)
+  
+  user.directory <- user.directories[u]
+  
+  # Get FSS features baseline
+  fss.feature.path <- paste(root.path, feature.directory, "baseline/", user.directory, "/", "fss-features.csv", sep = "")
+  fss.features <- read.csv(fss.feature.path)
+  data.1b <- rbind(data.1b, data.frame(subject = subjects, fss.features[, 1:7]))
+  
+  # Get FSS features
+  fss.feature.path <- paste(root.path, feature.directory, activity.directory, user.directory, "fss-features.csv", sep = "")
+  fss.features <- read.csv(fss.feature.path)
+  rm(fss.feature.path)
+    
+  # Get HRV features
+  source("code-snippets/get-hrv-features.R")
+  
+  # Left leg
+  # Get stride features
+  min.before.end <- 15
+  kinematic.data.file.name <- "imu-rn42-bc98"
+  source("code-snippets/get-stride-features.R")
+    
+  # Get jerk cost features
+  min.before.end <- 15
+  kinematic.data.file.name <- "imu-rn42-bc98"
+  source("code-snippets/get-jc-features.R")
+  mean.ms.interval.left = stride.features[, 1]
+  mean.jerk.cost.left = jc.features[, 1]
+
+  # Right leg
+  # Get stride features
+  min.before.end <- 15
+  kinematic.data.file.name <- "imu-rn42-3b70"
+  source("code-snippets/get-stride-features.R")
+    
+  # Get jerk cost features
+  min.before.end <- 15
+  kinematic.data.file.name <- "imu-rn42-3b70"
+  source("code-snippets/get-jc-features.R")
+  mean.ms.interval.right = stride.features[, 1]
+  mean.jerk.cost.right = jc.features[, 1]
+    
+  # Get cardio-locomotor phase synchronization features
+  source("code-snippets/get-cls-features.R")
+  
+  # Create data frame
+  data.1 <- rbind(data.1, data.frame(subject = subjects, fss.features[, c(1:8)], hrv.features[, c(2, 3, 5)], cls.features[, 1:2], mean.ms.interval.left, mean.ms.interval.right, mean.jerk.cost.left, mean.jerk.cost.right))
+  
+}
+
+data.1 <- cbind(data.1b, data.1)
+rownames(data.1) <- seq(length = nrow(data.1))
+data.1[, 25:26] <- data.1[, 25:26] / 10^3
+
+rm(u, user.directory, subjects, fss.features, hrv.features, cls.features, data.1b, jc.features, stride.features, mean.ms.interval.left, mean.ms.interval.right, mean.jerk.cost.left, mean.jerk.cost.right, min.before.end, user.count)
+```
+
+```{r view}
+View(cbind(data.1, user.directories))
+```
+
