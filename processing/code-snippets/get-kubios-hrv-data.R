@@ -10,9 +10,9 @@ if(samples > 1) {
     m <- ((k-1) * 9) + 1
     n <- m + 1
     
-    data.1 <- kubios.hrv.data[, m:n]
-    names(data.1) <- names(data) 
-    data <- rbind(data, data.1)
+    data.cols <- kubios.hrv.data[, m:n]
+    names(data.cols) <- names(data) 
+    data <- rbind(data, data.cols)
     
     m <- ((k-1) * 2) + 1
     n <- m + 1
@@ -20,12 +20,12 @@ if(samples > 1) {
     o <- which(kubios.hrv.data[, 3] == 2) + 1
     p <- nrow(kubios.hrv.data)
     
-    data.1 <- kubios.hrv.data[o:p, m:n]
-    names(data.1) <- names(data) 
-    data <- rbind(data, data.1)
+    data.cols <- kubios.hrv.data[o:p, m:n]
+    names(data.cols) <- names(data) 
+    data <- rbind(data, data.cols)
     
   }
-  rm(samples, k, m, n, o, p, data.1)
+  rm(samples, k, m, n, o, p, data.cols)
   data <- data[complete.cases(data), ]
 }
 

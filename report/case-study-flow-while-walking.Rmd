@@ -308,7 +308,7 @@ table <- xtable(cor.table, label = "table:korrelation-fallstudie-gehen", align =
 print(table, floating.environment="sidewaystable", caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
 # Clean up
-rm(apa.table.cor, cor.table, table)
+rm(apa.table.cor, cor.table, table, cn)
 ```
 
 ```{r regression-analysis, include=FALSE}
@@ -424,7 +424,7 @@ cls.data <- read.csv(cls.data.file.path)
 # Plot
 
 source("./code-snippets/plot-processes.R")
-title(sub = "nach 15 Minuten - Absorbiertheit: 4.3")
+title(sub = "nach 15 Minuten - Absorbiertheit: 4,3")
 
 # Plot optimal measure
 # Set directories
@@ -447,12 +447,12 @@ cls.data <- read.csv(cls.data.file.path)
 
 # Plot
 source("./code-snippets/plot-processes.R")
-title(sub = "nach 45 Minuten - Absorbiertheit: 6.25")
+title(sub = "nach 45 Minuten - Absorbiertheit: 6,25")
 
 dev.off()
 
 # Clean up
-rm(cls.data, jc.data, kubios.hrv.data, cls.data.file.path, cls.data.file.name, date.directory, heart.beat.times, jc.data.file.path, jc.data.file.name, kubios.hrv.data.file.path, kubios.hrv.data.file.name, m, n, samples)
+rm(cls.data, jc.data, kubios.hrv.data, cls.data.file.path, cls.data.file.name, date.directory, heart.beat.times, jc.data.file.path, jc.data.file.name, kubios.hrv.data.file.path, kubios.hrv.data.file.name, m, n, bpm.ylim, jc.ylim)
 ```
 
 \begin{sidewaysfigure}

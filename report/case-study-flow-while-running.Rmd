@@ -167,7 +167,7 @@ data.1[, 18] <- data.1[, 18] / 10^3
 
 ```{r fss-reability-running, echo=FALSE, warning=FALSE, include=FALSE}
 
-# Get all fss measurements of the running activities
+# Get all fss measurements of the running activity
 fss.features <- data.1[, 4:11]
 fss.file.paths <- list.files(path = paste(root.path, "raw-data/", activity.directory, sep = ""), pattern = "self-report.csv", full.names = TRUE, recursive = TRUE)
 
@@ -307,7 +307,7 @@ table <- xtable(cor.table, label = "table:korrelation-pilot-laufen", align = "lx
 print(table, floating.environment="sidewaystable", caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
 # Clean up
-rm(apa.table.cor, cor.table, table)
+rm(apa.table.cor, cor.table, table, cn)
 ```
 
 ```{r regression-analysis, include=FALSE}
@@ -369,7 +369,7 @@ rm(mean.hr, mean.hr.squared, linear.model, linear.model.2)
 
 \begin{figure}
 	\input{./tikz/5-8-regression}
-	\caption{Beobachtungen. (A) Absorbiertheit und mittlerer HR; (B) Absorbiertheit und RMSSD; (C) Glatterverlauf und mittlerer Bewegungsaufwand; (D) Absorbiertheit und mittlerer normalisierter Shannon Entropie Index. Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
+	\caption{Beobachtungen. (A) Absorbiertheit und mittlerer HR; (B) Absorbiertheit und RMSSD; (C) Glatter Verlauf und mittlerer Bewegungsaufwand; (D) Absorbiertheit und mittlerer normalisierter Shannon Entropie Index. Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
 	\label{figure:5-8-regression}
 \end{figure}
 
@@ -448,7 +448,7 @@ cls.data <- read.csv(cls.data.file.path)
 
 # Plot
 source("./code-snippets/plot-processes.R")
-title(sub = "Unterforderung - Absorbiertheit: 4.25")
+title(sub = "Unterforderung - Absorbiertheit: 4,25")
 
 # Plot optimal measure
 # Set directories
@@ -471,7 +471,7 @@ cls.data <- read.csv(cls.data.file.path)
 
 # Plot
 source("./code-snippets/plot-processes.R")
-title(sub = "optimal - Absorbiertheit: 5.25")
+title(sub = "optimal - Absorbiertheit: 5,25")
 
 # Plot overload measure
 # Set directories
@@ -494,12 +494,12 @@ cls.data <- read.csv(cls.data.file.path)
 
 # Plot
 source("./code-snippets/plot-processes.R")
-title(sub = "\"Uberforderung - Absorbiertheit: 3.75")
+title(sub = "\"Uberforderung - Absorbiertheit: 3,75")
 
 dev.off()
 
 # Clean up
-rm(cls.data, jc.data, kubios.hrv.data, cls.data.file.path, cls.data.file.name, date.directory, heart.beat.times, jc.data.file.path, jc.data.file.name, kubios.hrv.data.file.path, kubios.hrv.data.file.name, m, n, samples)
+rm(cls.data, jc.data, kubios.hrv.data, cls.data.file.path, cls.data.file.name, date.directory, heart.beat.times, jc.data.file.path, jc.data.file.name, kubios.hrv.data.file.path, kubios.hrv.data.file.name, m, n, bpm.ylim, jc.ylim)
 ```
 
 \begin{sidewaysfigure}
