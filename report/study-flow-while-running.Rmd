@@ -33,6 +33,7 @@ library("xtable")
 library("apaTables")
 library("lme4")
 library("coin")
+library("stringr")
 
 # Set paths
 root.path <- "C:/Users/sbogutzky/Desktop/daten (lokal)/2016/"
@@ -124,7 +125,7 @@ View(cbind(data.1, user.directories))
 
 ```{r fss-reability-baseline, echo=FALSE, warning=FALSE, include=FALSE}
 
-# Get all fss measurements of the running activities
+# Get all fss measurements of the baseline
 fss.features <- data.1[, 2:8]
 fss.file.paths <- list.files(path = paste(root.path, "raw-data/", "baseline/", sep = ""), pattern = "self-report.csv", full.names = TRUE, recursive = TRUE)
 
@@ -158,7 +159,7 @@ rm(data.table.flow, data.table.fluency, data.table.absorption, table)
 
 ```{r fss-reability-running, echo=FALSE, warning=FALSE, include=FALSE}
 
-# Get all fss measurements of the running activities
+# Get all fss measurements of the running activity
 fss.features <- data.1[, 10:17]
 fss.file.paths <- list.files(path = paste(root.path, "raw-data/", activity.directory, sep = ""), pattern = "self-report.csv", full.names = TRUE, recursive = TRUE)
 
@@ -190,7 +191,216 @@ print(table, caption.placement = "top", sanitize.rownames.function = function(x)
 rm(data.table.flow, data.table.fluency, data.table.absorption, table)
 ```
 
+```{r remove-observations, include=FALSE, echo=FALSE, warning=FALSE}
+data.1 <- data.1[-c(5, 28, 29, 36), ]
+```
 
+```{r check-normality, include=FALSE, echo=FALSE, warning=FALSE}
 
+# Check normality 
+for (i in c(2:4, 10:12, 18:26)) {
+  print(colnames(data.1)[i])
+  hist(data.1[, i], main = colnames(data.1)[i])
+  print(shapiro.test(data.1[, i]))
+}
 
+rm(i)
+```
 
+# Analyse
+
+```{r correlation-analysis, echo=FALSE, warning=FALSE, results="asis"}
+
+# Create APA table
+apa.table.cor <- apa.cor.table(data.1[, c(2:4, 10:12, 19, 22, 25:26)], show.conf.interval = FALSE)
+cor.table <- data.frame(apa.table.cor$table.body)[seq(1, 20, 2), 2:12]
+colnames(cor.table) <- c("M", "SD", "1", "2", "3", "4", "5", "6", "7", "8", "9")
+rownames(cor.table) <- c("1. Generalfaktor (Baseline)", "2. Glatter Verlauf (Baseline)", "3. Absorbiertheit (Baseline)", "4. Generalfaktor (Lauf)", "5. Glatter Verlauf (Lauf)", "6. Absorbiertheit (Lauf)", "7. Herzfrequenz (BPM)", "8. Norm. Shan. Entr. Index", "9. Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$) links", "10. Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$) rechts")
+
+for(cn in 1:ncol(cor.table)) {
+  cor.table[, cn] <- str_replace_all(cor.table[, cn], "-\\.", "-0,")
+  cor.table[, cn] <- str_replace_all(cor.table[, cn], "^\\.", "0,")
+  cor.table[, cn] <- str_replace_all(cor.table[, cn], "\\.", ",")
+}
+
+# Print latex table
+table <- xtable(cor.table, label = "table:korrelation-studie-laufen", align = "lxxxxxxxxxxx", caption = "Variablen zur Fallstudie zum Gehen: Arithmetisches Mittel, Standardabweichung und Korrelationen [$N = 32$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- * Korrelation ist auf dem Niveau von 0,05 (zweiseitig) signifikant. -+- ** Korrelation ist auf dem Niveau von 0,01 (zweiseitig) signifikant.")
+print(table, floating.environment="sidewaystable", caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
+
+# Clean up
+rm(apa.table.cor, cor.table, table, cn)
+```
+
+```{r regression-analysis, include=FALSE}
+
+# Setup tikz device
+tikz("./tikz/5-97-regression.tex", width = 5.22, height = 5.22)
+
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(2, 1))
+
+# Plot absorption on mean HR
+mean.hr.squared <- data.1$mean.hr^2
+linear.model <- lm(absorption ~ mean.hr, data = data.1)
+summary.lm(linear.model)
+mean.hr <- data.1$mean.hr
+linear.model.2 <- lm((data.1[, 12] - data.1[, 4]) ~ mean.hr + mean.hr.squared)
+summary.lm(linear.model.2)
+plot(data.1$mean.hr, (data.1[, 12] - data.1[, 4]), xlab = "Mittlere HR (BPM)", ylab = "$\\bigtriangleup$ Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
+abline(linear.model)
+mean.hr <- seq(120, 200, by = .5)
+mean.hr.squared <- mean.hr^2
+absorption.predicted <- predict.lm(linear.model.2, data.frame(mean.hr, mean.hr.squared))
+lines(mean.hr, absorption.predicted, lty = "dashed")
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+mtext("A", side = 2, line = 3, padj = -7, las = 1)
+
+# Plot absorption on NSEI
+plot(data.1$mean.nsei, (data.1[, 12] - data.1[, 4]), xlab = "Norm. Shannon Entropie Index", ylab = "$\\bigtriangleup$ Absorbiertheit", pch = 24, bg = rgb(96/255, 65/255, 79/255))
+linear.model <- lm((data.1[, 12] - data.1[, 4]) ~ data.1$mean.nsei)
+abline(linear.model)
+summary(linear.model)
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+mtext("B", side = 2, line = 3, padj = -7, las = 1)
+
+dev.off()
+
+# Clean up
+rm(mean.hr, mean.hr.squared, linear.model, linear.model.2)
+```
+\begin{figure}
+	\input{./tikz/5-97-regression}
+	\caption{Beobachtungen. (A) Absorbiertheit und mittlerer HR; (B) Absorbiertheit und mittlerer normalisierter Shannon Entropie Index. Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar. -+- $\bigtriangleup$ Wert berechnet durch die Subtraktion des Baseline-Wertes.}
+	\label{figure:5-97-regression}
+\end{figure}
+
+```{r process-oriented-approach, echo=FALSE, include=FALSE}
+
+# Setup tikz device
+tikz("./tikz/5-98-prozessorientierter-ansatz.tex", width = 7.91, height = 5.22)
+
+# Set graphic parameter
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfcol = c(3, 3))
+
+jc.ylim <- c(20, 60)
+bpm.ylim <- c(130, 190)
+
+# Plot underload measure
+# Set directories
+user.directory <- "beutner-stefan/"
+date.directory <- "2016-04-07--18-24-56/"
+
+# Set data file names
+kubios.hrv.data.file.name <- "imu-rn42-bd38-1_hrv.txt"
+jc.data.file.name <- "imu-rn42-3b70-jerk-cost-data-1.csv"
+cls.data.file.name <- "cls-phase-data-1.csv"
+
+# Set paths
+kubios.hrv.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, kubios.hrv.data.file.name, sep = "")
+jc.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, jc.data.file.name, sep = "")
+cls.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.data.file.name, sep = "")
+    
+# Load hrv, jerk cost and cls data
+source("../processing/code-snippets/get-kubios-hrv-data.R")
+jc.data <- read.csv(jc.data.file.path)
+cls.data <- read.csv(cls.data.file.path)
+
+# Plot
+source("./code-snippets/plot-processes.R")
+title(sub = "Unterforderung - Absorbiertheit: 5,5")
+
+# Plot optimal measure
+# Set directories
+user.directory <- "neumann-tim/"
+date.directory <- "2016-04-18--18-15-39/"
+
+# Set data file names
+kubios.hrv.data.file.name <- "imu-rn42-bd38-1_hrv.txt"
+jc.data.file.name <- "imu-rn42-3b70-jerk-cost-data-1.csv"
+cls.data.file.name <- "cls-phase-data-1.csv"
+
+# Set paths
+kubios.hrv.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, kubios.hrv.data.file.name, sep = "")
+jc.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, jc.data.file.name, sep = "")
+cls.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.data.file.name, sep = "")
+    
+# Load hrv, jerk cost and cls data
+source("../processing/code-snippets/get-kubios-hrv-data.R")
+jc.data <- read.csv(jc.data.file.path)
+cls.data <- read.csv(cls.data.file.path)
+
+# Plot
+source("./code-snippets/plot-processes.R")
+title(sub = "optimal - Absorbiertheit: 6,5")
+
+# Plot overload measure
+# Set directories
+user.directory <- "goeren-ferat/"
+date.directory <- "2016-03-22--17-17-27/"
+
+# Set data file names
+kubios.hrv.data.file.name <- "imu-rn42-bd38-1_hrv.txt"
+jc.data.file.name <- "imu-rn42-3b70-jerk-cost-data-1.csv"
+cls.data.file.name <- "cls-phase-data-1.csv"
+
+# Set paths
+kubios.hrv.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, kubios.hrv.data.file.name, sep = "")
+jc.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, jc.data.file.name, sep = "")
+cls.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.data.file.name, sep = "")
+    
+# Load hrv, jerk cost and cls data
+source("../processing/code-snippets/get-kubios-hrv-data.R")
+jc.data <- read.csv(jc.data.file.path)
+cls.data <- read.csv(cls.data.file.path)
+
+# Plot
+source("./code-snippets/plot-processes.R")
+title(sub = "\"Uberforderung - Absorbiertheit: 3,25")
+
+dev.off()
+
+# Clean up
+rm(cls.data, jc.data, kubios.hrv.data, cls.data.file.path, cls.data.file.name, user.directory, date.directory, heart.beat.times, jc.data.file.path, jc.data.file.name, kubios.hrv.data.file.path, kubios.hrv.data.file.name, m, n, bpm.ylim, jc.ylim)
+```
+
+\begin{sidewaysfigure}
+	\input{./tikz/5-98-prozessorientierter-ansatz}
+	\caption{Drei Minuten Daten einer Untersuchungsperson, die sich unterfordert hat (links), einer Untersuchungsperson, die ihr optimales Tempo gefunden hat (mitte) und einer Untersuchungsperson, die sich überfordert hat (rechts). Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- Rel. Phase = Relative Phase.}
+	\label{figure:5-9-prozessorientierter-ansatz}
+\end{sidewaysfigure}
+
+```{r regression-analysis-extra, echo=FALSE, include=FALSE}
+
+# Setup tikz device
+tikz("./tikz/5-99-regression-extra.tex", width = 5.22, height = 5.22)
+
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 1))
+
+# Plot NSEI on mean HR
+mean.hr.squared <- data.1$mean.hr^2
+linear.model <- lm(mean.nsei ~ mean.hr, data = data.1)
+summary.lm(linear.model)
+mean.hr <- data.1$mean.hr
+linear.model.2 <- lm(data.1$mean.nsei ~ mean.hr + mean.hr.squared)
+summary.lm(linear.model.2)
+plot(data.1$mean.hr, data.1$mean.nsei, xlab = "Mittlere HR ($BPM$)", ylab = "Normalisierter Shannon Entropie Index", pch = 21, bg = rgb(229/255, 66/255, 66/255))
+abline(linear.model)
+mean.hr <- seq(120, 200, by = .5)
+mean.hr.squared <- mean.hr^2
+absorption.predicted <- predict.lm(linear.model.2, data.frame(mean.hr, mean.hr.squared))
+lines(mean.hr, absorption.predicted, lty = "dashed")
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+dev.off()
+
+# Clean up
+rm(absorption.predicted, linear.model, linear.model.2, mean.hr, mean.hr.squared)
+```
+
+\begin{figure}
+	\input{./tikz/5-99-regression-extra}
+	\caption{Beobachtungen. Mittlerer normalisierter Shannon Entropie Index und mittlerer HR. Quelle: Eigene Darstellung -+ -\emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
+	\label{figure:5-99-regression-extra}
+\end{figure}
