@@ -18,6 +18,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
+options(OutDec = ",")
 
 # Remove all variables
 rm(list = ls(all = T))
@@ -32,6 +33,7 @@ library("xtable")
 library("apaTables")
 library("lme4")
 library("coin")
+library("stringr")
 
 # Set paths
 root.path <- "C:/Users/sbogutzky/Desktop/daten (lokal)/2013/"
@@ -197,7 +199,7 @@ print(table, caption.placement = "top", sanitize.rownames.function = function(x)
 rm(data.table.flow, data.table.fluency, data.table.absorption, table)
 ```
 
-```{r remove-observations}
+```{r remove-observations, include=FALSE}
 data.1 <- data.1[-c(1, 5, 9, 13, 17, 21), ]
 data.1[, 3] <- factor(data.1[, 3], levels = c("30'", "45'", "60'"), labels = c("30'", "45'", "60'"))
 ```
@@ -293,6 +295,12 @@ apa.table.cor <- apa.cor.table(data.1[, c(4, 5, 6, 13, 14, 16, 18)], show.conf.i
 cor.table <- data.frame(apa.table.cor$table.body)[seq(1, 14, 2), 2:9]
 colnames(cor.table) <- c("M", "SD", "1", "2", "3", "4", "5", "6")
 rownames(cor.table) <- c("1. Generalfaktor", "2. Glatter Verlauf", "3. Absorbiertheit", "4. Herzfrequenz (BPM)", "5. RMSSD ($ms$)", " 6. Norm. Shan. Entr. Index", "7. Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
+
+for(cn in 1:ncol(cor.table)) {
+  cor.table[, cn] <- str_replace_all(cor.table[, cn], "-\\.", "-0,")
+  cor.table[, cn] <- str_replace_all(cor.table[, cn], "^\\.", "0,")
+  cor.table[, cn] <- str_replace_all(cor.table[, cn], "\\.", ",")
+}
   
 # Print latex table
 table <- xtable(cor.table, label = "table:korrelation-pilot-laufen", align = "lxxxxxxxx", caption = "Variablen: Arithmetisches Mittel, Standardabweichung und Korrelationen [$N = 15$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- * Korrelation ist auf dem Niveau von 0,05 (zweiseitig) signifikant. -+- ** Korrelation ist auf dem Niveau von 0,01 (zweiseitig) signifikant.") 

@@ -18,6 +18,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
+options(OutDec = ",")
 
 # Remove all variables
 rm(list = ls(all = T))

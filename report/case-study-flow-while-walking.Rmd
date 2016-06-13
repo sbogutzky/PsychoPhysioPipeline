@@ -18,6 +18,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
+options(OutDec = ",")
 
 # Remove all variables
 rm(list = ls(all = T))
@@ -32,6 +33,7 @@ library("xtable")
 library("apaTables")
 library("lme4") 
 library("coin")
+library("stringr")
 
 # Set paths
 root.path <- "C:/Users/sbogutzky/Desktop/daten (lokal)/2014/"
@@ -294,7 +296,13 @@ apa.table.cor <- apa.cor.table(data.1[, c(4, 5, 6, 12, 13, 14, 16, 18)], show.co
 cor.table <- data.frame(apa.table.cor$table.body)[seq(1, 16, 2), 2:10]
 colnames(cor.table) <- c("M", "SD", "1", "2", "3", "4", "5", "6", "7")
 rownames(cor.table) <- c("1. Generalfaktor", "2. Glatter Verlauf", "3. Absorbiertheit", "4. Herzfrequenz (BPM)", "5. LF ($ms^2$)", "6. HF ($ms^2$)", "7. Norm. Shan. Entr. Index", "8. Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
-  
+
+for(cn in 1:ncol(cor.table)) {
+  cor.table[, cn] <- str_replace_all(cor.table[, cn], "-\\.", "-0,")
+  cor.table[, cn] <- str_replace_all(cor.table[, cn], "^\\.", "0,")
+  cor.table[, cn] <- str_replace_all(cor.table[, cn], "\\.", ",")
+}
+ 
 # Print latex table
 table <- xtable(cor.table, label = "table:korrelation-fallstudie-gehen", align = "lxxxxxxxxx", caption = "Variablen zur Fallstudie zum Gehen: Arithmetisches Mittel, Standardabweichung und Korrelationen [$N = 23$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- * Korrelation ist auf dem Niveau von 0,05 (zweiseitig) signifikant. -+- ** Korrelation ist auf dem Niveau von 0,01 (zweiseitig) signifikant.") 
 print(table, floating.environment="sidewaystable", caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
