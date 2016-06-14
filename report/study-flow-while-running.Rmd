@@ -57,6 +57,8 @@ feature.directory <- "features/"
 data.1 <- data.frame()
 data.1b <- data.frame()
 
+sub.workload <- c(1,2,3,1,1,3,2,2,3,3,2,3,3,3,1,1,3,1,3,2,3,1,2,1,2,1,3,1,3,1,1,1,1,1,3,1)
+
 for (u in 1:user.count) {
   
   subjects <- factor(u, levels = 1:user.count)
@@ -192,7 +194,8 @@ rm(data.table.flow, data.table.fluency, data.table.absorption, table)
 ```
 
 ```{r remove-observations, include=FALSE, echo=FALSE, warning=FALSE}
-data.1 <- data.1[-c(5, 28, 29, 36), ]
+data.1 <- data.1[-c(19, 28, 29, 36), ]
+sub.workload <- sub.workload[-c(19, 28, 29, 36)]
 ```
 
 ```{r check-normality, include=FALSE, echo=FALSE, warning=FALSE}
@@ -243,9 +246,9 @@ mean.hr.squared <- data.1$mean.hr^2
 linear.model <- lm(absorption ~ mean.hr, data = data.1)
 summary.lm(linear.model)
 mean.hr <- data.1$mean.hr
-linear.model.2 <- lm((data.1[, 12] - data.1[, 4]) ~ mean.hr + mean.hr.squared)
+linear.model.2 <- lm((data.1[, 12]) ~ mean.hr + mean.hr.squared)
 summary.lm(linear.model.2)
-plot(data.1$mean.hr, (data.1[, 12] - data.1[, 4]), xlab = "Mittlere HR (BPM)", ylab = "$\\bigtriangleup$ Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
+plot(data.1$mean.hr, (data.1[, 12]), xlab = "Mittlere HR (BPM)", ylab = "$\\bigtriangleup$ Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
 abline(linear.model)
 mean.hr <- seq(120, 200, by = .5)
 mean.hr.squared <- mean.hr^2
@@ -256,8 +259,8 @@ box()
 mtext("A", side = 2, line = 3, padj = -7, las = 1)
 
 # Plot absorption on NSEI
-plot(data.1$mean.nsei, (data.1[, 12] - data.1[, 4]), xlab = "Norm. Shannon Entropie Index", ylab = "$\\bigtriangleup$ Absorbiertheit", pch = 24, bg = rgb(96/255, 65/255, 79/255))
-linear.model <- lm((data.1[, 12] - data.1[, 4]) ~ data.1$mean.nsei)
+plot(data.1$mean.nsei, (data.1[, 12]), xlab = "Norm. Shannon Entropie Index", ylab = "$\\bigtriangleup$ Absorbiertheit", pch = 24, bg = rgb(96/255, 65/255, 79/255))
+linear.model <- lm((data.1[, 12]) ~ data.1$mean.nsei)
 abline(linear.model)
 summary(linear.model)
 grid(col = rgb(186/255, 187/255, 194/255))
@@ -274,6 +277,77 @@ rm(mean.hr, mean.hr.squared, linear.model, linear.model.2)
 	\caption{Beobachtungen. (A) Absorbiertheit und mittlerer HR; (B) Absorbiertheit und mittlerer normalisierter Shannon Entropie Index. Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar. -+- $\bigtriangleup$ Wert berechnet durch die Subtraktion des Baseline-Wertes.}
 	\label{figure:5-97-regression}
 \end{figure}
+
+```{r subjective-workload, echo=FALSE, warning=FALSE, include=FALSE}
+
+# Setup tikz device
+tikz("./tikz/5-98-mittelwert-vergleich.tex", width = 5.22, height = 5.22)
+
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(2, 2))
+
+boxplot((data.1[, 12] - data.1[, 4]) ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "überfordert")), ylab = "$\\bigtriangleup$ Absorbiertheit")
+mtext("A", side = 2, line = 3, padj = -7, las = 1)
+boxplot(data.1[, 19] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "überfordert")), ylab = "Mittlere HR (BPM)")
+mtext("B", side = 2, line = 3, padj = -7, las = 1)
+boxplot(data.1[, 22] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "überfordert")), ylab = "Norm. Shannon Entropie Index")
+mtext("C", side = 2, line = 3, padj = -7, las = 1)
+boxplot(data.1[, 26] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "überfordert")), ylab =  "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
+mtext("D", side = 2, line = 3, padj = -7, las = 1)
+
+dev.off()
+
+data.under.ch <- data.1[sub.workload == 1, ]
+data.optimal <- data.1[sub.workload == 2, ]
+data.over.ch <- data.1[sub.workload == 3, ]
+
+
+print(shapiro.test(data.under.ch[, 12]))
+print(shapiro.test(data.optimal[, 12]))
+print(shapiro.test(data.over.ch[, 12]))
+
+t.test((data.under.ch[, 12]), (data.optimal[, 12]))
+t.test((data.optimal[, 12]), (data.over.ch[, 12]))
+t.test((data.under.ch[, 12]), (data.over.ch[, 12]))
+
+print(shapiro.test(data.under.ch[, 12] - data.under.ch[, 4]))
+print(shapiro.test(data.optimal[, 12] - data.optimal[, 4]))
+print(shapiro.test(data.over.ch[, 12] - data.over.ch[, 4]))
+
+t.test((data.under.ch[, 12] - data.under.ch[, 4]), (data.optimal[, 12] - data.optimal[, 4]))
+t.test((data.optimal[, 12] - data.optimal[, 4]), (data.over.ch[, 12] - data.over.ch[, 4]))
+t.test((data.under.ch[, 12] - data.under.ch[, 4]), (data.over.ch[, 12] - data.over.ch[, 4]))
+
+print(shapiro.test(data.under.ch[, 19]))
+print(shapiro.test(data.optimal[, 19]))
+print(shapiro.test(data.over.ch[, 19]))
+
+t.test(data.under.ch[, 19], data.optimal[, 19])
+t.test(data.optimal[, 19], data.over.ch[, 19])
+t.test(data.under.ch[, 19], data.over.ch[, 19])
+
+print(shapiro.test(data.under.ch[, 22]))
+print(shapiro.test(data.optimal[, 22]))
+print(shapiro.test(data.over.ch[, 22]))
+
+wilcox.test(data.under.ch[, 22], data.optimal[, 22])
+wilcox.test(data.optimal[, 22], data.over.ch[, 22])
+wilcox.test(data.under.ch[, 22], data.over.ch[, 22])
+
+print(shapiro.test(data.under.ch[, 26]))
+print(shapiro.test(data.optimal[, 26]))
+print(shapiro.test(data.over.ch[, 26]))
+
+t.test(data.under.ch[, 26], data.optimal[, 26])
+t.test(data.optimal[, 26], data.over.ch[, 26])
+t.test(data.under.ch[, 26], data.over.ch[, 26])
+```
+
+\begin{figure}
+	\input{./tikz/5-98-mittelwert-vergleich}
+	\caption{Mittelwertvergleich - unterfordert, optimal beansprucht, überfordert. (A) $\bigtriangleup$ Absorbiertheit; (B) Mittlere HR; (C) Mittlerer normalisierter Shannon Entropie Index; (D) Bewegungsaufwand am rechten Bein.Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- Rel. Phase = Relative Phase.}
+	\label{figure:5-98-mittelwert-vergleich}
+\end{figure}
+
 
 ```{r process-oriented-approach, echo=FALSE, include=FALSE}
 
