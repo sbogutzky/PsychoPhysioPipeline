@@ -6,6 +6,7 @@ header-includes:
   - \usepackage[utf8]{inputenc} 
   - \usepackage[T1]{fontenc}
   - \usepackage{rotating}
+  - \usepackage[ngerman]{babel}
   - \usepackage{tikz}
   - \usepackage{booktabs} 
   - \usepackage{dcolumn}
@@ -285,14 +286,14 @@ tikz("./tikz/5-98-mittelwert-vergleich.tex", width = 5.22, height = 5.22)
 
 par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(2, 2))
 
-boxplot((data.1[, 12] - data.1[, 4]) ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "überfordert")), ylab = "$\\bigtriangleup$ Absorbiertheit")
-mtext("A", side = 2, line = 3, padj = -7, las = 1)
-boxplot(data.1[, 19] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "überfordert")), ylab = "Mittlere HR (BPM)")
-mtext("B", side = 2, line = 3, padj = -7, las = 1)
-boxplot(data.1[, 22] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "überfordert")), ylab = "Norm. Shannon Entropie Index")
-mtext("C", side = 2, line = 3, padj = -7, las = 1)
-boxplot(data.1[, 26] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "überfordert")), ylab =  "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
-mtext("D", side = 2, line = 3, padj = -7, las = 1)
+boxplot((data.1[, 12] - data.1[, 4]) ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab = "$\\bigtriangleup$ Absorbiertheit")
+mtext("A", side = 2, line = 3.5, padj = -7, las = 1)
+boxplot(data.1[, 19] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab = "Mittlere HR (BPM)")
+mtext("B", side = 2, line = 3.5, padj = -7, las = 1)
+boxplot(data.1[, 22] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab = "Norm. Shannon Entropie Index")
+mtext("C", side = 2, line = 3.5, padj = -7, las = 1)
+boxplot(data.1[, 26] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab =  "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
+mtext("D", side = 2, line = 3.5, padj = -7, las = 1)
 
 dev.off()
 
