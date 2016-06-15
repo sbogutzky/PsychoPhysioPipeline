@@ -116,7 +116,7 @@ rm(ecg.data, kinematic.data, stride.data, ecg.data.subset, kinematic.data.subset
 \begin{sidewaysfigure}
 	\input{./tikz/5-2-daten}
 	\caption{Aufgenommene Datenströme. Von links nach rechts: (schwarz) EKG-Ableitung RA-LL und EKG-Ableitung LA-LL; (grün) Beschleunigung in X-Richtung und Winkelgeschwindigkeit um die X Achse; (blau) Beschleunigung in Y-Richtung und Winkelgeschwindigkeit um die Y-Achse; (rot) Beschleunigung in Z-Richtung und Winkelgeschwindigkeit um die Z-Achse. Quelle: Eigene Darstellung}
-	\label{figure:5-2-daten}
+	\label{fig:5-2-daten}
 \end{sidewaysfigure}
 
 ```{r load-data, include=FALSE}
@@ -184,15 +184,15 @@ rm(fss.measurements, fss.features)
 ```{r fss-reability-running-latex-tables, echo=FALSE, warning=FALSE, results="asis"}
 
 # Print latex table
-table <- xtable(data.table.flow, label = "table:generalfaktor-fallstudie-laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des Generalfaktors der Fallstudie zum Laufen [$N = 24$]") 
+table <- xtable(data.table.flow, label = "table:generalfaktor_fallstudie_laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des Generalfaktors der Fallstudie zum Laufen [$N = 24$]") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
 
 # Print latex table
-table <- xtable(data.table.fluency, label = "table:glatter-verlauf-fallstudie-laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des glatten Verlaufs der Fallstudie zum Laufen [$N = 24$]") 
+table <- xtable(data.table.fluency, label = "table:glatter_verlauf_fallstudie-laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des glatten Verlaufs der Fallstudie zum Laufen [$N = 24$]") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
 # Print latex table
-table <- xtable(data.table.absorption, label = "table:absorbiertheit-fallstudie-laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items der Absorbiertheit der Fallstudie zum Laufen [$N = 24$]") 
+table <- xtable(data.table.absorption, label = "table:absorbiertheit_fallstudie_laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items der Absorbiertheit der Fallstudie zum Laufen [$N = 24$]") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
 # Clean up
@@ -219,7 +219,7 @@ data.1[, 3] <- factor(data.1[, 3], levels = c("30'", "45'", "60'"), labels = c("
   rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz (BPM)", "RMSSD ($ms$)", "Norm. Shan. Entr. Index", "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
   
   # Print latex table
-  table                   <- xtable(feature.table, label = "table:variablen-nach-sitzung-pilotstudie-laufen", align = "lyyyyyyy", caption = "Variablen: Arithmetisches Mittel $\\pm$ Standardabweichung zu den sechs Sitzungen [$N = 3$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
+  table                   <- xtable(feature.table, label = "table:variablen_nach_sitzung_fallstudie_laufen", align = "lyyyyyyy", caption = "Variablen der Fallstudie zum Laufen: Arithmetisches Mittel $\\pm$ Standardabweichung zu den sechs Sitzungen [$N = 3$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
   print(table, floating.environment="sidewaystable", caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
   # Clean up
@@ -239,7 +239,7 @@ data.1[, 3] <- factor(data.1[, 3], levels = c("30'", "45'", "60'"), labels = c("
   rownames(feature.table) <- c("Generalfaktor", "Glatter Verlauf", "Absorbiertheit", "Herzfrequenz (BPM)", "RMSSD ($ms$)", "Norm. Shan. Entr. Index", "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
   
   # Print latex table
-  table                   <- xtable(feature.table, label = "table:variablen-nach-messzeitpunkt-pilotstudie-laufen", align = "lyyyy", caption = "Variablen: Arithmetisches Mittel $\\pm$ Standardabweichung zu den drei Messzeitpunkten [$N = 6$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
+  table                   <- xtable(feature.table, label = "table:variablen_nach_messzeitpunkt_fallstudie_laufen", align = "lyyyy", caption = "Variablen zur Fallstudie zum Laufen: Arithmetisches Mittel $\\pm$ Standardabweichung zu den drei Messzeitpunkten [$N = 6$] -+-\\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
   print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
   # Clean up
@@ -303,7 +303,7 @@ for(cn in 1:ncol(cor.table)) {
 }
   
 # Print latex table
-table <- xtable(cor.table, label = "table:korrelation-pilot-laufen", align = "lxxxxxxxx", caption = "Variablen: Arithmetisches Mittel, Standardabweichung und Korrelationen [$N = 15$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- * Korrelation ist auf dem Niveau von 0,05 (zweiseitig) signifikant. -+- ** Korrelation ist auf dem Niveau von 0,01 (zweiseitig) signifikant.") 
+table <- xtable(cor.table, label = "table:korrelationen_fallstudie_laufen", align = "lxxxxxxxx", caption = "Variablen zur Fallstudie zum Laufen: Arithmetisches Mittel, Standardabweichung und Korrelationen [$N = 15$] -+-\emph{Anmerkung}: Bew. = Bewegungsaufwand. -+-* Korrelation ist auf dem Niveau von 0,05 (zweiseitig) signifikant. -+-** Korrelation ist auf dem Niveau von 0,01 (zweiseitig) signifikant.") 
 print(table, floating.environment="sidewaystable", caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
 # Clean up
@@ -369,8 +369,8 @@ rm(mean.hr, mean.hr.squared, linear.model, linear.model.2)
 
 \begin{figure}
 	\input{./tikz/5-8-regression}
-	\caption{Beobachtungen. (A) Absorbiertheit und mittlerer HR; (B) Absorbiertheit und RMSSD; (C) Glatter Verlauf und mittlerer Bewegungsaufwand; (D) Absorbiertheit und mittlerer normalisierter Shannon Entropie Index. Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
-	\label{figure:5-8-regression}
+	\caption{Beobachtungen zur Fallstudie zum Laufen. (A) Absorbiertheit und mittlerer HR; (B) Absorbiertheit und RMSSD; (C) Glatterverlauf und mittlerer Bewegungsaufwand; (D) Absorbiertheit und mittlerer normalisierter Shannon Entropie Index. Quelle: Eigene Darstellung -+-\emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar.-+-Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
+	\label{fig:5_8_regression}
 \end{figure}
 
 ```{r multilevel-model-for-absorption-on-mean-hr, echo=FALSE, include=FALSE}
@@ -505,7 +505,7 @@ rm(cls.data, jc.data, kubios.hrv.data, cls.data.file.path, cls.data.file.name, d
 \begin{sidewaysfigure}
 	\input{./tikz/5-9-prozessorientierter-ansatz}
 	\caption{Drei Minuten Daten aus einem Lauf mit Unterforderung (links), einem optimalen Lauf (mitte) und einem Lauf mit Überforderung (rechts). Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- Rel. Phase = Relative Phase.}
-	\label{figure:5-9-prozessorientierter-ansatz}
+	\label{fig:5_9_prozessorientierter_ansatz}
 \end{sidewaysfigure}
 
 ```{r regression-analysis-extra, echo=FALSE, include=FALSE}
@@ -539,6 +539,6 @@ rm(absorption.predicted, linear.model, linear.model.2, mean.hr, mean.hr.squared)
 
 \begin{figure}
 	\input{./tikz/5-10-regression-extra}
-	\caption{Beobachtungen. Mittlerer normalisierter Shannon Entropie Index und mittlerer HR. Quelle: Eigene Darstellung -+ -\emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
-	\label{figure:5-10-regression-extra}
+	\caption{Beobachtungen zur Fallstudie zum Laufen. Mittlerer normalisierter Shannon Entropie Index und mittlerer HR. Quelle: Eigene Darstellung -+-\emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+-Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
+	\label{fig:5_10_regression_extra}
 \end{figure}
