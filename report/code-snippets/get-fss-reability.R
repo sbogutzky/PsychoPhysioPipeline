@@ -1,7 +1,7 @@
 # Check reability
 library(multilevel)
 if(nrow(fss.measurements) > 1) {
-  fss.item.statements <- c("Ich fühle mich optimal beansprucht.", "Meine Gedanken bzw. Aktivitäten laufen flüssig und glatt.", "Ich merke gar nicht, wie die Zeit vergeht.", "Ich habe keine Mühe mich zu konzentrieren.", "Mein Kopf ist völlig klar.", "Ich bin ganz vertieft in das, was ich gerade mache.", "Die richtigen Gedanken/ Bewegungen kommen wie von selbst.", "Ich weiß bei jedem Schritt, was ich zu tun habe.", "Ich habe das Gefühl, den Ablauf unter Kontrolle zu haben.", "Ich bin völlig selbstvergessen.")
+  fss.item.statements <- c("Ich fÃ¼hle mich optimal beansprucht.", "Meine Gedanken bzw. AktivitÃ¤ten laufen flÃ¼ssig und glatt.", "Ich merke gar nicht, wie die Zeit vergeht.", "Ich habe keine MÃ¼he mich zu konzentrieren.", "Mein Kopf ist vÃ¶llig klar.", "Ich bin ganz vertieft in das, was ich gerade mache.", "Die richtigen Gedanken/ Bewegungen kommen wie von selbst.", "Ich weiÃŸ bei jedem Schritt, was ich zu tun habe.", "Ich habe das GefÃ¼hl, den Ablauf unter Kontrolle zu haben.", "Ich bin vÃ¶llig selbstvergessen.")
   fss.item.mean.values <- colMeans(fss.measurements[, 1:10], na.rm = TRUE)
   fss.item.sd.values <- apply(fss.measurements[, 1:10], 2, sd, na.rm = TRUE)
   

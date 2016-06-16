@@ -75,8 +75,8 @@ for (u in 1:user.count) {
   fss.feature.path <- paste(root.path, feature.directory, activity.directory, user.directory, "fss-features.csv", sep = "")
   fss.features <- read.csv(fss.feature.path)
   rm(fss.feature.path)
-    
-  # Get HRV features
+  
+  # Get HRV features 
   source("code-snippets/get-hrv-features.R")
   
   # Left leg
@@ -108,9 +108,11 @@ for (u in 1:user.count) {
   # Get cardio-locomotor phase synchronization features
   source("code-snippets/get-cls-features.R")
   
-  # Create data frame
-  data.1 <- rbind(data.1, data.frame(subject = subjects, fss.features[, c(1:8)], hrv.features[, c(2, 3, 5)], cls.features[, 1:2], mean.ms.interval.left, mean.ms.interval.right, mean.jerk.cost.left, mean.jerk.cost.right))
+  # Get
+  age <- trunc(as.numeric(as.Date(fss.features[, 17]) - as.Date(fss.features[, 9])) / -365)
   
+  # Create data frame
+  data.1 <- rbind(data.1, data.frame(subject = subjects, fss.features[, c(1:8)], hrv.features[, c(2, 3, 5)], cls.features[, 1:2], mean.ms.interval.left, mean.ms.interval.right, mean.jerk.cost.left, mean.jerk.cost.right, age))
 }
 
 data.1 <- cbind(data.1b, data.1)
@@ -145,15 +147,15 @@ rm(fss.measurements, fss.features)
 ```{r fss-reability-baseline-latex-tables, echo=FALSE, warning=FALSE, results="asis"}
 
 # Print latex table
-table <- xtable(data.table.flow, label = "table:generalfaktor-studie-laufen-baseline", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des Generalfaktors der Studie zum Laufen (Baseline) [$N = 36$]") 
+table <- xtable(data.table.flow, label = "tab:generalfaktor_studie_laufen_baseline", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des Generalfaktors der finalen Laufstudie (Baseline) [$N = 36$]") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
 
 # Print latex table
-table <- xtable(data.table.fluency, label = "table:glatter-verlauf-studie-laufen-baseline", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des glatten Verlaufs der Studie zum Laufen (Baseline) [$N = 36$]") 
+table <- xtable(data.table.fluency, label = "tab:glatter_verlauf_studie_laufen_baseline", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des glatten Verlaufs der finalen Laufstudie (Baseline) [$N = 36$]") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
 # Print latex table
-table <- xtable(data.table.absorption, label = "table:absorbiertheit-studie-laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items der Absorbiertheit der Studie zum Laufen (Baseline) [$N = 36$]") 
+table <- xtable(data.table.absorption, label = "tab:absorbiertheit_studie_laufen_baseline", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items der Absorbiertheit der finalen Laufstudie (Baseline) [$N = 36$]") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
 # Clean up
@@ -179,15 +181,15 @@ rm(fss.measurements, fss.features)
 ```{r fss-reability-running-latex-tables, echo=FALSE, warning=FALSE, results="asis"}
 
 # Print latex table
-table <- xtable(data.table.flow, label = "table:generalfaktor-studie-laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des Generalfaktors der Studie zum Laufen [$N = 36$]") 
+table <- xtable(data.table.flow, label = "tab:generalfaktor_studie_laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des Generalfaktors der finalen Laufstudie [$N = 36$]") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
 
 # Print latex table
-table <- xtable(data.table.fluency, label = "table:glatter-verlauf-studie-laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des glatten Verlaufs der Studie zum Laufen [$N = 36$]") 
+table <- xtable(data.table.fluency, label = "tab:glatter_verlauf_studie_laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des glatten Verlaufs der finalen Laufstudie [$N = 36$]") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
 # Print latex table
-table <- xtable(data.table.absorption, label = "table:absorbiertheit-studie-laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items der Absorbiertheit der Studie zum Laufen [$N = 36$]") 
+table <- xtable(data.table.absorption, label = "tab:absorbiertheit_studie_laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items der Absorbiertheit der finalen Laufstudie [$N = 36$]") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
 # Clean up
@@ -195,8 +197,8 @@ rm(data.table.flow, data.table.fluency, data.table.absorption, table)
 ```
 
 ```{r remove-observations, include=FALSE, echo=FALSE, warning=FALSE}
-data.1 <- data.1[-c(19, 28, 29, 36), ]
-sub.workload <- sub.workload[-c(19, 28, 29, 36)]
+data.1 <- data.1[-c(5, 28, 29, 36), ]
+sub.workload <- sub.workload[-c(5, 28, 29, 36)]
 ```
 
 ```{r check-normality, include=FALSE, echo=FALSE, warning=FALSE}
@@ -216,10 +218,10 @@ rm(i)
 ```{r correlation-analysis, echo=FALSE, warning=FALSE, results="asis"}
 
 # Create APA table
-apa.table.cor <- apa.cor.table(data.1[, c(2:4, 10:12, 19, 22, 25:26)], show.conf.interval = FALSE)
-cor.table <- data.frame(apa.table.cor$table.body)[seq(1, 20, 2), 2:12]
-colnames(cor.table) <- c("M", "SD", "1", "2", "3", "4", "5", "6", "7", "8", "9")
-rownames(cor.table) <- c("1. Generalfaktor (Baseline)", "2. Glatter Verlauf (Baseline)", "3. Absorbiertheit (Baseline)", "4. Generalfaktor (Lauf)", "5. Glatter Verlauf (Lauf)", "6. Absorbiertheit (Lauf)", "7. Herzfrequenz (BPM)", "8. Norm. Shan. Entr. Index", "9. Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$) links", "10. Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$) rechts")
+apa.table.cor <- apa.cor.table(data.1[, c(2:4, 10:12, 19, 22, 26)], show.conf.interval = FALSE)
+cor.table <- data.frame(apa.table.cor$table.body)[seq(1, 18, 2), 2:11]
+colnames(cor.table) <- c("M", "SD", "1", "2", "3", "4", "5", "6", "7", "8")
+rownames(cor.table) <- c("1. Generalfaktor (Baseline)", "2. Glatter Verlauf (Baseline)", "3. Absorbiertheit (Baseline)", "4. Generalfaktor (Lauf)", "5. Glatter Verlauf (Lauf)", "6. Absorbiertheit (Lauf)", "7. Herzfrequenz (BPM)", "8. Norm. Shan. Entr. Index", "9. Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$) rechts")
 
 for(cn in 1:ncol(cor.table)) {
   cor.table[, cn] <- str_replace_all(cor.table[, cn], "-\\.", "-0,")
@@ -228,7 +230,7 @@ for(cn in 1:ncol(cor.table)) {
 }
 
 # Print latex table
-table <- xtable(cor.table, label = "table:korrelation-studie-laufen", align = "lxxxxxxxxxxx", caption = "Variablen zur Fallstudie zum Gehen: Arithmetisches Mittel, Standardabweichung und Korrelationen [$N = 32$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- * Korrelation ist auf dem Niveau von 0,05 (zweiseitig) signifikant. -+- ** Korrelation ist auf dem Niveau von 0,01 (zweiseitig) signifikant.")
+table <- xtable(cor.table, label = "tab:korrelation_studie_laufen", align = "lxxxxxxxxxx", caption = "Variablen zur finalen Laufstudie: Arithmetisches Mittel, Standardabweichung und Korrelationen [$N = 32$] -+-\\emph{Anmerkung}: Bew. = Bewegungsaufwand. -+-* Korrelation ist auf dem Niveau von 0,05 (zweiseitig) signifikant. -+-** Korrelation ist auf dem Niveau von 0,01 (zweiseitig) signifikant.")
 print(table, floating.environment="sidewaystable", caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
 
 # Clean up
@@ -238,35 +240,55 @@ rm(apa.table.cor, cor.table, table, cn)
 ```{r regression-analysis, include=FALSE}
 
 # Setup tikz device
-tikz("./tikz/5-97-regression.tex", width = 5.22, height = 5.22)
+tikz("./tikz/5-18-regression.tex", width = 5.22, height = 5.22)
 
-par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(2, 1))
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(2, 2))
 
 # Plot absorption on mean HR
-mean.hr.squared <- data.1$mean.hr^2
-linear.model <- lm(absorption ~ mean.hr, data = data.1)
+mean.hr <- data.1[, 19]
+mean.hr.squared <- mean.hr^2
+linear.model <- lm((data.1[, 12] - data.1[, 4]) ~ mean.hr)
 summary.lm(linear.model)
-mean.hr <- data.1$mean.hr
-linear.model.2 <- lm((data.1[, 12]) ~ mean.hr + mean.hr.squared)
+
+linear.model.2 <- lm((data.1[, 12] - data.1[, 4]) ~ mean.hr + mean.hr.squared)
 summary.lm(linear.model.2)
-plot(data.1$mean.hr, (data.1[, 12]), xlab = "Mittlere HR (BPM)", ylab = "$\\bigtriangleup$ Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
+
+plot(mean.hr, (data.1[, 12] - data.1[, 4]), xlab = "Mittlere HR (BPM)", ylab = "$\\bigtriangleup$ Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
 abline(linear.model)
+
 mean.hr <- seq(120, 200, by = .5)
 mean.hr.squared <- mean.hr^2
 absorption.predicted <- predict.lm(linear.model.2, data.frame(mean.hr, mean.hr.squared))
 lines(mean.hr, absorption.predicted, lty = "dashed")
+
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 mtext("A", side = 2, line = 3, padj = -7, las = 1)
 
 # Plot absorption on NSEI
-plot(data.1$mean.nsei, (data.1[, 12]), xlab = "Norm. Shannon Entropie Index", ylab = "$\\bigtriangleup$ Absorbiertheit", pch = 24, bg = rgb(96/255, 65/255, 79/255))
-linear.model <- lm((data.1[, 12]) ~ data.1$mean.nsei)
+plot(data.1[, 22], (data.1[, 12] - data.1[, 4]), xlab = "Norm. Shannon Entropie Index", ylab = "$\\bigtriangleup$ Absorbiertheit", pch = 24, bg = rgb(96/255, 65/255, 79/255))
+linear.model <- lm((data.1[, 12] - data.1[, 4]) ~ data.1[, 22])
 abline(linear.model)
 summary(linear.model)
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 mtext("B", side = 2, line = 3, padj = -7, las = 1)
+
+plot(data.1[, 26], data.1[, 11], xlab = "Bewegungsaufw. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", ylab = "Glatter Verlauf", pch = 23, bg = rgb(0/255, 152/255, 199/255))
+linear.model <- lm(data.1[, 11] ~ data.1[, 26])
+abline(linear.model)
+summary(linear.model)
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+mtext("C", side = 2, line = 3, padj = -7, las = 1)
+
+plot(data.1[, 26], (data.1[, 12] - data.1[, 4]), xlab = "Bewegungsaufw. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", ylab = "$\\bigtriangleup$ Absorbiertheit", pch = 23, bg = rgb(0/255, 152/255, 199/255))
+linear.model <- lm((data.1[, 12] - data.1[, 4]) ~ data.1[, 26])
+abline(linear.model)
+summary(linear.model)
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+mtext("D", side = 2, line = 3, padj = -7, las = 1)
 
 dev.off()
 
@@ -274,9 +296,9 @@ dev.off()
 rm(mean.hr, mean.hr.squared, linear.model, linear.model.2)
 ```
 \begin{figure}
-	\input{./tikz/5-97-regression}
-	\caption{Beobachtungen. (A) Absorbiertheit und mittlerer HR; (B) Absorbiertheit und mittlerer normalisierter Shannon Entropie Index. Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar. -+- $\bigtriangleup$ Wert berechnet durch die Subtraktion des Baseline-Wertes.}
-	\label{figure:5-97-regression}
+	\input{./tikz/5-18-regression}
+	\caption{Beobachtungen. (A) $\bigtriangleup$Absorbiertheit und mittlerer HR; (B) $\bigtriangleup$Absorbiertheit und mittlerer normalisierter Shannon Entropie Index; (C) Glatter Verlauf und mittlerer Bewegungsaufwand; $\bigtriangleup$Absorbiertheit und mittlerer Bewegungsaufwand. Quelle: Eigene Darstellung -+-\emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+-Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar. -+-$\bigtriangleup$ Wert berechnet durch die Subtraktion des Baseline-Wertes.}
+	\label{fig:5_18_regression}
 \end{figure}
 
 ```{r subjective-workload, echo=FALSE, warning=FALSE, include=FALSE}
@@ -346,7 +368,7 @@ t.test(data.under.ch[, 26], data.over.ch[, 26])
 \begin{figure}
 	\input{./tikz/5-98-mittelwert-vergleich}
 	\caption{Mittelwertvergleich - unterfordert, optimal beansprucht, überfordert. (A) $\bigtriangleup$ Absorbiertheit; (B) Mittlere HR; (C) Mittlerer normalisierter Shannon Entropie Index; (D) Bewegungsaufwand am rechten Bein.Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- Rel. Phase = Relative Phase.}
-	\label{figure:5-98-mittelwert-vergleich}
+	\label{fig:5-98-mittelwert-vergleich}
 \end{figure}
 
 
@@ -442,7 +464,7 @@ rm(cls.data, jc.data, kubios.hrv.data, cls.data.file.path, cls.data.file.name, u
 \begin{sidewaysfigure}
 	\input{./tikz/5-98-prozessorientierter-ansatz}
 	\caption{Drei Minuten Daten einer Untersuchungsperson, die sich unterfordert hat (links), einer Untersuchungsperson, die ihr optimales Tempo gefunden hat (mitte) und einer Untersuchungsperson, die sich überfordert hat (rechts). Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- Rel. Phase = Relative Phase.}
-	\label{figure:5-9-prozessorientierter-ansatz}
+	\label{fig:5-9-prozessorientierter-ansatz}
 \end{sidewaysfigure}
 
 ```{r regression-analysis-extra, echo=FALSE, include=FALSE}
@@ -477,5 +499,5 @@ rm(absorption.predicted, linear.model, linear.model.2, mean.hr, mean.hr.squared)
 \begin{figure}
 	\input{./tikz/5-99-regression-extra}
 	\caption{Beobachtungen. Mittlerer normalisierter Shannon Entropie Index und mittlerer HR. Quelle: Eigene Darstellung -+ -\emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
-	\label{figure:5-99-regression-extra}
+	\label{fig:5-99-regression-extra}
 \end{figure}
