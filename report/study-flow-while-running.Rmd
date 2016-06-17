@@ -301,81 +301,10 @@ rm(mean.hr, mean.hr.squared, linear.model, linear.model.2)
 	\label{fig:5_18_regression}
 \end{figure}
 
-```{r subjective-workload, echo=FALSE, warning=FALSE, include=FALSE}
-
-# Setup tikz device
-tikz("./tikz/5-98-mittelwert-vergleich.tex", width = 5.22, height = 5.22)
-
-par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(2, 2))
-
-boxplot((data.1[, 12] - data.1[, 4]) ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab = "$\\bigtriangleup$ Absorbiertheit")
-mtext("A", side = 2, line = 3.5, padj = -7, las = 1)
-boxplot(data.1[, 19] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab = "Mittlere HR (BPM)")
-mtext("B", side = 2, line = 3.5, padj = -7, las = 1)
-boxplot(data.1[, 22] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab = "Norm. Shannon Entropie Index")
-mtext("C", side = 2, line = 3.5, padj = -7, las = 1)
-boxplot(data.1[, 26] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab =  "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
-mtext("D", side = 2, line = 3.5, padj = -7, las = 1)
-
-dev.off()
-
-data.under.ch <- data.1[sub.workload == 1, ]
-data.optimal <- data.1[sub.workload == 2, ]
-data.over.ch <- data.1[sub.workload == 3, ]
-
-
-print(shapiro.test(data.under.ch[, 12]))
-print(shapiro.test(data.optimal[, 12]))
-print(shapiro.test(data.over.ch[, 12]))
-
-t.test((data.under.ch[, 12]), (data.optimal[, 12]))
-t.test((data.optimal[, 12]), (data.over.ch[, 12]))
-t.test((data.under.ch[, 12]), (data.over.ch[, 12]))
-
-print(shapiro.test(data.under.ch[, 12] - data.under.ch[, 4]))
-print(shapiro.test(data.optimal[, 12] - data.optimal[, 4]))
-print(shapiro.test(data.over.ch[, 12] - data.over.ch[, 4]))
-
-t.test((data.under.ch[, 12] - data.under.ch[, 4]), (data.optimal[, 12] - data.optimal[, 4]))
-t.test((data.optimal[, 12] - data.optimal[, 4]), (data.over.ch[, 12] - data.over.ch[, 4]))
-t.test((data.under.ch[, 12] - data.under.ch[, 4]), (data.over.ch[, 12] - data.over.ch[, 4]))
-
-print(shapiro.test(data.under.ch[, 19]))
-print(shapiro.test(data.optimal[, 19]))
-print(shapiro.test(data.over.ch[, 19]))
-
-t.test(data.under.ch[, 19], data.optimal[, 19])
-t.test(data.optimal[, 19], data.over.ch[, 19])
-t.test(data.under.ch[, 19], data.over.ch[, 19])
-
-print(shapiro.test(data.under.ch[, 22]))
-print(shapiro.test(data.optimal[, 22]))
-print(shapiro.test(data.over.ch[, 22]))
-
-wilcox.test(data.under.ch[, 22], data.optimal[, 22])
-wilcox.test(data.optimal[, 22], data.over.ch[, 22])
-wilcox.test(data.under.ch[, 22], data.over.ch[, 22])
-
-print(shapiro.test(data.under.ch[, 26]))
-print(shapiro.test(data.optimal[, 26]))
-print(shapiro.test(data.over.ch[, 26]))
-
-t.test(data.under.ch[, 26], data.optimal[, 26])
-t.test(data.optimal[, 26], data.over.ch[, 26])
-t.test(data.under.ch[, 26], data.over.ch[, 26])
-```
-
-\begin{figure}
-	\input{./tikz/5-98-mittelwert-vergleich}
-	\caption{Mittelwertvergleich - unterfordert, optimal beansprucht, überfordert. (A) $\bigtriangleup$ Absorbiertheit; (B) Mittlere HR; (C) Mittlerer normalisierter Shannon Entropie Index; (D) Bewegungsaufwand am rechten Bein.Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- Rel. Phase = Relative Phase.}
-	\label{fig:5-98-mittelwert-vergleich}
-\end{figure}
-
-
 ```{r process-oriented-approach, echo=FALSE, include=FALSE}
 
 # Setup tikz device
-tikz("./tikz/5-98-prozessorientierter-ansatz.tex", width = 7.91, height = 5.22)
+tikz("./tikz/5-19-prozessorientierter-ansatz.tex", width = 7.91, height = 5.22)
 
 # Set graphic parameter
 par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfcol = c(3, 3))
@@ -462,15 +391,15 @@ rm(cls.data, jc.data, kubios.hrv.data, cls.data.file.path, cls.data.file.name, u
 ```
 
 \begin{sidewaysfigure}
-	\input{./tikz/5-98-prozessorientierter-ansatz}
-	\caption{Drei Minuten Daten einer Untersuchungsperson, die sich unterfordert hat (links), einer Untersuchungsperson, die ihr optimales Tempo gefunden hat (mitte) und einer Untersuchungsperson, die sich überfordert hat (rechts). Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- Rel. Phase = Relative Phase.}
-	\label{fig:5-9-prozessorientierter-ansatz}
+	\input{./tikz/5-19-prozessorientierter-ansatz}
+	\caption{Drei Minuten Daten einer Untersuchungsperson, die sich unterfordert hat (links), einer Untersuchungsperson, die ihr optimales Tempo gefunden hat (mitte) und einer Untersuchungsperson, die sich überfordert hat (rechts). Quelle: Eigene Darstellung -+-\emph{Anmerkung}: Bew. = Bewegungsaufwand. -+-Rel. Phase = Relative Phase.}
+	\label{fig:5_19_prozessorientierter_ansatz}
 \end{sidewaysfigure}
 
 ```{r regression-analysis-extra, echo=FALSE, include=FALSE}
 
 # Setup tikz device
-tikz("./tikz/5-99-regression-extra.tex", width = 5.22, height = 5.22)
+tikz("./tikz/5-xx-regression-extra.tex", width = 5.22, height = 5.22)
 
 par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 1))
 
@@ -497,7 +426,77 @@ rm(absorption.predicted, linear.model, linear.model.2, mean.hr, mean.hr.squared)
 ```
 
 \begin{figure}
-	\input{./tikz/5-99-regression-extra}
-	\caption{Beobachtungen. Mittlerer normalisierter Shannon Entropie Index und mittlerer HR. Quelle: Eigene Darstellung -+ -\emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+- Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
-	\label{fig:5-99-regression-extra}
+	\input{./tikz/5-xx-regression-extra}
+	\caption{Beobachtungen. Mittlerer normalisierter Shannon Entropie Index und mittlerer HR. Quelle: Eigene Darstellung -+-\emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+-Gestrichelte Linie stellt das bestmögliche quardratische Modell dar.}
+	\label{fig:5_xx_regression_extra}
+\end{figure}
+
+```{r subjective-workload, echo=FALSE, warning=FALSE, include=FALSE}
+
+# Setup tikz device
+tikz("./tikz/5-20-mittelwert-vergleich.tex", width = 5.22, height = 5.22)
+
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(2, 2))
+
+boxplot((data.1[, 12] - data.1[, 4]) ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab = "$\\bigtriangleup$ Absorbiertheit")
+mtext("A", side = 2, line = 3.5, padj = -7, las = 1)
+boxplot(data.1[, 19] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab = "Mittlere HR (BPM)")
+mtext("B", side = 2, line = 3.5, padj = -7, las = 1)
+boxplot(data.1[, 22] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab = "Norm. Shannon Entropie Index")
+mtext("C", side = 2, line = 3.5, padj = -7, las = 1)
+boxplot(data.1[, 26] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab =  "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
+mtext("D", side = 2, line = 3.5, padj = -7, las = 1)
+
+dev.off()
+
+data.under.ch <- data.1[sub.workload == 1, ]
+data.optimal <- data.1[sub.workload == 2, ]
+data.over.ch <- data.1[sub.workload == 3, ]
+
+
+print(shapiro.test(data.under.ch[, 12]))
+print(shapiro.test(data.optimal[, 12]))
+print(shapiro.test(data.over.ch[, 12]))
+
+t.test((data.under.ch[, 12]), (data.optimal[, 12]))
+t.test((data.optimal[, 12]), (data.over.ch[, 12]))
+t.test((data.under.ch[, 12]), (data.over.ch[, 12]))
+
+print(shapiro.test(data.under.ch[, 12] - data.under.ch[, 4]))
+print(shapiro.test(data.optimal[, 12] - data.optimal[, 4]))
+print(shapiro.test(data.over.ch[, 12] - data.over.ch[, 4]))
+
+t.test((data.under.ch[, 12] - data.under.ch[, 4]), (data.optimal[, 12] - data.optimal[, 4]))
+t.test((data.optimal[, 12] - data.optimal[, 4]), (data.over.ch[, 12] - data.over.ch[, 4]))
+t.test((data.under.ch[, 12] - data.under.ch[, 4]), (data.over.ch[, 12] - data.over.ch[, 4]))
+
+print(shapiro.test(data.under.ch[, 19]))
+print(shapiro.test(data.optimal[, 19]))
+print(shapiro.test(data.over.ch[, 19]))
+
+t.test(data.under.ch[, 19], data.optimal[, 19])
+t.test(data.optimal[, 19], data.over.ch[, 19])
+t.test(data.under.ch[, 19], data.over.ch[, 19])
+
+print(shapiro.test(data.under.ch[, 22]))
+print(shapiro.test(data.optimal[, 22]))
+print(shapiro.test(data.over.ch[, 22]))
+
+wilcox.test(data.under.ch[, 22], data.optimal[, 22])
+wilcox.test(data.optimal[, 22], data.over.ch[, 22])
+wilcox.test(data.under.ch[, 22], data.over.ch[, 22])
+
+print(shapiro.test(data.under.ch[, 26]))
+print(shapiro.test(data.optimal[, 26]))
+print(shapiro.test(data.over.ch[, 26]))
+
+t.test(data.under.ch[, 26], data.optimal[, 26])
+t.test(data.optimal[, 26], data.over.ch[, 26])
+t.test(data.under.ch[, 26], data.over.ch[, 26])
+```
+
+\begin{figure}
+	\input{./tikz/5-20-mittelwert-vergleich}
+	\caption{Mittelwertvergleich - unterfordert, optimal, überfordert. (A) $\bigtriangleup$ Absorbiertheit; (B) Mittlere HR; (C) Mittlerer normalisierter Shannon Entropie Index; (D) Bewegungsaufwand. Quelle: Eigene Darstellung -+-\emph{Anmerkung}: Bew. = Bewegungsaufwand.}
+	\label{fig:5_20_mittelwert_vergleich}
 \end{figure}
