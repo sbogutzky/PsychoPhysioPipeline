@@ -51,7 +51,7 @@ user.directory <- "grueter-barbara/"
 ```{r raw-data, include=FALSE}
 
 # Set directories
-date.directory <- "2014-06-03--12-29-16/"
+date.directory <- "2014-05-27--12-34-52/"
 
 # Set file names
 kinematic.data.file.name <- "imu-rn42-3b70-3.csv"
@@ -73,7 +73,7 @@ tikz("./tikz/x-x-daten.tex", width = 7.91, height = 5.22)
 
 par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfcol = c(2, 4))
 
-n <- 200
+n <- 600
 
 # Plot ECG data
 ecg.data.subset <- ecg.data[ecg.data[, 1] > stride.data[n, 1] & ecg.data[, 1] < stride.data[n + 1, 1], ]
