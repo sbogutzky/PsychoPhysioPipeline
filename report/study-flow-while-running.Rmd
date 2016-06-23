@@ -59,6 +59,7 @@ data.1 <- data.frame()
 data.1b <- data.frame()
 
 sub.workload <- c(1,2,3,1,1,3,2,2,3,3,2,3,3,3,1,1,3,1,3,2,3,1,2,1,2,1,3,1,3,1,1,1,1,1,3,1)
+self.workload <- c(6,8,6,5,5,8,7,8,7,7,6,7,7,8,6,5,7,6,7,8,5,6,4,7,6,6,7,7,9,7,5,7,3,6,5,7)
 
 for (u in 1:user.count) {
   
@@ -199,6 +200,7 @@ rm(data.table.flow, data.table.fluency, data.table.absorption, table)
 ```{r remove-observations, include=FALSE, echo=FALSE, warning=FALSE}
 data.1 <- data.1[-c(5, 28, 29, 36), ]
 sub.workload <- sub.workload[-c(5, 28, 29, 36)]
+self.workload <- self.workload[-c(5, 28, 29, 36)]
 ```
 
 ```{r check-normality, include=FALSE, echo=FALSE, warning=FALSE}
