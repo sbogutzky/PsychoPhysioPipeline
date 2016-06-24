@@ -1,0 +1,105 @@
+---
+title: "Analyse"
+author: "AUTHOR"
+date: "DATE"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+options(OutDec = ",")
+
+# Remove all variables
+rm(list = ls(all = T))
+
+# Set working directory
+setwd("~/psychophysiopipeline/report")
+
+# Load libraries
+library("flow")
+library("tikzDevice")
+library("xtable")
+library("apaTables")
+library("lme4")
+library("coin")
+library("stringr")
+
+# Set paths
+root.path <- "ROOT_DIR"
+
+# Set directories
+processed.data.directory <- "processed-data/"
+activity.directory <- "ACTIVITY_DIR"
+
+```
+
+```{r load-data, include=FALSE}
+
+# Load user directories
+user.directories <- paste(list.dirs(path = paste(root.path, "features/baseline/", sep = ""), full.names = F, recursive = F), "/", sep = "")
+user.count <- length(user.directories)
+
+# Set directories
+feature.directory <- "features/"
+
+# Collect data
+data.1 <- data.frame()
+
+for (u in 1:user.count) {
+  
+  subjects <- factor(u, levels = 1:user.count)
+  
+  user.directory <- user.directories[u]
+  
+  # Get FSS features
+  fss.feature.path <- paste(root.path, feature.directory, activity.directory, user.directory, "fss-features.csv", sep = "")
+  fss.features <- read.csv(fss.feature.path)
+  rm(fss.feature.path)
+  
+  # Get HRV features 
+  source("code-snippets/get-hrv-features.R")
+  
+  # Left leg
+  # Get stride features
+  min.before.end <- 15
+  kinematic.data.file.name <- "SENSOR_NAME"
+  source("code-snippets/get-stride-features.R")
+    
+  # Get jerk cost features
+  min.before.end <- 15
+  kinematic.data.file.name <- "SENSOR_NAME"
+  source("code-snippets/get-jc-features.R")
+  mean.ms.interval.left = stride.features[, 1]
+  mean.jerk.cost.left = jc.features[, 1]
+
+  # Right leg
+  # Get stride features
+  min.before.end <- 15
+  kinematic.data.file.name <- "SENSOR_NAME"
+  source("code-snippets/get-stride-features.R")
+    
+  # Get jerk cost features
+  min.before.end <- 15
+  kinematic.data.file.name <- "SENSOR_NAME"
+  source("code-snippets/get-jc-features.R")
+  mean.ms.interval.right = stride.features[, 1]
+  mean.jerk.cost.right = jc.features[, 1]
+    
+  # Get cardio-locomotor phase synchronization features
+  source("code-snippets/get-cls-features.R")
+  
+  # Get
+  age <- trunc(as.numeric(as.Date(fss.features[, 17]) - as.Date(fss.features[, 9])) / -365)
+  
+  # Create data frame
+  data.1 <- rbind(data.1, data.frame(subject = subjects, fss.features[, c(1:8)], hrv.features[, c(2, 3, 5)], cls.features[, 1:2], mean.ms.interval.left, mean.ms.interval.right, mean.jerk.cost.left, mean.jerk.cost.right, age))
+}
+
+rownames(data.1) <- seq(length = nrow(data.1))
+data.1[, 25:26] <- data.1[, 25:26] / 10^3
+
+rm(u, user.directory, subjects, fss.features, hrv.features, cls.features, jc.features, stride.features, mean.ms.interval.left, mean.ms.interval.right, mean.jerk.cost.left, mean.jerk.cost.right, min.before.end, user.count, kinematic.data.file.name)
+```
+
+```{r view, echo=FALSE, warning=FALSE,}
+View(cbind(data.1, user.directories))
+```
