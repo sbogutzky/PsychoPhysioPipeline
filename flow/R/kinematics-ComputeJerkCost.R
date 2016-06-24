@@ -1,14 +1,29 @@
+# The MIT License (MIT)
+# Copyright (c) 2016 Simon Bogutzky
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+# and associated documentation files (the "Software"), to deal in the Software without restriction,
+# including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 #' Computes the jerk cost of an acceleration in x-, y- and z-direction.
 #'
 #' \code{ComputeJerkCost} returns a vector with the jerk cost of the acceleration.
 #'
-#' @param t Vectors with intervals (s)
-#' @param x The other vector with acceleration. t and x must have the same length, greater than one, with no missing values.
-#' @param y The other vector with acceleration. t and y must have the same length, greater than one, with no missing values.
-#' @param z The other vector with acceleration. t and z must have the same length, greater than one, with no missing values.
-#' @param normalized Boolean. Normalized by cycle length.
-#' @param plot Boolean. Plot cycle acceleration, cycle jerk and the time differential of jerk-cost
-#' @return A vector with the jerk cost [m^2/s^4] of the acceleration or a vector with normalized jerk cost [m^2/s^5] of the acceleration.
+#' @param t a numeric of intervals (s)
+#' @param x a numeric of accelerations. t and x must have the same length, greater than one, with no missing values
+#' @param y a numeric of accelerations. t and y must have the same length, greater than one, with no missing values
+#' @param z a numeric of accelerations. t and z must have the same length, greater than one, with no missing values
+#' @param normalized a boolean. Normalized by cycle length
+#' @return the numeric vector of jerk cost [m^2/s^4] of the acceleration or a vector with normalized jerk cost [m^2/s^5] of the acceleration
 
 ComputeJerkCost <- function(t.s, data, normalized = F) {
   
