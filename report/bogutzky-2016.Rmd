@@ -1,0 +1,182 @@
+---
+title: "Psychophysiological Indices of Flow while Walking"
+author: "Simon Bogutzky"
+date: "Juni 2016"
+header-includes:
+  - \usepackage[utf8]{inputenc} 
+  - \usepackage[T1]{fontenc}
+  - \usepackage{rotating}
+  - \usepackage[ngerman]{babel}
+  - \usepackage{tikz}
+  - \usepackage{booktabs} 
+  - \usepackage{dcolumn}
+  - \newcolumntype{x}{D{;}{\pm}{3.3}} 
+  - \newcolumntype{y}{D{;}{\pm}{5.3}}
+  - \newcolumntype{z}{D{;}{\pm}{7.7}}
+output: 
+  pdf_document: 
+    keep_tex: yes
+---
+
+```{r setup, include=FALSE}
+options(OutDec = ".")
+
+# Remove all variables
+rm(list = ls(all = T))
+
+# Set working directory
+setwd("~/Entwicklung/psychophysiopipeline/report")
+
+# Load libraries
+library("flow")
+library("tikzDevice")
+library("xtable")
+library("apaTables")
+library("lme4") 
+library("coin")
+library("stringr")
+
+# Set paths
+root.path <- "C:/Users/sbogutzky/Documents/Laufen und Flow/daten (lokal)/2014/"
+
+# Set directories
+processed.data.directory <- "processed-data/"
+activity.directory <- "walking/"
+user.directory <- "grueter-barbara/"
+
+```
+
+```{r load-data, include=FALSE}
+
+# Set directories
+feature.directory <- "features/"
+
+# Collect data
+data.1 <- data.frame()
+    
+# Get FSS features
+fss.feature.path <- paste(root.path, feature.directory, activity.directory, user.directory, "fss-features.csv", sep = "")
+fss.features <- read.csv(fss.feature.path)
+rm(fss.feature.path)
+    
+# Get HRV features
+source("code-snippets/get-hrv-features.R")
+
+# Get stride features
+min.before.end <- 12
+kinematic.data.file.name <- "imu-rn42-3b70"
+source("code-snippets/get-stride-features.R")
+    
+# Get jerk cost features
+min.before.end <- 12
+kinematic.data.file.name <- "imu-rn42-3b70"
+source("code-snippets/get-jc-features.R")
+    
+# Get cardio-locomotor phase synchronization features
+source("code-snippets/get-cls-features.R") 
+
+# Set factors
+subjects <- factor(fss.features[, 16], levels = c("Barbara"), labels = c("Female"))
+measurements <- factor(fss.features[, 14], levels = c(1, 2, 3, 4), labels = c("15'", "30'", "45'", "60'"))
+sessions <- factor(fss.features[, 9], levels = c("2014-05-27 12:34:52", "2014-05-28 14:13:25",  "2014-06-03 12:29:16", "2014-06-04 12:09:38", "2014-06-05 13:18:49", "2014-06-06 11:08:16"), labels = c("27.05", "28.05", "03.06", "04.06", "05.06", "06.06"))
+  
+# Create data frame
+data.1 <- rbind(data.1, data.frame(subject = subjects, session = sessions, measurement = measurements, absorption = fss.features[, 3], rmssd = hrv.features[, 5], mean.jerk.cost = jc.features[, 1]))
+rownames(data.1) <- seq(length = nrow(data.1))
+
+# Clean up
+rm(fss.features, hrv.features, cls.features, stride.features, jc.features, subjects, sessions, measurements)
+
+data.1[, 6] <- data.1[, 6] / 10^3
+```
+
+# Variablen
+
+```{r variables-session-wise, echo=FALSE, warning=FALSE, results="asis"}
+    
+  # Create table
+  options(stringsAsFactors = FALSE)
+  feature.table <- data.frame()
+  for (i in 4:6) {
+    feature.table <- rbind(feature.table, c(paste(formatC(round(tapply(data.1[, i], data.1[, 2], mean, na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(tapply(data.1[, i], data.1[, 2], sd, na.rm=TRUE), 2), format = "f", digits = 2)),  paste(formatC(round(mean(data.1[, i], na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(sd(data.1[, i], na.rm=TRUE), 2), format = "f", digits = 2))))
+  }
+  
+  colnames(feature.table) <- c(levels(data.1[, 2]), "Gesamt")
+  rownames(feature.table) <- c("Absorbiertheit", "RMSSD ($ms$)", "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
+  
+  # Print latex table
+  table                   <- xtable(feature.table, label = "table:variablen-nach-sitzung", align = "lyyyyyyy", caption = "Variablen: Arithmetisches Mittel $\\pm$ Standardabweichung zu den sechs Sitzungen [$N = 4$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
+  print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
+  
+  # Clean up
+  rm(feature.table, table, i)
+  
+```
+
+```{r variables-measurement-wise, echo=FALSE, warning=FALSE, results="asis"}
+    
+  # Create table
+  options(stringsAsFactors = FALSE)
+  feature.table <- data.frame()
+  for (i in 4:6) {
+    feature.table <- rbind(feature.table, c(paste(formatC(round(tapply(data.1[, i], data.1[, 3], mean, na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(tapply(data.1[, i], data.1[, 3], sd, na.rm=TRUE), 2), format = "f", digits = 2)),  paste(formatC(round(mean(data.1[, i], na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(sd(data.1[, i], na.rm=TRUE), 2), format = "f", digits = 2))))
+  }
+  
+  colnames(feature.table) <- c(levels(data.1[, 3]), "Gesamt")
+  rownames(feature.table) <-  c("Absorbiertheit", "RMSSD ($ms$)", "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
+  
+  # Print latex table
+  table                   <- xtable(feature.table, label = "table:variablen-nach-messzeitpunkt", align = "lyyyyy", caption = "Variablen: Arithmetisches Mittel $\\pm$ Standardabweichung zu den vier Messzeitpunkten [$N = 6$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
+  print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
+  
+  # Clean up
+  rm(feature.table, table, i)
+```
+
+# Analyse
+
+```{r correlation-analysis, echo=FALSE, warning=FALSE}
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 5] ~ data.1[as.numeric(data.1[, 3]) == 2, 5], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 5] ~ data.1[as.numeric(data.1[, 3]) == 3, 5], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 1, 5] ~ data.1[as.numeric(data.1[, 3]) == 4, 5], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 2, 5] ~ data.1[as.numeric(data.1[, 3]) == 3, 5], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 2, 5] ~ data.1[as.numeric(data.1[, 3]) == 4, 5], distribution="exact")
+wilcoxsign_test(data.1[as.numeric(data.1[, 3]) == 3, 5] ~ data.1[as.numeric(data.1[, 3]) == 4, 5], distribution="exact")
+
+
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(3, 2))
+
+plot(data.1[, 5], data.1[, 4], xlab = "RMSSD (ms)", ylab = "Absorption")
+plot(data.1[, 6], data.1[, 4], xlab = "Jerk-Cost (m2*s-5)", ylab = "Absorption")
+# plot(data.1[, 6], data.1[, 5])
+
+hist(data.1[, 4], main = "Absorption", xlab = "Absorption")
+shapiro.test(data.1[, 4])
+hist(data.1[, 5], main = "RMSSD (ms)", xlab = "RMSSD (ms)")
+shapiro.test(data.1[, 5])
+hist(data.1[, 6], main = "Jerk-Cost (m2*s-5)", xlab = "Jerk-Cost (m2*s-5)")
+shapiro.test(data.1[, 6])
+
+# cor.test(data.1[, 5], data.1[, 4], "greater", "pearson")
+# cor.test(data.1[, 6], data.1[, 4], "less", "pearson")
+# cor.test(data.1[, 6], data.1[, 5], "less", "pearson")
+```
+
+```{r session-overviews, echo=FALSE, warning=FALSE}
+
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(3, 2))
+
+for(level in levels(data.1[, 2])) {
+  plot(data.1[data.1[, 2] == level, 3], data.1[data.1[, 2] == level, 4], type = "b", sub = data.1[data.1[, 2] == level, 2], ylim = c(2, 7), ylab = "Absorption")
+}
+
+for(level in levels(data.1[, 2])) {
+  plot(data.1[data.1[, 2] == level, 3], data.1[data.1[, 2] == level, 5], type = "b", sub = data.1[data.1[, 2] == level, 2], ylim = c(2.5, 7.5), ylab = "RMSSD (ms)")
+}
+
+for(level in levels(data.1[, 2])) {
+  plot(data.1[data.1[, 2] == level, 3], data.1[data.1[, 2] == level, 6], type = "b", sub = data.1[data.1[, 2] == level, 2], ylim = c(5, 8), ylab = "Jerk-Cost (m2*s-5)")
+}
+
+```
+
