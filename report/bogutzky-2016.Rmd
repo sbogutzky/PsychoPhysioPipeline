@@ -25,7 +25,7 @@ options(OutDec = ".")
 rm(list = ls(all = T))
 
 # Set working directory
-setwd("~/Entwicklung/psychophysiopipeline/report")
+setwd("~/Entwicklung/psychophysiopipeline-r/report")
 
 # Load libraries
 library("flow")
@@ -85,7 +85,7 @@ data.1 <- rbind(data.1, data.frame(subject = subjects, session = sessions, measu
 rownames(data.1) <- seq(length = nrow(data.1))
 
 # Clean up
-rm(fss.features, hrv.features, cls.features, stride.features, jc.features, subjects, sessions, measurements)
+rm(fss.features, cls.features, stride.features, jc.features, subjects, sessions, measurements)
 
 data.1[, 6] <- data.1[, 6] / 10^3
 ```
