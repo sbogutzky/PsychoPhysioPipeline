@@ -16,15 +16,14 @@
 
 # Version 2.0
 
+# !!! Use file directory as working directory
+
 # Remove all variables
 rm(list = ls(all = T))  
 
 # Load libraries
 library(flow)
 library(zoom)
-
-# Set working directory
-setwd("~/psychophysiopipeline/processing")
 
 # User input
 root.directory.path <- readline("Quellverzeichnis > ")  
