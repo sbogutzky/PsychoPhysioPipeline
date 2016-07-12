@@ -238,9 +238,9 @@ lines(mean.hr, absorption.predicted, lty = "dashed")
 ```
 
 # Examination of the course during the run
-red = Mean HR (tranformated)
-blue = RMSSD (tranformated)
-green = Jerk-cost (tranformated)
+red = Mean HR (transformated)
+blue = RMSSD (transformated)
+green = Jerk-cost (transformated)
 
 ```{r session-overviews, echo=FALSE, warning=FALSE, exclude = TRUE}
 
