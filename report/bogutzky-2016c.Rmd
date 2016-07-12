@@ -1,0 +1,217 @@
+---
+title: "Cardiolocomotor Phase Synchronization Effects on Flow while Running"
+author: "Simon Bogutzky"
+date: "Juni 2016"
+header-includes:
+  - \usepackage[utf8]{inputenc} 
+  - \usepackage[T1]{fontenc}
+  - \usepackage{rotating}
+  - \usepackage[ngerman]{babel}
+  - \usepackage{tikz}
+  - \usepackage{booktabs} 
+  - \usepackage{dcolumn}
+  - \newcolumntype{x}{D{;}{\pm}{3.3}} 
+  - \newcolumntype{y}{D{;}{\pm}{5.3}}
+  - \newcolumntype{z}{D{;}{\pm}{7.7}}
+output: 
+  pdf_document: 
+    keep_tex: yes
+---
+
+```{r setup, include=FALSE}
+# !!! Use file directory as working directory 
+
+options(OutDec = ".")
+
+# Remove all variables
+rm(list = ls(all = T))
+
+# Load libraries
+library("flow")
+library("tikzDevice")
+library("xtable")
+library("apaTables")
+library("lme4") 
+library("coin")
+library("stringr")
+
+# Set paths
+root.path <- "/Volumes/flow/Documents/eigene-dateien/bogutzky-simon/daten/2013/"
+
+# Set directories
+processed.data.directory <- "processed-data/"
+activity.directory <- "running/"
+user.directory <- "buse-patrick/"
+
+```
+
+```{r load-data, include=FALSE}
+
+# Set directories
+feature.directory <- "features/"
+
+# Collect data
+data.1 <- data.frame()
+    
+# Get FSS features
+fss.feature.path <- paste(root.path, feature.directory, activity.directory, user.directory, "fss-features.csv", sep = "")
+fss.features <- read.csv(fss.feature.path)
+rm(fss.feature.path)
+    
+# Get HRV features
+source("code-snippets/get-hrv-features.R")
+
+# Get stride features
+min.before.end <- 12
+kinematic.data.file.name <- "imu-rn42-3b70"
+source("code-snippets/get-stride-features.R")
+    
+# Get jerk cost features
+min.before.end <- 12
+kinematic.data.file.name <- "imu-rn42-3b70"
+source("code-snippets/get-jc-features.R")
+    
+# Get cardiolocomotor phase synchronization features
+source("code-snippets/get-cls-features.R") 
+
+# Set factors
+subjects <- factor(fss.features[, 16], levels = c("Patrick"), labels = c("Male"))
+measurements <- factor(fss.features[, 14], levels = c(1, 2, 3, 4), labels = c("15'", "30'", "45'", "60'"))
+sessions <- factor(fss.features[, 9], levels = c("2013-10-03 17:55:54", "2013-10-10 17:41:56", "2013-10-17 18:07:11", "2013-10-24 17:32:14", "2013-10-31 18:31:19", "2013-11-07 17:34:06"), labels = c("03/10", "10/10", "17/10", "24/10", "31/10", "07/11"))
+  
+# Create data frame
+data.1 <- rbind(data.1, data.frame(subject = subjects, session = sessions, measurement = measurements, absorption = fss.features[, 3], mean.hr = hrv.features[, 3], mean.stride = 60000 / stride.features[, 1], mean.nsei = cls.features[, 1]))
+rownames(data.1) <- seq(length = nrow(data.1))
+
+# Clean up
+rm(fss.features, cls.features, hrv.features, jc.features, stride.features, subjects, sessions, measurements)
+```
+
+```{r remove-observations, include=FALSE}
+data.2 <- data.1[-c(1, 5, 9, 13, 17, 21), ]
+data.2[, 3] <- factor(data.2[, 3], levels = c("30'", "45'", "60'"), labels = c("30'", "45'", "60'"))
+
+data.2 <- data.2[-c(7:9), ]
+data.2[, 2] <- factor(data.2[, 2], levels = c("03/10", "10/10", "24/10", "31/10", "07/11"), labels = c("03/10", "10/10", "24/10", "31/10", "07/11"))
+
+rownames(data.2) <- seq(length = nrow(data.2))
+```
+
+# Descriptive Statistics
+
+```{r variables-session-wise, echo=FALSE, warning=FALSE, results="asis"}
+    
+  # Create table
+  options(stringsAsFactors = FALSE)
+  feature.table <- data.frame()
+  for (i in 4:7) {
+    feature.table <- rbind(feature.table, c(paste(formatC(round(tapply(data.2[, i], data.2[, 2], mean, na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(tapply(data.2[, i], data.2[, 2], sd, na.rm=TRUE), 2), format = "f", digits = 2)),  paste(formatC(round(mean(data.2[, i], na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(sd(data.2[, i], na.rm=TRUE), 2), format = "f", digits = 2))))
+  }
+  
+  colnames(feature.table) <- c(levels(data.2[, 2]), "Total")
+  rownames(feature.table) <- c("Absorption", "Mean HR (1/min)", "Mean Stride (1/min)", "Mean Norm. Shannon Entropy Index")
+  
+  # Print latex table
+  table                   <- xtable(feature.table, label = "table:variables-session-wise", caption = "Variables: Mean $\\pm$ standard deviation of five session [$N = 3$]") 
+  print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
+  
+  # Clean up
+  rm(feature.table, table, i)
+  
+```
+
+```{r variables-stop-wise, echo=FALSE, warning=FALSE, results="asis"}
+    
+  # Create table
+  options(stringsAsFactors = FALSE)
+  feature.table <- data.frame()
+  for (i in 4:7) {
+    feature.table <- rbind(feature.table, c(paste(formatC(round(tapply(data.2[, i], data.2[, 3], mean, na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(tapply(data.2[, i], data.2[, 3], sd, na.rm=TRUE), 2), format = "f", digits = 2)),  paste(formatC(round(mean(data.2[, i], na.rm=TRUE), 2), format = "f", digits = 2), ";", formatC(round(sd(data.2[, i], na.rm=TRUE), 2), format = "f", digits = 2))))
+  }
+  
+  colnames(feature.table) <- c(levels(data.2[, 3]), "Total")
+  rownames(feature.table) <- c("Absorption", "Mean HR (1/min)", "Mean Stride (1/min)", "Mean Norm. Shannon Entropy Index")
+  
+  # Print latex table
+  table                   <- xtable(feature.table, label = "table:variables-stop-wise", caption = "Variables: Mean $\\pm$ standard deviation of three stops [$N = 5$]") 
+  print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
+  
+  # Clean up
+  rm(feature.table, table, i)
+```
+
+# Correlation between Paired Samples
+
+## Scatter Plots
+
+```{r scatter-plots, echo=FALSE, warning=FALSE}
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 3))
+
+plot(data.2[, 5], data.2[, 4], xlab = "Mean HR (1/min)", ylab = "Absorption")
+plot(data.2[, 6], data.2[, 4], xlab = "Mean Stride (1/min)", ylab = "Absorption")
+plot(data.2[, 7], data.2[, 4], xlab = "Mean Norm. Shannon Entropy Index", ylab = "Absorption")
+```
+
+## Remove outliers
+
+```{r remove-outliers, include=FALSE}
+data.3 <- data.2
+
+rownames(data.3) <- seq(length = nrow(data.3))
+```
+
+```{r scatter-plots-without-outliers, echo=FALSE, warning=FALSE}
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 3))
+
+plot(data.3[, 5], data.3[, 4], xlab = "Mean HR (1/min)", ylab = "Absorption")
+plot(data.3[, 6], data.3[, 4], xlab = "Mean Stride (1/min)", ylab = "Absorption")
+plot(data.3[, 7], data.3[, 4], xlab = "Mean Norm. Shannon Entropy Index", ylab = "Absorption")
+```
+
+## Test for Normality
+
+```{r test-normality, echo=FALSE, warning=FALSE}
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(2, 2))
+
+hist(data.3[, 4], main = "Absorption", xlab = "Absorption")
+print("Absorption")
+shapiro.test(data.3[, 4])
+
+hist(data.3[, 5], main = "Mean HR", xlab = "Mean HR (1/min)")
+print("Mean HR")
+shapiro.test(data.3[, 5])
+
+hist(data.3[, 6], main = "Mean Stride", xlab = "Mean Stride (1/min)")
+print("Mean Stride")
+shapiro.test(data.3[, 6])
+
+hist(data.3[, 7], main = "Mean Norm. Shannon Entropy Index", xlab = "Mean Norm. Shannon Entropy Index")
+print("Mean Norm. Shannon Entropy Index")
+shapiro.test(data.3[, 7])
+```
+
+## Test for Correlation between Paired Samples
+
+```{r test-correlation, echo=FALSE, warning=FALSE}
+cor.test(data.3[, 5], data.3[, 4], "greater", "pearson")
+cor.test(data.3[, 7], data.3[, 4], "greater", "pearson")
+cor.test(data.3[, 6], data.3[, 4], "less", "pearson")
+```
+
+# Examination of the course during the run
+red = Mean HR (transformated)
+blue = Mean Stride (transformated)
+green = Mean Normalized Shannon Entropy Index (transformated)
+
+```{r session-overviews, echo=FALSE, warning=FALSE, exclude = TRUE}
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(3, 2))
+
+for(level in levels(data.1[, 2])) {
+  plot(data.1[data.1[, 2] == level, 3], data.1[data.1[, 2] == level, 4], type = "b", sub = data.1[data.1[, 2] == level, 2], ylim = c(2, 7), ylab = "Absorption")
+  points(data.1[data.1[, 2] == level, 3], (data.1[data.1[, 2] == level, 5] / 190) * 7, type = "b", col = "red")
+  points(data.1[data.1[, 2] == level, 3], (data.1[data.1[, 2] == level, 6] / 90) * 7, type = "b", col = "blue")
+  points(data.1[data.1[, 2] == level, 3], (data.1[data.1[, 2] == level, 7] / 0.1) * 7, type = "b", col = "green")
+}
+
+```
+
