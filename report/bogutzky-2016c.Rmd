@@ -143,7 +143,7 @@ rownames(data.2) <- seq(length = nrow(data.2))
 ```
 
 
-```{r boxplots, echo=FALSE, warning=FALSE, include=FALSE}
+```{r boxplots, echo=FALSE, warning=FALSE}
 
 fit <- abs(data.2$challenge - data.2$skill) + abs(data.2$fit - 4)
 fit <- abs(fit - max(fit))
@@ -208,7 +208,7 @@ red = Mean HR (transformated)
 blue = Mean Stride (transformated)
 green = Mean Normalized Shannon Entropy Index (transformated)
 
-```{r session-overviews, echo=FALSE, warning=FALSE, exclude = TRUE}
+```{r session-overviews, echo=FALSE, warning=FALSE, exclude=TRUE}
 par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(3, 2))
 
 for(level in levels(data.1[, 2])) {
