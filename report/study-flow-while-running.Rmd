@@ -502,3 +502,45 @@ t.test(data.under.ch[, 26], data.over.ch[, 26])
 	\caption{Mittelwertvergleich - unterfordert, optimal, überfordert. (A) $\bigtriangleup$ Absorbiertheit; (B) Mittlere HR; (C) Mittlerer normalisierter Shannon Entropie Index; (D) Bewegungsaufwand. Quelle: Eigene Darstellung -+-\emph{Anmerkung}: Bew. = Bewegungsaufwand.}
 	\label{fig:5_20_mittelwert_vergleich}
 \end{figure}
+
+```{r boxplots, echo=FALSE, warning=FALSE, include=FALSE}
+
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(2, 3))
+boxplot(data.1[, 10] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Generalfaktor")
+boxplot(data.1[, 11] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Glatter Verlauf")
+boxplot(data.1[, 12] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Absorbiertheit")
+boxplot(data.1[, 18] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "SDNN (ms)")
+boxplot(data.1[, 19] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Mittlere HR (BPM)")
+boxplot(data.1[, 20] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "RMSSD (ms)")
+
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(3, 2))
+boxplot(data.1[, 21] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Mittlerer Koheränz Index")
+boxplot(data.1[, 22] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Mittlerer normalisierter Shannon Entropie Index")
+boxplot(data.1[, 23] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Mittlere Doppelschrittdauer (ms) L")
+boxplot(data.1[, 24] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Mittlere Doppelschrittdauer (ms) L")
+boxplot(data.1[, 25] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Mittlerer Bewegungsaufwand (m^2s^5) L")
+boxplot(data.1[, 26] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Mittlerer Bewegungsaufwand (m^2s^5) R")
+
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 1))
+boxplot(data.1[, 27] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Alter")
+
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(2, 3))
+boxplot(data.1[, 10] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Generalfaktor")
+boxplot(data.1[, 11] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Glatter Verlauf")
+boxplot(data.1[, 12] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Absorbiertheit")
+boxplot(data.1[, 18] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "SDNN (ms)")
+boxplot(data.1[, 19] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Mittlere HR (BPM)")
+boxplot(data.1[, 20] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "RMSSD (ms)")
+
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(3, 2))
+boxplot(data.1[, 21] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Mittlerer Koheränz Index")
+boxplot(data.1[, 22] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Mittlerer normalisierter Shannon Entropie Index")
+boxplot(data.1[, 23] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Mittlere Doppelschrittdauer (ms) L")
+boxplot(data.1[, 24] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Mittlere Doppelschrittdauer (ms) R")
+boxplot(data.1[, 25] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Mittlerer Bewegungsaufwand (m^2s^5) L")
+boxplot(data.1[, 26] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Mittlerer Bewegungsaufwand (m^2s^5) R")
+
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 1))
+boxplot(data.1[, 27] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Alter")
+```
+
