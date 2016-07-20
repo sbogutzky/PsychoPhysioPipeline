@@ -80,7 +80,7 @@ measurements <- factor(fss.features[, 14], levels = c(1, 2, 3, 4), labels = c("1
 sessions <- factor(fss.features[, 9], levels = c("2013-10-03 17:55:54", "2013-10-10 17:41:56", "2013-10-17 18:07:11", "2013-10-24 17:32:14", "2013-10-31 18:31:19", "2013-11-07 17:34:06"), labels = c("03/10", "10/10", "17/10", "24/10", "31/10", "07/11"))
   
 # Create data frame
-data.1 <- rbind(data.1, data.frame(subject = subjects, session = sessions, measurement = measurements, absorption = fss.features[, 3], mean.hr = hrv.features[, 3], mean.stride = 60000 / stride.features[, 1], mean.nsei = cls.features[, 1], challenge = fss.features[, 5], skill = fss.features[, 6], fit = fss.features[, 8]))
+data.1 <- rbind(data.1, data.frame(subject = subjects, session = sessions, measurement = measurements, absorption = fss.features[, 3], mean.hr = hrv.features[, 3], mean.stride = 60000 / stride.features[, 1], mean.nsei = cls.features[, 2], challenge = fss.features[, 5], skill = fss.features[, 6], fit = fss.features[, 8]))
 rownames(data.1) <- seq(length = nrow(data.1))
 
 # Clean up
