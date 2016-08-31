@@ -1,7 +1,7 @@
 ---
-title: "Einzelfallanalyse Flow beim Laufen (intraindividell)"
+title: "Flow beim Laufen (intraindividell)"
 author: "Simon Bogutzky"
-date: "Juni 2016"
+date: "September 2016"
 header-includes:
   - \usepackage[utf8]{inputenc} 
   - \usepackage[T1]{fontenc}
