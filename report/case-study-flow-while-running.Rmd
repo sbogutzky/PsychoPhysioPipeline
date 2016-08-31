@@ -25,7 +25,7 @@ options(OutDec = ",")
 rm(list = ls(all = T))
 
 # Set working directory
-setwd("~/psychophysiopipeline/report")
+setwd("~/Entwicklung/projects/bogutzky/repositories/psychophysiopipeline/report")
 
 # Load libraries
 library("flow")
@@ -37,7 +37,7 @@ library("coin")
 library("stringr")
 
 # Set paths
-root.path <- "C:/Users/sbogutzky/Desktop/daten (lokal)/2013/"
+root.path <- "/Volumes/DOS/daten/2013/"
 
 # Set directories
 processed.data.directory <- "processed-data/"
