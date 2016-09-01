@@ -111,7 +111,7 @@ box()
 dev.off()
 
 # Clean up
-rm(ecg.data, kinematic.data, stride.data, ecg.data.subset, kinematic.data.subset, date.directory, ecg.data.file.path, ecg.data.file.name, kinematic.data.path, kinematic.data.file.name, stride.data.path, stride.data.file.name, n, x.p)
+rm(stride.data, ecg.data.subset, kinematic.data.subset, date.directory, ecg.data.file.path, ecg.data.file.name, kinematic.data.path, kinematic.data.file.name, stride.data.path, stride.data.file.name, n, x.p)
 ```
 
 \begin{sidewaysfigure}
@@ -119,6 +119,69 @@ rm(ecg.data, kinematic.data, stride.data, ecg.data.subset, kinematic.data.subset
 	\caption[Aufgenommene Datenströme beim Laufen]{Aufgenommene Datenströme eines Bewegungsaublaufs in der ersten Studie zum Flow-Erleben beim Laufen. Von links nach rechts: (schwarz) EKG-Ableitung RA-LL und EKG-Ableitung LA-LL; (grün) Beschleunigung in X-Richtung und Winkelgeschwindigkeit um die X Achse; (blau) Beschleunigung in Y-Richtung und Winkelgeschwindigkeit um die Y-Achse; (rot) Beschleunigung in Z-Richtung und Winkelgeschwindigkeit um die Z-Achse}
 	\label{fig:5_2_daten}
 \end{sidewaysfigure}
+
+```{r cls-basis, include=FALSE}
+
+tikz("./tikz/5_5_grundlage_der_klps.tex", width = 5.22, height = 5.22)
+
+par(mai = c(.1, .1, .1, .1), mgp = c(.1, .1, 0), mfcol = c(1, 1))
+
+start.timestamp <- min(ecg.data$timestamp.ms) + (5 * 60 * 1000) + 200
+stop.timestamp <- start.timestamp + 1.5 * 1000
+
+kinematic.data.subset <- kinematic.data[kinematic.data$timestamp.ms > start.timestamp & kinematic.data$timestamp.ms < stop.timestamp, ]
+ecg.data.subset <- ecg.data[ecg.data$timestamp.ms > start.timestamp & ecg.data$timestamp.ms < stop.timestamp, ]
+
+ecg.data.subset.minima <- SearchExtrema(ecg.data.subset$ecg.la.ll.mv, "minima")
+ecg.data.subset.minima <- ecg.data.subset.minima[ecg.data.subset$ecg.la.ll.mv[ecg.data.subset.minima] < -2]
+
+kinematic.data.subset.minima <- SearchExtrema(-kinematic.data.subset$angular.velocity.x.deg.s, "minima")
+kinematic.data.subset.minima <- kinematic.data.subset.minima[-kinematic.data.subset$angular.velocity.x.deg.s[kinematic.data.subset.minima] < -550]
+
+plot(ecg.data.subset$timestamp.ms / 1000, (ecg.data.subset$ecg.la.ll.mv * 200) + 1300, type = "l", xlab = "", ylab = "", xlim = c(min(ecg.data.subset$timestamp.ms) / 1000 - .4, max(ecg.data.subset$timestamp.ms) / 1000), ylim = c(-1400, 1600), xaxs = "i", axes = FALSE)
+lines(kinematic.data.subset$timestamp.ms / 1000, -kinematic.data.subset$angular.velocity.x.deg.s, col = rgb(155/255, 193/255, 54/255))
+
+segments(x0 = kinematic.data.subset$timestamp.ms[kinematic.data.subset.minima] / 1000, y0 = -900, y1 = 1600, lty = "dashed")
+
+segments(x0 = ecg.data.subset$timestamp.ms[ecg.data.subset.minima] / 1000, y0 = -1100, y1 = 1600, lty = "dashed")
+
+arrows(x0 = min(ecg.data.subset$timestamp.ms / 1000), y0 = -600, max(ecg.data.subset$timestamp.ms / 1000), length = 0.05)
+
+text(kinematic.data.subset$timestamp.ms[kinematic.data.subset.minima] / 1000, c(-800, -800),  as.character(round(kinematic.data.subset$timestamp.ms[kinematic.data.subset.minima] / 1000 - 2200, 2)))
+
+text(ecg.data.subset$timestamp.ms[ecg.data.subset.minima] / 1000, c(-1000, -1000),  as.character(round(ecg.data.subset$timestamp.ms[ecg.data.subset.minima] / 1000 - 2200, 2)))
+
+text(min(ecg.data.subset$timestamp.ms)/1000 - .2, 1000, "EKG (mV)")
+text(min(ecg.data.subset$timestamp.ms)/1000 - .2, 0, "Winkel-\ngeschwindig-\nkeit ($deg \\cdot s^{-1}$)")
+text(min(ecg.data.subset$timestamp.ms)/1000 - .2, -600, "Zeit (s)")
+
+arrows(x0 = ecg.data.subset$timestamp.ms[ecg.data.subset.minima][1] / 1000, x1 = kinematic.data.subset$timestamp.ms[kinematic.data.subset.minima][1] / 1000, y0 = -1150, length = 0.05)
+arrows(x0 = ecg.data.subset$timestamp.ms[ecg.data.subset.minima][2] / 1000, x1 = kinematic.data.subset$timestamp.ms[kinematic.data.subset.minima][1] / 1000, y0 = -1200, length = 0.05)
+
+arrows(x0 = ecg.data.subset$timestamp.ms[ecg.data.subset.minima][3] / 1000, x1 = kinematic.data.subset$timestamp.ms[kinematic.data.subset.minima][2] / 1000, y0 = -1150, length = 0.05)
+arrows(x0 = ecg.data.subset$timestamp.ms[ecg.data.subset.minima][4] / 1000, x1 = kinematic.data.subset$timestamp.ms[kinematic.data.subset.minima][2] / 1000, y0 = -1200, length = 0.05)
+
+dif <- c(round(ecg.data.subset$timestamp.ms[ecg.data.subset.minima][1] / 1000 - kinematic.data.subset$timestamp.ms[kinematic.data.subset.minima][1] / 1000, 2),
+         round(ecg.data.subset$timestamp.ms[ecg.data.subset.minima][2] / 1000 - kinematic.data.subset$timestamp.ms[kinematic.data.subset.minima][1] / 1000, 2),
+         round(ecg.data.subset$timestamp.ms[ecg.data.subset.minima][3] / 1000 - kinematic.data.subset$timestamp.ms[kinematic.data.subset.minima][2] / 1000, 2),
+         round(ecg.data.subset$timestamp.ms[ecg.data.subset.minima][4] / 1000 - kinematic.data.subset$timestamp.ms[kinematic.data.subset.minima][2] / 1000, 2)) - c(.01, 0, 0, 0)
+
+text(ecg.data.subset$timestamp.ms[ecg.data.subset.minima][1] / 1000, -1300, paste("t-tk=", dif[1]))
+text(ecg.data.subset$timestamp.ms[ecg.data.subset.minima][2] / 1000, -1350, paste("t-tk=", dif[2]))
+text(ecg.data.subset$timestamp.ms[ecg.data.subset.minima][3] / 1000, -1300, paste("t-tk=", dif[3]))
+text(ecg.data.subset$timestamp.ms[ecg.data.subset.minima][4] / 1000, -1350, paste("t-tk=", dif[4]))
+
+dev.off()
+
+rm(ecg.data, ecg.data.subset, ecg.data.subset.minima, kinematic.data, kinematic.data.subset, kinematic.data.subset.minima, dif, start.timestamp, stop.timestamp)
+
+```
+
+\begin{figure}[t]
+	\input{./tikz/5_5_grundlage_der_klps}
+	\caption[Grundlage der Berechnung der kardio-lokomotorischen Phasensynchronisation]{Grundlage der Berechnung der kardio-lokomotorischen Phasensynchronisation.}
+	\label{fig:5_5_grundlage_der_klps}
+\end{figure}
 
 ```{r load-data, include=FALSE}
 
