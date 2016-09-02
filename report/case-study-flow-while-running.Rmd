@@ -179,7 +179,7 @@ rm(ecg.data, ecg.data.subset, ecg.data.subset.minima, kinematic.data, kinematic.
 
 \begin{figure}[t]
 	\input{./tikz/5_5_grundlage_der_klps}
-	\caption[Grundlage der Berechnung der kardio-lokomotorischen Phasensynchronisation]{Grundlage der Berechnung der kardio-lokomotorischen Phasensynchronisation.}
+	\caption[Grundlage der Berechnung der kardio-lokomotorischen Phasensynchronisation]{Grundlage der Berechnung der kardio-lokomotorischen Phasensynchronisation}
 	\label{fig:5_5_grundlage_der_klps}
 \end{figure}
 
@@ -248,15 +248,15 @@ rm(fss.measurements, fss.features)
 ```{r fss-reability-running-latex-tables, echo=FALSE, warning=FALSE, results="asis"}
 
 # Print latex table
-table <- xtable(data.table.flow, label = "tab:generalfaktor_fallstudie_laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des Generalfaktors der Fallstudie zum Laufen [$N = 24$]") 
+table <- xtable(data.table.flow, label = "tab:generalfaktor_fallstudie_laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des Generalfaktors der ersten Studie zum Flow-Erleben beim Laufen") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
 
 # Print latex table
-table <- xtable(data.table.fluency, label = "tab:glatter_verlauf_fallstudie-laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des glatten Verlaufs der Fallstudie zum Laufen [$N = 24$]") 
+table <- xtable(data.table.fluency, label = "tab:glatter_verlauf_fallstudie-laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des glatten Verlaufs der ersten Studie zum Flow-Erleben beim Laufen [$N = 24$]") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
 # Print latex table
-table <- xtable(data.table.absorption, label = "tab:absorbiertheit_fallstudie_laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items der Absorbiertheit der Fallstudie zum Laufen [$N = 24$]") 
+table <- xtable(data.table.absorption, label = "tab:absorbiertheit_fallstudie_laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items der Absorbiertheit der ersten Studie zum Flow-Erleben beim Laufen [$N = 24$]") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
 # Clean up
