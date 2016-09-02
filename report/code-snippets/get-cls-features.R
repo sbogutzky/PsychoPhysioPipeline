@@ -10,6 +10,7 @@ for (i in 1:nrow(fss.features)) {
   
   if(file.exists(cls.data.path)) {
     cls.data <- read.csv(cls.data.path, skip = 2)
+    cls.data <- cls.data[max(cls.data[, 1], na.rm = T) - min.before.end * 60000 < cls.data[, 1], ]
     cls.feature.row <- data.frame(t(colMeans(cls.data[, 2:3], na.rm = T)))
     names(cls.feature.row) <- cls.feature.names
     cls.features <- rbind(cls.features, cls.feature.row)
