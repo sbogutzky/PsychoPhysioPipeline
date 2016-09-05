@@ -31,4 +31,4 @@ for (i in 1:nrow(fss.features)) {
   }
   rm(kubios.hrv.data.file.path, hrv.feature.row)
 }
-rm(hrv.feature.names, i, session.start)
+rm(hrv.feature.names, i, session.start, heart.beat.times, rr, rmssd, mean.hr, kubios.hrv.data)
