@@ -294,7 +294,7 @@ plotBoxAndWhiskerPlot(data.1$session, data.1$rmssd, col = rgb(0/255, 152/255, 19
 
 plotBoxAndWhiskerPlot(data.1$session, data.1$mean.jerk.cost, col = rgb(0/255, 152/255, 199/255, .5), ylim = c(14, 24), main = "Bewegungsaufwand", ylab = "$\\times 10^3 \\: m^2 \\cdot s^{-5}$", pch = 16)
 
-plotBoxAndWhiskerPlot(data.1$session, data.1$mean.jerk.cost, col = rgb(0/255, 152/255, 199/255, .5), ylim = c(14, 24), main = "Doppelschrittfr.", ylab = "$1/min$", pch = 16)
+plotBoxAndWhiskerPlot(data.1$session, data.1$mean.ms.interval, col = rgb(0/255, 152/255, 199/255, .5), ylim = c(86, 89), main = "Doppelschrittfr.", ylab = "$1/min$", pch = 16)
 
 plotBoxAndWhiskerPlot(data.1$session, data.1$mean.hr, col = rgb(0/255, 152/255, 199/255, .5), ylim = c(160, 190), main = "Herzfrequenz", ylab = "$1/min$", pch = 16)
 plotBoxAndWhiskerPlot(data.1$session, data.1$mean.nsei, col = rgb(0/255, 152/255, 199/255, .5), ylim = c(0, .5), main = "N. Shan. Entr. Index", ylab = "$[0, 1]$", pch = 16)
@@ -348,7 +348,7 @@ plotBoxAndWhiskerPlot(data.1$measurement, data.1$rmssd, col = rgb(0/255, 152/255
 
 plotBoxAndWhiskerPlot(data.1$measurement, data.1$mean.jerk.cost, col = rgb(0/255, 152/255, 199/255, .5), ylim = c(14, 24), main = "Bewegungsaufwand", ylab = "$\\times 10^3 \\: m^2 \\cdot s^{-5}$", pch = 16)
 
-plotBoxAndWhiskerPlot(data.1$measurement, data.1$mean.jerk.cost, col = rgb(0/255, 152/255, 199/255, .5), ylim = c(14, 24), main = "Doppelschrittfr.", ylab = "$1/min$", pch = 16)
+plotBoxAndWhiskerPlot(data.1$measurement, data.1$mean.ms.interval, col = rgb(0/255, 152/255, 199/255, .5), ylim = c(86, 89), main = "Doppelschrittfr.", ylab = "$1/min$", pch = 16)
 
 plotBoxAndWhiskerPlot(data.1$measurement, data.1$mean.hr, col = rgb(0/255, 152/255, 199/255, .5), ylim = c(160, 190), main = "Herzfrequenz", ylab = "$1/min$", pch = 16)
 plotBoxAndWhiskerPlot(data.1$measurement, data.1$mean.nsei, col = rgb(0/255, 152/255, 199/255, .5), ylim = c(0, .5), main = "N. Shan. Entr. Index", ylab = "$[0, 1]$", pch = 16)
@@ -512,17 +512,17 @@ par(mai = c(.5, .5, .2, .1), mgp = c(2.5, 1, 0), mfrow = c(3, 1))
 plotRelation(data.1$mean.ms.interval, data.1$flow, xlab = "Doppelschrittfrequenz ($1/min$)", ylab = "Generalfaktor", pch = 21, bg = rgb(0/255, 152/255, 199/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
-mtext("A", side = 2, line = 1, padj = -4, las = 1)
+mtext("A", side = 2, line = 1, padj = -5, las = 1)
 
 plotRelation(data.1$mean.hr, data.1$mean.jerk.cost, xlab = "Mittlere HR ($1/min$)", ylab = "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$))", pch = 21, bg = rgb(0/255, 152/255, 199/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
-mtext("B", side = 2, line = 1, padj = -4, las = 1)
+mtext("B", side = 2, line = 1, padj = -5, las = 1)
 
 plotRelation(data.1$mean.hr, data.1$mean.nsei, ylab = "Norm. Shannon Entropie Index", xlab = "Mittlere HR ($1/min$)", pch = 21, bg = rgb(0/255, 152/255, 199/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
-mtext("C", side = 2, line = 1, padj = -4, las = 1)
+mtext("C", side = 2, line = 1, padj = -5, las = 1)
 
 dev.off()
 ```
