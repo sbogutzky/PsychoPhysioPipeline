@@ -177,7 +177,7 @@ rm(ecg.data, ecg.data.subset, ecg.data.subset.minima, kinematic.data, kinematic.
 
 ```
 
-\begin{figure}[t]
+\begin{figure}[ht]
 	\input{./tikz/5_5_grundlage_der_klps}
 	\caption[Grundlage der Berechnung der kardio-lokomotorischen Phasensynchronisation]{Grundlage der Berechnung der kardio-lokomotorischen Phasensynchronisation}
 	\label{fig:5_5_grundlage_der_klps}
@@ -297,12 +297,12 @@ plotBoxAndWhiskerPlot(data.1$session, data.1$mean.jerk.cost, col = rgb(0/255, 15
 plotBoxAndWhiskerPlot(data.1$session, data.1$mean.jerk.cost, col = rgb(0/255, 152/255, 199/255, .5), ylim = c(14, 24), main = "Doppelschrittfr.", ylab = "$1/min$", pch = 16)
 
 plotBoxAndWhiskerPlot(data.1$session, data.1$mean.hr, col = rgb(0/255, 152/255, 199/255, .5), ylim = c(160, 190), main = "Herzfrequenz", ylab = "$1/min$", pch = 16)
-plotBoxAndWhiskerPlot(data.1$session, data.1$mean.nsei, col = rgb(0/255, 152/255, 199/255, .5), ylim = c(0, .5), main = "Norm. Shan. Entr. In.", ylab = "$[0, 1]$", pch = 16)
+plotBoxAndWhiskerPlot(data.1$session, data.1$mean.nsei, col = rgb(0/255, 152/255, 199/255, .5), ylim = c(0, .5), main = "N. Shan. Entr. Index", ylab = "$[0, 1]$", pch = 16)
 
 dev.off()
 ```
 
-\begin{figure}[t]
+\begin{figure}[ht]
 	\input{./tikz/5_6_ubersicht_nach_laufen_erste_studie}
 	\caption[Übersicht der expliziten und impliziten Merkmale nach Läufen der ersten Studie]{Übersicht der expliziten und impliziten Merkmale nach Läufen der ersten Studie [$N = 4$]}
 	\label{fig:5_6_ubersicht_nach_laufen_erste_studie}
@@ -351,11 +351,17 @@ plotBoxAndWhiskerPlot(data.1$measurement, data.1$mean.jerk.cost, col = rgb(0/255
 plotBoxAndWhiskerPlot(data.1$measurement, data.1$mean.jerk.cost, col = rgb(0/255, 152/255, 199/255, .5), ylim = c(14, 24), main = "Doppelschrittfr.", ylab = "$1/min$", pch = 16)
 
 plotBoxAndWhiskerPlot(data.1$measurement, data.1$mean.hr, col = rgb(0/255, 152/255, 199/255, .5), ylim = c(160, 190), main = "Herzfrequenz", ylab = "$1/min$", pch = 16)
-plotBoxAndWhiskerPlot(data.1$measurement, data.1$mean.nsei, col = rgb(0/255, 152/255, 199/255, .5), ylim = c(0, .5), main = "Norm. Shan. Entr. In.", ylab = "$[0, 1]$", pch = 16)
+plotBoxAndWhiskerPlot(data.1$measurement, data.1$mean.nsei, col = rgb(0/255, 152/255, 199/255, .5), ylim = c(0, .5), main = "N. Shan. Entr. Index", ylab = "$[0, 1]$", pch = 16)
 
 dev.off()
 
 ```
+
+\begin{figure}[ht]
+	\input{./tikz/5_7_ubersicht_nach_messzeitpunkten_erste_studie}
+	\caption[Übersicht der expliziten und impliziten Merkmale nach Messzeitpunkten der ersten Studie]{Übersicht der expliziten und impliziten Merkmale nach Messzeitpunkten der ersten Studie [$N = 6$]}
+	\label{fig:5_7_ubersicht_nach_messzeitpunkten_erste_studie}
+\end{figure}
 
 ```{r variables-measurement-wise, echo=FALSE, warning=FALSE, results="asis"}
     
@@ -468,6 +474,7 @@ plotRelation <- function(x, y, ...) {
   plot(x, y, ...)
   x.squared <- x^2
   linear.model <- lm(y ~ x + x.squared)
+  print(summary(linear.model))
   x <- seq(min(x), max(x), length.out = 100)
   x.squared <- x^2
   y.predicted <- predict.lm(linear.model, data.frame(x, x.squared))
@@ -490,122 +497,46 @@ for (i in c(4, 5, 6, 10, 12, 13, 15, 16, 17)) {
   }
 }
 
+# Clean up
+rm(x, x.squared, y, i, j, linear.model)
+
 ```
 
 ```{r regression-analysis, include=FALSE}
 
-par(mai = c(.5, .5, .2, .1), mgp = c(2.5, 1, 0), mfrow = c(5, 1))
-
-color <- rep(rgb(0/255, 152/255, 199/255), 24)
-color[data.1$mean.ms.interval < 87] <- rgb(96/255, 65/255, 79/255)
-color[data.1$mean.ms.interva > 88] <- rgb(229/255, 66/255, 66/255)
-
-pchs <- rep(21, 24)
-pchs[data.1$mean.ms.interva < 87] <- 22
-pchs[data.1$mean.ms.interva > 88] <- 23
-
-plotRelation(data.1$mean.ms.interval, data.1$flow, xlab = "Doppelschrittfrequenz ($1/min$)", ylab = "Generalfaktor", pch = pchs, bg = color)
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-
-plot(data.1$mean.ms.interval, data.1$mean.jerk.cost, ylab = "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", xlab = "Doppelschrittfrequenz ($1/min$)", pch = pchs, bg = color)
-linear.model <- lm(data.1$mean.jerk.cost ~ data.1$mean.ms.interval)
-abline(linear.model)
-summary(linear.model)
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-
-plotRelation(data.1$mean.hr, data.1$mean.jerk.cost, xlab = "Mittlere HR ($1/min$)", ylab = "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$))", pch = pchs, bg = color)
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-
-plotRelation(data.1$mean.hr, data.1$mean.nsei, ylab = "Norm. Shannon Entropie Index", xlab = "Mittlere HR ($1/min$)", pch = pchs, bg = color)
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-
-plot(data.1$mean.hr, data.1$fit, ylab = "AFP", xlab = "Mittlere HR ($1/min$)", pch = pchs, bg = color)
-linear.model <- lm(data.1$fit ~ data.1$mean.hr)
-abline(linear.model)
-summary(linear.model)
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-
-
-
-
-```
-
-```{r}
-require(lattice)
-xyplot(flow ~ mean.nsei, groups = groups, data = data.1, type = c("p", "r"), pch = c(21, 22, 23), xlab = "x", ylab = "Flow", auto.key = T)
-
-summary(lm(data.1$flow ~ data.1$mean.hr + groups + data.1$mean.hr * groups)) 
-
 # Setup tikz device
-#tikz("./tikz/5-8-regression.tex", width = 5.22, height = 5.22)
+tikz("./tikz/5_8_regression_analyse.tex", width = 5.22, height = 5.22)
 
-par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(2, 2))
+par(mai = c(.5, .5, .2, .1), mgp = c(2.5, 1, 0), mfrow = c(3, 1))
 
-# Plot absorption on mean HR
-mean.hr.squared <- data.1$mean.hr^2
-linear.model <- lm(mean.nsei ~ mean.hr, data = data.1)
-summary.lm(linear.model)
-mean.hr <- data.1$mean.hr
-linear.model.2 <- lm(data.1$mean.nsei ~ mean.hr + mean.hr.squared)
-summary.lm(linear.model.2)
-plot(data.1$mean.hr, data.1$mean.nsei, xlab = "Mittlere HR (BPM)", ylab = "Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
-abline(linear.model)
-mean.hr <- seq(160, 190, by = .5)
-mean.hr.squared <- mean.hr^2
-absorption.predicted <- predict.lm(linear.model.2, data.frame(mean.hr, mean.hr.squared))
-lines(mean.hr, absorption.predicted, lty = "dashed")
+plotRelation(data.1$mean.ms.interval, data.1$flow, xlab = "Doppelschrittfrequenz ($1/min$)", ylab = "Generalfaktor", pch = 21, bg = rgb(0/255, 152/255, 199/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
-mtext("A", side = 2, line = 3, padj = -7, las = 1)
+mtext("A", side = 2, line = 1, padj = -4, las = 1)
 
-# Plot absorption on RMSSD
-plot(data.1$rmssd, data.1$absorption, xlab = "RMSSD ($ms$)", ylab = "Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
-linear.model <- lm(data.1$absorption ~ data.1$rmssd)
-abline(linear.model)
-summary(linear.model)
+plotRelation(data.1$mean.hr, data.1$mean.jerk.cost, xlab = "Mittlere HR ($1/min$)", ylab = "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$))", pch = 21, bg = rgb(0/255, 152/255, 199/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
-mtext("B", side = 2, line = 3, padj = -7, las = 1)
+mtext("B", side = 2, line = 1, padj = -4, las = 1)
 
-# Plot absorption on NSEI
-plot(data.1$mean.nsei, data.1$absorption, xlab = "Norm. Shannon Entropie Index", ylab = "Absorbiertheit", pch = 24, bg = rgb(96/255, 65/255, 79/255))
-linear.model <- lm(data.1$absorption ~ data.1$mean.nsei)
-abline(linear.model)
-summary(linear.model)
+plotRelation(data.1$mean.hr, data.1$mean.nsei, ylab = "Norm. Shannon Entropie Index", xlab = "Mittlere HR ($1/min$)", pch = 21, bg = rgb(0/255, 152/255, 199/255))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
-mtext("C", side = 2, line = 3, padj = -7, las = 1)
+mtext("C", side = 2, line = 1, padj = -4, las = 1)
 
-# Plot fluency on jerk cost
-plot(data.1$mean.jerk.cost, data.1$fluency, xlab = "Bewegungsaufw. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", ylab = "Glatter Verlauf", pch = 23, bg = rgb(0/255, 152/255, 199/255))
-linear.model <- lm(data.1$fluency ~ data.1$mean.jerk.cost)
-abline(linear.model)
-summary(linear.model)
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-mtext("D", side = 2, line = 3, padj = -7, las = 1)
-
-#dev.off()
-
-# Clean up
-rm(mean.hr, mean.hr.squared, linear.model, linear.model.2)
+dev.off()
 ```
 
-\begin{figure}
-	\input{./tikz/5-8-regression}
-	\caption{Beobachtungen zur Fallstudie zum Laufen. (A) Absorbiertheit und mittlerer HR; (B) Absorbiertheit und RMSSD; (C) Glatterverlauf und mittlerer Bewegungsaufwand; (D) Absorbiertheit und mittlerer normalisierter Shannon Entropie Index. Quelle: Eigene Darstellung -+-\emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar.-+-Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
-	\label{fig:5_8_regression}
+\begin{figure}[ht]
+	\input{./tikz/5_8_regression_analyse}
+	\caption[Quadratische Zusammenhänge zwischen expliziten und impliziten Merkmalen beim Laufen]{Quadratische Zusammenhänge zwischen expliziten und impliziten Merkmalen beim Laufen. (A) Generalfaktor und mittlere Doppelschrittfrequenz; (B) mittlerer Bewegungsaufwand und mittlere HR; (C) Mittlerer normalisierter Shannon Entropie Index und mittlere HR-+-\emph{Anmerkung}: Gestrichelte Linie stellt das bestmögliche quardratische Modell dar.}
+	\label{fig:5_8_regression_analyse}
 \end{figure}
 
 ```{r process-oriented-approach, echo=FALSE, include=FALSE}
 
 # Setup tikz device
-tikz("./tikz/5-9-prozessorientierter-ansatz.tex", width = 7.91, height = 5.22)
+tikz("./tikz/5_9_prozessorientierter-ansatz.tex", width = 7.91, height = 5.22)
 
 # Set graphic parameter
 par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfcol = c(3, 3))
@@ -689,80 +620,7 @@ rm(cls.data, jc.data, kubios.hrv.data, cls.data.file.path, cls.data.file.name, d
 ```
 
 \begin{sidewaysfigure}
-	\input{./tikz/5-9-prozessorientierter-ansatz}
+	\input{./tikz/5_9_prozessorientierter-ansatz}
 	\caption{Drei Minuten Daten aus einem Lauf mit Unterforderung (links), einem optimalen Lauf (mitte) und einem Lauf mit Überforderung (rechts). Quelle: Eigene Darstellung -+- \emph{Anmerkung}: Bew. = Bewegungsaufwand. -+- Rel. Phase = Relative Phase.}
 	\label{fig:5_9_prozessorientierter_ansatz}
 \end{sidewaysfigure}
-
-```{r regression-analysis-extra, echo=FALSE, include=FALSE}
-
-# Setup tikz device
-tikz("./tikz/5-10-regression-extra.tex", width = 5.22, height = 5.22)
-
-par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 1))
-
-# Plot NSEI on mean HR
-mean.hr.squared <- data.2$mean.hr^2
-linear.model <- lm(mean.nsei ~ mean.hr, data = data.2)
-summary.lm(linear.model)
-mean.hr <- data.2$mean.hr
-linear.model.2 <- lm(data.2$mean.nsei ~ mean.hr + mean.hr.squared)
-summary.lm(linear.model.2)
-plot(data.2$mean.hr, data.2$mean.nsei, xlab = "Mittlere HR ($BPM$)", ylab = "Normalisierter Shannon Entropie Index", pch = 21, bg = rgb(229/255, 66/255, 66/255))
-abline(linear.model)
-mean.hr <- seq(160, 190, by = .5)
-mean.hr.squared <- mean.hr^2
-absorption.predicted <- predict.lm(linear.model.2, data.frame(mean.hr, mean.hr.squared))
-lines(mean.hr, absorption.predicted, lty = "dashed")
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-
-dev.off()
-
-# Clean up
-rm(absorption.predicted, linear.model, linear.model.2, mean.hr, mean.hr.squared)
-```
-
-\begin{figure}
-	\input{./tikz/5-10-regression-extra}
-	\caption{Beobachtungen zur Fallstudie zum Laufen. Mittlerer normalisierter Shannon Entropie Index und mittlerer HR. Quelle: Eigene Darstellung -+-\emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+-Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar.}
-	\label{fig:5_10_regression_extra}
-\end{figure}
-
-
-```{r}
-median.cut.feature <- 15
-test.feature <- 6
-
-sub.1 <- data.1[data.1[,median.cut.feature] <= median(data.1[,median.cut.feature], na.rm = T),]
-sub.2 <- data.1[data.1[,median.cut.feature] > median(data.1[,median.cut.feature], na.rm = T),]
-
-t.test(sub.1[,test.feature], sub.2[,test.feature])
-
-fac <- rep(1, 24) 
-fac[c(5, 6, 8, 9, 10, 14, 18, 22, 23)] <- 2
-fac[c(7, 12, 15, 16, 19, 20, 24)] <- 3
-
-spm.d <- c(1:4, 11, 13, 17, 21)
-balance <- c(5, 6, 8, 9, 10, 14, 18, 22, 23)
-bpm.d <- c(7, 12, 15, 16, 19, 20, 24)
-
-sub.1 <- data.1[spm.d,]
-sub.2 <- data.1[balance,]
-sub.3 <- data.1[bpm.d,]
-
-plot(sub.2$mean.nsei, sub.2$flow, ylim = c(min(data.1$flow), 6), xlim = c(min(data.1$mean.nsei), max(data.1$mean.nsei)), pch = 21, bg = "cyan", xlab = "Phasensynchronisation", ylab = "Flow")
-lmo <- lm(sub.2$flow ~ sub.2$mean.nsei)
-abline(lmo, col = "cyan")
-summary(lmo)
-
-points(sub.1$mean.nsei, sub.1$flow, pch = 22, bg = "green")
-lmo <- lm(sub.1$flow ~ sub.1$mean.nsei)
-abline(lmo, col = "green", lty = "dashed")
-points(sub.3$mean.nsei, sub.3$flow, pch = 23, bg = "red")
-lmo <- lm(sub.3$flow ~ sub.3$mean.nsei)
-abline(lmo, col = "red", lty = "dotted")
-
-legend("topleft", pch = c(21,22,23), legend = c("Balance", "Schritt Dominanz (Unterf.)", "Herz Dominanz (Überf.)"), pt.bg = c("cyan", "green", "red"), text.width = 0.3)
-
-```
