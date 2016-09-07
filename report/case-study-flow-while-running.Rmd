@@ -69,7 +69,7 @@ stride.data <- read.csv(stride.data.path)
 ecg.data <- read.csv(ecg.data.file.path)
 
 # Setup tikz device
-tikz("./tikz/5_2_daten.tex", width = 7.91, height = 5.22)
+tikz("./tikz/rohdaten_1.tex", width = 7.91, height = 5.22)
 
 par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfcol = c(2, 4))
 
@@ -115,14 +115,14 @@ rm(stride.data, ecg.data.subset, kinematic.data.subset, date.directory, ecg.data
 ```
 
 \begin{sidewaysfigure}
-\input{./tikz/5_2_daten}
+\input{./tikz/rohdaten_1}
 \caption[Aufgenommene Datenströme beim Laufen]{Aufgenommene Datenströme eines Bewegungsaublaufs in der ersten Studie zum Flow-Erleben beim Laufen. Von links nach rechts: (schwarz) EKG-Ableitung RA-LL und EKG-Ableitung LA-LL; (grün) Beschleunigung in X-Richtung und Winkelgeschwindigkeit um die X Achse; (blau) Beschleunigung in Y-Richtung und Winkelgeschwindigkeit um die Y-Achse; (rot) Beschleunigung in Z-Richtung und Winkelgeschwindigkeit um die Z-Achse}
-\label{fig:5_2_daten}
+\label{fig:rohdaten_1}
 \end{sidewaysfigure}
 
 ```{r cls-basis, include=FALSE}
 
-tikz("./tikz/5_5_grundlage_der_klps.tex", width = 5.22, height = 5.22)
+tikz("./tikz/grundlage_klps.tex", width = 5.22, height = 5.22)
 
 par(mai = c(.1, .1, .1, .1), mgp = c(.1, .1, 0), mfcol = c(1, 1))
 
@@ -177,10 +177,10 @@ rm(ecg.data, ecg.data.subset, ecg.data.subset.minima, kinematic.data, kinematic.
 
 ```
 
-\begin{figure}[ht]
-\input{./tikz/5_5_grundlage_der_klps}
+\begin{figure}[!htb]
+\input{./tikz/grundlage_klps}
 \caption[Grundlage der Berechnung der kardio-lokomotorischen Phasensynchronisation]{Grundlage der Berechnung der kardio-lokomotorischen Phasensynchronisation}
-\label{fig:5_5_grundlage_der_klps}
+\label{fig:grundlage_klps}
 \end{figure}
 
 ```{r load-data, include=FALSE}
@@ -251,15 +251,15 @@ rm(fss.measurements, fss.features)
 ```{r fss-reability-running-latex-tables, echo=FALSE, warning=FALSE, results="asis"}
 
 # Print latex table
-table <- xtable(data.table.flow, label = "tab:generalfaktor_fallstudie_laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des Generalfaktors der ersten Studie zum Flow-Erleben beim Laufen") 
+table <- xtable(data.table.flow, label = "tab:generalfaktor_1", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des Generalfaktors der ersten Studie zum Flow-Erleben beim Laufen") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
 
 # Print latex table
-table <- xtable(data.table.fluency, label = "tab:glatter_verlauf_fallstudie-laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des glatten Verlaufs der ersten Studie zum Flow-Erleben beim Laufen [$N = 24$]") 
+table <- xtable(data.table.fluency, label = "tab:glatter_verlauf_1", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des glatten Verlaufs der ersten Studie zum Flow-Erleben beim Laufen [$N = 24$]") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
 
 # Print latex table
-table <- xtable(data.table.absorption, label = "tab:absorbiertheit_fallstudie_laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items der Absorbiertheit der ersten Studie zum Flow-Erleben beim Laufen [$N = 24$]") 
+table <- xtable(data.table.absorption, label = "tab:absorbiertheit_1", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items der Absorbiertheit der ersten Studie zum Flow-Erleben beim Laufen [$N = 24$]") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
 
 # Clean up
@@ -271,7 +271,7 @@ rm(data.table.flow, data.table.fluency, data.table.absorption, table)
 ```{r variables-session-wise-box-and-whisker-plots, include=FALSE}
 
 # Setup tikz device
-tikz("./tikz/5_6_ubersicht_nach_laufen_erste_studie.tex", width = 5.22, height = 5.22)
+tikz("./tikz/ubersicht_nach_laufen_1.tex", width = 5.22, height = 5.22)
 
 plotBoxAndWhiskerPlot = function(x, y, col, ...) {
  boxplot(y ~ x, outline = FALSE, boxwex = .75, col = rgb(186/255, 187/255, 194/255, .5), ...)
@@ -302,10 +302,10 @@ plotBoxAndWhiskerPlot(data.1$session, data.1$mean.nsei, col = rgb(0/255, 152/255
 dev.off()
 ```
 
-\begin{figure}[ht]
-\input{./tikz/5_6_ubersicht_nach_laufen_erste_studie}
+\begin{figure}[!htb]
+\input{./tikz/ubersicht_nach_laufen_1}
 \caption[Übersicht der expliziten und impliziten Merkmale nach Läufen der ersten Studie]{Übersicht der expliziten und impliziten Merkmale nach Läufen der ersten Studie [$N = 4$]}
-\label{fig:5_6_ubersicht_nach_laufen_erste_studie}
+\label{fig:ubersicht_nach_laufen_1}
 \end{figure}
 
 
@@ -322,7 +322,7 @@ colnames(feature.table) <- c(levels(data.1[, 2]), "Gesamt")
 rownames(feature.table) <- c("Generalfaktor $[1, 7]$", "Glatter Verlauf $[1, 7]$", "Absorbiertheit $[1, 7]$", "AFP $[1, 9]$", "Herzfrequenz ($1/min$)", "RMSSD ($ms$)", "Norm. Shan. Entr. Index", "Doppelschrittfr. ($1/min$)", "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
 
 # Print latex table
-table <- xtable(feature.table, label = "tab:ubersicht_nach_laufen_erste_studie", align = "lyyyyyyy", caption = "Übersicht der expliziten und impliziten Merkmale nach Läufen der ersten Studie: Arithmetisches Mittel $\\pm$ Standardabweichung zu den sechs Läufen [$N = 4$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
+table <- xtable(feature.table, label = "tab:ubersicht_nach_laufen_1", align = "lyyyyyyy", caption = "Übersicht der expliziten und impliziten Merkmale nach Läufen der ersten Studie: Arithmetisches Mittel $\\pm$ Standardabweichung zu den sechs Läufen [$N = 4$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
 print(table, floating.environment="sidewaystable", caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
 
 # Clean up
@@ -332,7 +332,7 @@ rm(feature.table, table, i)
 ```{r variables-measurement-wise-box-and-whisker-plots, include=FALSE}
 
 # Setup tikz device
-tikz("./tikz/5_7_ubersicht_nach_messzeitpunkten_erste_studie.tex", width = 5.22, height = 5.22)
+tikz("./tikz/ubersicht_nach_messzeitpunkten_1.tex", width = 5.22, height = 5.22)
 
 # Set graphic parameter
 par(mai = c(.5, .5, .2, .1), mgp = c(2.5, 1, 0), mfrow = c(3, 3))
@@ -357,10 +357,10 @@ dev.off()
 
 ```
 
-\begin{figure}[ht]
-\input{./tikz/5_7_ubersicht_nach_messzeitpunkten_erste_studie}
+\begin{figure}[!htb]
+\input{./tikz/ubersicht_nach_messzeitpunkten_1}
 \caption[Übersicht der expliziten und impliziten Merkmale nach Messzeitpunkten der ersten Studie]{Übersicht der expliziten und impliziten Merkmale nach Messzeitpunkten der ersten Studie [$N = 6$]}
-\label{fig:5_7_ubersicht_nach_messzeitpunkten_erste_studie}
+\label{fig:ubersicht_nach_messzeitpunkten_1}
 \end{figure}
 
 ```{r variables-measurement-wise, echo=FALSE, warning=FALSE, results="asis"}
@@ -376,7 +376,7 @@ colnames(feature.table) <- c(levels(data.1[, 3]), "Gesamt")
 rownames(feature.table) <- c("Generalfaktor $[1, 7]$", "Glatter Verlauf $[1, 7]$", "Absorbiertheit $[1, 7]$", "AFP $[1, 9]$", "Herzfrequenz ($1/min$)", "RMSSD ($ms$)", "Norm. Shan. Entr. Index", "Doppelschrittfr. ($1/min$)", "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
 
 # Print latex table
-table <- xtable(feature.table, label = "tab:ubersicht_nach_messzeitpunkten_erste_studie", align = "lyyyyy", caption = "Übersicht der expliziten und impliziten Merkmale nach Messzeitpunkten der ersten Studie: Arithmetisches Mittel $\\pm$ Standardabweichung zu den sechs Läufen [$N = 6$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
+table <- xtable(feature.table, label = "tab:ubersicht_nach_messzeitpunkten_1", align = "lyyyyy", caption = "Übersicht der expliziten und impliziten Merkmale nach Messzeitpunkten der ersten Studie zum Laufen: Arithmetisches Mittel $\\pm$ Standardabweichung zu den sechs Läufen [$N = 6$] -+- \\emph{Anmerkung}: Bew. = Bewegungsaufwand.") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
 
 # Clean up
@@ -452,7 +452,7 @@ for(cn in 1:ncol(cor.table)) {
 }
 
 # Print latex table
-table <- xtable(cor.table, label = "tab:korrelationen_erste_studie_laufen", align = "lxxxxxxxxxx", caption = "Korrelationsmatrix der ersten Studie zum Flow-Erleben beim Laufen: Arithmetisches Mittel, Standardabweichung und Korrelationen [$N = 24$] -+-Anmerkung: Bew. = Bewegungsaufwand. -+-* Korrelation ist auf dem Niveau von 0,05 (zweiseitig) signifikant. -+-** Korrelation ist auf dem Niveau von 0,01 (zweiseitig) signifikant.") 
+table <- xtable(cor.table, label = "tab:korrelationen_1", align = "lxxxxxxxxxx", caption = "Korrelationsmatrix der ersten Studie zum Flow-Erleben beim Laufen: Arithmetisches Mittel, Standardabweichung und Korrelationen [$N = 24$] -+-Anmerkung: Bew. = Bewegungsaufwand. -+-* Korrelation ist auf dem Niveau von 0,05 (zweiseitig) signifikant. -+-** Korrelation ist auf dem Niveau von 0,01 (zweiseitig) signifikant.") 
 print(table, floating.environment="sidewaystable", caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
 
 # Clean up
@@ -505,7 +505,7 @@ rm(x, x.squared, y, i, j, linear.model)
 ```{r regression-analysis, include=FALSE}
 
 # Setup tikz device
-tikz("./tikz/5_8_regression_analyse.tex", width = 5.22, height = 5.22)
+tikz("./tikz/regressionsanalyse_1.tex", width = 5.22, height = 5.22)
 
 par(mai = c(.5, .5, .2, .1), mgp = c(2.5, 1, 0), mfrow = c(3, 1))
 
@@ -527,10 +527,10 @@ mtext("C", side = 2, line = 1, padj = -5, las = 1)
 dev.off()
 ```
 
-\begin{figure}[ht]
-\input{./tikz/5_8_regression_analyse}
+\begin{figure}[!htb]
+\input{./tikz/regressionsanalyse_1}
 \caption[Quadratische Zusammenhänge zwischen expliziten und impliziten Merkmalen beim Laufen]{Quadratische Zusammenhänge zwischen expliziten und impliziten Merkmalen beim Laufen. (A) Generalfaktor und mittlere Doppelschrittfrequenz; (B) mittlerer Bewegungsaufwand und mittlere HR; (C) Mittlerer normalisierter Shannon Entropie Index und mittlere HR-+-\emph{Anmerkung}: Gestrichelte Linie stellt das bestmögliche quardratische Modell dar.}
-\label{fig:5_8_regression_analyse}
+\label{fig:regressionsanalyse_1}
 \end{figure}
 
 ```{r process-oriented-approach, echo=FALSE, include=FALSE}
@@ -585,7 +585,7 @@ cls.phase.data <- read.csv(cls.phase.data.file.path)
 cls.index.data <- read.csv(cls.index.data.file.path)
 
 # Setup tikz device
-tikz("./tikz/5_9_prozessorientierter_ansatz.tex", width = 7.91, height = 5.22)
+tikz("./tikz/prozessorientierte_ansicht.tex", width = 7.91, height = 5.22)
 
 # Set graphic parameter
 par(mai = c(.5, .5, .2, .1), mgp = c(2.5, 1, 0), mfrow = c(4, 1))
@@ -617,7 +617,7 @@ rm(cls.index.data, cls.phase.data, jc.data, kubios.hrv.data, cls.index.data.file
 ```
 
 \begin{sidewaysfigure}
-\input{./tikz/5_9_prozessorientierter_ansatz}
+\input{./tikz/prozessorientierte_ansicht}
 \caption[Beispielhafte Prozessdarstellung des letzten Laufabschnittes vom 07. November 2013 (Erste Studie: Laufen)]{Beispielhafte Prozessdarstellung des letzten Laufabschnittes vom 07. November 2013 -+- \emph{Anmerkung}: Rel. Phase = Relative Phase}
-\label{fig:5_9_prozessorientierter_ansatz}
+\label{fig:prozessorientierte_ansicht}
 \end{sidewaysfigure}
