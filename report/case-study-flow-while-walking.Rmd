@@ -160,7 +160,7 @@ dev.off()
 
 \begin{figure}[!htb]
 \input{./tikz/ubersicht_nach_gangen_2}
-\caption[Übersicht der expliziten und impliziten Merkmale nach Gängen der Machbarkeitsstudie]{Übersicht der expliziten und impliziten Merkmale nach Gängen der Machbarkeitsstudie [$N ~ 4$]}
+\caption[Übersicht der expliziten und impliziten Merkmale nach Gängen der Machbarkeitsstudie]{Übersicht der expliziten und impliziten Merkmale nach Gängen der Machbarkeitsstudie [$N \approx 4$]}
 \label{fig:ubersicht_nach_gangen_2}
 \end{figure}
 
@@ -178,7 +178,7 @@ colnames(feature.table) <- c(levels(data.1[, 2]), "Gesamt")
 rownames(feature.table) <- c("Generalfaktor $[1, 7]$", "Glatter Verlauf $[1, 7]$", "Absorbiertheit $[1, 7]$", "Herzfrequenz ($1/min$)", "Norm. Shan. Entr. Index", "Doppelschrittfr. ($1/min$)")
 
 # Print latex table
-table <- xtable(feature.table, label = "tab:ubersicht_nach_gangen_2", align = "lyyyyyyy", caption = "Übersicht der expliziten und impliziten Merkmale nach Gängen der Machbarkeitsstudie: Arithmetisches Mittel $\\pm$ Standardabweichung zu den sechs Gängen [$N ~ 4$]") 
+table <- xtable(feature.table, label = "tab:ubersicht_nach_gangen_2", align = "lyyyyyyy", caption = "Übersicht der expliziten und impliziten Merkmale nach Gängen der Machbarkeitsstudie: Arithmetisches Mittel $\\pm$ Standardabweichung zu den sechs Gängen [$N \approx 4$]") 
 print(table, floating.environment="sidewaystable", caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
 
 # Clean up
@@ -208,7 +208,7 @@ dev.off()
 
 \begin{figure}[!htb]
 \input{./tikz/ubersicht_nach_messzeitpunkten_2}
-\caption[Übersicht der expliziten und impliziten Merkmale nach Messzeitpunkten der Machbarkeitsstudie]{Übersicht der expliziten und impliziten Merkmale nach Messzeitpunkten der Machbarkeitsstudie [$N ~ 6$]}
+\caption[Übersicht der expliziten und impliziten Merkmale nach Messzeitpunkten der Machbarkeitsstudie]{Übersicht der expliziten und impliziten Merkmale nach Messzeitpunkten der Machbarkeitsstudie [$N \approx 6$]}
 \label{fig:ubersicht_nach_messzeitpunkten_2}
 \end{figure}
 
@@ -225,7 +225,7 @@ colnames(feature.table) <- c(levels(data.1[, 3]), "Gesamt")
 rownames(feature.table) <- c("Generalfaktor $[1, 7]$", "Glatter Verlauf $[1, 7]$", "Absorbiertheit $[1, 7]$", "Herzfrequenz ($1/min$)", "Norm. Shan. Entr. Index", "Doppelschrittfr. ($1/min$)")
 
 # Print latex table
-table <- xtable(feature.table, label = "tab:ubersicht_nach_messzeitpunkten_2", align = "lyyyyy", caption = "Übersicht der expliziten und impliziten Merkmale nach Messzeitpunkten der Machbarkeitsstudie: Arithmetisches Mittel $\\pm$ Standardabweichung zu den sechs Gängen [$N ~ 6$]") 
+table <- xtable(feature.table, label = "tab:ubersicht_nach_messzeitpunkten_2", align = "lyyyyy", caption = "Übersicht der expliziten und impliziten Merkmale nach Messzeitpunkten der Machbarkeitsstudie: Arithmetisches Mittel $\\pm$ Standardabweichung zu den sechs Gängen [$N \approx 6$]") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
 
 # Clean up
