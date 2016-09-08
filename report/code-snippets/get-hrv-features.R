@@ -22,6 +22,7 @@ for (i in 1:nrow(fss.features)) {
     hrv.feature.row <- data.frame(mean.hr, rmssd)
     names(hrv.feature.row) <- hrv.feature.names
     hrv.features <- rbind(hrv.features, hrv.feature.row)
+    rm(heart.beat.times, rr, rmssd, mean.hr, kubios.hrv.data)
   } 
   
   else {
@@ -31,4 +32,4 @@ for (i in 1:nrow(fss.features)) {
   }
   rm(kubios.hrv.data.file.path, hrv.feature.row)
 }
-rm(hrv.feature.names, i, session.start, heart.beat.times, rr, rmssd, mean.hr, kubios.hrv.data)
+rm(hrv.feature.names, i, session.start)
