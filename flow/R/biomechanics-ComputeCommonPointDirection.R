@@ -14,11 +14,34 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# set directories
-activity.directory <- "running/" #paste(tolower(activity), "/",  sep = "")
-#user.directory <- paste(tolower(last.name), "-", tolower(first.name), "/",  sep = "")
+#' Computes the common direction of the relative phase of two oscillators
+#' 
+#' \code{ComputeCommonPointDirection} returns most common direction.
+#' @param t a numerical vector of the times in second of the relative phases.
+#' @param psi a numerical vector of the realive phase.
+#' @param t.k the point in time for calculting the index.
+#' @param t.w the time window around t.k in seconds (default = 10).
+#' @return the most commen direction 1 = up, 2 = balance, 3 = down.
 
-# Set directory paths
-raw.data.directory.path <- paste(root.directory.path, "raw-data/", activity.directory, user.directory, sep = "")
-processed.data.directory.path <- paste(root.directory.path, "processed-data/", activity.directory, user.directory, sep = "")
-feature.directory.path <- paste(root.directory.path, "features/", activity.directory, user.directory, sep = "")
+ComputeCommonPointDirection <- function(t, psi, t.k, t.w = 10) {
+  
+  t.j <- t.k - t.w / 2 <= t & t < t.k + t.w / 2
+  
+  x <- psi[t.j]
+  x <- x[!is.na(x)]
+  # print(x)
+  
+  n <- length(x)
+  if(n > 1) {
+    
+    diffs <- diff(x)
+    up <-  sum(diffs > 0)
+    down <- sum(diffs < 0)
+    balanced <- sum(diffs == 0)
+    
+    return(which.max(c(down, balanced, up)))
+  
+  } else {
+    return(2)
+  }
+}

@@ -1,5 +1,5 @@
 cls.features  <- data.frame()
-cls.feature.names <- c("mean.pcoi", "mean.nsei")
+cls.feature.names <- c("mean.pcoi", "mean.nsei", "direction")
 for (i in 1:nrow(fss.features)) {
   
   session.start <- fss.features[i, 9]
@@ -11,14 +11,14 @@ for (i in 1:nrow(fss.features)) {
   if(file.exists(cls.data.path)) {
     cls.data <- read.csv(cls.data.path, skip = 2)
     cls.data <- cls.data[max(cls.data[, 1], na.rm = T) - min.before.end * 60000 < cls.data[, 1], ]
-    cls.feature.row <- data.frame(t(colMeans(cls.data[, 2:3], na.rm = T)))
+    cls.feature.row <- data.frame(t(colMeans(cls.data[, 2:3], na.rm = T)), as.numeric(which.max(table(as.factor(c(cls.data[, 4], levels = c(1,2,3)))))))
     names(cls.feature.row) <- cls.feature.names
     cls.features <- rbind(cls.features, cls.feature.row)
     rm(cls.data)
   } 
   
   else {
-    cls.feature.row <- data.frame(t(rep(NA, 2)))
+    cls.feature.row <- data.frame(t(rep(NA, 3)))
     names(cls.feature.row) <- cls.feature.names
     cls.features <- rbind(cls.features, cls.feature.row)
   }
