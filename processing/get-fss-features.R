@@ -17,24 +17,20 @@
 # Version 2.0
 
 # Remove all variables
-#rm(list = ls(all = T))  
+rm(list = ls(all = T))  
 
 # Load libraries
 library(flow)
 
+# Set working directory
+setwd("~/psychophysiopipeline/processing")
+
 # User input
-
-
-
-root.directory.path <- "/Volumes/DOS/daten/2016/" #readline("Quellverzeichnis > ")
-first.name <- "X" #readline("Vorname der Untersuchungsperson > ")
-last.name <- "X" #readline("Nachname der Untersuchungsperson > ")
-date.of.birth <- "2011-12-12" #readline("Geburtsdatum der Untersuchungsperson (Format: YYYY-MM-dd) > ")
-activity <- "Running" #readline("Aktivität der Untersuchung > ")
-
-user.directories <- paste(list.dirs("/Volumes/DOS/daten/2016/processed-data/running", recursive = F, full.names = F), "/", sep = "")
-
-for(user.directory in user.directories) {
+root.directory.path <- readline("Quellverzeichnis > ")
+first.name <- readline("Vorname der Untersuchungsperson > ")
+last.name <- readline("Nachname der Untersuchungsperson > ")
+date.of.birth <- readline("Geburtsdatum der Untersuchungsperson (Format: YYYY-MM-dd) > ")
+activity <- readline("Aktivität der Untersuchung > ")
 
 # Set directory paths
 source("./code-snippets/set-directory-paths.R")
@@ -60,7 +56,6 @@ for (self.report.file.name in self.report.file.names) {
     
     # Calculate fss dimensions
     fss.measurement <- as.numeric(self.report.data[i, 4:19])
-    print(fss.measurement[c(1,3,6,10)])
     fss.dimensions <- ComputeFlowShortScaleDimensions(fss.measurement)
     
     # Add fss features
@@ -73,11 +68,10 @@ for (self.report.file.name in self.report.file.names) {
 if(!dir.exists(feature.directory.path)) {
   dir.create(feature.directory.path, recursive = T)
 }
-#write.csv(fss.features, paste(feature.directory.path, "fss-features.csv", sep = ""), row.names = F)
-
+write.csv(fss.features, paste(feature.directory.path, "fss-features.csv", sep = ""), row.names = F)
 
 print("---")
 print(paste("fss-features.csv in", feature.directory.path, "geschrieben."))
-}
+
 # Clean up
-#rm(fss.dimensions, self.report.data, activity, activity.end.ms, activity.start.ms, date.of.birth, first.name, fss.measurement, i, last.name, self.report.end.ms, self.report.file.name, self.report.file.names, session.start)
+rm(fss.dimensions, self.report.data, activity, activity.end.ms, activity.start.ms, date.of.birth, first.name, fss.measurement, i, last.name, self.report.end.ms, self.report.file.name, self.report.file.names, session.start)

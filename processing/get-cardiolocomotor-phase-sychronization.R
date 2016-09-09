@@ -26,14 +26,14 @@ library(flow)
 library(zoom)
 
 # User input
-root.directory.path <- "/Volumes/DOS/daten/2016/" # readline("Quellverzeichnis > ")  
-#first.name <- readline("Vorname der Untersuchungsperson > ")
-#last.name <- readline("Nachname der Untersuchungsperson > ")
-#activity <-  readline("Aktivität der Untersuchung > ")
-ecg.data.file.name <- "imu-rn42-bd38" #readline("Dateiname der Datei mit EKG-Daten (ohne .csv) > ")
-kinematic.data.file.name.1 <- "imu-rn42-3b70" #readline("Dateiname der ersten Datei mit kinematischen Daten (ohne .csv) > ")
-kinematic.data.file.name.2 <- "" # "imu-rn42-bc98" #readline("Dateiname der zweiten Datei mit kinematischen Daten (ohne .csv / optimal) > ")
-time.window.s <- 15 #as.numeric(readline("Zeitfenster für die Index-Berechnung  (s) > "))
+root.directory.path <- readline("Quellverzeichnis > ")  
+first.name <- readline("Vorname der Untersuchungsperson > ")
+last.name <- readline("Nachname der Untersuchungsperson > ")
+activity <-  readline("Aktivität der Untersuchung > ")
+ecg.data.file.name <- readline("Dateiname der Datei mit EKG-Daten (ohne .csv) > ")
+kinematic.data.file.name.1 <- readline("Dateiname der ersten Datei mit kinematischen Daten (ohne .csv) > ")
+kinematic.data.file.name.2 <- readline("Dateiname der zweiten Datei mit kinematischen Daten (ohne .csv / optimal) > ")
+time.window.s <- as.numeric(readline("Zeitfenster für die Index-Berechnung  (s) > "))
 if(is.na(time.window.s)) time.window.s = 30
 
 user.directories <- paste(list.dirs("/Volumes/DOS/daten/2016/processed-data/running", recursive = F, full.names = F), "/", sep = "")
@@ -77,8 +77,6 @@ for (self.report.file.name in self.report.file.names) {
       stride.data.1 <- stride.data.1[order(stride.data.1[, 1]),]
       stride.times <- stride.data.1[, 1] / 1000
       
-      summary(diff(stride.data.1[, 1]))
-      
       # Load heart beat times
       source("./code-snippets/get-kubios-hrv-data.R")
       heart.beat.times <- c(kubios.hrv.data[1, 1] - kubios.hrv.data[1, 2], kubios.hrv.data[, 1])
@@ -90,7 +88,7 @@ for (self.report.file.name in self.report.file.names) {
       y.lim <- c(min(mean(spm, na.rm = TRUE) - sd(spm, na.rm = TRUE) * 2, mean(bpm, na.rm = TRUE) - sd(bpm, na.rm = TRUE) * 2), max(mean(spm, na.rm = TRUE) + sd(spm, na.rm = TRUE) * 2, mean(bpm, na.rm = TRUE) + sd(bpm, na.rm = TRUE) * 2))
       
       # Plot
-      par(mfcol = c(4, 1), mar = c(3.5, 4, 2, 4) + 0.1, mgp = c(2.5, 1, 0))
+      par(mfcol = c(3, 1), mar = c(3.5, 4, 2, 4) + 0.1, mgp = c(2.5, 1, 0))
       
       # SPM vs. BPM 
       plot(stride.times, spm, xlab = "", ylab = "Mittlerer Schritt & Mittlerer HR", xaxt = "n", xlim = time.range.s, ylim = y.lim, xaxs = "i", pch = 23, bg = rgb(0/255, 152/255, 199/255))
@@ -132,28 +130,19 @@ for (self.report.file.name in self.report.file.names) {
       cls.index.data <- cls.index.data[cls.index.data[, 1] / 1000 > min(heart.beat.times) & cls.index.data[, 1] / 1000 < max(heart.beat.times), ]
       rm(timestamps, phase.coherence.indexes, normalized.shannon.entropy.indexes, common.point.directions)
       
-      plot(cls.index.data[, 1] / 1000, cls.index.data[, 3], type = "l", xlab = "", ylab = "Indexes", xaxt = "n",  yaxt = "n", xlim = time.range.s, xaxs = "i", yaxs = "i", ylim = y.lim, col = rgb(0/255, 152/255, 199/255))
+      plot(cls.index.data[, 1] / 1000, cls.index.data[, 3], type = "l", xlab = "Zeit (s)", ylab = "Indexes", xaxt = "n",  yaxt = "n", xlim = time.range.s, xaxs = "i", yaxs = "i", ylim = y.lim, col = rgb(0/255, 152/255, 199/255))
       lines(cls.index.data[, 1] / 1000, cls.index.data[, 2], lty = 2)
       abline(v = seq(time.range.s[1], time.range.s[2], time.window.s), lty = "dashed", col = rgb(186/255, 187/255, 194/255))
       axis(1, at = seq(time.range.s[1], time.range.s[2], time.window.s), labels = seq(time.range.s[1], time.range.s[2], time.window.s), las = 1)
       axis(2, at = seq(y.lim[1], y.lim[2], .2), labels = seq(y.lim[1], y.lim[2], .2))
       legend("topright", c("PCoI", "NSEI"), lty = c("dashed", "solid"),  col = c("black", rgb(0/255, 152/255, 199/255)), bg = "white")
       box()
-      
-      plot(cls.index.data[, 1] / 1000, cls.index.data[, 4], type = "l", xlab = "Zeit (s)", ylab = "Direction", xaxt = "n",  yaxt = "n", xlim = time.range.s, xaxs = "i", yaxs = "i", ylim = c(1, 3), col = rgb(0/255, 152/255, 199/255))
-      abline(v = seq(time.range.s[1], time.range.s[2], time.window.s), lty = "dashed", col = rgb(186/255, 187/255, 194/255))
-      axis(1, at = seq(time.range.s[1], time.range.s[2], time.window.s), labels = seq(time.range.s[1], time.range.s[2], time.window.s), las = 1)
-      axis(2, at = seq(y.lim[1], y.lim[2], .2), labels = seq(y.lim[1], y.lim[2], .2))
-      box()
-      
-      #zm()
+      zm()
       
       # Print synchronisation features
       print("---")
       print(paste("Mittlerer normalisierter Shannon Entropie Index:", round(mean(cls.index.data[, 3], na.rm = TRUE), 2)))
       print(paste("Mittlerer Phasenkohärenz Index:", round(mean(cls.index.data[, 2], na.rm = TRUE), 2)))
-      
-      print(summary(as.factor(cls.index.data[, 4])))
       
       # Write to csv file
       if(!dir.exists(paste(processed.data.directory.path, date.directory, sep =""))) {
@@ -172,7 +161,6 @@ for (self.report.file.name in self.report.file.names) {
       print("oder")
       print(paste("Datei nicht gefunden:", kinematic.data.file.name.1))
     }
-    # readline("Weiter > ")
+    readline("Weiter > ")
   }
-}
 }

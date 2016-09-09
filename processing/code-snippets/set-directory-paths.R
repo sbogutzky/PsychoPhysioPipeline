@@ -15,8 +15,8 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 # set directories
-activity.directory <- "running/" #paste(tolower(activity), "/",  sep = "")
-#user.directory <- paste(tolower(last.name), "-", tolower(first.name), "/",  sep = "")
+activity.directory <- paste(tolower(activity), "/",  sep = "")
+user.directory <- paste(tolower(last.name), "-", tolower(first.name), "/",  sep = "")
 
 # Set directory paths
 raw.data.directory.path <- paste(root.directory.path, "raw-data/", activity.directory, user.directory, sep = "")
