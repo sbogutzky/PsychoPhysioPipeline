@@ -110,95 +110,18 @@ rownames(data.1) <- seq(length = nrow(data.1))
 rm(u, user.directory, user.efforts, subjects, fss.features, hrv.features, cls.features, jc.features, stride.features, mean.ms.interval.left, mean.ms.interval.right, mean.jerk.cost.left, mean.jerk.cost.right, min.before.end, user.count, kinematic.data.file.name, age)
 ```
 
-```{r view, echo=FALSE, warning=FALSE, eval=FALSE}
 
-# Remove users
-data.2 <- cbind(data.1, user.directories)
-data.3 <- data.2
-data.3 <- data.3[-c(28, 29, 33, 36, 10, 15, 26, 32), ]
-
-
-physiological.state <- data.3$direction
-physiological.state[data.3$mean.nsei > .1] <- 2
-
-plot(data.2, col = physiological.state)
-apa.cor.table(data.2, show.conf.interval = FALSE)
-
-data.3 <- data.3[, c(2:4,10,13,16,18)]
-
-
-feature <- 3
-
-boxplot(data.3[, feature] ~ factor(physiological.state, labels = c("Herz dominiert", "Gleichgewicht", "Schritt dominiert")), ylab = "Absorbiertheit")
-
-# hist(data.3[physiological.state == 1, feature])
-# length(data.3[physiological.state == 1, feature])
-# shapiro.test(data.3[physiological.state == 1, feature])
-# hist(data.3[physiological.state == 2, feature])
-# length(data.3[physiological.state == 2, feature])
-# shapiro.test(data.3[physiological.state == 2, feature])
-# hist(data.3[physiological.state == 3, feature])
-# length(data.3[physiological.state == 3, feature])
-# shapiro.test(data.3[physiological.state == 3, feature])
-
-t.test(data.3[physiological.state == 1, feature], data.3[physiological.state == 2, feature])
-t.test(data.3[physiological.state == 2, feature], data.3[physiological.state == 3, feature])
-
-require(lattice)
-summary(lm(data.3$absorption ~ data.3$mean.hr + data.3$mean.nsei + data.3$mean.hr * data.3$mean.nsei)) 
-xyplot(data.3$absorption ~ data.3$mean.hr, groups = physiological.state, data = data.3, type = c('p','r'), grid = T, lwd = 3, auto.key = T)
-
-require(lattice)
-summary(lm(data.3$fluency ~ data.3$stride.freq.right + physiological.state + data.3$stride.freq.right * physiological.state)) 
-xyplot(data.3$flow ~ data.3$stride.freq.right, groups = physiological.state, data = data.3, type = c('p','r'), grid = T, lwd = 3, auto.key = T)
-
-require(lattice)
-summary(lm(data.3$fluency ~ data.3$mean.jerk.cost.right.10.3 + physiological.state + data.3$mean.jerk.cost.right.10.3 * physiological.state)) 
-xyplot(data.3$flow ~ data.3$mean.jerk.cost.right.10.3, groups = physiological.state, data = data.3, type = c('p','r'), grid = T, lwd = 3, auto.key = T)
-
+```{r outliers, echo=FALSE, warning=FALSE}
+outliers <- c(28, 29, 33, 36, 15)
 ```
 
 # FKS Reabilität
 
-```{r fss-reability-baseline, echo=FALSE, warning=FALSE, include=FALSE}
-
-# Get all fss measurements of the baseline
-fss.features <- data.1[, 2:8]
-fss.file.paths <- list.files(path = paste(root.path, "raw-data/", "baseline/", sep = ""), pattern = "self-report.csv", full.names = TRUE, recursive = TRUE)
-
-fss.measurements <- data.frame()
-for(fss.file.path in fss.file.paths) {
-  fss.measurements <- rbind(fss.measurements, read.csv(fss.file.path, comment.char = "#")[4:13])
-}
-rm(fss.file.path, fss.file.paths)
-
-source("./code-snippets/get-fss-reability.R")
-rm(fss.measurements, fss.features)
-```
-
-```{r fss-reability-baseline-latex-tables, echo=FALSE, warning=FALSE, results="asis"}
-
-# Print latex table
-table <- xtable(data.table.flow, label = "tab:generalfaktor_studie_laufen_baseline", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des Generalfaktors der finalen Laufstudie (Baseline) [$N = 36$]") 
-print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
-
-# Print latex table
-table <- xtable(data.table.fluency, label = "tab:glatter_verlauf_studie_laufen_baseline", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des glatten Verlaufs der finalen Laufstudie (Baseline) [$N = 36$]") 
-print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
-  
-# Print latex table
-table <- xtable(data.table.absorption, label = "tab:absorbiertheit_studie_laufen_baseline", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items der Absorbiertheit der finalen Laufstudie (Baseline) [$N = 36$]") 
-print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
-  
-# Clean up
-rm(data.table.flow, data.table.fluency, data.table.absorption, table)
-```
-
 ```{r fss-reability-running, echo=FALSE, warning=FALSE, include=FALSE}
 
 # Get all fss measurements of the running activity
-fss.features <- data.1[, 10:17]
-fss.file.paths <- list.files(path = paste(root.path, "raw-data/", activity.directory, sep = ""), pattern = "self-report.csv", full.names = TRUE, recursive = TRUE)
+fss.features <- data.1[-outliers, 2:8]
+fss.file.paths <- list.files(path = paste(root.path, "raw-data/", activity.directory, sep = ""), pattern = "self-report.csv", full.names = TRUE, recursive = TRUE)[-outliers]
 
 fss.measurements <- data.frame()
 for(fss.file.path in fss.file.paths) {
@@ -213,33 +136,61 @@ rm(fss.measurements, fss.features)
 ```{r fss-reability-running-latex-tables, echo=FALSE, warning=FALSE, results="asis"}
 
 # Print latex table
-table <- xtable(data.table.flow, label = "tab:generalfaktor_studie_laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des Generalfaktors der finalen Laufstudie [$N = 36$]") 
+table <- xtable(data.table.flow, label = "tab:generalfaktor_3", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des Generalfaktors der finalen Studie zum Flow-Erleben beim Laufen [$N = 31$]") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
 
 # Print latex table
-table <- xtable(data.table.fluency, label = "tab:glatter_verlauf_studie_laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des glatten Verlaufs der finalen Laufstudie [$N = 36$]") 
+table <- xtable(data.table.fluency, label = "tab:glatter_verlauf_3", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items des glatten Verlaufs der finalen Studie zum Flow-Erleben beim Laufen [$N = 31$]") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
 # Print latex table
-table <- xtable(data.table.absorption, label = "tab:absorbiertheit_studie_laufen", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items der Absorbiertheit der finalen Laufstudie [$N = 36$]") 
+table <- xtable(data.table.absorption, label = "tab:absorbiertheit_3", align = "lrrr", caption = "Arithmetisches Mittel, Standardabweichung und Item-Faktor-Korrelation der Items der Absorbiertheit der finalen Studie zum Flow-Erleben beim Laufen [$N = 31$]") 
 print(table, caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
   
 # Clean up
 rm(data.table.flow, data.table.fluency, data.table.absorption, table)
 ```
 
-```{r remove-observations, include=FALSE, echo=FALSE, warning=FALSE}
-data.1 <- data.1[-c(28, 36), ]
-#sub.workload <- sub.workload[-c(5, 28, 36)]
-#self.workload <- self.workload[-c(5, 28, 36)]
+```{r index-comparison, include=FALSE}
+
+tikz("./tikz/index_vergleich.tex", width = 5.22, height = 2.61)
+
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 2))
+
+overall.indexes <- c(0.009479866, 0.008291153, 0.012661074, 0.170756999, 0.164715884, 0.225978723, 0.011853303, 0.012152296, 0.016826622, 0.014994005, 0.013929257, 0.015920958, 0.023145577, 0.021027996, 0.031569351, 0.067347875, 0.066556551, 0.097911633, 0.149307606, 0.143584546, 0.213715884, 0.124253080, 0.117114094, 0.162494407, 0.006899329, 0.007548098, 0.010412752, 0.008201794, 0.008183651, 0.009961969, 0.213881432, 0.216058166, 0.294520134, 0.059482103, 0.062630872, 0.084174302, 0.058818589, 0.059170022, 0.087743848, 0.067930649, 0.067058231, 0.091884787, 0.011688690, 0.011697987, 0.017493289, 0.052784994, 0.052675252, 0.072583893, 0.007538634, 0.007687570, 0.011759508, 0.018540873, 0.018434004, 0.028234899, 0.012525253, 0.013430649, 0.014459732, 0.337982083, 0.339354586, 0.438128492, 0.006544743, 0.006751678, 0.008387709, 0.009207955, 0.009623043, 0.014361298, 0.415145414, 0.381386338, 0.484294183, 0.018307263, 0.018664430, 0.029960894, 0.237380739, 0.236705817, 0.317565996, 0.009586475, 0.008876940, 0.011628603, 0.006156951, 0.006059284, 0.015545861, 0.012771557, 0.012980984, 0.022651007, 0.014613662, 0.018451902, 0.025617877, 0.009978747, 0.009473154, 0.015664804, 0.008602464, 0.008690157, 0.011072707, 0.008842282, 0.010293065, 0.013373184, 0.019947368, 0.019338565, 0.024741611, 0.007786353, 0.008759239, 0.013532438, 0.025468680, 0.034974273, 0.043356425)
+groups <- rep(1:3, 35)
+
+boxplot(overall.indexes ~ factor(groups, labels = c("DR", "DL", "E")), xlab = "Norm. Shan. Entr. Index") 
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+print(t.test(overall.indexes[groups == 1], overall.indexes[groups == 2]))
+print(t.test(overall.indexes[groups == 1], overall.indexes[groups == 3]))
+print(t.test(overall.indexes[groups == 3], overall.indexes[groups == 2]))
+
+plot(overall.indexes[groups == 1], overall.indexes[groups == 3], xlab = "Doppelschritt (linkes Bein)", ylab = "Einzelschritt", pch = 21,  bg = rgb(0/255, 152/255, 199/255))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
+
+print(summary(lm(overall.indexes[groups == 2] ~ overall.indexes[groups == 3])))
+print(summary(lm(overall.indexes[groups == 1] ~ overall.indexes[groups == 3])))
+
+dev.off()
+
+rm(groups, overall.indexes)
 ```
+\begin{figure}
+	\input{./tikz/index_vergleich}
+	\caption[Kardio-lokomotorischen Phasensynchronation: Vergleich der Doppelschrittberechnung und Einzelschrittberechnung]{Kardio-lokomotorischen Phasensynchronation: Vergleich der Doppelschrittberechnung und Einzelschrittberechnung: (rechts) Mittelwertvergleich; (links) Zusammenhang zwischen Doppelschrittberechnung ausgehend vom linken Bein und Einzelschrittberechnung -+- \emph{Anmerkung}: DL = Doppelschrittberechnung ausgehend vom linken Bein -+-  DR = Doppelschrittberechnung ausgehend vom rechten Bein -+- E = Einzelschritt}
+	\label{fig:index_vergleich}
+\end{figure}
 
 ```{r check-normality, include=FALSE, echo=FALSE, warning=FALSE}
 
 # Check normality 
-for (i in c(2:4,8,10,11,13,15,17)) {
+for (i in c(2:4, 10, 13, 16, 18)) {
   print(colnames(data.1)[i])
-  hist(data.1[, i], main = colnames(data.1)[i])
+  hist(data.1[-outliers, i], main = colnames(data.1)[i])
   print(shapiro.test(data.1[, i]))
 }
 
@@ -251,10 +202,11 @@ rm(i)
 ```{r correlation-analysis, echo=FALSE, warning=FALSE, results="asis"}
 
 # Create APA table
-apa.table.cor <- apa.cor.table(data.1[, c(2:4, 10:12, 19, 22, 26)], show.conf.interval = FALSE)
-cor.table <- data.frame(apa.table.cor$table.body)[seq(1, 18, 2), 2:11]
-colnames(cor.table) <- c("M", "SD", "1", "2", "3", "4", "5", "6", "7", "8")
-rownames(cor.table) <- c("1. Generalfaktor (Baseline)", "2. Glatter Verlauf (Baseline)", "3. Absorbiertheit (Baseline)", "4. Generalfaktor (Lauf)", "5. Glatter Verlauf (Lauf)", "6. Absorbiertheit (Lauf)", "7. Herzfrequenz (BPM)", "8. Norm. Shan. Entr. Index", "9. Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$) rechts")
+apa.table.cor <- apa.cor.table(data.1[-outliers, c(2:4, 10, 13, 16, 18)], show.conf.interval = FALSE)
+
+cor.table <- data.frame(apa.table.cor$table.body)[seq(1, 14, 2), 2:9]
+colnames(cor.table) <- c("M", "SD", "1", "2", "3", "4", "5", "6")
+rownames(cor.table) <- c("1. Generalfaktor", "2. Glatter Verlauf", "3. Absorbiertheit", "4. HR ($1/min$)", "5. Norm. Shan. Entr. Index", "6. Doppelschrittfrequenz ($1/min$) rechts", "7. Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$) rechts")
 
 for(cn in 1:ncol(cor.table)) {
   cor.table[, cn] <- str_replace_all(cor.table[, cn], "-\\.", "-0,")
@@ -263,75 +215,118 @@ for(cn in 1:ncol(cor.table)) {
 }
 
 # Print latex table
-table <- xtable(cor.table, label = "tab:korrelation_studie_laufen", align = "lxxxxxxxxxx", caption = "Variablen zur finalen Laufstudie: Arithmetisches Mittel, Standardabweichung und Korrelationen [$N = 32$] -+-\\emph{Anmerkung}: Bew. = Bewegungsaufwand. -+-* Korrelation ist auf dem Niveau von 0,05 (zweiseitig) signifikant. -+-** Korrelation ist auf dem Niveau von 0,01 (zweiseitig) signifikant.")
+table <- xtable(cor.table, label = "tab:korrelationen_3", align = "lxxxxxxxx", caption = "Korrelationsmatrix der finalen Studie zum Flow-Erleben beim Laufen: Arithmetisches Mittel, Standardabweichung und Korrelationen [$N = 29$] -+-\\emph{Anmerkung}: Bew. = Bewegungsaufwand. -+-* Korrelation ist auf dem Niveau von 0,05 (zweiseitig) signifikant. -+-** Korrelation ist auf dem Niveau von 0,01 (zweiseitig) signifikant.")
 print(table, floating.environment="sidewaystable", caption.placement = "top", sanitize.rownames.function = function(x){x}, comment = FALSE, booktabs = TRUE)
 
 # Clean up
 rm(apa.table.cor, cor.table, table, cn)
 ```
 
-```{r regression-analysis, include=FALSE}
+```{r regression-analysis-preprossing, include=FALSE}
+par(mai = c(.5, .5, .2, .1), mgp = c(2.5, 1, 0), mfrow = c(3, 3))
+
+data.2 <- data.1[-outliers, ]
+physiological.state <- data.2$direction
+physiological.state[data.2$mean.nsei > .1] <- 2
+
+data.2$direction <- physiological.state
+
+lmp <- function (modelobject) {
+ if (class(modelobject) != "lm") stop("Not an object of class 'lm' ")
+ f <- summary(modelobject)$fstatistic
+ p <- pf(f[1],f[2],f[3],lower.tail=F)
+ attributes(p) <- NULL
+ return(p)
+}
+
+plotRelation <- function(x, y, ...) {
+ plot(x, y, ...)
+ x.squared <- x^2
+ linear.model <- lm(y ~ x + x.squared)
+ print(summary(linear.model))
+ x <- seq(min(x), max(x), length.out = 100)
+ x.squared <- x^2
+ y.predicted <- predict.lm(linear.model, data.frame(x, x.squared))
+ lines(x, y.predicted, lty = "dashed")
+}
+
+for (i in 2:19) {
+ for (j in 2:19) {
+ if (i != j) {
+ x <- data.2[, i]
+ x.squared <- x^2
+ y <- data.2[, j]
+ linear.model <- lm(y ~ x + x.squared)
+ if(lmp(linear.model) < .05) {
+ print(paste(colnames(data.2)[i], "~", colnames(data.2)[j]))
+ print(summary(linear.model))
+ plotRelation(x, y, xlab = colnames(data.2)[i], ylab = colnames(data.2)[j], pch = 21, bg = rgb(229/255, 66/255, 66/255))
+ }
+ }
+ }
+}
+
+# Clean up
+rm(x, x.squared, y, i, j, linear.model)
+
+```
+
+```{r effect-test-preprocessing, echo=FALSE, warning=FALSE, eval=FALSE}
+
+data.2 <- data.1[-outliers, c(2:4, 10:13, 15:18)]
+
+print(length(data.2[physiological.state == 3, 1])) 
+print(length(data.2[physiological.state == 2, 1])) 
+print(length(data.2[physiological.state == 1, 1]))
+
+for(i in 1:11) {
+  par(mai = c(.5, .5, .2, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 4))
+  boxplot(data.2[, i] ~ factor(physiological.state, labels = c("Herz dominiert", "Gleichgewicht", "Schritt dominiert")), ylab = colnames(data.2)[i])
+  
+  print("---------------------")
+  
+  print(colnames(data.2)[i])
+  
+  hist(data.2[physiological.state == 3, i], main = colnames(data.2)[i]) 
+  print(shapiro.test(data.2[physiological.state == 3, i]))
+  
+  hist(data.2[physiological.state == 2, i], main = colnames(data.2)[i]) 
+  print(shapiro.test(data.2[physiological.state == 2, i]))
+  
+  hist(data.2[physiological.state == 1, i], main = colnames(data.2)[i]) 
+  print(shapiro.test(data.2[physiological.state == 1, i]))
+
+  print(t.test(data.2[physiological.state == 1, i], data.2[physiological.state == 2, i]))
+  print(t.test(data.2[physiological.state == 2, i], data.2[physiological.state == 3, i]))
+
+  print("---------------------")
+}
+
+```
+
+```{r effect-test, echo=FALSE, warning=FALSE, include=FALSE}
 
 # Setup tikz device
-tikz("./tikz/5-18-regression.tex", width = 5.22, height = 5.22)
+tikz("./tikz/5-20-mittelwert-vergleich.tex", width = 5.22, height = 5.22)
 
 par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(2, 2))
 
-# Plot absorption on mean HR
-mean.hr <- data.1[, 19]
-mean.hr.squared <- mean.hr^2
-linear.model <- lm((data.1[, 12] - data.1[, 4]) ~ mean.hr)
-summary.lm(linear.model)
-
-linear.model.2 <- lm((data.1[, 12] - data.1[, 4]) ~ mean.hr + mean.hr.squared)
-summary.lm(linear.model.2)
-
-plot(mean.hr, (data.1[, 12] - data.1[, 4]), xlab = "Mittlere HR (BPM)", ylab = "$\\bigtriangleup$ Absorbiertheit", pch = 21, bg = rgb(229/255, 66/255, 66/255))
-abline(linear.model)
-
-mean.hr <- seq(120, 200, by = .5)
-mean.hr.squared <- mean.hr^2
-absorption.predicted <- predict.lm(linear.model.2, data.frame(mean.hr, mean.hr.squared))
-lines(mean.hr, absorption.predicted, lty = "dashed")
-
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-mtext("A", side = 2, line = 3, padj = -7, las = 1)
-
-# Plot absorption on NSEI
-plot(data.1[, 22], (data.1[, 12] - data.1[, 4]), xlab = "Norm. Shannon Entropie Index", ylab = "$\\bigtriangleup$ Absorbiertheit", pch = 24, bg = rgb(96/255, 65/255, 79/255))
-linear.model <- lm((data.1[, 12] - data.1[, 4]) ~ data.1[, 22])
-abline(linear.model)
-summary(linear.model)
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-mtext("B", side = 2, line = 3, padj = -7, las = 1)
-
-plot(data.1[, 26], data.1[, 11], xlab = "Bewegungsaufw. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", ylab = "Glatter Verlauf", pch = 23, bg = rgb(0/255, 152/255, 199/255))
-linear.model <- lm(data.1[, 11] ~ data.1[, 26])
-abline(linear.model)
-summary(linear.model)
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-mtext("C", side = 2, line = 3, padj = -7, las = 1)
-
-plot(data.1[, 26], (data.1[, 12] - data.1[, 4]), xlab = "Bewegungsaufw. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)", ylab = "$\\bigtriangleup$ Absorbiertheit", pch = 23, bg = rgb(0/255, 152/255, 199/255))
-linear.model <- lm((data.1[, 12] - data.1[, 4]) ~ data.1[, 26])
-abline(linear.model)
-summary(linear.model)
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
-mtext("D", side = 2, line = 3, padj = -7, las = 1)
+boxplot((data.1[, 12] - data.1[, 4]) ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab = "$\\bigtriangleup$ Absorbiertheit")
+mtext("A", side = 2, line = 3.5, padj = -7, las = 1)
+boxplot(data.1[, 19] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab = "Mittlere HR (BPM)")
+mtext("B", side = 2, line = 3.5, padj = -7, las = 1)
+boxplot(data.1[, 22] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab = "Norm. Shannon Entropie Index")
+mtext("C", side = 2, line = 3.5, padj = -7, las = 1)
+boxplot(data.1[, 26] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab =  "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
+mtext("D", side = 2, line = 3.5, padj = -7, las = 1)
 
 dev.off()
-
-# Clean up
-rm(mean.hr, mean.hr.squared, linear.model, linear.model.2)
 ```
+
 \begin{figure}
-	\input{./tikz/5-18-regression}
-	\caption{Beobachtungen. (A) $\bigtriangleup$Absorbiertheit und mittlerer HR; (B) $\bigtriangleup$Absorbiertheit und mittlerer normalisierter Shannon Entropie Index; (C) Glatter Verlauf und mittlerer Bewegungsaufwand; $\bigtriangleup$Absorbiertheit und mittlerer Bewegungsaufwand. Quelle: Eigene Darstellung -+-\emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+-Gestrichelte Linie stellt ggf. das bestmögliche quardratische Modell dar. -+-$\bigtriangleup$ Wert berechnet durch die Subtraktion des Baseline-Wertes.}
-	\label{fig:5_18_regression}
+	\input{./tikz/5-20-mittelwert-vergleich}
+	\caption{Mittelwertvergleich - unterfordert, optimal, überfordert. (A) $\bigtriangleup$ Absorbiertheit; (B) Mittlere HR; (C) Mittlerer normalisierter Shannon Entropie Index; (D) Bewegungsaufwand. Quelle: Eigene Darstellung -+-\emph{Anmerkung}: Bew. = Bewegungsaufwand.}
+	\label{fig:5_20_mittelwert_vergleich}
 \end{figure}
 
 ```{r process-oriented-approach, echo=FALSE, include=FALSE}
@@ -429,149 +424,20 @@ rm(cls.data, jc.data, kubios.hrv.data, cls.data.file.path, cls.data.file.name, u
 	\label{fig:5_19_prozessorientierter_ansatz}
 \end{sidewaysfigure}
 
-```{r regression-analysis-extra, echo=FALSE, include=FALSE}
+```{r}
 
-# Setup tikz device
-tikz("./tikz/5-xx-regression-extra.tex", width = 5.22, height = 5.22)
+require(lattice)
+summary(lm(data.2$flow ~ data.2$mean.hr + physiological.state + data.2$mean.hr * physiological.state))
+xyplot(data.2$flow ~ data.2$mean.hr, groups = physiological.state, data = data.2, type = c('p','r'), grid = T, lwd = 3, auto.key = T)
 
-par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 1))
+summary(lm(data.2$flow ~ data.2$mean.stride.freq.right + physiological.state + data.2$mean.stride.freq.right * physiological.state))
+xyplot(data.2$flow ~ data.2$mean.stride.freq.right, groups = physiological.state, data = data.2, type = c('p','r'), grid = T, lwd = 3, auto.key = T)
 
-# Plot NSEI on mean HR
-mean.hr.squared <- data.1$mean.hr^2
-linear.model <- lm(mean.nsei ~ mean.hr, data = data.1)
-summary.lm(linear.model)
-mean.hr <- data.1$mean.hr
-linear.model.2 <- lm(data.1$mean.nsei ~ mean.hr + mean.hr.squared)
-summary.lm(linear.model.2)
-plot(data.1$mean.hr, data.1$mean.nsei, xlab = "Mittlere HR ($BPM$)", ylab = "Normalisierter Shannon Entropie Index", pch = 21, bg = rgb(229/255, 66/255, 66/255))
-abline(linear.model)
-mean.hr <- seq(120, 200, by = .5)
-mean.hr.squared <- mean.hr^2
-absorption.predicted <- predict.lm(linear.model.2, data.frame(mean.hr, mean.hr.squared))
-lines(mean.hr, absorption.predicted, lty = "dashed")
-grid(col = rgb(186/255, 187/255, 194/255))
-box()
+summary(lm(data.2$flow ~ data.2$mean.jerk.cost.right.10.3 + physiological.state + data.2$mean.jerk.cost.right.10.3 * physiological.state))
+xyplot(data.2$flow ~ data.2$mean.jerk.cost.right.10.3, groups = physiological.state, data = data.2, type = c('p','r'), grid = T, lwd = 3, auto.key = T)
 
-dev.off()
-
-# Clean up
-rm(absorption.predicted, linear.model, linear.model.2, mean.hr, mean.hr.squared)
 ```
 
-\begin{figure}
-	\input{./tikz/5-xx-regression-extra}
-	\caption{Beobachtungen. Mittlerer normalisierter Shannon Entropie Index und mittlerer HR. Quelle: Eigene Darstellung -+-\emph{Anmerkung}: Durchgezogene Linie stellt das bestmögliche liniare Modell dar. -+-Gestrichelte Linie stellt das bestmögliche quardratische Modell dar.}
-	\label{fig:5_xx_regression_extra}
-\end{figure}
-
-```{r subjective-workload, echo=FALSE, warning=FALSE, include=FALSE}
-
-# Setup tikz device
-tikz("./tikz/5-20-mittelwert-vergleich.tex", width = 5.22, height = 5.22)
-
-par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(2, 2))
-
-boxplot((data.1[, 12] - data.1[, 4]) ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab = "$\\bigtriangleup$ Absorbiertheit")
-mtext("A", side = 2, line = 3.5, padj = -7, las = 1)
-boxplot(data.1[, 19] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab = "Mittlere HR (BPM)")
-mtext("B", side = 2, line = 3.5, padj = -7, las = 1)
-boxplot(data.1[, 22] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab = "Norm. Shannon Entropie Index")
-mtext("C", side = 2, line = 3.5, padj = -7, las = 1)
-boxplot(data.1[, 26] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab =  "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
-mtext("D", side = 2, line = 3.5, padj = -7, las = 1)
-
-dev.off()
-
-data.under.ch <- data.1[sub.workload == 1, ]
-data.optimal <- data.1[sub.workload == 2, ]
-data.over.ch <- data.1[sub.workload == 3, ]
 
 
-print(shapiro.test(data.under.ch[, 12]))
-print(shapiro.test(data.optimal[, 12]))
-print(shapiro.test(data.over.ch[, 12]))
-
-t.test((data.under.ch[, 12]), (data.optimal[, 12]))
-t.test((data.optimal[, 12]), (data.over.ch[, 12]))
-t.test((data.under.ch[, 12]), (data.over.ch[, 12]))
-
-print(shapiro.test(data.under.ch[, 12] - data.under.ch[, 4]))
-print(shapiro.test(data.optimal[, 12] - data.optimal[, 4]))
-print(shapiro.test(data.over.ch[, 12] - data.over.ch[, 4]))
-
-t.test((data.under.ch[, 12] - data.under.ch[, 4]), (data.optimal[, 12] - data.optimal[, 4]))
-t.test((data.optimal[, 12] - data.optimal[, 4]), (data.over.ch[, 12] - data.over.ch[, 4]))
-t.test((data.under.ch[, 12] - data.under.ch[, 4]), (data.over.ch[, 12] - data.over.ch[, 4]))
-
-print(shapiro.test(data.under.ch[, 19]))
-print(shapiro.test(data.optimal[, 19]))
-print(shapiro.test(data.over.ch[, 19]))
-
-t.test(data.under.ch[, 19], data.optimal[, 19])
-t.test(data.optimal[, 19], data.over.ch[, 19])
-t.test(data.under.ch[, 19], data.over.ch[, 19])
-
-print(shapiro.test(data.under.ch[, 22]))
-print(shapiro.test(data.optimal[, 22]))
-print(shapiro.test(data.over.ch[, 22]))
-
-wilcox.test(data.under.ch[, 22], data.optimal[, 22])
-wilcox.test(data.optimal[, 22], data.over.ch[, 22])
-wilcox.test(data.under.ch[, 22], data.over.ch[, 22])
-
-print(shapiro.test(data.under.ch[, 26]))
-print(shapiro.test(data.optimal[, 26]))
-print(shapiro.test(data.over.ch[, 26]))
-
-t.test(data.under.ch[, 26], data.optimal[, 26])
-t.test(data.optimal[, 26], data.over.ch[, 26])
-t.test(data.under.ch[, 26], data.over.ch[, 26])
-```
-
-\begin{figure}
-	\input{./tikz/5-20-mittelwert-vergleich}
-	\caption{Mittelwertvergleich - unterfordert, optimal, überfordert. (A) $\bigtriangleup$ Absorbiertheit; (B) Mittlere HR; (C) Mittlerer normalisierter Shannon Entropie Index; (D) Bewegungsaufwand. Quelle: Eigene Darstellung -+-\emph{Anmerkung}: Bew. = Bewegungsaufwand.}
-	\label{fig:5_20_mittelwert_vergleich}
-\end{figure}
-
-```{r boxplots, echo=FALSE, warning=FALSE, include=FALSE}
-
-par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(2, 3))
-boxplot(data.1[, 10] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Generalfaktor")
-boxplot(data.1[, 11] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Glatter Verlauf")
-boxplot(data.1[, 12] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Absorbiertheit")
-boxplot(data.1[, 18] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "SDNN (ms)")
-boxplot(data.1[, 19] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Mittlere HR (BPM)")
-boxplot(data.1[, 20] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "RMSSD (ms)")
-
-par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(3, 2))
-boxplot(data.1[, 21] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Mittlerer Koheränz Index")
-boxplot(data.1[, 22] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Mittlerer normalisierter Shannon Entropie Index")
-boxplot(data.1[, 23] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Mittlere Doppelschrittdauer (ms) L")
-boxplot(data.1[, 24] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Mittlere Doppelschrittdauer (ms) L")
-boxplot(data.1[, 25] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Mittlerer Bewegungsaufwand (m^2s^5) L")
-boxplot(data.1[, 26] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Mittlerer Bewegungsaufwand (m^2s^5) R")
-
-par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 1))
-boxplot(data.1[, 27] ~ interaction(data.1[, 14], data.1[, 17]), xlab = "Anforderung.Gleichgewicht", ylab = "Alter")
-
-par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(2, 3))
-boxplot(data.1[, 10] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Generalfaktor")
-boxplot(data.1[, 11] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Glatter Verlauf")
-boxplot(data.1[, 12] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Absorbiertheit")
-boxplot(data.1[, 18] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "SDNN (ms)")
-boxplot(data.1[, 19] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Mittlere HR (BPM)")
-boxplot(data.1[, 20] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "RMSSD (ms)")
-
-par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(3, 2))
-boxplot(data.1[, 21] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Mittlerer Koheränz Index")
-boxplot(data.1[, 22] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Mittlerer normalisierter Shannon Entropie Index")
-boxplot(data.1[, 23] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Mittlere Doppelschrittdauer (ms) L")
-boxplot(data.1[, 24] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Mittlere Doppelschrittdauer (ms) R")
-boxplot(data.1[, 25] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Mittlerer Bewegungsaufwand (m^2s^5) L")
-boxplot(data.1[, 26] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Mittlerer Bewegungsaufwand (m^2s^5) R")
-
-par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 1))
-boxplot(data.1[, 27] ~ data.1[, 17], xlab = "Gleichgewicht", ylab = "Alter")
-```
 
