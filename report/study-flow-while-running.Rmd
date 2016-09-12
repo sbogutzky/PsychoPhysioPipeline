@@ -111,8 +111,15 @@ rm(u, user.directory, user.efforts, subjects, fss.features, hrv.features, cls.fe
 ```
 
 
-```{r outliers, echo=FALSE, warning=FALSE}
+```{r data-mod, echo=FALSE, warning=FALSE}
 outliers <- c(28, 29, 33, 36, 15)
+data.2 <- data.1[-outliers,]
+
+physiological.state <- data.2$direction
+physiological.state[data.2$mean.nsei > .1] <- 2
+physiological.state <- factor(physiological.state, levels = c(3, 2, 1), labels = c("S", "G", "H"))
+
+data.2 <- data.2[, c(2:4, 10:13, 15:18)]
 ```
 
 # FKS Reabilität
@@ -120,7 +127,7 @@ outliers <- c(28, 29, 33, 36, 15)
 ```{r fss-reability-running, echo=FALSE, warning=FALSE, include=FALSE}
 
 # Get all fss measurements of the running activity
-fss.features <- data.1[-outliers, 2:8]
+fss.features <- data.2[, 1:3]
 fss.file.paths <- list.files(path = paste(root.path, "raw-data/", activity.directory, sep = ""), pattern = "self-report.csv", full.names = TRUE, recursive = TRUE)[-outliers]
 
 fss.measurements <- data.frame()
@@ -185,13 +192,14 @@ rm(groups, overall.indexes)
 	\label{fig:index_vergleich}
 \end{figure}
 
-```{r check-normality, include=FALSE, echo=FALSE, warning=FALSE}
+```{r check-normality, include=FALSE, echo=FALSE, warning=FALSE, eval=FALSE}
+par(mai = c(.5, .5, .2, .1), mgp = c(2.5, 1, 0), mfrow = c(3, 3))
 
 # Check normality 
-for (i in c(2:4, 10, 13, 16, 18)) {
-  print(colnames(data.1)[i])
-  hist(data.1[-outliers, i], main = colnames(data.1)[i])
-  print(shapiro.test(data.1[, i]))
+for (i in 1:ncol(data.2)) {
+  print(colnames(data.2)[i])
+  hist(data.2[, i], main = colnames(data.2)[i])
+  print(shapiro.test(data.2[, i]))
 }
 
 rm(i)
@@ -202,7 +210,7 @@ rm(i)
 ```{r correlation-analysis, echo=FALSE, warning=FALSE, results="asis"}
 
 # Create APA table
-apa.table.cor <- apa.cor.table(data.1[-outliers, c(2:4, 10, 13, 16, 18)], show.conf.interval = FALSE)
+apa.table.cor <- apa.cor.table(data.2[, c(1:4, 7, 9, 11)], show.conf.interval = FALSE)
 
 cor.table <- data.frame(apa.table.cor$table.body)[seq(1, 14, 2), 2:9]
 colnames(cor.table) <- c("M", "SD", "1", "2", "3", "4", "5", "6")
@@ -222,14 +230,8 @@ print(table, floating.environment="sidewaystable", caption.placement = "top", sa
 rm(apa.table.cor, cor.table, table, cn)
 ```
 
-```{r regression-analysis-preprossing, include=FALSE}
+```{r regression-analysis-preprossing, include=FALSE, eval=FALSE}
 par(mai = c(.5, .5, .2, .1), mgp = c(2.5, 1, 0), mfrow = c(3, 3))
-
-data.2 <- data.1[-outliers, ]
-physiological.state <- data.2$direction
-physiological.state[data.2$mean.nsei > .1] <- 2
-
-data.2$direction <- physiological.state
 
 lmp <- function (modelobject) {
  if (class(modelobject) != "lm") stop("Not an object of class 'lm' ")
@@ -250,19 +252,19 @@ plotRelation <- function(x, y, ...) {
  lines(x, y.predicted, lty = "dashed")
 }
 
-for (i in 2:19) {
- for (j in 2:19) {
- if (i != j) {
- x <- data.2[, i]
- x.squared <- x^2
- y <- data.2[, j]
- linear.model <- lm(y ~ x + x.squared)
- if(lmp(linear.model) < .05) {
- print(paste(colnames(data.2)[i], "~", colnames(data.2)[j]))
- print(summary(linear.model))
- plotRelation(x, y, xlab = colnames(data.2)[i], ylab = colnames(data.2)[j], pch = 21, bg = rgb(229/255, 66/255, 66/255))
- }
- }
+for (i in 1:ncol(data.2)) {
+ for (j in 1:ncol(data.2)) {
+  if (i != j) {
+    x <- data.2[, i]
+    x.squared <- x^2
+    y <- data.2[, j]
+    linear.model <- lm(y ~ x + x.squared)
+    if(lmp(linear.model) < .05) {
+      print(paste(colnames(data.2)[i], "~", colnames(data.2)[j]))
+      print(summary(linear.model))
+      plotRelation(x, y, xlab = colnames(data.2)[i], ylab = colnames(data.2)[j], pch = 21, bg = rgb(229/255, 66/255, 66/255))
+    }
+  }
  }
 }
 
@@ -273,13 +275,11 @@ rm(x, x.squared, y, i, j, linear.model)
 
 ```{r effect-test-preprocessing, echo=FALSE, warning=FALSE, eval=FALSE}
 
-data.2 <- data.1[-outliers, c(2:4, 10:13, 15:18)]
+print(length(data.2[physiological.state == "S", 1]))
+print(length(data.2[physiological.state == "G", 1])) 
+print(length(data.2[physiological.state == "H", 1])) 
 
-print(length(data.2[physiological.state == 3, 1])) 
-print(length(data.2[physiological.state == 2, 1])) 
-print(length(data.2[physiological.state == 1, 1]))
-
-for(i in 1:11) {
+for(i in 1:ncol(data.2)) {
   par(mai = c(.5, .5, .2, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 4))
   boxplot(data.2[, i] ~ factor(physiological.state, labels = c("Herz dominiert", "Gleichgewicht", "Schritt dominiert")), ylab = colnames(data.2)[i])
   
@@ -287,28 +287,31 @@ for(i in 1:11) {
   
   print(colnames(data.2)[i])
   
-  hist(data.2[physiological.state == 3, i], main = colnames(data.2)[i]) 
-  print(shapiro.test(data.2[physiological.state == 3, i]))
-  print(mean(data.2[physiological.state == 3, i]))
-  print(sd(data.2[physiological.state == 3, i]))
+  hist(data.2[physiological.state == "S", i], main = colnames(data.2)[i]) 
+  print(shapiro.test(data.2[physiological.state == "S", i]))
+  print(mean(data.2[physiological.state == "S", i]))
+  print(sd(data.2[physiological.state == "S", i]))
   
-  hist(data.2[physiological.state == 2, i], main = colnames(data.2)[i]) 
-  print(shapiro.test(data.2[physiological.state == 2, i]))
-  print(mean(data.2[physiological.state == 2, i]))
-  print(sd(data.2[physiological.state == 2, i]))
+  hist(data.2[physiological.state == "G", i], main = colnames(data.2)[i]) 
+  print(shapiro.test(data.2[physiological.state == "G", i]))
+  print(mean(data.2[physiological.state == "G", i]))
+  print(sd(data.2[physiological.state == "G", i]))
   
-  hist(data.2[physiological.state == 1, i], main = colnames(data.2)[i]) 
-  print(shapiro.test(data.2[physiological.state == 1, i]))
-  print(mean(data.2[physiological.state == 1, i]))
-  print(sd(data.2[physiological.state == 1, i]))
+  hist(data.2[physiological.state == "H", i], main = colnames(data.2)[i]) 
+  print(shapiro.test(data.2[physiological.state == "H", i]))
+  print(mean(data.2[physiological.state == "H", i]))
+  print(sd(data.2[physiological.state == "H", i]))
 
-  print(var.test(data.2[physiological.state == 1, i], data.2[physiological.state == 2, i]))
-  print(t.test(data.2[physiological.state == 1, i], data.2[physiological.state == 2, i], var.equal = T))
-  print(var.test(data.2[physiological.state == 2, i], data.2[physiological.state == 3, i]))
-  print(t.test(data.2[physiological.state == 2, i], data.2[physiological.state == 3, i], var.equal = T))
+  print(var.test(data.2[physiological.state == "S", i], data.2[physiological.state == "G", i]))
+  print(t.test(data.2[physiological.state == "S", i], data.2[physiological.state == "G", i], var.equal = T))
+  print(var.test(data.2[physiological.state == "H", i], data.2[physiological.state == "G", i]))
+  print(t.test(data.2[physiological.state == "H", i], data.2[physiological.state == "G", i], var.equal = T))
 
   print("---------------------")
 }
+
+# Clean up
+rm(i)
 
 ```
 
@@ -319,15 +322,15 @@ tikz("./tikz/mittelwert_vergleich.tex", width = 5.22, height = 2.61)
 
 par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 3))
 
-boxplot(data.2[, 1] ~ factor(physiological.state, labels = c("S", "G", "H")), ylab = "Generalfaktor", ylim = c(2.5, 7))
+boxplot(data.2[, 1] ~ physiological.state, ylab = "Generalfaktor", ylim = c(2.5, 7))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 mtext("A", side = 2, line = 3.5, padj = -7, las = 1)
-boxplot(data.2[, 2] ~ factor(physiological.state, labels = c("S", "G", "H")), ylab = "Glatter Verlauf", ylim = c(2.5, 7))
+boxplot(data.2[, 2] ~ physiological.state, ylab = "Glatter Verlauf", ylim = c(2.5, 7))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 mtext("B", side = 2, line = 3.5, padj = -7, las = 1)
-boxplot(data.2[, 3] ~ factor(physiological.state, labels = c("S", "G", "H")), ylab = "Absorbiertheit", ylim = c(2.5, 7))
+boxplot(data.2[, 3] ~ physiological.state, ylab = "Absorbiertheit", ylim = c(2.5, 7))
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 mtext("C", side = 2, line = 3.5, padj = -7, las = 1)
@@ -344,121 +347,61 @@ dev.off()
 ```{r process-oriented-approach, echo=FALSE, include=FALSE}
 
 # Setup tikz device
-#tikz("./tikz/prozessorientierter-ansicht_2.tex", width = 7.91, height = 5.22)
+tikz("./tikz/prozessorientierte_ansicht_2.tex", width = 7.91, height = 5.22)
+
+# Set data file names
+kubios.hrv.data.file.name <- "imu-rn42-bd38-1_hrv.txt"
+jc.data.file.name.r <- "imu-rn42-3b70-jerk-cost-data-1.csv"
+jc.data.file.name.l <- "imu-rn42-bc98-jerk-cost-data-1.csv"
+cls.phase.data.file.name <- "cls-phase-data-1.csv"
+cls.index.data.file.name <- "cls-index-data-1.csv"
 
 # Set graphic parameter
 par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfcol = c(4, 3))
 
-jc.ylim <- c(20, 60)
-bpm.ylim <- c(130, 190)
-
-# Plot underload measure
+# Plot 3
 # Set directories
 user.directory <- user.directories[26]
 date.directory <- paste(list.dirs(paste(root.path, processed.data.directory, activity.directory, user.directory, sep = ""), full.names = F, recursive = F)[1], "/", sep = "")
 
-# Set data file names
-kubios.hrv.data.file.name <- "imu-rn42-bd38-1_hrv.txt"
-jc.data.file.name <- "imu-rn42-3b70-jerk-cost-data-1.csv"
-cls.phase.data.file.name <- "cls-phase-data-1.csv"
-cls.index.data.file.name <- "cls-index-data-1.csv"
-
-# Set paths
-kubios.hrv.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, kubios.hrv.data.file.name, sep = "")
-jc.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, jc.data.file.name, sep = "")
-cls.phase.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.phase.data.file.name, sep = "")
-cls.index.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.index.data.file.name, sep = "")
-    
-# Load hrv, jerk cost and cls data
-source("../processing/code-snippets/get-kubios-hrv-data.R")
-jc.data <- read.csv(jc.data.file.path)
-cls.phase.data <- read.csv(cls.phase.data.file.path)
-cls.index.data <- read.csv(cls.index.data.file.path)
-
 # Plot
 source("./code-snippets/plot-processes.R")
-title(sub = "Unterforderung - Absorbiertheit: 5,5")
+title(sub = "Schritt dominiert - Generalfaktor: 4,5")
 
-# Plot optimal measure
+# Plot 2
 # Set directories
 user.directory <- user.directories[23]
 date.directory <- paste(list.dirs(paste(root.path, processed.data.directory, activity.directory, user.directory, sep = ""), full.names = F, recursive = F)[1], "/", sep = "")
 
-# Set data file names
-kubios.hrv.data.file.name <- "imu-rn42-bd38-1_hrv.txt"
-jc.data.file.name <- "imu-rn42-3b70-jerk-cost-data-1.csv"
-cls.phase.data.file.name <- "cls-phase-data-1.csv"
-cls.index.data.file.name <- "cls-index-data-1.csv"
-
-# Set paths
-kubios.hrv.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, kubios.hrv.data.file.name, sep = "")
-jc.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, jc.data.file.name, sep = "")
-cls.phase.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.phase.data.file.name, sep = "")
-cls.index.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.index.data.file.name, sep = "")
-    
-# Load hrv, jerk cost and cls data
-source("../processing/code-snippets/get-kubios-hrv-data.R")
-jc.data <- read.csv(jc.data.file.path)
-cls.phase.data <- read.csv(cls.phase.data.file.path)
-cls.index.data <- read.csv(cls.index.data.file.path)
-
 # Plot
 source("./code-snippets/plot-processes.R")
-title(sub = "optimal - Absorbiertheit: 6,5")
+title(sub = "Gleichgewicht - Generalfaktor: 6,0")
 
-# Plot overload measure
+# Plot 3
 # Set directories
 user.directory <- user.directories[21]
 date.directory <- paste(list.dirs(paste(root.path, processed.data.directory, activity.directory, user.directory, sep = ""), full.names = F, recursive = F)[1], "/", sep = "")
 
-# Set data file names
-kubios.hrv.data.file.name <- "imu-rn42-bd38-1_hrv.txt"
-jc.data.file.name <- "imu-rn42-3b70-jerk-cost-data-1.csv"
-cls.phase.data.file.name <- "cls-phase-data-1.csv"
-cls.index.data.file.name <- "cls-index-data-1.csv"
-
-# Set paths
-kubios.hrv.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, kubios.hrv.data.file.name, sep = "")
-jc.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, jc.data.file.name, sep = "")
-cls.phase.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.phase.data.file.name, sep = "")
-cls.index.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.index.data.file.name, sep = "")
-    
-# Load hrv, jerk cost and cls data
-source("../processing/code-snippets/get-kubios-hrv-data.R")
-jc.data <- read.csv(jc.data.file.path)
-cls.phase.data <- read.csv(cls.phase.data.file.path)
-cls.index.data <- read.csv(cls.index.data.file.path)
-
 # Plot
 source("./code-snippets/plot-processes.R")
-title(sub = "\"Uberforderung - Absorbiertheit: 3,25")
+title(sub = "Herz dominiert - Generalfaktor: 4,9")
 
-#dev.off()
+dev.off()
 
 # Clean up
-rm(cls.phase.data, jc.data, kubios.hrv.data, cls.phase.data.file.path, cls.phase.data.file.name, user.directory, date.directory, heart.beat.times, jc.data.file.path, jc.data.file.name, kubios.hrv.data.file.path, kubios.hrv.data.file.name, m, n, bpm.ylim, jc.ylim)
+rm(kubios.hrv.data.file.name, jc.data.file.name.r, jc.data.file.name.l, cls.phase.data.file.name, cls.index.data.file.name, user.directory, date.directory)
 ```
 
 \begin{sidewaysfigure}
-	\input{./tikz/5-19-prozessorientierter-ansatz}
-	\caption{Drei Minuten Daten einer Untersuchungsperson, die sich unterfordert hat (links), einer Untersuchungsperson, die ihr optimales Tempo gefunden hat (mitte) und einer Untersuchungsperson, die sich überfordert hat (rechts). Quelle: Eigene Darstellung -+-\emph{Anmerkung}: Bew. = Bewegungsaufwand. -+-Rel. Phase = Relative Phase.}
-	\label{fig:5_19_prozessorientierter_ansatz}
+	\input{./tikz/prozessorientierte_ansicht_2}
+	\caption{Eine Minute Daten einer Untersuchungsperson der Gruppe Schritt dominiert (links), einer Untersuchungsperson Geleichgewicht (mitte) und einer Untersuchungsperson der Gruppe Herz dominert (rechts). \emph{Anmerkung}: Rel. Phase = Relative Phase.}
+	\label{fig:prozessorientierte_ansicht_2}
 \end{sidewaysfigure}
 
-```{r}
+```{r test-interaction, echo=FALSE, include=FALSE, eval=FALSE}
 
 require(lattice)
-summary(lm(data.2$flow ~ data.2$mean.hr + physiological.state + data.2$mean.hr * physiological.state))
-xyplot(data.2$flow ~ data.2$mean.hr, groups = physiological.state, data = data.2, type = c('p','r'), grid = T, lwd = 3, auto.key = T)
-
-summary(lm(data.2$flow ~ data.2$mean.stride.freq.right + physiological.state + data.2$mean.stride.freq.right * physiological.state))
-xyplot(data.2$flow ~ data.2$mean.stride.freq.right, groups = physiological.state, data = data.2, type = c('p','r'), grid = T, lwd = 3, auto.key = T)
-
 summary(lm(data.2$flow ~ data.2$mean.jerk.cost.right.10.3 + physiological.state + data.2$mean.jerk.cost.right.10.3 * physiological.state))
 xyplot(data.2$flow ~ data.2$mean.jerk.cost.right.10.3, groups = physiological.state, data = data.2, type = c('p','r'), grid = T, lwd = 3, auto.key = T)
 
 ```
-
-
-
-
