@@ -289,15 +289,23 @@ for(i in 1:11) {
   
   hist(data.2[physiological.state == 3, i], main = colnames(data.2)[i]) 
   print(shapiro.test(data.2[physiological.state == 3, i]))
+  print(mean(data.2[physiological.state == 3, i]))
+  print(sd(data.2[physiological.state == 3, i]))
   
   hist(data.2[physiological.state == 2, i], main = colnames(data.2)[i]) 
   print(shapiro.test(data.2[physiological.state == 2, i]))
+  print(mean(data.2[physiological.state == 2, i]))
+  print(sd(data.2[physiological.state == 2, i]))
   
   hist(data.2[physiological.state == 1, i], main = colnames(data.2)[i]) 
   print(shapiro.test(data.2[physiological.state == 1, i]))
+  print(mean(data.2[physiological.state == 1, i]))
+  print(sd(data.2[physiological.state == 1, i]))
 
-  print(t.test(data.2[physiological.state == 1, i], data.2[physiological.state == 2, i]))
-  print(t.test(data.2[physiological.state == 2, i], data.2[physiological.state == 3, i]))
+  print(var.test(data.2[physiological.state == 1, i], data.2[physiological.state == 2, i]))
+  print(t.test(data.2[physiological.state == 1, i], data.2[physiological.state == 2, i], var.equal = T))
+  print(var.test(data.2[physiological.state == 2, i], data.2[physiological.state == 3, i]))
+  print(t.test(data.2[physiological.state == 2, i], data.2[physiological.state == 3, i], var.equal = T))
 
   print("---------------------")
 }
@@ -307,58 +315,65 @@ for(i in 1:11) {
 ```{r effect-test, echo=FALSE, warning=FALSE, include=FALSE}
 
 # Setup tikz device
-tikz("./tikz/5-20-mittelwert-vergleich.tex", width = 5.22, height = 5.22)
+tikz("./tikz/mittelwert_vergleich.tex", width = 5.22, height = 2.61)
 
-par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(2, 2))
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 3))
 
-boxplot((data.1[, 12] - data.1[, 4]) ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab = "$\\bigtriangleup$ Absorbiertheit")
+boxplot(data.2[, 1] ~ factor(physiological.state, labels = c("S", "G", "H")), ylab = "Generalfaktor", ylim = c(2.5, 7))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
 mtext("A", side = 2, line = 3.5, padj = -7, las = 1)
-boxplot(data.1[, 19] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab = "Mittlere HR (BPM)")
+boxplot(data.2[, 2] ~ factor(physiological.state, labels = c("S", "G", "H")), ylab = "Glatter Verlauf", ylim = c(2.5, 7))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
 mtext("B", side = 2, line = 3.5, padj = -7, las = 1)
-boxplot(data.1[, 22] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab = "Norm. Shannon Entropie Index")
+boxplot(data.2[, 3] ~ factor(physiological.state, labels = c("S", "G", "H")), ylab = "Absorbiertheit", ylim = c(2.5, 7))
+grid(col = rgb(186/255, 187/255, 194/255))
+box()
 mtext("C", side = 2, line = 3.5, padj = -7, las = 1)
-boxplot(data.1[, 26] ~ factor(sub.workload, levels = c(1, 2, 3), labels = c("unterfordert", "optimal", "\"uberfordert")), ylab =  "Bew. ($\\times 10^3 \\: m^2 \\cdot s^{-5}$)")
-mtext("D", side = 2, line = 3.5, padj = -7, las = 1)
 
 dev.off()
 ```
 
 \begin{figure}
-	\input{./tikz/5-20-mittelwert-vergleich}
-	\caption{Mittelwertvergleich - unterfordert, optimal, überfordert. (A) $\bigtriangleup$ Absorbiertheit; (B) Mittlere HR; (C) Mittlerer normalisierter Shannon Entropie Index; (D) Bewegungsaufwand. Quelle: Eigene Darstellung -+-\emph{Anmerkung}: Bew. = Bewegungsaufwand.}
-	\label{fig:5_20_mittelwert_vergleich}
+	\input{./tikz/mittelwert_vergleich}
+	\caption{Mittelwertvergleich -- Schritt dominiert (S), Gleichgewicht (G), Herz dominiert (H). (A) Generalfaktor; (B) Glatter Verlauf; (C) Absorbiertheit}
+	\label{fig:mittelwert_vergleich}
 \end{figure}
 
 ```{r process-oriented-approach, echo=FALSE, include=FALSE}
 
 # Setup tikz device
-tikz("./tikz/5-19-prozessorientierter-ansatz.tex", width = 7.91, height = 5.22)
+#tikz("./tikz/prozessorientierter-ansicht_2.tex", width = 7.91, height = 5.22)
 
 # Set graphic parameter
-par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfcol = c(3, 3))
+par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfcol = c(4, 3))
 
 jc.ylim <- c(20, 60)
 bpm.ylim <- c(130, 190)
 
 # Plot underload measure
 # Set directories
-user.directory <- "beutner-stefan/"
-date.directory <- "2016-04-07--18-24-56/"
+user.directory <- user.directories[26]
+date.directory <- paste(list.dirs(paste(root.path, processed.data.directory, activity.directory, user.directory, sep = ""), full.names = F, recursive = F)[1], "/", sep = "")
 
 # Set data file names
 kubios.hrv.data.file.name <- "imu-rn42-bd38-1_hrv.txt"
 jc.data.file.name <- "imu-rn42-3b70-jerk-cost-data-1.csv"
-cls.data.file.name <- "cls-phase-data-1.csv"
+cls.phase.data.file.name <- "cls-phase-data-1.csv"
+cls.index.data.file.name <- "cls-index-data-1.csv"
 
 # Set paths
 kubios.hrv.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, kubios.hrv.data.file.name, sep = "")
 jc.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, jc.data.file.name, sep = "")
-cls.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.data.file.name, sep = "")
+cls.phase.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.phase.data.file.name, sep = "")
+cls.index.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.index.data.file.name, sep = "")
     
 # Load hrv, jerk cost and cls data
 source("../processing/code-snippets/get-kubios-hrv-data.R")
 jc.data <- read.csv(jc.data.file.path)
-cls.data <- read.csv(cls.data.file.path)
+cls.phase.data <- read.csv(cls.phase.data.file.path)
+cls.index.data <- read.csv(cls.index.data.file.path)
 
 # Plot
 source("./code-snippets/plot-processes.R")
@@ -366,23 +381,26 @@ title(sub = "Unterforderung - Absorbiertheit: 5,5")
 
 # Plot optimal measure
 # Set directories
-user.directory <- "neumann-tim/"
-date.directory <- "2016-04-18--18-15-39/"
+user.directory <- user.directories[23]
+date.directory <- paste(list.dirs(paste(root.path, processed.data.directory, activity.directory, user.directory, sep = ""), full.names = F, recursive = F)[1], "/", sep = "")
 
 # Set data file names
 kubios.hrv.data.file.name <- "imu-rn42-bd38-1_hrv.txt"
 jc.data.file.name <- "imu-rn42-3b70-jerk-cost-data-1.csv"
-cls.data.file.name <- "cls-phase-data-1.csv"
+cls.phase.data.file.name <- "cls-phase-data-1.csv"
+cls.index.data.file.name <- "cls-index-data-1.csv"
 
 # Set paths
 kubios.hrv.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, kubios.hrv.data.file.name, sep = "")
 jc.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, jc.data.file.name, sep = "")
-cls.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.data.file.name, sep = "")
+cls.phase.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.phase.data.file.name, sep = "")
+cls.index.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.index.data.file.name, sep = "")
     
 # Load hrv, jerk cost and cls data
 source("../processing/code-snippets/get-kubios-hrv-data.R")
 jc.data <- read.csv(jc.data.file.path)
-cls.data <- read.csv(cls.data.file.path)
+cls.phase.data <- read.csv(cls.phase.data.file.path)
+cls.index.data <- read.csv(cls.index.data.file.path)
 
 # Plot
 source("./code-snippets/plot-processes.R")
@@ -390,32 +408,35 @@ title(sub = "optimal - Absorbiertheit: 6,5")
 
 # Plot overload measure
 # Set directories
-user.directory <- "goeren-ferat/"
-date.directory <- "2016-03-22--17-17-27/"
+user.directory <- user.directories[21]
+date.directory <- paste(list.dirs(paste(root.path, processed.data.directory, activity.directory, user.directory, sep = ""), full.names = F, recursive = F)[1], "/", sep = "")
 
 # Set data file names
 kubios.hrv.data.file.name <- "imu-rn42-bd38-1_hrv.txt"
 jc.data.file.name <- "imu-rn42-3b70-jerk-cost-data-1.csv"
-cls.data.file.name <- "cls-phase-data-1.csv"
+cls.phase.data.file.name <- "cls-phase-data-1.csv"
+cls.index.data.file.name <- "cls-index-data-1.csv"
 
 # Set paths
 kubios.hrv.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, kubios.hrv.data.file.name, sep = "")
 jc.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, jc.data.file.name, sep = "")
-cls.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.data.file.name, sep = "")
+cls.phase.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.phase.data.file.name, sep = "")
+cls.index.data.file.path <- paste(root.path, processed.data.directory, activity.directory, user.directory, date.directory, cls.index.data.file.name, sep = "")
     
 # Load hrv, jerk cost and cls data
 source("../processing/code-snippets/get-kubios-hrv-data.R")
 jc.data <- read.csv(jc.data.file.path)
-cls.data <- read.csv(cls.data.file.path)
+cls.phase.data <- read.csv(cls.phase.data.file.path)
+cls.index.data <- read.csv(cls.index.data.file.path)
 
 # Plot
 source("./code-snippets/plot-processes.R")
 title(sub = "\"Uberforderung - Absorbiertheit: 3,25")
 
-dev.off()
+#dev.off()
 
 # Clean up
-rm(cls.data, jc.data, kubios.hrv.data, cls.data.file.path, cls.data.file.name, user.directory, date.directory, heart.beat.times, jc.data.file.path, jc.data.file.name, kubios.hrv.data.file.path, kubios.hrv.data.file.name, m, n, bpm.ylim, jc.ylim)
+rm(cls.phase.data, jc.data, kubios.hrv.data, cls.phase.data.file.path, cls.phase.data.file.name, user.directory, date.directory, heart.beat.times, jc.data.file.path, jc.data.file.name, kubios.hrv.data.file.path, kubios.hrv.data.file.name, m, n, bpm.ylim, jc.ylim)
 ```
 
 \begin{sidewaysfigure}

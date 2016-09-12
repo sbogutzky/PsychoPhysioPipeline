@@ -585,7 +585,7 @@ cls.phase.data <- read.csv(cls.phase.data.file.path)
 cls.index.data <- read.csv(cls.index.data.file.path)
 
 # Setup tikz device
-tikz("./tikz/prozessorientierte_ansicht.tex", width = 7.91, height = 5.22)
+tikz("./tikz/prozessorientierte_ansicht_1.tex", width = 7.91, height = 5.22)
 
 # Set graphic parameter
 par(mai = c(.5, .5, .2, .1), mgp = c(2.5, 1, 0), mfrow = c(4, 1))
@@ -617,7 +617,7 @@ rm(cls.index.data, cls.phase.data, jc.data, kubios.hrv.data, cls.index.data.file
 ```
 
 \begin{sidewaysfigure}
-\input{./tikz/prozessorientierte_ansicht}
+\input{./tikz/prozessorientierte_ansicht_1}
 \caption[Beispielhafte Prozessdarstellung des letzten Laufabschnittes vom 07. November 2013 (Erste Studie: Laufen)]{Beispielhafte Prozessdarstellung des letzten Laufabschnittes vom 07. November 2013 -+- \emph{Anmerkung}: Rel. Phase = Relative Phase}
 \label{fig:prozessorientierte_ansicht}
 \end{sidewaysfigure}
