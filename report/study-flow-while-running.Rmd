@@ -349,6 +349,7 @@ dev.off()
 # Setup tikz device
 tikz("./tikz/prozessorientierte_ansicht_2.tex", width = 7.91, height = 5.22)
 
+
 # Set data file names
 kubios.hrv.data.file.name <- "imu-rn42-bd38-1_hrv.txt"
 jc.data.file.name.r <- "imu-rn42-3b70-jerk-cost-data-1.csv"
@@ -357,7 +358,7 @@ cls.phase.data.file.name <- "cls-phase-data-1.csv"
 cls.index.data.file.name <- "cls-index-data-1.csv"
 
 # Set graphic parameter
-par(mai = c(.8, .8, .1, .1), mgp = c(2.5, 1, 0), mfcol = c(4, 3))
+par(mai = c(.5, .5, .2, .1), mgp = c(2.5, 1, 0), mfcol = c(4, 3))
 
 # Plot 3
 # Set directories

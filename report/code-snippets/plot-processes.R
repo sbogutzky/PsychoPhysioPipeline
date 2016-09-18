@@ -20,7 +20,7 @@ kubios.hrv.data <- kubios.hrv.data[kubios.hrv.data[, 1] * 1000 > n & kubios.hrv.
 stride.times <- c(jc.data[1, 1] - jc.data[1, 1], jc.data[, 1])
 
 # Plot data
-plot(jc.data[, 1] / 1000, 60 / diff(stride.times / 1000), xlab = "", ylab = "Mittlere Schrittfr. ($1/min$)", xaxs = "i", yaxs = "i", ylim = c(135, 205), pch = 23, bg = rgb(0/255, 152/255, 199/255), xlim = c(min(jc.data[, 1]), max(jc.data[, 1]))/1000)
+plot(jc.data[, 1] / 1000, 60 / diff(stride.times / 1000), xlab = "", ylab = "Mittlere SF ($1/min$)", xaxs = "i", yaxs = "i", ylim = c(135, 205), pch = 23, bg = rgb(0/255, 152/255, 199/255), xlim = c(min(jc.data[, 1]), max(jc.data[, 1]))/1000)
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 
@@ -33,7 +33,7 @@ plot(cls.phase.data[, 1] / 1000, cls.phase.data[, 3], xlab = "", ylab = "Rel. Ph
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 
-plot(cls.index.data[, 1] / 1000, cls.index.data[, 3], type = "l", xlab = "Zeit (s)", ylab = "Norm. Shan. Entr. Index", xaxs = "i", yaxs = "i", ylim = c(0, 1), xlim = c(min(jc.data[, 1]), max(jc.data[, 1]))/1000)
+plot(cls.index.data[, 1] / 1000, cls.index.data[, 3], type = "l", xlab = "Zeit (s)", ylab = "N. Shan. Entr. Index", xaxs = "i", yaxs = "i", ylim = c(0, 1), xlim = c(min(jc.data[, 1]), max(jc.data[, 1]))/1000)
 grid(col = rgb(186/255, 187/255, 194/255))
 box()
 
