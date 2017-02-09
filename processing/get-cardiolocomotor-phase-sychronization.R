@@ -36,10 +36,6 @@ kinematic.data.file.name.2 <- readline("Dateiname der zweiten Datei mit kinemati
 time.window.s <- as.numeric(readline("Zeitfenster für die Index-Berechnung  (s) > "))
 if(is.na(time.window.s)) time.window.s = 30
 
-user.directories <- paste(list.dirs("/Volumes/DOS/daten/2016/processed-data/running", recursive = F, full.names = F), "/", sep = "")
-
-for(user.directory in user.directories) {
-
 # Set directory paths
 source("./code-snippets/set-directory-paths.R")
 
