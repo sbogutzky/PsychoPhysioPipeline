@@ -281,7 +281,7 @@ print(length(data.2[physiological.state == "H", 1]))
 
 for(i in 1:ncol(data.2)) {
   par(mai = c(.5, .5, .2, .1), mgp = c(2.5, 1, 0), mfrow = c(1, 4))
-  boxplot(data.2[, i] ~ factor(physiological.state, labels = c("Herz dominiert", "Gleichgewicht", "Schritt dominiert")), ylab = colnames(data.2)[i])
+  boxplot(data.2[, i] ~ factor(physiological.state, labels = c("Schritt dominiert", "Gleichgewicht", "Herz dominiert")), ylab = colnames(data.2)[i])
   
   print("---------------------")
   
@@ -290,16 +290,19 @@ for(i in 1:ncol(data.2)) {
   hist(data.2[physiological.state == "S", i], main = colnames(data.2)[i]) 
   print(shapiro.test(data.2[physiological.state == "S", i]))
   print(mean(data.2[physiological.state == "S", i]))
+  print(median(data.2[physiological.state == "S", i]))
   print(sd(data.2[physiological.state == "S", i]))
   
   hist(data.2[physiological.state == "G", i], main = colnames(data.2)[i]) 
   print(shapiro.test(data.2[physiological.state == "G", i]))
   print(mean(data.2[physiological.state == "G", i]))
+  print(median(data.2[physiological.state == "G", i]))
   print(sd(data.2[physiological.state == "G", i]))
   
   hist(data.2[physiological.state == "H", i], main = colnames(data.2)[i]) 
   print(shapiro.test(data.2[physiological.state == "H", i]))
   print(mean(data.2[physiological.state == "H", i]))
+  print(median(data.2[physiological.state == "H", i]))
   print(sd(data.2[physiological.state == "H", i]))
 
   print(var.test(data.2[physiological.state == "S", i], data.2[physiological.state == "G", i]))
