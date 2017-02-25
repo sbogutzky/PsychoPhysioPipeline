@@ -37,7 +37,7 @@ library("coin")
 library("stringr")
 
 # Set paths
-root.path <- "/Volumes/DOS/daten/2016/"
+root.path <- "/Users/sbogutzky/Documents/Dokumente/Studium/Promotion/2016/Studien/Daten/2016/"
 
 # Set directories
 processed.data.directory <- "processed-data/"
@@ -363,7 +363,7 @@ cls.index.data.file.name <- "cls-index-data-1.csv"
 # Set graphic parameter
 par(mai = c(.5, .5, .2, .1), mgp = c(2.5, 1, 0), mfcol = c(4, 3))
 
-# Plot 3
+# Plot 1
 # Set directories
 user.directory <- user.directories[26]
 date.directory <- paste(list.dirs(paste(root.path, processed.data.directory, activity.directory, user.directory, sep = ""), full.names = F, recursive = F)[1], "/", sep = "")
