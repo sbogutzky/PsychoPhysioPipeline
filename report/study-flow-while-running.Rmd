@@ -37,7 +37,7 @@ library("coin")
 library("stringr")
 
 # Set paths
-root.path <- "/Users/sbogutzky/Documents/Dokumente/Studium/Promotion/2016/Studien/Daten/2016/"
+root.path <- "/Users/sbogutzky/Documents/archiv/studium/promotion/2016/studien/daten/2016/"
 
 # Set directories
 processed.data.directory <- "processed-data/"
