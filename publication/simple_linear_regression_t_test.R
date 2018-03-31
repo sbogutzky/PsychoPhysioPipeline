@@ -1,5 +1,5 @@
 library(readr)
-data.summary <- read_csv("~/Documents/archiv/studium/promotion/2016/studien/data_summary_1.csv")
+data.summary <- read_csv("~/Documents/archiv/studium/promotion/2016/studien/data_summary.csv")
 data.summary <- data.summary[data.summary$grp != 4, ]
 
 # Recode flow
@@ -61,7 +61,7 @@ print(data.summary[data.summary$grp == 2, ])
 print(data.summary[data.summary$grp == 3, ])
 
 par(mfrow=c(1, 1))
-boxplot(data.summary$absorption ~ factor(data.summary$grp, labels = c("step dominated", "balanced", "heart dominated")), main = "Absorption")
+boxplot(data.summary$absorption ~ factor(data.summary$grp, labels = c("step dominated", "synchronized", "heart dominated")), main = "Absorption")
 
 print(t.test(data.summary$absorption[data.summary$grp == 1], data.summary$absorption[data.summary$grp == 2], var.equal = F))
 print(t.test(data.summary$absorption[data.summary$grp == 2], data.summary$absorption[data.summary$grp == 3], var.equal = F))
