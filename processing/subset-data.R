@@ -1,5 +1,5 @@
 # The MIT License (MIT)
-# Copyright (c) 2016 Simon Bogutzky
+# Copyright (c) 2016 University of Applied Sciences Bremen
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 # and associated documentation files (the "Software"), to deal in the Software without restriction,
 # including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -16,6 +16,8 @@
 
 # Version 2.0
 
+# !!! Set working directory to file directory
+
 # Remove all variables
 rm(list = ls(all = T))  
 
@@ -23,16 +25,13 @@ rm(list = ls(all = T))
 library(flow)
 library(zoom)
 
-# Set working directory
-setwd("~/psychophysiopipeline/processing")
-
 # User input
-root.directory.path <- readline("Quellverzeichnis > ") 
-first.name <- readline("Vorname der Untersuchungsperson > ")
-last.name <- readline("Nachname der Untersuchungsperson > ")
-activity <- readline("Aktivität der Untersuchung > ")
-data.file.name <- readline("Dateiname der Datendatei (ohne .csv) > ")
-is.gps.data <- "JA" == readline("Sind die Daten GPS-Daten (JA/NEIN) > ")
+root.directory.path <- readline("Source data directory (with / at the end) > ") 
+first.name <- readline("First name of the participant > ")
+last.name <- readline("Last name of the participant > ")
+activity <- readline("Activity of the session > ")
+data.file.name <- readline("Filename of the data file (without .csv) > ")
+is.gps.data <- "Y" == readline("GPS data? (Y/N) > ")
 
 # Set directory paths
 source("./code-snippets/set-directory-paths.R")
@@ -64,8 +63,8 @@ for (self.report.file.name in self.report.file.names) {
       duration.s <- (max(data.1.subset[, 1]) - min(data.1.subset[, 1])) / 1000
       fs <- ComputeSamplingRate(data.1.subset[, 1])
       print("---")
-      print(paste("Abtastrate:", round(fs, 2), "Hz"))
-      print(paste("Länge:", round(duration.s, 2), "s"))
+      print(paste("Sampling rate:", round(fs, 2), "Hz"))
+      print(paste("Duration:", round(duration.s, 2), "s"))
       
       # Check data
       j <- 2
@@ -74,10 +73,12 @@ for (self.report.file.name in self.report.file.names) {
       }
       source("./code-snippets/translate.R")
       par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
-      plot(data.1.subset[, 1] / 1000, data.1.subset[, j], type = "l", xlab = "Zeit (s)", ylab = ReturnFieldLabels(colnames(data.1.subset)[j]), xaxs = "i")
-      title(paste(strftime(session.start + activity.start.ms / 1000, format="%d.%m.%Y %H:%M"), " #", i, sep = ""))
+      plot(data.1.subset[, 1] / 1000, data.1.subset[, j], type = "l", xlab = "Time (s)", ylab = ReturnFieldLabels(colnames(data.1.subset)[j]), xaxs = "i")
+      title(paste(strftime(session.start + activity.start.ms / 1000, format="%m/%d/%Y %H:%M"), " #", i, sep = ""))
       zm()
-      readline("Weiter > ")
+      
+      if(i != nrow(self.report.data))
+        readline("Next > ")
       
       # Write to csv file
       if(!dir.exists(paste(processed.data.directory.path, date.directory, sep =""))) {
@@ -86,7 +87,7 @@ for (self.report.file.name in self.report.file.names) {
       write.csv(data.1.subset, paste(processed.data.directory.path, date.directory, data.file.name, "-", i, ".csv", sep = ""), row.names = F)
       
       print("---")
-      print(paste(paste(data.file.name, "-", i, ".csv", sep = ""), "in", paste(processed.data.directory.path, date.directory, sep =""), "geschrieben."))
+      print(paste("Wrote", paste(data.file.name, "-", i, ".csv", sep = ""), "in", paste(processed.data.directory.path, date.directory, sep ="")))
       
       # Clean up
       rm(j)
@@ -112,7 +113,7 @@ for (self.report.file.name in self.report.file.names) {
       write(footer, paste(processed.data.directory.path, date.directory, data.file.name, "-", i, ".kml", sep = ""), append = T)
       
       print("---")
-      print(paste(paste(data.file.name, "-", i, ".kml", sep = ""), "in", paste(processed.data.directory.path, date.directory, sep =""), "geschrieben."))
+      print(paste("Wrote", paste(data.file.name, "-", i, ".kml", sep = ""), "in", paste(processed.data.directory.path, date.directory, sep ="")))
     
       # Clean up
       rm(header, footer)

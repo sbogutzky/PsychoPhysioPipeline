@@ -1,5 +1,5 @@
  # The MIT License (MIT)
- # Copyright (c) 2016 Simon Bogutzky
+ # Copyright (c) 2016 University of Applied Sciences Bremen
  # Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  # and associated documentation files (the "Software"), to deal in the Software without restriction,
  # including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -16,19 +16,18 @@
 
 # Version 2.0
 
+# !!! Set working directory to file directory
+
 # Remove all variables
 rm(list = ls(all = T))  
 
 # Load libraries
 library(flow)
 
-# Set working directory
-setwd("~/psychophysiopipeline/processing")
-
 # User input
-root.directory.path <- readline("Quellverzeichnis > ") 
-activity <- readline("Aktivität der Untersuchung > ")
-kinematic.data.file.name <- readline("Dateiname der Datei mit kinematischen Daten (ohne .csv) > ")
+root.directory.path <- readline("Source data directory (with / at the end) > ") 
+activity <- readline("Activity of the session > ")
+kinematic.data.file.name <- readline("Filename of the file with kinematic data (without .csv) > ")
 
 kinematic.data.file.paths <- list.files(path = paste(root.directory.path, "processed-data/", sep = ""), pattern = paste(kinematic.data.file.name, "-[0-9].csv", sep = ""), full.names = TRUE, recursive = TRUE)
 optimal.cutoff.frequency.data <- c()
@@ -49,13 +48,13 @@ for (i in 1:n) {
   # Compute optimal cut off frequencies
   optimal.cutoff.frequency.data <- c(optimal.cutoff.frequency.data, ComputeOptimalCutoffFrequency(kinematic.data[, 2], fs, f.n), ComputeOptimalCutoffFrequency(kinematic.data[, 3], fs, f.n), ComputeOptimalCutoffFrequency(kinematic.data[, 4], fs, f.n))
 
-  print(paste("Datei", i, "von", n, "verarbeitet."))
+  print(paste("File", i, "of", n, "processed."))
 }
 
 optimal.cutoff.frequency.data <- matrix(optimal.cutoff.frequency.data, 3, i)
 optimal.cutoff.frequencies <- rowMeans(optimal.cutoff.frequency.data, na.rm = T)
 
 print("---")
-print(paste("Grenzfrequenz für die Beschleunigung entlang der X-Achse:", round(optimal.cutoff.frequencies[1], 1), "Hz"))
-print(paste("Grenzfrequenz für die Beschleunigung entlang der Y-Achse:", round(optimal.cutoff.frequencies[2], 1), "Hz"))
-print(paste("Grenzfrequenz für die Beschleunigung entlang der Z-Achse:", round(optimal.cutoff.frequencies[3], 1), "Hz"))
+print(paste("Cut off frequency for the acceleration along the X-axis:", round(optimal.cutoff.frequencies[1], 1), "Hz"))
+print(paste("Cut off frequency for the acceleration along the Y-axis:", round(optimal.cutoff.frequencies[2], 1), "Hz"))
+print(paste("Cut off frequency for the acceleration along the Z-axis:", round(optimal.cutoff.frequencies[3], 1), "Hz"))

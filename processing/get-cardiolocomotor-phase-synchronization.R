@@ -1,5 +1,5 @@
 # The MIT License (MIT)
-# Copyright (c) 2016 Simon Bogutzky
+# Copyright (c) 2016 University of Applied Sciences Bremen
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 # and associated documentation files (the "Software"), to deal in the Software without restriction,
 # including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -16,7 +16,7 @@
 
 # Version 2.0
 
-# !!! Use file directory as working directory
+# !!! Set working directory to file directory
 
 # Remove all variables
 rm(list = ls(all = T))  
@@ -26,14 +26,14 @@ library(flow)
 library(zoom)
 
 # User input
-root.directory.path <- readline("Quellverzeichnis > ")  
-first.name <- readline("Vorname der Untersuchungsperson > ")
-last.name <- readline("Nachname der Untersuchungsperson > ")
-activity <-  readline("Aktivität der Untersuchung > ")
-ecg.data.file.name <- readline("Dateiname der Datei mit EKG-Daten (ohne .csv) > ")
-kinematic.data.file.name.1 <- readline("Dateiname der ersten Datei mit kinematischen Daten (ohne .csv) > ")
-kinematic.data.file.name.2 <- readline("Dateiname der zweiten Datei mit kinematischen Daten (ohne .csv / optimal) > ")
-time.window.s <- as.numeric(readline("Zeitfenster für die Index-Berechnung  (s) > "))
+root.directory.path <- readline("Source data directory (with / at the end) > ") 
+first.name <- readline("First name of the participant > ")
+last.name <- readline("Last name of the participant > ")
+activity <- readline("Activity of the session > ")
+ecg.data.file.name <- readline("Filename of the file with ECG data (without .csv) > ")
+kinematic.data.file.name.1 <- readline("Filename of the first file with kinematic data (without .csv) > ")
+kinematic.data.file.name.2 <- readline("Filename of the second file with kinematic data (optional / without .csv) > ")
+time.window.s <- as.numeric(readline("Time window for the index calculation (s) > "))
 if(is.na(time.window.s)) time.window.s = 30
 
 # Set directory paths
@@ -87,14 +87,14 @@ for (self.report.file.name in self.report.file.names) {
       par(mfcol = c(3, 1), mar = c(3.5, 4, 2, 4) + 0.1, mgp = c(2.5, 1, 0))
       
       # SPM vs. BPM 
-      plot(stride.times, spm, xlab = "", ylab = "Mittlerer Schritt & Mittlerer HR", xaxt = "n", xlim = time.range.s, ylim = y.lim, xaxs = "i", pch = 23, bg = rgb(0/255, 152/255, 199/255))
+      plot(stride.times, spm, xlab = "", ylab = "Mean Step & Mean HR", xaxt = "n", xlim = time.range.s, ylim = y.lim, xaxs = "i", pch = 23, bg = rgb(0/255, 152/255, 199/255))
       points(heart.beat.times, bpm, pch = 21, bg = rgb(229/255, 66/255, 66/255))
       abline(v = seq(time.range.s[1], time.range.s[2], time.window.s), lty = "dashed", col = rgb(186/255, 187/255, 194/255))
       axis(1, at = seq(time.range.s[1], time.range.s[2], time.window.s), labels = seq(time.range.s[1], time.range.s[2], time.window.s), las = 1)
       legend("topright", c("SPM", "BPM"), pch = c(23, 21), pt.bg = c(rgb(0/255, 152/255, 199/255), rgb(229/255, 66/255, 66/255)), bg = "white")
       box()
       
-      title(paste(format(session.start + activity.start.ms / 1000, "%d.%m.%Y %H:%M", tz = "CET"), " #", i, sep = ""))
+      title(paste(format(session.start + activity.start.ms / 1000, "%m/%d/%Y %H:%M", tz = "CET"), " #", i, sep = ""))
       
       # Stroboscopic Technique
       instantaneous.phase.data <- ComputeInstantaneousPhases(heart.beat.times, stride.times)
@@ -114,19 +114,17 @@ for (self.report.file.name in self.report.file.names) {
       timestamps <- seq(min(cls.phase.data[, 1] / 1000) + time.window.s/2, max(cls.phase.data[, 1] / 1000) - time.window.s/2, 1)
       phase.coherence.indexes <- c()
       normalized.shannon.entropy.indexes <- c()
-      common.point.directions <- c()
       for (timestamp in timestamps) {
         phase.coherence.indexes <- c(phase.coherence.indexes, ComputePhaseCoherenceIndex(cls.phase.data[, 1] / 1000, cls.phase.data[, 3], timestamp, time.window.s))
-        normalized.shannon.entropy.indexes <- c(normalized.shannon.entropy.indexes, ComputeNormalizedShannonEntropyIndex(cls.phase.data[, 1] / 1000, cls.phase.data[, 3], timestamp, time.window.s)) 
-        common.point.directions <- c(common.point.directions, ComputeCommonPointDirection(cls.phase.data[, 1] / 1000, cls.phase.data[, 3], timestamp, time.window.s))
+        normalized.shannon.entropy.indexes <- c(normalized.shannon.entropy.indexes, ComputeNormalizedShannonEntropyIndex(cls.phase.data[, 1]/ 1000, cls.phase.data[, 3], timestamp, time.window.s)) 
       }
       rm(timestamp)
       
-      cls.index.data <- data.frame(timestamp.ms = timestamps * 1000, pcoi = round(phase.coherence.indexes, 3), nsei = round(normalized.shannon.entropy.indexes, 3), direction = common.point.directions)
+      cls.index.data <- data.frame(timestamp.ms = timestamps * 1000, pcoi = round(phase.coherence.indexes, 3), nsei = round(normalized.shannon.entropy.indexes, 3))
       cls.index.data <- cls.index.data[cls.index.data[, 1] / 1000 > min(heart.beat.times) & cls.index.data[, 1] / 1000 < max(heart.beat.times), ]
-      rm(timestamps, phase.coherence.indexes, normalized.shannon.entropy.indexes, common.point.directions)
+      rm(timestamps, phase.coherence.indexes, normalized.shannon.entropy.indexes)
       
-      plot(cls.index.data[, 1] / 1000, cls.index.data[, 3], type = "l", xlab = "Zeit (s)", ylab = "Indexes", xaxt = "n",  yaxt = "n", xlim = time.range.s, xaxs = "i", yaxs = "i", ylim = y.lim, col = rgb(0/255, 152/255, 199/255))
+      plot(cls.index.data[, 1] / 1000, cls.index.data[, 3], type = "l", xlab = "Time (s)", ylab = "Indexes", xaxt = "n",  yaxt = "n", xlim = time.range.s, xaxs = "i", yaxs = "i", ylim = y.lim, col = rgb(0/255, 152/255, 199/255))
       lines(cls.index.data[, 1] / 1000, cls.index.data[, 2], lty = 2)
       abline(v = seq(time.range.s[1], time.range.s[2], time.window.s), lty = "dashed", col = rgb(186/255, 187/255, 194/255))
       axis(1, at = seq(time.range.s[1], time.range.s[2], time.window.s), labels = seq(time.range.s[1], time.range.s[2], time.window.s), las = 1)
@@ -135,10 +133,10 @@ for (self.report.file.name in self.report.file.names) {
       box()
       zm()
       
-      # Print synchronisation features
+      # Print synchronization features
       print("---")
-      print(paste("Mittlerer normalisierter Shannon Entropie Index:", round(mean(cls.index.data[, 3], na.rm = TRUE), 2)))
-      print(paste("Mittlerer Phasenkohärenz Index:", round(mean(cls.index.data[, 2], na.rm = TRUE), 2)))
+      print(paste("Mean normalized Shannon Entropy Index:", round(mean(cls.index.data[, 3], na.rm = TRUE), 2)))
+      print(paste("Mean Coherence Index:", round(mean(cls.index.data[, 2], na.rm = TRUE), 2)))
       
       # Write to csv file
       if(!dir.exists(paste(processed.data.directory.path, date.directory, sep =""))) {
@@ -148,15 +146,15 @@ for (self.report.file.name in self.report.file.names) {
       write.csv(cls.phase.data, paste(processed.data.directory.path, date.directory, "cls-phase-data-", i, ".csv", sep = ""), row.names = F)
       
       print("---")
-      print(paste(paste("cls-index-data-", i, ".csv", sep = ""), "in", paste(processed.data.directory.path, date.directory, sep =""), "geschrieben."))
-      print(paste(paste("cls-phase-data-", i, ".csv", sep = ""), "in", paste(processed.data.directory.path, date.directory, sep =""), "geschrieben."))
+      print(paste("Wrote", paste("cls-index-data-", i, ".csv", sep = ""), "in", paste(processed.data.directory.path, date.directory, sep ="")))
+      print(paste("Wrote", paste("cls-phase-data-", i, ".csv", sep = ""), "in", paste(processed.data.directory.path, date.directory, sep ="")))
       
     } else {
       print("---")
-      print(paste("Datei nicht gefunden:", ecg.data.file.name))
-      print("oder")
-      print(paste("Datei nicht gefunden:", kinematic.data.file.name.1))
+      print(paste("File not found:", ecg.data.file.name))
+      print("or")
+      print(paste("File not found:", kinematic.data.file.name.1))
     }
-    readline("Weiter > ")
+    readline("Next > ")
   }
 }

@@ -1,5 +1,5 @@
 # The MIT License (MIT)
-# Copyright (c) 2016 Simon Bogutzky
+# Copyright (c) 2016 University of Applied Sciences Bremen
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 # and associated documentation files (the "Software"), to deal in the Software without restriction,
 # including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -16,21 +16,20 @@
 
 # Version 2.0
 
+# !!! Set working directory to file directory
+
 # Remove all variables
 rm(list = ls(all = T))  
 
 # Load libraries
 library(flow)
 
-# Set working directory
-setwd("~/psychophysiopipeline/processing")
-
 # User input
-root.directory.path <- readline("Quellverzeichnis > ")
-first.name <- readline("Vorname der Untersuchungsperson > ")
-last.name <- readline("Nachname der Untersuchungsperson > ")
-date.of.birth <- readline("Geburtsdatum der Untersuchungsperson (Format: YYYY-MM-dd) > ")
-activity <- readline("Aktivität der Untersuchung > ")
+root.directory.path <- readline("Source data directory (with / at the end) > ")
+first.name <- readline("First name of the participant > ")
+last.name <- readline("Last name of the participant > ")
+date.of.birth <- readline("Birthday of the participant (Format: YYYY-MM-dd) > ")
+activity <- readline("Activity of the session > ")
 
 # Set directory paths
 source("./code-snippets/set-directory-paths.R")
@@ -71,7 +70,7 @@ if(!dir.exists(feature.directory.path)) {
 write.csv(fss.features, paste(feature.directory.path, "fss-features.csv", sep = ""), row.names = F)
 
 print("---")
-print(paste("fss-features.csv in", feature.directory.path, "geschrieben."))
+print(paste("Wrote fss-features.csv in", feature.directory.path))
 
 # Clean up
 rm(fss.dimensions, self.report.data, activity, activity.end.ms, activity.start.ms, date.of.birth, first.name, fss.measurement, i, last.name, self.report.end.ms, self.report.file.name, self.report.file.names, session.start)

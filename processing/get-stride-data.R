@@ -1,5 +1,5 @@
 # The MIT License (MIT)
-# Copyright (c) 2016 Simon Bogutzky
+# Copyright (c) 2016 University of Applied Sciences Bremen
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 # and associated documentation files (the "Software"), to deal in the Software without restriction,
 # including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -16,6 +16,8 @@
 
 # Version 2.0
 
+# !!! Set working directory to file directory
+
 # Remove all variables
 rm(list = ls(all = T))  
 
@@ -23,16 +25,13 @@ rm(list = ls(all = T))
 library(flow)
 library(zoom)
 
-# Set working directory
-setwd("~/psychophysiopipeline/processing")
-
 # User input
-root.directory.path <- readline("Quellverzeichnis > ")  
-first.name <- readline("Vorname der Untersuchungsperson > ")
-last.name <- readline("Nachname der Untersuchungsperson > ")
-activity <- readline("Aktivität der Untersuchung > ")
-kinematic.data.file.name <- readline("Dateiname der Datei mit kinematischen Daten (ohne .csv) > ")
-angular.velocity.offset <- as.numeric(readline("Grenz bei in der keine Schritt erkannt werden sollen (+/- deg/s) > "))
+root.directory.path <- readline("Source data directory (with / at the end) > ") 
+first.name <- readline("First name of the participant > ")
+last.name <- readline("Last name of the participant > ")
+activity <- readline("Activity of the session > ")
+kinematic.data.file.name <- readline("Filename of the file with kinematic data (without .csv) > ")
+angular.velocity.offset <- as.numeric(readline("Threshold for impossible detection (+/- deg/s) > "))
 
 # Set directory paths
 source("./code-snippets/set-directory-paths.R")
@@ -61,7 +60,7 @@ for (self.report.file.name in self.report.file.names) {
       
       fs <- ComputeSamplingRate(kinematic.data[, 1])
       print("---")
-      print(paste("Abtastrate:", round(fs, 2), "Hz"))
+      print(paste("Sampling rate:", round(fs, 2), "Hz"))
       
       # Detect Midswings
       cf <- ComputeOptimalCutoffFrequency(kinematic.data[, 5], fs, 4)
@@ -76,19 +75,19 @@ for (self.report.file.name in self.report.file.names) {
         source("./code-snippets/translate.R")
         stride.per.minute <- 60 / diff(kinematic.data[mid.swing.indexes, 1] / 1000)
         stride.per.minute <- c(mean(stride.per.minute), stride.per.minute)
-        anomaly <- DetectAnomaly(stride.per.minute, kinematic.data[mid.swing.indexes, 5], epsilon = 0, xlab = "Mittlerer Doppelschritt (1/min)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xlim = c(min(stride.per.minute, na.rm = TRUE), max(stride.per.minute, na.rm = TRUE)), ylim = c(min(kinematic.data[mid.swing.indexes, 5]), max(kinematic.data[mid.swing.indexes, 5])), pch = 21, bg = rgb(229/255, 66/255, 66/255))
+        anomaly <- DetectAnomaly(stride.per.minute, kinematic.data[mid.swing.indexes, 5], epsilon = 0, xlab = "Mean Stride (1/min)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xlim = c(min(stride.per.minute, na.rm = TRUE), max(stride.per.minute, na.rm = TRUE)), ylim = c(min(kinematic.data[mid.swing.indexes, 5]), max(kinematic.data[mid.swing.indexes, 5])), pch = 21, bg = rgb(229/255, 66/255, 66/255))
         if(length(anomaly$outliers) > 0) {
           mid.swing.indexes <- mid.swing.indexes[-anomaly$outliers]
         }
-        readline("Weiter > ")
+        readline("Next > ")
         
         # Compute mean stride
         stride.per.minute <- c(NA, 60 / diff(kinematic.data[mid.swing.indexes, 1] / 1000))
         mean.nn <- mean(stride.per.minute, na.rm = TRUE)
         print("---")
-        print(paste("Mittlerer Doppelschritt:", round(mean.nn, 2), "1/min"))
+        print(paste("Mean stride:", round(mean.nn, 2), "1/min"))
         sd.nn <- sd(stride.per.minute, na.rm = TRUE)
-        print(paste("Mittlerer Doppelschritt (SD):", round(sd.nn, 2), "1/min"))
+        print(paste("Mean stride (SD):", round(sd.nn, 2), "1/min"))
        
         # Check outliers manual
         outliers <- which(stride.per.minute < mean.nn - sd.nn * 2.5)
@@ -100,17 +99,17 @@ for (self.report.file.name in self.report.file.names) {
             m <- outlier - 7; if (m < 0) m <- 0
             n <- outlier + 7; if (n > length(mid.swing.indexes)) n <- length(mid.swing.indexes)
             par(mfcol = c(2, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
-            plot(kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 1] / 1000, kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 5], xlab = "Zeitstempel (s)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xaxs = "i", type = "l", main = paste("Kontrolle zum Hinzufügen", j, "von", n.outlier))
+            plot(kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 1] / 1000, kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 5], xlab = "Time (s)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xaxs = "i", type = "l", main = paste("Add control", j, "of", n.outlier))
             points(kinematic.data[mid.swing.indexes[m:n], 1] / 1000, kinematic.data[mid.swing.indexes[m:n], 5], pch = 23, bg = rgb(0/255, 152/255, 199/255))
             # Add mid swings
             
             add <- identify(kinematic.data[, 1] / 1000, kinematic.data[, 5], plot = FALSE)
             if(length(add) > 0) {
               new.indexes <- c(new.indexes, add)
-              plot(kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 1] / 1000, kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 5], xlab = "Zeitstempel (s)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xaxs = "i", type = "l", main = "hinzugefügt")
+              plot(kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 1] / 1000, kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 5], xlab = "Time (s)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xaxs = "i", type = "l", main = "added")
               points(kinematic.data[mid.swing.indexes[m:n], 1] / 1000, kinematic.data[mid.swing.indexes[m:n], 5], pch = 23, bg = rgb(0/255, 152/255, 199/255))
               points(kinematic.data[add, 1] / 1000, kinematic.data[add, 5], pch = 23, bg = rgb(0/255, 152/255, 199/255))
-              readline("Weiter > ")
+              readline("Next > ")
             } else {
               frame()
             }
@@ -133,16 +132,16 @@ for (self.report.file.name in self.report.file.names) {
             m <- outlier - 7; if (m < 0) m <- 0
             n <- outlier + 7; if (n > length(mid.swing.indexes)) n <- length(mid.swing.indexes)
             par(mfrow = c(2, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
-            plot(kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 1] / 1000, kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 5], xlab = "Zeitstempel (s)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xaxs = "i", type = "l", main = paste("Kontrolle zum Entfernen", j, "von", n.outlier))
+            plot(kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 1] / 1000, kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 5], xlab = "Time (s)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xaxs = "i", type = "l", main = paste("Remove control", j, "of", n.outlier))
             points(kinematic.data[mid.swing.indexes[m:n], 1] / 1000, kinematic.data[mid.swing.indexes[m:n], 5], pch = 23, bg = rgb(0/255, 152/255, 199/255))
             
             # Remove selected mid swings
             remove <- identify(kinematic.data[mid.swing.indexes, 1] / 1000, kinematic.data[mid.swing.indexes, 5], plot = FALSE)
             if(length(remove) > 0) {
-              plot(kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 1] / 1000, kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 5], xlab = "Zeitstempel (s)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xaxs = "i", type = "l", main = "entfernt")
+              plot(kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 1] / 1000, kinematic.data[min(mid.swing.indexes[m:n]):max(mid.swing.indexes[m:n]), 5], xlab = "Time (s)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xaxs = "i", type = "l", main = "removed")
               points(kinematic.data[mid.swing.indexes[-remove], 1] / 1000, kinematic.data[mid.swing.indexes[-remove], 5], pch = 23, bg = rgb(0/255, 152/255, 199/255))
               real.outlier <- c(real.outlier, remove)
-              readline("Weiter > ")
+              readline("Next > ")
             } else {
               frame()
             }
@@ -156,14 +155,14 @@ for (self.report.file.name in self.report.file.names) {
         stride.per.minute <- c(NA, 60 / diff(kinematic.data[mid.swing.indexes, 1] / 1000))
         mean.nn <- mean(stride.per.minute, na.rm = TRUE)
         print("---")
-        print(paste("Mittlerer Doppelschritt:", round(mean.nn, 2), "1/min"))
+        print(paste("Mean stride:", round(mean.nn, 2), "1/min"))
         sd.nn <- sd(stride.per.minute, na.rm = TRUE)
-        print(paste("Mittlerer Doppelschritt (SD):", round(sd.nn, 2), "1/min"))
+        print(paste("Mean stride (SD):", round(sd.nn, 2), "1/min"))
         
         # Plot kinematic data
         par(mfcol = c(1, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
         source("./code-snippets/translate.R")
-        plot(kinematic.data[, 1], kinematic.data[, 5], xlab = "Zeit (s)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xaxs = "i", type = "l")
+        plot(kinematic.data[, 1], kinematic.data[, 5], xlab = "Time (s)", ylab = ReturnFieldLabels(colnames(kinematic.data)[5]), xaxs = "i", type = "l")
         points(kinematic.data[mid.swing.indexes, 1], kinematic.data[mid.swing.indexes , 5], pch = 23, bg = rgb(0/255, 152/255, 199/255))
         grid()
         zm()
@@ -171,10 +170,10 @@ for (self.report.file.name in self.report.file.names) {
         # Remove pauses
         stride.data <- data.frame(timestamp.ms = round(kinematic.data[mid.swing.indexes, 1], 3), nn.interval.ms = c(NA, round(diff(kinematic.data[mid.swing.indexes, 1]), 3)))
         par(mfrow = c(2, 1), mar = c(3.5, 4, 3.5, 4) + 0.1, mgp = c(2.5, 1, 0))
-        plot(stride.data[, 1] / 1000, 60 / (stride.data[, 2] / 1000), xlab = "Zeit (s)", ylab = "Mittlerer Doppelschritt (1/min)", xaxs = "i", type = "l")
+        plot(stride.data[, 1] / 1000, 60 / (stride.data[, 2] / 1000), xlab = "Time (s)", ylab = "Mean Stride (1/min)", xaxs = "i", type = "l")
         grid()
         stride.data <- stride.data[stride.data[, 2] < 1300 | is.na(stride.data[, 2]), ]
-        plot(stride.data[, 1] / 1000, 60 / (stride.data[, 2] / 1000), xlab = "Zeit (s)", ylab = "Mittlerer Doppelschritt (1/min)", xaxs = "i", type = "l")
+        plot(stride.data[, 1] / 1000, 60 / (stride.data[, 2] / 1000), xlab = "Time (s)", ylab = "Mean Stride (1/min)", xaxs = "i", type = "l")
         grid()
         zm()
 
@@ -183,9 +182,9 @@ for (self.report.file.name in self.report.file.names) {
         step.duration <- last.step - first.step
         
         print("---")
-        print(paste("Erster Doppelschritt: ", sprintf("%02d", trunc(first.step / 60)), ":", sprintf("%02d", trunc(first.step %% 60)), " (", first.step, " s)", sep = ""))
-        print(paste("Dauer: ", sprintf("%02d", trunc(step.duration / 60)), ":", sprintf("%02d", trunc(step.duration %% 60)), " (", step.duration, " s)", sep = ""))
-        print(paste("Letzter Doppelschritt: ", sprintf("%02d", trunc(last.step / 60)), ":", sprintf("%02d", trunc(last.step %% 60)), " (", last.step, " s)", sep = ""))
+        print(paste("First stride: ", sprintf("%02d", trunc(first.step / 60)), ":", sprintf("%02d", trunc(first.step %% 60)), " (", first.step, " s)", sep = ""))
+        print(paste("Duration: ", sprintf("%02d", trunc(step.duration / 60)), ":", sprintf("%02d", trunc(step.duration %% 60)), " (", step.duration, " s)", sep = ""))
+        print(paste("Last stride: ", sprintf("%02d", trunc(last.step / 60)), ":", sprintf("%02d", trunc(last.step %% 60)), " (", last.step, " s)", sep = ""))
 
         # Write to csv file
         if(!dir.exists(paste(processed.data.directory.path, date.directory, sep =""))) {
@@ -194,16 +193,16 @@ for (self.report.file.name in self.report.file.names) {
         write.csv(stride.data, paste(processed.data.directory.path, date.directory, kinematic.data.file.name, "-stride-data-", i, ".csv", sep = ""), row.names = F)
         
         print("---")
-        print(paste(paste(kinematic.data.file.name, "-stride-data-", i, ".csv", sep = ""), "in", paste(processed.data.directory.path, date.directory, sep =""), "geschrieben."))
+        print(paste("Wrote", paste(kinematic.data.file.name, "-stride-data-", i, ".csv", sep = ""), "in", paste(processed.data.directory.path, date.directory, sep ="")))
 
       } else {
         print("---")
-        print("Kein Ereignis 'MS' gefunden.")
+        print("No 'MS' events found.")
       } 
       
     } else {
       print("---")
-      print(paste("Datei nicht gefunden:", kinematic.data.file.path))
+      print(paste("File not found:", kinematic.data.file.path))
     }
   }
 }

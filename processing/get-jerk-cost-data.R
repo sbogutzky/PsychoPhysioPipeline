@@ -1,5 +1,5 @@
 # The MIT License (MIT)
-# Copyright (c) 2016 Simon Bogutzky
+# Copyright (c) 2016 University of Applied Sciences Bremen
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 # and associated documentation files (the "Software"), to deal in the Software without restriction,
 # including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -16,6 +16,8 @@
 
 # Version 2.0
 
+# !!! Set working directory to file directory
+
 # Remove all variables
 rm(list = ls(all = T))  
 
@@ -24,18 +26,15 @@ library(flow)
 library(zoom)
 library(signal)
 
-# Set working directory
-setwd("~/psychophysiopipeline/processing")
-
 # User input
-root.directory.path <- readline("Quellverzeichnis > ") 
-first.name <- readline("Vorname der Untersuchungsperson > ")
-last.name <- readline("Nachname der Untersuchungsperson > ")
-activity <- readline("Aktivität der Untersuchung > ")
-kinematic.data.file.name <- readline("Dateiname der Datei mit kinematischen Daten (ohne .csv) > ")
-cut.off.frequency.x <- as.numeric(readline("Grenzfrequenz für die Beschleunigung entlang der X-Achse (Hz) > "))
-cut.off.frequency.y <- as.numeric(readline("Grenzfrequenz für die Beschleunigung entlang der Y-Achse (Hz) > "))
-cut.off.frequency.z <- as.numeric(readline("Grenzfrequenz für die Beschleunigung entlang der Z-Achse (Hz) > "))
+root.directory.path <- readline("Source data directory (with / at the end) > ") 
+first.name <- readline("First name of the participant > ")
+last.name <- readline("Last name of the participant > ")
+activity <- readline("Activity of the session > ")
+kinematic.data.file.name <- readline("Filename of the file with kinematic data (without .csv) > ")
+cut.off.frequency.x <- as.numeric(readline("Cutoff frequency for the acceleration along the X-axis (Hz) > "))
+cut.off.frequency.y <- as.numeric(readline("Cutoff frequency for the acceleration along the Y-axis (Hz) > "))
+cut.off.frequency.z <- as.numeric(readline("Cutoff frequency for the acceleration along the Z-axis (Hz) > "))
 
 # Set directory paths
 source("./code-snippets/set-directory-paths.R")
@@ -106,8 +105,8 @@ for (self.report.file.name in self.report.file.names) {
       
       # Print stride features
       print("---")
-      print(paste("Mittlerer Doppelschritt:", round(mean.stride, 2), "1/min"))
-      print(paste("Mittlerer Bewegungsaufwand:", round(mean.jerk.cost, 2), "m^2/s^-5"))
+      print(paste("Mean stride:", round(mean.stride, 2), "1/min"))
+      print(paste("Mean jerk-cost:", round(mean.jerk.cost, 2), "m^2/s^-5"))
       
       # Write to csv file
       if(!dir.exists(paste(processed.data.directory.path, date.directory, sep =""))) {
@@ -116,13 +115,13 @@ for (self.report.file.name in self.report.file.names) {
       write.csv(jerk.cost.data, paste(processed.data.directory.path, date.directory, kinematic.data.file.name, "-jerk-cost-data-", i, ".csv", sep = ""), row.names = F)
       
       print("---")
-      print(paste(paste(kinematic.data.file.name, "-jerk-cost-data-", i, ".csv", sep = ""), "in", paste(processed.data.directory.path, date.directory, sep =""), "geschrieben."))
+      print(paste("Wrote", paste(kinematic.data.file.name, "-jerk-cost-data-", i, ".csv", sep = ""), "in", paste(processed.data.directory.path, date.directory, sep ="")))
   
     } else {
       print("---")
-      print(paste("Datei nicht gefunden:", kinematic.data.file.path))
-      print("oder")
-      print(paste("Datei nicht gefunden:", stride.data.file.path))
+      print(paste("File not found:", kinematic.data.file.path))
+      print("or")
+      print(paste("File not found:", stride.data.file.path))
     }
   }
 }

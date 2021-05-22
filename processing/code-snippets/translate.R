@@ -1,5 +1,5 @@
 # The MIT License (MIT)
-# Copyright (c) 2016 Simon Bogutzky
+# Copyright (c) 2016 University of Applied Sciences Bremen
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 # and associated documentation files (the "Software"), to deal in the Software without restriction,
 # including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -17,22 +17,22 @@
 ReturnFieldLabels <- function(col.name) {
   field.label = col.name
   if(col.name == "acceleration.x.ms.2") {
-    field.label = expression("Beschleunigung X (" ~ m%.%s^{-2} ~ ")")
+    field.label = expression("Acceleration X (" ~ m%.%s^{-2} ~ ")")
   }
   if(col.name == "acceleration.y.ms.2") {
-    field.label = expression("Beschleunigung Y (" ~ m%.%s^{-2} ~ ")")
+    field.label = expression("Acceleration Y (" ~ m%.%s^{-2} ~ ")")
   }
   if(col.name == "acceleration.z.ms.2") {
-    field.label = expression("Beschleunigung Z (" ~ m%.%s^{-2} ~ ")")
+    field.label = expression("Acceleration Z (" ~ m%.%s^{-2} ~ ")")
   }
   if(col.name == "angular.velocity.x.deg.s") {
-    field.label = expression("Winkelgeschwindigkeit X (" ~ deg%.%s^{-1} ~ ")")
+    field.label = expression("Angular Velocity X (" ~ deg%.%s^{-1} ~ ")")
   }
   if(col.name == "angular.velocity.y.deg.s") {
-    field.label = expression("Winkelgeschwindigkeit Y (" ~ deg%.%s^{-1} ~ ")")
+    field.label = expression("Angular Velocity Y (" ~ deg%.%s^{-1} ~ ")")
   }
   if(col.name == "angular.velocity.z.deg.s") {
-    field.label = expression("Winkelgeschwindigkeit Z (" ~ deg%.%s^{-1} ~ ")")
+    field.label = expression("Angular Velocity Z (" ~ deg%.%s^{-1} ~ ")")
   }
   return(field.label)
 }
