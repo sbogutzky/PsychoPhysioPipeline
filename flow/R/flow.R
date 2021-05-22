@@ -1,5 +1,5 @@
 # The MIT License (MIT)
-# Copyright (c) 2016 Simon Bogutzky
+# Copyright (c) 2016 University of Applied Sciences Bremen
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 # and associated documentation files (the "Software"), to deal in the Software without restriction,
 # including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -14,7 +14,7 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#' flow: A package for non disruptive flow measures.
+#' flow: A package for implicit flow measures.
 #'
 #' The flow package provides the basic functionalities for the PsychoPhysioPipeline
 #'

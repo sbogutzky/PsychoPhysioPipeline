@@ -1,13 +1,11 @@
 Package: flow
-Title: flow
-Version: 2.0
-Date: 2013-04-02
+Title: flow: A package for implicit flow measures
+Version: 2.0.0
+Date: 2016-07-19
 Author: Simon Bogutzky
 Maintainer: Simon Bogutzky <simon.bogutzky@hs-bremen.de>
-Description: A package for non disruptive flow measures.
-Suggests:
-    MASS
-License: GPL-2
+Description: A package for implicit flow measures.
+License: MIT
 Imports:
     pracma, signal, car, zoom
 RoxygenNote: 5.0.1
