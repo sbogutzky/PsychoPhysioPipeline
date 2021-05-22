@@ -1,6 +1,6 @@
 ---
-title: "Analyse"
-author: "AUTHOR"
+title: "Example"
+author: "Simon Bogutzky"
 date: "DATE"
 output: pdf_document
 ---
@@ -12,7 +12,7 @@ options(OutDec = ",")
 rm(list = ls(all = T))
 
 # Set working directory
-setwd("~/psychophysiopipeline/report")
+setwd("~/psychophysiopipeline-github/report") # WORKING DIRECTORY
 
 # Load libraries
 library("flow")
@@ -24,18 +24,18 @@ library("coin")
 library("stringr")
 
 # Set paths
-root.path <- "ROOT_DIR"
+root.path <- "~/psychophysiopipeline-github/example-data/" # ROOT DATA PATH
 
 # Set directories
 processed.data.directory <- "processed-data/"
-activity.directory <- "ACTIVITY_DIR"
+activity.directory <- "running/"
 
 ```
 
 ```{r load-data, include=FALSE}
 
 # Load user directories
-user.directories <- paste(list.dirs(path = paste(root.path, "features/baseline/", sep = ""), full.names = F, recursive = F), "/", sep = "")
+user.directories <- paste(list.dirs(path = paste(root.path, processed.data.directory, activity.directory, sep = ""), full.names = F, recursive = F), "/", sep = "")
 user.count <- length(user.directories)
 
 # Set directories
@@ -56,17 +56,18 @@ for (u in 1:user.count) {
   rm(fss.feature.path)
   
   # Get HRV features 
+  ecg.data.file.name <- "ecg" # SENSOR_NAME
   source("code-snippets/get-hrv-features.R")
   
   # Left leg
   # Get stride features
   min.before.end <- 15
-  kinematic.data.file.name <- "SENSOR_NAME"
+  kinematic.data.file.name <- "imu-rn42-bc98" # SENSOR_NAME
   source("code-snippets/get-stride-features.R")
     
   # Get jerk cost features
   min.before.end <- 15
-  kinematic.data.file.name <- "SENSOR_NAME"
+  kinematic.data.file.name <- "imu-rn42-3b70" # SENSOR_NAME
   source("code-snippets/get-jc-features.R")
   mean.ms.interval.left = stride.features[, 1]
   mean.jerk.cost.left = jc.features[, 1]
@@ -74,12 +75,12 @@ for (u in 1:user.count) {
   # Right leg
   # Get stride features
   min.before.end <- 15
-  kinematic.data.file.name <- "SENSOR_NAME"
+  kinematic.data.file.name <- "imu-rn42-bc98" # SENSOR_NAME
   source("code-snippets/get-stride-features.R")
     
   # Get jerk cost features
   min.before.end <- 15
-  kinematic.data.file.name <- "SENSOR_NAME"
+  kinematic.data.file.name <- "imu-rn42-3b70" # SENSOR_NAME
   source("code-snippets/get-jc-features.R")
   mean.ms.interval.right = stride.features[, 1]
   mean.jerk.cost.right = jc.features[, 1]
@@ -95,9 +96,9 @@ for (u in 1:user.count) {
 }
 
 rownames(data.1) <- seq(length = nrow(data.1))
-data.1[, 25:26] <- data.1[, 25:26] / 10^3
+data.1[, 17:18] <- data.1[, 17:18] / 10^3
 
-rm(u, user.directory, subjects, fss.features, hrv.features, cls.features, jc.features, stride.features, mean.ms.interval.left, mean.ms.interval.right, mean.jerk.cost.left, mean.jerk.cost.right, min.before.end, user.count, kinematic.data.file.name)
+rm(u, user.directory, subjects, fss.features, hrv.features, cls.features, jc.features, stride.features, mean.ms.interval.left, mean.ms.interval.right, mean.jerk.cost.left, mean.jerk.cost.right, min.before.end, user.count, kinematic.data.file.name, age)
 ```
 
 ```{r view, echo=FALSE, warning=FALSE,}
