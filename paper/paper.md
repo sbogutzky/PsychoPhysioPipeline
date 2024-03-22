@@ -10,15 +10,20 @@ tags:
 authors:
  - name: Simon Bogutzky
    orcid: 0000-0002-9279-6549
-   affiliation: University of Applied Sciences Bremen
+   affiliation: 1
  - name: Phillip Marsch
-   affiliation: University of Applied Sciences Bremen
+   affiliation: 1
  - name: Licínio Roque
-   affiliation: University of Coimbra
+   affiliation: 2
  - name: Nassrin Hajinejad
-   affiliation: University of Applied Sciences Bremen
+   affiliation: 1
  - name: Barbara Grüter
-   affiliation: University of Applied Sciences Bremen
+   affiliation: 1
+affiliations:
+  - name: University of Applied Sciences Bremen
+    index: 1
+  - name: University of Coimbra
+    index: 2
 date: 04 August 2016
 bibliography: paper.bib
 ---
